@@ -9,16 +9,25 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Changed
-- Prompt Anatomy footer — single compact link (logo + “Prompt Anatomy ↗”) instead of separate “Powered by” line and full-width CTA
-
-### Fixed
-- Bot Docker startup crash on Railway — skip repo-root `.env` lookup when `main.py` runs from `/app` (IndexError on `parents[2]`)
-
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events
 - Server-side replay validation (anti-cheat)
+
+## [1.8.1] - 2026-05-31
+
+v1.8.1 — Telegram mobile polish and playability (no new mechanics, screens, or API).
+
+### Changed
+- Prompt Anatomy footer — single compact link (logo + "Prompt Anatomy ↗") instead of separate "Powered by" line and full-width CTA
+- Telegram mobile shell — hide duplicate in-app header; native `BackButton`; floating sound FAB; safe-area / `viewport-fit=cover` padding for notched devices
+- Gameplay visibility — overlay tap zones on the ladder (full play area); dynamic rung scaling so all 7 rungs fit; tap-prompt bar below HUD; compact home with rule above CTA (home ticker removed); safe-side hints for first 5 taps
+- Viewport QA — play-area ratio threshold raised to 65%; rung-fit check that seven slots fit inside `#gamePlayArea`
+- [ROADMAP.md](ROADMAP.md) — release train through v1.8 shipped; v1.8.1 ship gate; deploy gate closed; F&F → v1.9
+- [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md), [DOCS_INDEX.md](DOCS_INDEX.md), [README.md](README.md) — production URLs live
+
+### Fixed
+- Bot Docker startup crash on Railway — skip repo-root `.env` lookup when `main.py` runs from `/app` (IndexError on `parents[2]`)
 
 ## [1.8.0] - 2026-05-31
 
@@ -184,7 +193,8 @@ Initial monorepo scaffold — MVP v1 foundation.
 ### Security
 - Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
 
-[Unreleased]: compare/v1.8.0...HEAD
+[Unreleased]: compare/v1.8.1...HEAD
+[1.8.1]: compare/v1.8.0...v1.8.1
 [1.8.0]: compare/v1.7.0...v1.8.0
 [1.7.0]: compare/v1.6.0...v1.7.0
 [1.6.0]: compare/v1.5.0...v1.6.0

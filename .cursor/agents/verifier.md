@@ -45,14 +45,21 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 
 ### v1.8 Narrative beats
 
-- [ ] Home ticker rotates headline on each home mount
-- [ ] Foreshadow payoff possible when headline `deathType` matches failure (manual spot-check)
+- [ ] Headline picked on home mount (hidden `#newsTickerText`); foreshadow on game-over when `deathType` matches (manual spot-check)
 - [ ] RE-APPLY counter persists in `localStorage`; flavor line on game-over
 - [ ] Manager nemesis line on promotion; CEO trap toast at 35y
 - [ ] Intern fake-promo toasts at ~2y / ~5y / ~9.9y
 - [ ] Floor label updates during play; reorg HUD strip when reorgs active
 - [ ] Game-over leaderboard gap line when daily LB reachable
 - [ ] `prefers-reduced-motion`: promo stamp / death hold / heartbeat do not block play
+
+### v1.8.1 Telegram mobile polish
+
+- [ ] In Telegram: no duplicate in-app header; native `BackButton` returns home from game / leaderboard / how-to-play
+- [ ] Overlay tap zones cover full `#gamePlayArea`; 7 rungs fit at 320px width
+- [ ] Tap-prompt bar on first run; safe-side hints for first 5 taps
+- [ ] Sound FAB + safe-area padding on notched devices
+- [ ] Bot starts on Railway without Docker `.env` IndexError (`main.py` from `/app`)
 
 ### v1.6 Gameplay
 

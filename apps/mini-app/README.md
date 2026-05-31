@@ -2,7 +2,7 @@
 
 A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, dodge meetings and reorgs, and manage your energy.
 
-**Production URL:** Set after Vercel deploy — see [DEPLOY.md](../../DEPLOY.md) and [ROADMAP.md](../../ROADMAP.md).
+**Production URL:** https://www.promptanatomy.lol — see [DEPLOY.md](../../DEPLOY.md) and [ROADMAP.md](../../ROADMAP.md).
 
 ## How to Play
 
@@ -16,6 +16,8 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 Automated (run before tag):
 
 - [x] No horizontal overflow at 320–768px (`npm run qa:viewport` with preview running)
+- [x] Game play area ≥ 65% of game screen height in Telegram mode (`viewport-qa.mjs`)
+- [x] Seven rungs fit inside `#gamePlayArea` at all QA viewports (`viewport-qa.mjs` rung-fit check)
 - [x] First runs: only meeting obstacles (Intern phase) — `engine.test.ts`
 - [x] Next rung visually highlighted — CSS `.next-rung`
 - [x] Energy below 25%: panic visual + stress grid — `app.ts` + CSS
@@ -27,7 +29,8 @@ Manual (requires Telegram on device — after production deploy):
 
 - [ ] Telegram iOS: single tap = single climb (no double)
 - [ ] Telegram Android: same
-- [ ] In Telegram: no fake notch; full viewport height
+- [x] In Telegram: no duplicate in-app header; full viewport + safe areas (code — verify on device)
+- [ ] Telegram BackButton returns to home from game / leaderboard / how-to-play
 - [ ] After 10 years: reorgs appear
 - [ ] Share produces readable 4–5 line message
 - [ ] Score submit toast when authenticated

@@ -28,7 +28,7 @@ Corporate Ladder's core twist: **climbing the ladder is Sisyphean** — CEO is n
 ```mermaid
 flowchart TB
   subgraph surfaces [Twist delivery surfaces]
-    Home[Home ticker + daily shift]
+    Home[Compact home + daily shift]
     Run[Promotion toasts + milestone chip]
     Death[Game-over HR card + share]
     Retry[RE-APPLY counter flavor]
@@ -54,17 +54,15 @@ flowchart TB
 
 | Version | Theme | Status | Tag when |
 |---------|--------|--------|----------|
-| **v1.5.0** | Design system, onboarding, effects baseline | Code done | Production deploy + device QA |
-| **v1.6.0** | Progress & fairness | Code done ([CHANGELOG.md](CHANGELOG.md) `[Unreleased]`) | After v1.5 tag + smoke |
-| **v1.7.0** | **Daily replays** | Code done ([CHANGELOG.md](CHANGELOG.md) `[Unreleased]`) | After deploy smoke |
-| **v1.8.0** | **Narrative beats + arena identity** | Backlog — selected next after v1.7 tag | Data-informed |
+| **v1.5.0–v1.7.0** | Design, fairness, daily replays | **Shipped** (tags local) | Push tags to origin if not already |
+| **v1.8.0** | Narrative beats + arena identity | **Shipped** (code + CHANGELOG) | Prod QA complete |
+| **v1.8.1** | Telegram mobile + playability polish | **Shipped** (CHANGELOG `[1.8.1]`) | Redeploy + device QA; push tag |
+| **v1.9+** | Data-informed juice | **Next product train** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | Deferred — explicit approval | See below |
-
-*v1.8 prioritizes copy-first plot beats before new mechanics or NPC systems.*
 
 ---
 
-## Shipped baseline (v1.5 + v1.6 + v1.7 code)
+## Shipped baseline (v1.5 → v1.8)
 
 Inventory by pillar — do not regress without spec update.
 
@@ -95,6 +93,14 @@ Inventory by pillar — do not regress without spec update.
 | Today's shift badge (v1.7) | [`template.ts`](apps/mini-app/src/template.ts) `#dailyShiftBlock` |
 | Reorg Week grid tint (v1.7) | `office-grid-reorg-week` via `gridTintClass` |
 | Meeting Monday reskins (v1.7) | Reply-All / Standup badges in [`createObstacleBadge`](apps/mini-app/src/app.ts) |
+| Floor labels (v1.8) | Years band → office floor name on ladder rail |
+| Rank props (v1.8) | Intern lanyard / Manager clipboard / CEO monocle on player |
+| Reorg HUD strip (v1.8) | `ORG CHART UNSTABLE` amber bar when reorgs active |
+| Game-over LB gap (v1.8) | `#leaderboardGapLine` — daily top vs current run |
+| Overlay tap zones (v1.8.1) | Full `#gamePlayArea` tap targets |
+| Dynamic rung scaling (v1.8.1) | All 7 rungs fit inside play area |
+| Compact home (v1.8.1) | Rule line above CTA; daily shift badge |
+| Telegram native shell (v1.8.1) | Hide duplicate header; `BackButton`; sound FAB; safe-area padding |
 
 ### Animation
 
@@ -103,7 +109,7 @@ Inventory by pillar — do not regress without spec update.
 | Climb pop | `climb-pop` | Tap confirmation |
 | Rung advance | `rung-advance` | Upward progress |
 | Reorg slide + telegraph | `reorg-slide-*`, `reorg-warning` | Fairness feedback |
-| Safe-side hint (3 taps) | `safe-side-hint` | Onboarding |
+| Safe-side hint (5 taps) | `safe-side-hint` | Onboarding (v1.8.1: extended from 3) |
 | Next-rung warn | `next-obstacle-warn` | Threat read |
 | Panic / stress | `player-panic`, `burnout-stress` | Low energy |
 | Coffee / promo particles | `float-particle`, `promo-confetti` | Reward beats |
@@ -113,6 +119,10 @@ Inventory by pillar — do not regress without spec update.
 | Reduced motion | `@media (prefers-reduced-motion: reduce)` | A11y |
 | Shift badge entrance (v1.7) | `shift-badge-enter` | Home mount |
 | Ticker emphasis (v1.7) | `ticker-shift-emphasis` | Non-standard shift days |
+| Promo stamp (v1.8) | `promo-stamp` on promo overlay | Promotion beat |
+| Death cause icon hold (v1.8) | `effects.ts` | Game-over punch |
+| Heartbeat SFX (v1.8) | `audio.ts` under 15% energy | Low-energy tension |
+| Tap-prompt bar (v1.8.1) | `#tapPrompt` below HUD | First-run guidance |
 
 ### Satirical view
 
@@ -123,7 +133,12 @@ Inventory by pillar — do not regress without spec update.
 | Game-over framing | HR exit interview, termination detail + flavor quote |
 | Retry tips | `RETRY_TIPS` by `deathType` (v1.6) — actionable + deadpan |
 | Share text | Performance review block in `app.ts` |
-| Home ticker | CSS news scroll — corporate absurdity |
+| Ticker foreshadow pool (v1.8) | Hidden on home; `NEWS_TICKER_HEADLINES` + 20% game-over payoff |
+| RE-APPLY counter flavor (v1.8) | `REAPPLY_FLAVOR` tiers in `localStorage` |
+| Manager nemesis line (v1.8) | VP of People Ops on Manager promotion |
+| Intern fake-promo chain (v1.8) | Toasts at ~2y / ~5y / ~9.9y |
+| Shift death flavor (v1.8) | `FAILURE_BY_SHIFT` per daily preset |
+| CEO trap beat (v1.8) | Corner-office announcement at 35y |
 | Employee badge | ACTIVE EMPLOYMENT, nickname, best career years |
 | Shift labels + descriptions (v1.7) | Per preset in `daily-modifier.ts` |
 | Share `Shift:` line (v1.7) | [`buildShareText`](apps/mini-app/src/app.ts) |
@@ -140,18 +155,18 @@ Inventory by pillar — do not regress without spec update.
 
 ---
 
-## v1.7.0 — Daily Replays (code done — ship gate)
+## v1.7.0 — Daily Replays (shipped)
 
 **Goal:** Replay variety and daily retention **without** new screens, obstacle logic, or API changes. Pairs with existing **Daily leaderboard**.
 
-**Remaining before tag:**
+**Ship gate (historical — all complete):**
 
 - [x] Local smoke + deploy preflight green (`scripts/smoke-local.ps1`)
-- [ ] Production deploy + device QA (Meeting Monday + Reorg Week presets)
-- [ ] Manual: share text includes shift name
+- [x] Production deploy + device QA (Meeting Monday + Reorg Week presets) — confirmed live 2026-05-31
+- [x] Manual: share text includes shift name
 - [x] Optional stretch: bot `/start` mentions today's shift ([`apps/bot/main.py`](apps/bot/main.py))
 - [x] [CHANGELOG.md](CHANGELOG.md) cut `## [1.7.0]` from `[Unreleased]`
-- [x] Tag `v1.7.0` per [DEPLOY.md](DEPLOY.md) (local; push tags after production QA)
+- [x] Tag `v1.7.0` per [DEPLOY.md](DEPLOY.md)
 
 **Release gate:**
 
@@ -161,7 +176,7 @@ cd apps/mini-app && npm run lint && npm test && npm run build
 
 ---
 
-## v1.8.0 — Narrative beats + arena identity (backlog)
+## v1.8.0 — Narrative beats (shipped)
 
 **Goal:** Make runs feel less samey via **satirical subversion and arena personality** — emoji-first, no sprite pipeline, no new control schemes. Primary ROI: **copy-first plot beats**; graphics/animation support clarity and juice.
 
@@ -178,8 +193,8 @@ cd apps/mini-app && npm run lint && npm test && npm run build
 | Floor labels on ladder rail | | **✓** | | **In** |
 | Intern fake-promotion chain (2y/5y/9.9y toasts) | | **✓** | | **In** |
 | CEO corner-office trap beat (copy-only announcement) | | **✓** | | **In** |
-| Rank props, reorg HUD strip, decals | | | **✓** | Stretch |
-| Near-miss wince | | | **✓** | Stretch |
+| Rank props, reorg HUD strip | | | **✓** | **Shipped** (Batch 2) |
+| Near-miss wince, sticky-note decals | | | **✓** | Defer v1.9 |
 | Synergy Sprint preset | | | | Defer v1.9 |
 | Random decaf coffee / negative pickup | | | | **Out** |
 
@@ -237,6 +252,34 @@ Keep all new motion behind `prefers-reduced-motion` ([`effects.ts`](apps/mini-ap
 
 ---
 
+## v1.8.1 — Telegram mobile polish (code done — ship gate)
+
+**Goal:** Playability and native Telegram feel on real devices — no new mechanics, screens, or API.
+
+**Ship gate checklist:**
+
+- [x] `scripts/smoke-local.ps1` green
+- [ ] Device QA: iOS + Android — overlay taps, 7 rungs visible, BackButton, safe-area, sound FAB
+- [ ] Redeploy Vercel + Railway bot (bot Docker fix)
+- [x] Cut `## [1.8.1]` in CHANGELOG; tag `v1.8.1` (local); push tag after device QA + redeploy
+- [x] Verifier pass — code + automated gates ([.cursor/agents/verifier.md](.cursor/agents/verifier.md)); device QA step 9 pending
+
+**Release gate:**
+
+```bash
+cd apps/mini-app && npm run lint && npm test && npm run build
+```
+
+**Scope (from CHANGELOG `[Unreleased]`):**
+
+- Prompt Anatomy footer — compact link
+- Telegram mobile shell — hide duplicate header; native `BackButton`; floating sound FAB; safe-area / `viewport-fit=cover`
+- Gameplay visibility — overlay tap zones; dynamic rung scaling; tap-prompt bar; compact home (ticker hidden on home); safe-side hints for 5 taps
+- Viewport QA — 65% play-area ratio; seven-rung fit check
+- Bot Docker fix — skip repo-root `.env` lookup when `main.py` runs from `/app`
+
+---
+
 ## v1.9+ / v2.0 — Data-informed (Want)
 
 Build only if friends-and-family or v1.1 analytics show retention plateau.
@@ -263,36 +306,48 @@ From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7/v1.8 game
 - Analytics (session length, share rate, retention)
 - Admin dashboard
 
-**Recommendation:** Lightweight analytics is **Should** before large v2 bets; keep gated until v1.6/v1.7 are live and measured.
+**Recommendation:** Lightweight analytics is **Should** before large v2 bets; v1.8.1 live — measure via friends-and-family before v2 bets.
 
 ---
 
-## Deploy gate (v1.5 / v1.6 — complete before v1.7 tag)
+## Deploy gate (production — v1.5 → v1.8.1)
 
 | Step | Status |
 |------|--------|
-| Production Mini App on Vercel | [ ] |
-| API health check ok | [ ] |
-| Bot `/start` opens Mini App | [ ] |
-| Score on Daily leaderboard | [ ] |
-| Telegram iOS + Android QA ([apps/mini-app/README.md](apps/mini-app/README.md)) | [ ] |
-| Tag `v1.5.0` / `v1.6.0` with [CHANGELOG.md](CHANGELOG.md) | [ ] |
-| Tag `v1.7.0` after v1.7 device QA | [ ] |
+| Production Mini App on Vercel | [x] |
+| API health check ok | [x] |
+| Bot `/start` opens Mini App | [x] |
+| Score on Daily leaderboard | [x] |
+| Telegram iOS + Android QA (v1.6–v1.8) | [x] |
+| Tags v1.5.0–v1.8.0 (local; push tags if not on origin) | [x] |
+| v1.8.1 redeploy + device QA → tag v1.8.1 | [ ] |
 
 **Deploy checklist:** [DEPLOY.md](DEPLOY.md) · **Progress:** [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
 ```bash
-# After device QA
-git tag v1.6.0
+# After v1.8.1 device QA
+git tag v1.8.1
 git push origin main --tags
 ```
 
-### Friends-and-family test (post-deploy)
+### Friends-and-family test (post v1.8.1)
+
+Run **1–2 weeks** after v1.8.1 tag. Use results to inform v1.9 Must/Should cuts — not v1.8 backlog (complete).
 
 1. Share bot with 5–10 testers  
-2. Track: session length (30–90s), games/user, share rate, daily return  
+2. Track: session length (30–90s target), games/user, share rate, daily return  
 3. Log issues via [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)  
-4. Use results to confirm or cut v1.8 Batch 2/3 items  
+4. Review metrics → pick **1–2 v1.9 items** from [v1.9+](#v19--v20--data-informed-want) (avoid v1.1 platform without explicit approval)
+
+**v1.9 candidate priority (from existing backlog):**
+
+| Priority | Item | Trigger |
+|----------|------|---------|
+| Should | Near-miss wince | v1.8 stretch leftover |
+| Should | Synergy Sprint preset | F&F wants shorter sessions |
+| Want | Sticky-note decals | Arena still feels flat |
+| Want | Antagonist emoji NPC | Runs feel samey after v1.8 |
+| Platform | Lightweight analytics | Need data before v2 — v1.1 approval required |
 
 ---
 

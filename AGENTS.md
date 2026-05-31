@@ -69,7 +69,7 @@ Telegram Mini App game: tap left/right to climb a corporate ladder, avoid obstac
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails (family alias: mother’s `DESIGN_SYSTEM.md`) |
 
 | [CHANGELOG.md](CHANGELOG.md) | Release history (Keep a Changelog) |
-| [ROADMAP.md](ROADMAP.md) | Release train, product pillars, v1.7+ planned work |
+| [ROADMAP.md](ROADMAP.md) | Release train, product pillars, v1.8.1 + v1.9 planned work |
 | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Manual production deploy progress tracker |
 
 
@@ -169,9 +169,9 @@ Copy `.env.example` to `.env` and fill in credentials.
 
 
 
-**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. v1.5 design polish and v1.6 fairness/onboarding complete in code.
+**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. v1.5–v1.8.1 complete in code; production live.
 
-**Next (v1.7):** Daily replays — see [ROADMAP.md](ROADMAP.md). Do not start without aligning with shipped baseline.
+**Next:** v1.8.1 redeploy + device QA, then friends-and-family → v1.9 (ROADMAP § v1.9+) — see [ROADMAP.md](ROADMAP.md).
 
 
 

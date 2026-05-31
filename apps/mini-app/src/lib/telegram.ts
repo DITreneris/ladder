@@ -7,6 +7,20 @@ export interface TelegramUser {
 type HapticImpact = "light" | "medium" | "heavy" | "rigid" | "soft";
 type HapticNotification = "error" | "success" | "warning";
 
+interface SafeAreaInset {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+}
+
+interface TelegramBackButton {
+  show: () => void;
+  hide: () => void;
+  onClick: (callback: () => void) => void;
+  offClick: (callback: () => void) => void;
+}
+
 declare global {
   interface Window {
     Telegram?: {
@@ -19,7 +33,10 @@ declare global {
         openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink?: (url: string) => void;
         MainButton: { hide: () => void };
+        BackButton?: TelegramBackButton;
         themeParams: Record<string, string>;
+        safeAreaInset?: SafeAreaInset;
+        contentSafeAreaInset?: SafeAreaInset;
         setHeaderColor?: (color: string) => void;
         setBackgroundColor?: (color: string) => void;
         disableVerticalSwipes?: () => void;
@@ -35,8 +52,33 @@ declare global {
   }
 }
 
+let backButtonHandler: (() => void) | null = null;
+
 function setThemeVar(root: HTMLElement, cssVar: string, value: string | undefined, fallback: string): void {
   root.style.setProperty(cssVar, value && value.length > 0 ? value : fallback);
+}
+
+function insetPx(value: number | undefined): string {
+  if (value === undefined || Number.isNaN(value)) return "0px";
+  return `${Math.max(0, value)}px`;
+}
+
+export function applySafeAreaInsets(): void {
+  const tg = window.Telegram?.WebApp;
+  const root = document.documentElement;
+  if (!tg) return;
+
+  const safe = tg.safeAreaInset ?? {};
+  const content = tg.contentSafeAreaInset ?? {};
+
+  root.style.setProperty("--tg-safe-area-inset-top", insetPx(safe.top));
+  root.style.setProperty("--tg-safe-area-inset-bottom", insetPx(safe.bottom));
+  root.style.setProperty("--tg-safe-area-inset-left", insetPx(safe.left));
+  root.style.setProperty("--tg-safe-area-inset-right", insetPx(safe.right));
+  root.style.setProperty("--tg-content-safe-area-inset-top", insetPx(content.top));
+  root.style.setProperty("--tg-content-safe-area-inset-bottom", insetPx(content.bottom));
+  root.style.setProperty("--tg-content-safe-area-inset-left", insetPx(content.left));
+  root.style.setProperty("--tg-content-safe-area-inset-right", insetPx(content.right));
 }
 
 export function applyTelegramTheme(): void {
@@ -67,6 +109,8 @@ export function applyTelegramTheme(): void {
   } else if (tg?.setBackgroundColor) {
     tg.setBackgroundColor("#020617");
   }
+
+  applySafeAreaInsets();
 }
 
 function onThemeChanged(callback: () => void): void {
@@ -74,6 +118,34 @@ function onThemeChanged(callback: () => void): void {
   if (tg?.onEvent) {
     tg.onEvent("themeChanged", callback);
   }
+}
+
+function onSafeAreaChanged(callback: () => void): void {
+  const tg = window.Telegram?.WebApp;
+  if (!tg?.onEvent) return;
+  tg.onEvent("safeAreaChanged", callback);
+  tg.onEvent("contentSafeAreaChanged", callback);
+}
+
+export function showTelegramBack(onClick: () => void): void {
+  const bb = window.Telegram?.WebApp?.BackButton;
+  if (!bb) return;
+  if (backButtonHandler) {
+    bb.offClick(backButtonHandler);
+  }
+  backButtonHandler = onClick;
+  bb.onClick(onClick);
+  bb.show();
+}
+
+export function hideTelegramBack(): void {
+  const bb = window.Telegram?.WebApp?.BackButton;
+  if (!bb) return;
+  if (backButtonHandler) {
+    bb.offClick(backButtonHandler);
+    backButtonHandler = null;
+  }
+  bb.hide();
 }
 
 export function hapticImpact(style: HapticImpact): void {
@@ -117,6 +189,7 @@ export function initTelegram(): void {
     tg.MainButton.hide();
     applyTelegramTheme();
     onThemeChanged(applyTelegramTheme);
+    onSafeAreaChanged(applySafeAreaInsets);
   }
 }
 

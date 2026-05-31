@@ -47,9 +47,11 @@ import {
   getInitData,
   hapticImpact,
   hapticNotification,
+  hideTelegramBack,
   initTelegram,
   isTelegram,
   shareText,
+  showTelegramBack,
 } from "./lib/telegram";
 import { audio } from "./game/audio";
 
@@ -139,6 +141,21 @@ function showToast(msg: string): void {
   }, 2500);
 }
 
+function syncTelegramBackButton(tab: Screen): void {
+  if (!isTelegram()) return;
+  if (tab === "home") {
+    hideTelegramBack();
+    return;
+  }
+  showTelegramBack(() => {
+    if (tab === "game" && engine?.isActive()) {
+      engine.stop();
+      enableVerticalSwipe();
+    }
+    goHome();
+  });
+}
+
 function switchTab(tab: Screen): void {
   ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
     $(id).classList.add("hidden");
@@ -155,6 +172,7 @@ function switchTab(tab: Screen): void {
   const el = $(map[tab]);
   el.classList.remove("hidden");
   el.classList.add("flex");
+  syncTelegramBackButton(tab);
   audio.nav();
 }
 
@@ -192,9 +210,8 @@ function refreshDailyShiftUI(): void {
   activeDailyModifier = resolveDailyModifier();
   $("dailyShiftLabel").textContent = activeDailyModifier.label;
   $("dailyShiftDescription").textContent = activeDailyModifier.description;
-
-  const ticker = $("tickerBar");
-  ticker.classList.toggle("ticker-shift-emphasis", activeDailyModifier.id !== "standard");
+  const pill = $("dailyShiftPill");
+  if (pill) pill.title = activeDailyModifier.description;
 
   const viewport = document.querySelector(".cl-viewport");
   if (viewport) {
@@ -269,6 +286,18 @@ function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right"): void
   }
 }
 
+const RUNG_HEIGHT_MAX = 52;
+
+function layoutRungs(): void {
+  const playArea = $("gamePlayArea");
+  const h = playArea.clientHeight;
+  if (h <= 0) return;
+  const rungHeight = Math.max(40, Math.min(RUNG_HEIGHT_MAX, Math.floor(h / MAX_VISIBLE_RUNGS)));
+  playArea.querySelectorAll("[data-rung-slot]").forEach((el) => {
+    (el as HTMLElement).style.height = `${rungHeight}px`;
+  });
+}
+
 function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
   let rungEl = container.querySelector(`[data-rung-slot="${index}"]`) as HTMLElement | null;
   if (rungEl) return rungEl;
@@ -277,7 +306,6 @@ function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
   rungEl.dataset.rungSlot = String(index);
   rungEl.className =
     "relative w-full flex justify-between items-center transition-all duration-75 select-none pointer-events-none";
-  rungEl.style.height = "52px";
 
   const connector = document.createElement("div");
   connector.className =
@@ -370,6 +398,7 @@ function renderRungsInner(): void {
 
   if (advanced) triggerRungAdvance(container);
   prevRungsSnapshot = rungs.map((r) => ({ ...r }));
+  layoutRungs();
 }
 
 function renderRungsWithReorgFeedback(): void {
@@ -457,18 +486,22 @@ function setLeaderboardPeriod(period: LeaderboardPeriod): void {
   renderLeaderboard();
 }
 
+let tapPromptTimer: ReturnType<typeof setTimeout> | null = null;
+
 function startGame(): void {
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
   $("burnoutMeter").style.width = "100%";
   $("tapPrompt").classList.remove("hidden");
+  if (tapPromptTimer) clearTimeout(tapPromptTimer);
+  tapPromptTimer = setTimeout(() => $("tapPrompt").classList.add("hidden"), 3000);
   flashBurnoutStress(false);
   playerInPanic = false;
   $("playerClimber").classList.remove("player-panic");
   $("playerActionEmoji").classList.add("idle-bob");
   prevRungsSnapshot = [];
   lastPointerTapAt = 0;
-  earlyTapsRemaining = 3;
+  earlyTapsRemaining = 5;
   shiftToastShown = false;
   ceoTrapShown = false;
   activeDailyModifier = engine.getDailyModifier();
@@ -480,6 +513,7 @@ function startGame(): void {
   updateFloorLabel(0);
   updateReorgHudStrip("Intern");
   switchTab("game");
+  requestAnimationFrame(() => layoutRungs());
 }
 
 function goHome(): void {
@@ -750,6 +784,9 @@ export function mountApp(): void {
   bindTapButton($("btnTapLeft"), "left");
   bindTapButton($("btnTapRight"), "right");
 
+  const playArea = $("gamePlayArea");
+  new ResizeObserver(() => layoutRungs()).observe(playArea);
+
   window.addEventListener("keydown", (e) => {
     if (!engine.isActive()) return;
     if (e.key === "ArrowLeft") engine.handleTap("left");
@@ -776,6 +813,7 @@ export function mountApp(): void {
 
   updateRankUI("Intern");
   refreshDailyShiftUI();
+  syncTelegramBackButton("home");
 
   const initData = getInitData();
   if (initData) {

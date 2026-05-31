@@ -12,6 +12,9 @@ export const APP_SHELL = `
   <div class="cl-phone-notch absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-5 bg-black rounded-b-xl z-50 flex items-center justify-center">
     <div class="w-12 h-1 rounded-full mb-1" style="background: var(--cl-border);"></div>
   </div>
+  <button id="soundToggleBtn" type="button" onclick="toggleMute()" class="sound-fab focus-ring" title="Toggle Sound" aria-label="Toggle sound">
+    <i id="soundIcon" class="fa-solid fa-volume-high text-sm"></i>
+  </button>
   <div class="cl-header flex items-center justify-between pt-5 pb-3 px-3 rounded-t-2xl border-b select-none z-40">
     <div class="flex items-center space-x-2">
       <button onclick="goHome()" class="cl-header-muted min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors duration-150 focus-ring rounded-lg" aria-label="Back to home">
@@ -26,53 +29,43 @@ export const APP_SHELL = `
       </div>
     </div>
     <div class="flex items-center space-x-3 cl-header-muted">
-      <button id="soundToggleBtn" onclick="toggleMute()" class="cl-header-muted min-h-[44px] min-w-[44px] flex items-center justify-center hover:opacity-100 transition focus-ring rounded-lg" title="Toggle Sound" aria-label="Toggle sound">
-        <i id="soundIcon" class="fa-solid fa-volume-high text-sm"></i>
-      </button>
       <i class="fa-solid fa-ellipsis-vertical text-sm cursor-pointer cl-header-muted"></i>
     </div>
   </div>
-  <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid">
-    <div id="startScreen" class="flex flex-col flex-grow justify-between p-6 select-none z-10">
-      <div class="text-center mt-6">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-2xl shadow-lg mb-4 transform -rotate-6">
-          <i class="fa-solid fa-briefcase text-3xl"></i>
+  <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
+    <div id="startScreen" class="flex flex-col flex-grow min-h-0 select-none z-10 px-4 pt-4 pb-2">
+      <div class="space-y-3 flex-shrink-0">
+        <div class="text-center">
+          <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
+            <i class="fa-solid fa-briefcase text-xl"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Simulating modern work chaos</p>
         </div>
-        <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
-        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-2">Simulating modern work chaos</p>
-        <p class="text-caption text-slate-600 mt-2 px-4">Pick the empty side. Avoid meetings. Grab coffee.</p>
-      </div>
-      <div class="card-light space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-          <span class="text-caption font-bold uppercase text-slate-400 tracking-wider">Employee Badge</span>
-          <span class="text-micro bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">ACTIVE EMPLOYMENT</span>
-        </div>
-        <div class="flex items-center space-x-3">
-          <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-lg border-2 border-indigo-200" id="avatarIcon">🧑‍💻</div>
-          <div class="flex-grow">
-            <input type="text" id="usernameInput" value="CorporateSlave" class="font-bold text-slate-800 border-b border-dashed border-slate-300 focus:border-cl-primary focus:outline-none focus-ring bg-transparent w-full min-h-[44px]" placeholder="Enter Nickname...">
-            <p class="text-xs text-slate-500 mt-0.5" id="userTitleLabel">Starting Rank: Intern</p>
+        <div class="card-light space-y-2 py-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0" id="avatarIcon">🧑‍💻</div>
+            <div class="flex-grow min-w-0">
+              <input type="text" id="usernameInput" value="CorporateSlave" class="font-bold text-slate-800 border-b border-dashed border-slate-300 focus:border-cl-primary focus:outline-none focus-ring bg-transparent w-full min-h-[44px]" placeholder="Enter Nickname...">
+              <p class="text-xs text-slate-500 mt-0.5 truncate" id="userTitleLabel">Starting Rank: Intern</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-nano font-bold uppercase text-slate-400">Best</p>
+              <p class="text-xs font-bold text-slate-950" id="highScoreBadge">0.0 Years</p>
+            </div>
           </div>
         </div>
-        <div class="flex justify-between items-center text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
-          <span>Best Corporate Career:</span>
-          <span class="font-bold text-slate-950" id="highScoreBadge">0.0 Years</span>
+        <div id="dailyShiftBlock" class="shift-badge-enter">
+          <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
+            <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
+            <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+          </div>
+          <p id="dailyShiftDescription" class="hidden" aria-hidden="true"></p>
         </div>
       </div>
-      <div id="dailyShiftBlock" class="shift-badge-enter space-y-1">
-        <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5">
-          <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
-          <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
-        </div>
-        <p id="dailyShiftDescription" class="text-center text-nano text-slate-500 px-2">Synergy optional. Attendance mandatory.</p>
-      </div>
-      <div id="tickerBar" class="ticker-bar">
-        <span class="font-bold border-r border-amber-500/30 pr-2 mr-2 shrink-0">NEWS:</span>
-        <div class="news-ticker-track">
-          <span id="newsTickerText" class="news-ticker-text font-mono text-caption">* Loading corporate news feed *</span>
-        </div>
-      </div>
-      <div class="space-y-2">
+      <span id="newsTickerText" class="hidden" aria-hidden="true"></span>
+      <div class="start-cta-bar shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
+        <p class="text-caption font-semibold text-slate-700 text-center px-1">Tap the empty side. Avoid meetings. Grab coffee.</p>
         <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
           <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
         </button>
@@ -87,37 +80,30 @@ export const APP_SHELL = `
         ${BRAND_FOOTER}
       </div>
     </div>
-    <div id="gameScreen" class="hidden flex-col flex-grow relative select-none">
+    <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
-      <div class="p-4 bg-white border-b border-slate-200 z-10 flex flex-col space-y-2.5">
-        <div class="flex items-center justify-between">
-          <div class="text-slate-900">
-            <span class="text-label-upper text-slate-400 block leading-none">Longevity</span>
-            <span class="text-2xl font-black text-slate-900" id="gameYearsLabel">0.0</span>
-            <span class="text-xs font-bold text-slate-500">Years</span>
+      <div id="gameHud" class="game-hud z-10 flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-baseline gap-1 text-slate-900">
+            <span class="text-2xl font-black leading-none" id="gameYearsLabel">0.0</span>
+            <span class="text-caption font-bold text-slate-500">Years</span>
           </div>
-          <div class="text-right">
-            <span class="text-label-upper text-slate-400 block leading-none">Current Rank</span>
+          <div class="text-right min-w-0">
             <span class="badge-rank-intern mt-0.5" id="gameRankBadge">
               <span id="rankBadgeIcon">🧑‍💻</span> <span id="rankBadgeText">Intern</span>
             </span>
-            <p id="milestoneChip" class="text-caption font-bold text-cl-primary mt-1">Manager in 10.0y</p>
+            <p id="milestoneChip" class="text-caption font-bold text-cl-primary truncate">Manager in 10.0y</p>
           </div>
         </div>
-        <div class="space-y-1">
-          <div class="flex items-center justify-between text-caption font-bold text-slate-500">
-            <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-500"></i> Energy</span>
-            <span id="burnoutPercentLabel">100%</span>
-          </div>
-          <div id="reorgHudStrip" class="reorg-hud-strip hidden">
-            <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
-          </div>
-          <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200">
+        <div class="flex items-center gap-2">
+          <span class="flex shrink-0 items-center gap-1 text-caption font-bold text-slate-500"><i class="fa-solid fa-bolt text-amber-500"></i></span>
+          <div class="h-2 flex-1 overflow-hidden rounded-full border border-slate-200 bg-slate-100 p-px">
             <div id="burnoutMeter" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75" style="width: 100%;"></div>
           </div>
+          <span id="burnoutPercentLabel" class="text-caption font-bold text-slate-500 w-8 text-right">100%</span>
         </div>
       </div>
-      <div id="promoOverlay" class="absolute top-28 left-4 right-4 bg-amber-50 border-2 border-amber-300 rounded-xl p-3 shadow-lg flex items-center gap-3 z-30 transform scale-0 transition-transform duration-300">
+      <div id="promoOverlay" class="absolute top-16 left-4 right-4 bg-amber-50 border-2 border-amber-300 rounded-xl p-3 shadow-lg flex items-center gap-3 z-30 transform scale-0 transition-transform duration-300">
         <div class="text-3xl">🎉</div>
         <div class="flex-grow">
           <h4 class="font-extrabold text-amber-900 text-xs uppercase tracking-wide">Promoted!</h4>
@@ -125,39 +111,40 @@ export const APP_SHELL = `
         </div>
         <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-1 rounded rotate-12 shrink-0">PROMOTED</span>
       </div>
-      <div class="flex-grow relative bg-slate-100 flex flex-col justify-end overflow-hidden pb-4">
-        <div class="absolute bottom-12 left-4 right-4 opacity-5 flex justify-between items-end pointer-events-none select-none">
-          <div class="w-12 h-36 bg-slate-900 rounded-t"></div>
-          <div class="w-16 h-48 bg-slate-900 rounded-t"></div>
-          <div class="w-8 h-24 bg-slate-900 rounded-t"></div>
-          <div class="w-14 h-40 bg-slate-900 rounded-t"></div>
+      <div id="tapPrompt" class="tap-prompt-bar hidden">Tap the empty side to climb</div>
+      <div class="game-body min-h-0 flex-1 flex flex-col">
+        <div id="gamePlayArea" class="game-play-area">
+          <div id="reorgHudStrip" class="reorg-hud-strip reorg-hud-overlay hidden">
+            <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
+          </div>
+          <div class="absolute bottom-8 left-4 right-4 opacity-5 flex justify-between items-end pointer-events-none select-none">
+            <div class="w-12 h-36 bg-slate-900 rounded-t"></div>
+            <div class="w-16 h-48 bg-slate-900 rounded-t"></div>
+            <div class="w-8 h-24 bg-slate-900 rounded-t"></div>
+            <div class="w-14 h-40 bg-slate-900 rounded-t"></div>
+          </div>
+          <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 w-48 flex flex-col-reverse justify-start items-center pb-12 select-none pointer-events-none">
+            <div class="absolute top-0 bottom-0 left-12 w-2 bg-slate-300 border-x border-slate-400"></div>
+            <div class="absolute top-0 bottom-0 right-12 w-2 bg-slate-300 border-x border-slate-400"></div>
+            <p id="floorLabel" class="absolute top-1 left-0 right-0 text-center text-nano font-bold uppercase tracking-wider text-slate-400/80">Floor 1 — Intern Pit</p>
+            <div id="rungsContainer" class="relative w-full h-full flex flex-col-reverse justify-start"></div>
+          </div>
+          <div id="playerClimber" class="absolute bottom-16 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none" style="left: calc(50% - 92px);">
+            <span id="playerRankProp" class="absolute -top-1 -right-1 text-lg leading-none rank-prop" aria-hidden="true">🪪</span>
+            <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
+            <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>
+          </div>
+          <div id="tapOverlay" class="tap-overlay select-none">
+            <button id="btnTapLeft" type="button" aria-label="Climb left" class="tap-zone tap-zone-left touch-none">
+              <span class="tap-zone-label">← LEFT</span>
+              <span class="keyboard-hint text-nano text-slate-400 font-mono opacity-60">Keyboard: ←</span>
+            </button>
+            <button id="btnTapRight" type="button" aria-label="Climb right" class="tap-zone tap-zone-right touch-none">
+              <span class="tap-zone-label">RIGHT →</span>
+              <span class="keyboard-hint text-nano text-slate-400 font-mono opacity-60">Keyboard: →</span>
+            </button>
+          </div>
         </div>
-        <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 w-48 flex flex-col-reverse justify-start items-center pb-20 select-none pointer-events-none">
-          <div class="absolute top-0 bottom-0 left-12 w-2 bg-slate-300 border-x border-slate-400"></div>
-          <div class="absolute top-0 bottom-0 right-12 w-2 bg-slate-300 border-x border-slate-400"></div>
-          <p id="floorLabel" class="absolute top-2 left-0 right-0 text-center text-nano font-bold uppercase tracking-wider text-slate-400/80">Floor 1 — Intern Pit</p>
-          <div id="rungsContainer" class="relative w-full h-full flex flex-col-reverse justify-start"></div>
-        </div>
-        <div id="playerClimber" class="absolute bottom-20 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none" style="left: calc(50% - 92px);">
-          <span id="playerRankProp" class="absolute -top-1 -right-1 text-lg leading-none rank-prop" aria-hidden="true">🪪</span>
-          <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
-          <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>
-        </div>
-        <div id="tapPrompt" class="absolute bottom-40 left-0 right-0 text-center animate-bounce z-10 pointer-events-none">
-          <span class="bg-cl-primary text-white text-caption font-bold py-1 px-3 rounded-full shadow-md uppercase tracking-wider">Tap Left or Right to Climb!</span>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-3 p-4 bg-white border-t border-slate-200 z-10 select-none">
-        <button id="btnTapLeft" aria-label="Climb left" class="tap-zone tap-zone-left h-28 bg-gradient-to-b from-slate-100 to-slate-200 border-2 border-slate-300 rounded-2xl flex flex-col items-center justify-center space-y-1 shadow-sm active:scale-95 touch-none">
-          <i class="fa-solid fa-arrow-left text-2xl text-slate-700"></i>
-          <span class="text-xs font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
-          <span class="text-nano text-slate-400 font-mono">Keyboard: ←</span>
-        </button>
-        <button id="btnTapRight" aria-label="Climb right" class="tap-zone tap-zone-right h-28 bg-gradient-to-b from-slate-100 to-slate-200 border-2 border-slate-300 rounded-2xl flex flex-col items-center justify-center space-y-1 shadow-sm active:scale-95 touch-none">
-          <i class="fa-solid fa-arrow-right text-2xl text-slate-700"></i>
-          <span class="text-xs font-extrabold text-slate-800 tracking-wide">TAP RIGHT</span>
-          <span class="text-nano text-slate-400 font-mono">Keyboard: →</span>
-        </button>
       </div>
     </div>
     <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between p-6 select-none overflow-y-auto">

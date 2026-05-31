@@ -25,7 +25,7 @@ A fast-paced Telegram Mini App where players climb the corporate ladder while do
 
 ### Screens
 
-- Home (news ticker, best score, Punch In)
+- Home (daily shift badge, compact rule line, Punch In)
 - Game (HUD, tap zones, climb arena)
 - Game Over (performance card, share, retry)
 - Leaderboard (Daily + Weekly tabs)
@@ -59,7 +59,7 @@ A fast-paced Telegram Mini App where players climb the corporate ladder while do
 
 ### Post-MVP polish releases
 
-v1.5 (design system, effects, co-branding) and v1.6 (progress/fairness) are **polish on v1**, not scope expansion. Detailed inventory: [ROADMAP.md](../ROADMAP.md) § Shipped baseline.
+v1.5 (design system, effects, co-branding), v1.6 (progress/fairness), v1.7 (daily shift presets), v1.8 (narrative beats + arena identity), and v1.8.1 (Telegram mobile polish) are **polish on v1**, not scope expansion. Detailed inventory: [ROADMAP.md](../ROADMAP.md) § Shipped baseline.
 
 ## Terminology
 

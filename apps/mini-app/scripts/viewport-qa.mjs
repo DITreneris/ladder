@@ -1,5 +1,5 @@
 /**
- * Viewport QA — checks horizontal overflow on Corporate Ladder shell screens.
+ * Viewport QA — checks horizontal overflow, play-area budget, and rung fit on Corporate Ladder screens.
  * Run: npm run preview (in apps/mini-app) then npm run qa:viewport
  */
 import { chromium } from "playwright";
@@ -13,8 +13,15 @@ const VIEWPORTS = [
   { width: 768, height: 1024, label: "768px" },
 ];
 
+const MIN_PLAY_AREA_RATIO = 0.65;
+
 const SCREENS = [
   { id: "start", label: "Start", setup: null },
+  {
+    id: "game",
+    label: "Game",
+    setup: () => window.startGame(),
+  },
   {
     id: "leaderboard",
     label: "Leaderboard",
@@ -31,9 +38,38 @@ async function hasHorizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
 }
 
+async function playAreaRatio(page) {
+  return page.evaluate(() => {
+    const gameScreen = document.getElementById("gameScreen");
+    const playArea = document.getElementById("gamePlayArea");
+    if (!gameScreen || !playArea) return 0;
+    return playArea.clientHeight / gameScreen.clientHeight;
+  });
+}
+
+async function rungFit(page) {
+  return page.evaluate(() => {
+    const playArea = document.getElementById("gamePlayArea");
+    if (!playArea) return { ok: false, reason: "missing-play-area" };
+    const slots = playArea.querySelectorAll("[data-rung-slot]");
+    if (!slots.length) return { ok: false, reason: "no-rung-slots" };
+    const slotHeight = slots[0].clientHeight;
+    const total = slotHeight * slots.length;
+    const budget = playArea.clientHeight + 1;
+    return {
+      ok: total <= budget,
+      slotHeight,
+      slotCount: slots.length,
+      total,
+      budget: playArea.clientHeight,
+    };
+  });
+}
+
 async function waitForApp(page) {
   await page.waitForSelector("#startScreen", { timeout: 15000 });
   await page.waitForFunction(() => typeof window.switchTab === "function", { timeout: 5000 });
+  await page.waitForFunction(() => typeof window.startGame === "function", { timeout: 5000 });
 }
 
 async function main() {
@@ -47,6 +83,7 @@ async function main() {
     try {
       await page.goto(BASE, { waitUntil: "load", timeout: 30000 });
       await waitForApp(page);
+      await page.evaluate(() => document.documentElement.classList.add("cl-in-telegram"));
     } catch (err) {
       console.error(`Failed to load ${BASE}. Start preview first: npx vite preview --host 127.0.0.1 --port 4173`);
       console.error(err);
@@ -67,7 +104,36 @@ async function main() {
       if (overflow) {
         const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
         const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-        failures.push({ viewport: vp.label, screen: screen.label, scrollWidth, clientWidth });
+        failures.push({
+          viewport: vp.label,
+          screen: screen.label,
+          type: "horizontal-overflow",
+          scrollWidth,
+          clientWidth,
+        });
+      }
+
+      if (screen.id === "game") {
+        const ratio = await playAreaRatio(page);
+        if (ratio < MIN_PLAY_AREA_RATIO) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "play-area-ratio",
+            ratio,
+            min: MIN_PLAY_AREA_RATIO,
+          });
+        }
+
+        const fit = await rungFit(page);
+        if (!fit.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "rung-fit",
+            ...fit,
+          });
+        }
       }
     }
 
@@ -81,7 +147,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("VIEWPORT QA PASSED: no horizontal overflow at 320–768px on start, leaderboard, how-to-play.");
+  console.log(
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; game play area >= 65%; 7 rungs fit in play area (Telegram mode)."
+  );
 }
 
 main().catch((err) => {

@@ -6,8 +6,8 @@
 
 | Surface | URL |
 |---------|-----|
-| Mini App (production) | Set after Vercel deploy — `MINI_APP_URL` in `.env` ([DEPLOY.md](DEPLOY.md)) |
-| API (production) | Set after Railway deploy — `VITE_API_URL` in `.env` |
+| Mini App (production) | https://www.promptanatomy.lol |
+| API (production) | https://ladder-production-642d.up.railway.app |
 | Bot | Telegram — `@CorporateLadderBot` (or your `VITE_BOT_USERNAME`) |
 | Database | Supabase project dashboard |
 
@@ -81,7 +81,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train; narrative thesis; v1.7 code done; v1.8 narrative beats + arena identity |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train through v1.8 shipped; v1.8.1 polish; v1.9 next |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |

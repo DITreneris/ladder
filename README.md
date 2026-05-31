@@ -22,15 +22,15 @@ A fast-paced Telegram Mini App where players climb the corporate ladder while av
 
 |---------|-----|
 
-| **Mini App** | Deploy to Vercel — set `MINI_APP_URL` in `.env` (see [DEPLOY.md](DEPLOY.md)) |
+| **Mini App** | https://www.promptanatomy.lol |
 
 | **Telegram bot** | `@CorporateLadderBot` (or your `VITE_BOT_USERNAME`) |
 
-| **API health** | `{VITE_API_URL}/health` after Railway deploy |
+| **API health** | https://ladder-production-642d.up.railway.app/health |
 
 
 
-After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with production URLs.
+After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with production URLs. *(Live as of 2026-05-31.)*
 
 
 
@@ -80,7 +80,7 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 | [DOCS_INDEX.md](DOCS_INDEX.md) | Document map and task router for humans and agents |
 
-| [ROADMAP.md](ROADMAP.md) | Release train (v1.5–v1.9), shipped baseline, v1.7 daily replays |
+| [ROADMAP.md](ROADMAP.md) | Release train (v1.5–v1.9), shipped baseline through v1.8.1 |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails |
 
 | [primal.txt](primal.txt) | Product narrative and tone |
