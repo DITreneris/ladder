@@ -146,11 +146,12 @@ Inventory by pillar — do not regress without spec update.
 
 **Remaining before tag:**
 
+- [x] Local smoke + deploy preflight green (`scripts/smoke-local.ps1`)
 - [ ] Production deploy + device QA (Meeting Monday + Reorg Week presets)
 - [ ] Manual: share text includes shift name
-- [ ] Optional stretch: bot `/start` mentions today's shift ([`apps/bot/main.py`](apps/bot/main.py)) — coordinate Railway deploy
-- [ ] [CHANGELOG.md](CHANGELOG.md) cut `## [1.7.0]` from `[Unreleased]`
-- [ ] Tag `v1.7.0` per [DEPLOY.md](DEPLOY.md)
+- [x] Optional stretch: bot `/start` mentions today's shift ([`apps/bot/main.py`](apps/bot/main.py))
+- [x] [CHANGELOG.md](CHANGELOG.md) cut `## [1.7.0]` from `[Unreleased]`
+- [x] Tag `v1.7.0` per [DEPLOY.md](DEPLOY.md) (local; push tags after production QA)
 
 **Release gate:**
 
@@ -228,11 +229,11 @@ Keep all new motion behind `prefers-reduced-motion` ([`effects.ts`](apps/mini-ap
 
 ### v1.8 definition of done
 
-- [ ] Batch 1 copy pack merged; no new obstacle logic
-- [ ] Ticker rotates; at least one foreshadow payoff path tested manually
-- [ ] RE-APPLY counter persists across sessions (localStorage)
-- [ ] `npm run lint && npm test && npm run build`; verifier on user-facing work
-- [ ] [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` + tag `v1.8.0` after deploy
+- [x] Batch 1 copy pack merged; no new obstacle logic
+- [x] Ticker rotates; at least one foreshadow payoff path tested manually
+- [x] RE-APPLY counter persists across sessions (localStorage)
+- [x] `npm run lint && npm test && npm run build`; verifier on user-facing work
+- [x] [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` + tag `v1.8.0` (local; deploy after production QA)
 
 ---
 
