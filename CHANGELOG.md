@@ -14,6 +14,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) — Telegram iOS/Android sign-off checklist
 
 ### Changed
+- Home opening — compact amber news strip (headline pool), visible daily shift description, `ticker-shift-emphasis` on non-standard shifts, Employee Badge header, satirical rule line, hero entrance fade
+- Game controls — restore snippet-style bottom tap deck (`tap-controls-bar` + visible h-28 TAP LEFT / TAP RIGHT buttons); remove transparent play-area overlay
+- Viewport QA — play-area ratio 50% (tap deck outside `#gamePlayArea`); tap bar visibility check
 - [ROADMAP.md](ROADMAP.md) — v1.9.0 provisional row; redeploy verified; F&F tracker link
 
 ### Planned (v1.1)

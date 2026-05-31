@@ -16,7 +16,7 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 Automated (run before tag):
 
 - [x] No horizontal overflow at 320–768px (`npm run qa:viewport` with preview running)
-- [x] Game play area ≥ 65% of game screen height in Telegram mode (`viewport-qa.mjs`)
+- [x] Game play area ≥ 50% of game screen height in Telegram mode (`viewport-qa.mjs`; tap deck outside play area)
 - [x] Seven rungs fit inside `#gamePlayArea` at all QA viewports (`viewport-qa.mjs` rung-fit check)
 - [x] First runs: only meeting obstacles (Intern phase) — `engine.test.ts`
 - [x] Next rung visually highlighted — CSS `.next-rung`

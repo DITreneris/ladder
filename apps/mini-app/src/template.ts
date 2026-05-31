@@ -34,15 +34,19 @@ export const APP_SHELL = `
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
     <div id="startScreen" class="flex flex-col flex-grow min-h-0 select-none z-10 px-4 pt-4 pb-2">
-      <div class="space-y-3 flex-shrink-0">
+      <div class="space-y-2.5 flex-shrink-0">
         <div class="text-center">
-          <div class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
+          <div class="home-hero-enter home-hero-enter-icon inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
             <i class="fa-solid fa-briefcase text-xl"></i>
           </div>
-          <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
-          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1.5">Simulating modern work chaos</p>
+          <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
+          <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Simulating modern work chaos</p>
         </div>
         <div class="card-light space-y-2 py-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span class="text-nano font-bold uppercase text-slate-400 tracking-wider">Employee Badge</span>
+            <span class="text-nano bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">ACTIVE EMPLOYMENT</span>
+          </div>
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0" id="avatarIcon">🧑‍💻</div>
             <div class="flex-grow min-w-0">
@@ -55,17 +59,22 @@ export const APP_SHELL = `
             </div>
           </div>
         </div>
+        <div id="homeNewsTicker" class="ticker-bar shrink-0">
+          <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
+          <div class="news-ticker-track min-w-0 flex-1">
+            <span id="newsTickerText" class="news-ticker-text text-caption font-mono"></span>
+          </div>
+        </div>
         <div id="dailyShiftBlock" class="shift-badge-enter">
           <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
             <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
             <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
           </div>
-          <p id="dailyShiftDescription" class="hidden" aria-hidden="true"></p>
+          <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1"></p>
         </div>
       </div>
-      <span id="newsTickerText" class="hidden" aria-hidden="true"></span>
       <div class="start-cta-bar shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
-        <p class="text-caption font-semibold text-slate-700 text-center px-1">Tap the empty side. Avoid meetings. Grab coffee.</p>
+        <p class="text-caption font-semibold text-slate-700 text-center px-1">One tap, one rung. Meetings terminate. Coffee negotiates.</p>
         <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
           <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
         </button>
@@ -134,16 +143,18 @@ export const APP_SHELL = `
             <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
             <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>
           </div>
-          <div id="tapOverlay" class="tap-overlay select-none">
-            <button id="btnTapLeft" type="button" aria-label="Climb left" class="tap-zone tap-zone-left touch-none">
-              <span class="tap-zone-label">← LEFT</span>
-              <span class="keyboard-hint text-nano text-slate-400 font-mono opacity-60">Keyboard: ←</span>
-            </button>
-            <button id="btnTapRight" type="button" aria-label="Climb right" class="tap-zone tap-zone-right touch-none">
-              <span class="tap-zone-label">RIGHT →</span>
-              <span class="keyboard-hint text-nano text-slate-400 font-mono opacity-60">Keyboard: →</span>
-            </button>
-          </div>
+        </div>
+        <div id="tapControlsBar" class="tap-controls-bar select-none">
+          <button id="btnTapLeft" type="button" aria-label="Climb left" class="btn-tap-zone btn-tap-zone-left touch-none focus-ring">
+            <i class="fa-solid fa-arrow-left icon-md text-slate-700" aria-hidden="true"></i>
+            <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
+            <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: ←</span>
+          </button>
+          <button id="btnTapRight" type="button" aria-label="Climb right" class="btn-tap-zone btn-tap-zone-right touch-none focus-ring">
+            <i class="fa-solid fa-arrow-right icon-md text-slate-700" aria-hidden="true"></i>
+            <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP RIGHT</span>
+            <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: →</span>
+          </button>
         </div>
       </div>
     </div>

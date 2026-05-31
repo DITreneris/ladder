@@ -171,6 +171,32 @@
   width: var(--size-icon-md);
   height: var(--size-icon-md);
 }
+
+@utility tap-controls-bar {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 1rem;
+  padding-bottom: calc(1rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
+@utility btn-tap-zone {
+  touch-action: none;
+  display: flex;
+  height: 7rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border-radius: 1rem;
+  border: 2px solid #cbd5e1;
+  background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  transition: transform 100ms ease, background 100ms ease, border-color 100ms ease;
+}
 .cl-phone-shell {
   background-color: var(--cl-bg);
   border-color: var(--cl-border);
@@ -294,33 +320,24 @@ html.cl-in-telegram .text-micro {
   background: #f1f5f9;
 }
 
-.tap-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  z-index: 20;
+.btn-tap-zone:active {
+  transform: scale(0.95);
 }
 
-.tap-zone {
-  touch-action: none;
-  display: flex;
-  flex: 1 1 0%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.125rem;
-  padding-bottom: calc(0.5rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
-  border: none;
-  border-radius: 0;
-  background: transparent;
+.btn-tap-zone-left:active {
+  border-color: color-mix(in srgb, var(--color-cl-primary) 60%, #cbd5e1);
+  background: linear-gradient(to bottom, #e2e8f0, color-mix(in srgb, var(--color-cl-accent-indigo) 15%, #e2e8f0));
+  box-shadow: inset 4px 0 0 var(--color-cl-primary);
 }
 
-.tap-zone-label {
-  font-size: 11px;
-  font-weight: 800;
-  opacity: 0.45;
-  color: #334155;
-  letter-spacing: 0.05em;
+.btn-tap-zone-right:active {
+  border-color: color-mix(in srgb, var(--color-cl-accent-indigo) 60%, #cbd5e1);
+  background: linear-gradient(to bottom, #e2e8f0, color-mix(in srgb, var(--color-cl-accent-indigo) 15%, #e2e8f0));
+  box-shadow: inset -4px 0 0 var(--color-cl-accent-indigo);
+}
+
+.cl-in-telegram .keyboard-hint {
+  display: none;
 }
 
 .tap-prompt-bar {
@@ -613,6 +630,19 @@ html.cl-in-telegram .text-micro {
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 
+.home-hero-enter {
+  animation: row-fade-in 0.25s ease-out both;
+}
+.home-hero-enter-icon {
+  animation-delay: 0ms;
+}
+.home-hero-enter-title {
+  animation-delay: 80ms;
+}
+.home-hero-enter-tagline {
+  animation-delay: 160ms;
+}
+
 @keyframes skeleton-pulse {
   0%,
   100% {
@@ -716,14 +746,6 @@ html.cl-in-telegram .text-micro {
   animation: next-obstacle-warn 0.7s ease-in-out 2;
 }
 
-.tap-zone-left:active {
-  box-shadow: inset 4px 0 0 var(--color-cl-primary);
-}
-
-.tap-zone-right:active {
-  box-shadow: inset -4px 0 0 var(--color-cl-accent-indigo);
-}
-
 .hidden {
   display: none !important;
 }
@@ -790,6 +812,7 @@ html.cl-in-telegram .text-micro {
   .meter-flash,
   .rung-advance,
   #leaderboardList > .lb-row,
+  .home-hero-enter,
   .lb-skeleton-row,
   .obstacle-pulse,
   .safe-side-hint,

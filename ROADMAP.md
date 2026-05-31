@@ -98,7 +98,7 @@ Inventory by pillar — do not regress without spec update.
 | Rank props (v1.8) | Intern lanyard / Manager clipboard / CEO monocle on player |
 | Reorg HUD strip (v1.8) | `ORG CHART UNSTABLE` amber bar when reorgs active |
 | Game-over LB gap (v1.8) | `#leaderboardGapLine` — daily top vs current run |
-| Overlay tap zones (v1.8.1) | Full `#gamePlayArea` tap targets |
+| Bottom tap deck (v1.8.1+) | Visible h-28 TAP LEFT / TAP RIGHT in `#tapControlsBar` |
 | Dynamic rung scaling (v1.8.1) | All 7 rungs fit inside play area |
 | Compact home (v1.8.1) | Rule line above CTA; daily shift badge |
 | Telegram native shell (v1.8.1) | Hide duplicate header; `BackButton`; sound FAB; safe-area padding |

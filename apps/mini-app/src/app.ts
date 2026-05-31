@@ -106,7 +106,8 @@ function updateReorgHudStrip(rank: Rank): void {
 
 function mountTickerHeadline(): void {
   activeTickerHeadline = pickTickerHeadline();
-  $("newsTickerText").textContent = formatTickerText(activeTickerHeadline);
+  const formatted = formatTickerText(activeTickerHeadline);
+  $("newsTickerText").textContent = `${formatted}     ${formatted}`;
   engine?.setActiveTicker(activeTickerHeadline);
 }
 
@@ -211,7 +212,10 @@ function refreshDailyShiftUI(): void {
   $("dailyShiftLabel").textContent = activeDailyModifier.label;
   $("dailyShiftDescription").textContent = activeDailyModifier.description;
   const pill = $("dailyShiftPill");
-  if (pill) pill.title = activeDailyModifier.description;
+  if (pill) {
+    pill.title = activeDailyModifier.description;
+    pill.classList.toggle("ticker-shift-emphasis", activeDailyModifier.id !== "standard");
+  }
 
   const viewport = document.querySelector(".cl-viewport");
   if (viewport) {

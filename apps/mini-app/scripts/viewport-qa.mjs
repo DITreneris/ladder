@@ -13,7 +13,9 @@ const VIEWPORTS = [
   { width: 768, height: 1024, label: "768px" },
 ];
 
-const MIN_PLAY_AREA_RATIO = 0.65;
+// Bottom tap deck sits outside #gamePlayArea; rung-fit is the primary ladder guardrail.
+const MIN_PLAY_AREA_RATIO = 0.5;
+const MIN_TAP_BUTTON_HEIGHT = 112;
 
 const SCREENS = [
   { id: "start", label: "Start", setup: null },
@@ -64,6 +66,14 @@ async function rungFit(page) {
       budget: playArea.clientHeight,
     };
   });
+}
+
+async function tapBarVisible(page) {
+  return page.evaluate((minHeight) => {
+    const bar = document.getElementById("tapControlsBar");
+    const btn = document.getElementById("btnTapLeft");
+    return Boolean(bar && btn && bar.offsetHeight > 0 && btn.offsetHeight >= minHeight);
+  }, MIN_TAP_BUTTON_HEIGHT);
 }
 
 async function waitForApp(page) {
@@ -134,6 +144,15 @@ async function main() {
             ...fit,
           });
         }
+
+        const tapBar = await tapBarVisible(page);
+        if (!tapBar) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "tap-bar-missing",
+          });
+        }
       }
     }
 
@@ -148,7 +167,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; game play area >= 65%; 7 rungs fit in play area (Telegram mode)."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; game play area >= 50%; tap deck visible (h-28); 7 rungs fit in play area (Telegram mode)."
   );
 }
 

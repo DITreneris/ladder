@@ -10,7 +10,7 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 
 - [x] `main` pushed; tag `v1.8.1` on origin
 - [x] API `GET /health` → `{"status":"ok"}`
-- [x] Production bundle includes v1.8.1 markers (`sound-fab`, `tapOverlay`, `BackButton`, `viewport-fit=cover`)
+- [x] Production bundle includes v1.8.1 markers (`sound-fab`, `tapControlsBar`, `BackButton`, `viewport-fit=cover`)
 - [x] Local smoke + viewport QA green
 
 ---
@@ -21,7 +21,7 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 |---|------|------|
 | 1 | No duplicate in-app header | [ ] |
 | 2 | BackButton → home from game / LB / how-to-play | [ ] |
-| 3 | Overlay taps: left/right half of ladder; one tap = one climb | [ ] |
+| 3 | Bottom tap deck | TAP LEFT / TAP RIGHT visible; one tap = one climb | [ ] |
 | 4 | All 7 rungs visible | [ ] |
 | 5 | Tap-prompt bar on first run | [ ] |
 | 6 | Safe-side hints (first 5 taps) | [ ] |
@@ -38,7 +38,7 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 |---|------|------|
 | 1 | No duplicate in-app header | [ ] |
 | 2 | BackButton → home from game / LB / how-to-play | [ ] |
-| 3 | Overlay taps: left/right half of ladder; one tap = one climb | [ ] |
+| 3 | Bottom tap deck | TAP LEFT / TAP RIGHT visible; one tap = one climb | [ ] |
 | 4 | All 7 rungs visible | [ ] |
 | 5 | Tap-prompt bar on first run | [ ] |
 | 6 | Safe-side hints (first 5 taps) | [ ] |

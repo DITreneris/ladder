@@ -56,7 +56,7 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 ### v1.8.1 Telegram mobile polish
 
 - [ ] In Telegram: no duplicate in-app header; native `BackButton` returns home from game / leaderboard / how-to-play
-- [ ] Overlay tap zones cover full `#gamePlayArea`; 7 rungs fit at 320px width
+- [ ] Visible TAP LEFT / TAP RIGHT bottom deck (`#tapControlsBar`); each button h-28; 7 rungs fit at 320px width
 - [ ] Tap-prompt bar on first run; safe-side hints for first 5 taps
 - [ ] Sound FAB + safe-area padding on notched devices
 - [ ] Bot starts on Railway without Docker `.env` IndexError (`main.py` from `/app`)

@@ -91,7 +91,9 @@ Set by [`applyTelegramTheme()`](apps/mini-app/src/lib/telegram.ts) from `themePa
 | `card-light` | Employee badge shell |
 | `card-light-sm` | How-to-play row |
 | `card-performance` | Game-over performance card |
-| `ticker-bar` | News ticker strip (utility retained; home ticker hidden since v1.8.1 — engine-only foreshadow via `#newsTickerText`) |
+| `ticker-bar` | Compact home news strip + amber promo surfaces; `#newsTickerText` scrolls one headline from `NEWS_TICKER_HEADLINES` (game-over foreshadow unchanged) |
+| `tap-controls-bar` | Fixed bottom grid for TAP LEFT / TAP RIGHT deck |
+| `btn-tap-zone` | Game climb button — h-28, gradient slate, snippet parity |
 | `badge-rank-intern` / `-manager` / `-ceo` | In-game rank pill |
 | `lb-tab-active` / `lb-tab-inactive` | Leaderboard period toggle |
 | `lb-row-self` | Current-user leaderboard highlight |
@@ -129,7 +131,7 @@ Set in `updateRankUI()` via `RANK_BADGE` map in [`app.ts`](apps/mini-app/src/app
 
 Game animations live in `style.css` (climb-pop, shake-finite, ticker-scroll, etc.). All listed in the `@media (prefers-reduced-motion: reduce)` block — animations disabled, game remains playable.
 
-**Do not add** decorative marketing animations to shell screens beyond existing row-fade-in. Home no longer shows a scrolling ticker (v1.8.1); ticker pool drives game-over foreshadow only.
+**Do not add** decorative marketing animations to shell screens beyond existing row-fade-in and home hero entrance (`home-hero-enter`). Home shows a **compact scrolling news strip** (`ticker-bar` + `news-ticker-text`); ticker pool still drives optional game-over foreshadow.
 
 ---
 
@@ -137,15 +139,15 @@ Game animations live in `style.css` (climb-pop, shake-finite, ticker-scroll, etc
 
 ### 8.1 Touch targets
 
-Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented):** game overlay tap zones (transparent left/right halves over `#gamePlayArea`; labels at bottom edge only), leaderboard tab pills (compact toggle).
+Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented):** game tap deck `btn-tap-zone` at `h-28` (112px — snippet parity), leaderboard tab pills (compact toggle).
 
 ### 8.1.1 Telegram full-viewport mode (`.cl-in-telegram`)
 
 - Hide in-app `.cl-header` — use Telegram native title + `BackButton` API
 - Floating `.sound-fab` for mute toggle (not duplicated in header)
 - Safe-area padding on `.cl-phone-shell` via `--tg-content-safe-area-inset-*` + `env(safe-area-inset-*)`
-- Home: compact hero + identity card + daily shift pill; rule above sticky `.start-cta-bar` (no scroll on default phones)
-- Game: compact `.game-hud`, slim `.tap-prompt-bar` below HUD, full-height `.game-play-area` with `.tap-overlay` left/right zones; rung height scales dynamically (40–52px) to fit 7 visible rungs
+- Home: compact hero + identity card (Employee Badge / ACTIVE EMPLOYMENT) + scrolling news strip + daily shift pill + description; rule above sticky `.start-cta-bar` (no scroll on default phones)
+- Game: compact `.game-hud`, slim `.tap-prompt-bar` below HUD, `#gamePlayArea` for ladder only, fixed `.tap-controls-bar` with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; keyboard hints hidden in Telegram
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
 
 ### 8.2 Focus
@@ -197,7 +199,7 @@ In-play and failure surfaces — clarity over decoration. Animation class names:
 | **Milestone chip** | HUD during play | `Manager in X.y` / `CEO in X.y` / corner office secured; `text-micro` |
 | **Death cause row** | Game-over card | Icon + label per failure type (Meeting, Reorg, Deadline, Energy) |
 | **Retry tip** | Below death cause | Satirical one-liner from `constants.ts`; `text-caption` |
-| **Tap-zone glow** | Active tap feedback | `tap-zone-left/right:active` border — v1.6 control feel |
+| **Tap-zone glow** | Active tap feedback | `btn-tap-zone-left/right:active` inset accent — v1.6 control feel |
 | **Career high line** | Performance card | Best rank + years from profile when available |
 
 Game-over layout uses `card-light` + performance review framing (REJECTED stamp). Obstacle badges: red meeting, amber reorg, bright red deadline (CEO contrast).
