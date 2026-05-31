@@ -212,6 +212,29 @@ export class GameEngine {
     this.stopLoops();
   }
 
+  /** Frozen mid-game state for OG screenshot capture (`?og=1`). */
+  applyOgCaptureSnapshot(rungs: Rung[], score: number, timeLeft: number, playerSide: PlayerSide, rank: Rank): void {
+    this.stopLoops();
+    this.isPlaying = true;
+    this.isGameOverState = false;
+    this.firstTapDone = true;
+    this.score = score;
+    this.timeLeft = timeLeft;
+    this.playerSide = playerSide;
+    this.currentRank = rank;
+    this.nextRungId = rungs.length;
+    this.coffeeCollected = false;
+    this.tutorialCoffeeDone = true;
+    this.drainPausedUntil = 0;
+    this.internFakePromoShown.clear();
+    this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
+    this.rungs = rungs.map((r) => ({ ...r }));
+
+    this.updatePlayerPosition(playerSide);
+    this.renderRungs();
+    this.callbacks.onScoreUpdate(score / 4, timeLeft);
+  }
+
   private stopLoops(): void {
     if (this.timerInterval) clearInterval(this.timerInterval);
     if (this.reorgInterval) clearInterval(this.reorgInterval);

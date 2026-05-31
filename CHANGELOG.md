@@ -10,6 +10,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- OG image pipeline — Playwright composite (`capture:og`, `og-preview.html`, `?og=1` seeded gameplay); `public/og.png` (1200×630); `.github/social-preview.png` (1280×640); `verify:og` CI check
+- Phase 0 discoverability — `index.html` meta description, Open Graph (`og:image` dimensions + alt), Twitter cards, `noindex`; `public/robots.txt`
+- [docs/discoverability-plan.md](docs/discoverability-plan.md) — Telegram-first discoverability roadmap (defers full SEO)
 - [docs/FF_TEST.md](docs/FF_TEST.md) — friends-and-family protocol (2026-05-31 → 2026-06-14)
 - [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) — Telegram iOS/Android sign-off checklist
 

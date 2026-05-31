@@ -12,9 +12,9 @@ Mix **iOS + Android**; not all on the core team.
 
 **Share message:**
 
-> Corporate Ladder — satirical office climb game in Telegram. Play **3 runs** over the next few days and tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+> Corporate Ladder — satirical office climb game in Telegram. Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
 
-**Bot:** `@CorporateLadderBot` · **Mini App:** https://www.promptanatomy.lol
+**Bot (primary entry):** https://t.me/CorporateLadderBot · `@CorporateLadderBot` · **Mini App URL (WebApp shell only):** https://www.promptanatomy.lol
 
 | Tester | Platform | Invited | Runs (wk1) | Notes |
 |--------|----------|---------|------------|-------|

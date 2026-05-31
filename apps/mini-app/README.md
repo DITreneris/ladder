@@ -84,6 +84,9 @@ npm run test     # Vitest (engine + constants)
 npm run build    # Production bundle → dist/
 npm run preview  # Preview production build
 npm run qa:viewport  # Playwright overflow check (preview must be running)
+npm run capture:hero  # README portrait → docs/assets/gameplay.png
+npm run capture:og    # Link previews → public/og.png + .github/social-preview.png
+npm run verify:og     # Assert OG PNG dimensions (CI)
 ```
 
 ## Design system
@@ -91,6 +94,19 @@ npm run qa:viewport  # Playwright overflow check (preview must be running)
 Token source: `src/style.css` (`@theme` + `@utility`). Guide: [../../DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md).
 
 After layout changes: `npm run build && npm run preview` (terminal 1), then `npm run qa:viewport` (terminal 2).
+
+### OG link-preview images
+
+Regenerate after shell/game UI changes:
+
+```bash
+npm run build && npm run preview -- --host 127.0.0.1 --port 4173
+# terminal 2 (set PREVIEW_URL if preview picked another port)
+npm run capture:og
+npm run verify:og
+```
+
+Outputs: `public/og.png` (1200×630), `.github/social-preview.png` (1280×640). Intermediate crop in `public/og-cache/` (gitignored).
 
 ## Local Development
 

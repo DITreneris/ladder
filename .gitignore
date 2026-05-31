@@ -48,3 +48,6 @@ npm-debug.log*
 
 # Vercel
 .vercel
+
+# OG capture cache (intermediate crop)
+apps/mini-app/public/og-cache/

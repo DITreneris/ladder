@@ -20,6 +20,15 @@ import {
 } from "./game/constants";
 import { type DailyModifier, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
+import {
+  buildOgCaptureRungs,
+  OG_CAPTURE_DAILY_MODIFIER,
+  OG_CAPTURE_ENERGY,
+  OG_CAPTURE_PLAYER_SIDE,
+  OG_CAPTURE_RANK,
+  OG_CAPTURE_SCORE,
+  OG_CAPTURE_YEARS,
+} from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type LeaderboardEntry } from "./lib/api";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
@@ -77,6 +86,10 @@ let ceoTrapShown = false;
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 
 const $ = (id: string) => document.getElementById(id)!;
+
+function isOgCaptureMode(): boolean {
+  return new URLSearchParams(window.location.search).get("og") === "1";
+}
 
 function flashPlayerEmoji(emoji: string, ms: number): void {
   if (playerEmojiFlashTimer) clearTimeout(playerEmojiFlashTimer);
@@ -686,6 +699,56 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
   });
 }
 
+function mountOgCaptureMode(): void {
+  document.documentElement.dataset.ogCapture = "1";
+  activeDailyModifier = OG_CAPTURE_DAILY_MODIFIER;
+
+  const viewport = document.querySelector(".cl-viewport");
+  if (viewport) {
+    for (const cls of GRID_TINT_CLASSES) {
+      viewport.classList.remove(cls);
+    }
+    if (activeDailyModifier.gridTintClass) {
+      viewport.classList.add(activeDailyModifier.gridTintClass);
+    }
+  }
+
+  $("soundToggleBtn").classList.add("hidden");
+  $("tapControlsBar").classList.add("hidden");
+  $("tapPrompt").classList.add("hidden");
+  $("promoOverlay").classList.add("hidden");
+
+  prevRungsSnapshot = [];
+  earlyTapsRemaining = 0;
+  playerInPanic = false;
+  $("playerActionEmoji").classList.remove("idle-bob");
+
+  engine.applyOgCaptureSnapshot(
+    buildOgCaptureRungs(),
+    OG_CAPTURE_SCORE,
+    OG_CAPTURE_ENERGY,
+    OG_CAPTURE_PLAYER_SIDE,
+    OG_CAPTURE_RANK
+  );
+
+  updateRankUI(OG_CAPTURE_RANK);
+  updateMilestoneChip(OG_CAPTURE_YEARS);
+  updateFloorLabel(OG_CAPTURE_YEARS);
+  updateReorgHudStrip(OG_CAPTURE_RANK);
+  $("burnoutMeter").style.width = `${OG_CAPTURE_ENERGY}%`;
+  $("burnoutPercentLabel").textContent = `${OG_CAPTURE_ENERGY}%`;
+  $("gameYearsLabel").textContent = OG_CAPTURE_YEARS.toFixed(1);
+
+  switchTab("game");
+
+  requestAnimationFrame(() => {
+    layoutRungs();
+    requestAnimationFrame(() => {
+      (window as unknown as Record<string, unknown>).__CL_OG_READY__ = true;
+    });
+  });
+}
+
 export function mountApp(): void {
   initTelegram();
   username = getDisplayName();
@@ -774,7 +837,8 @@ export function mountApp(): void {
         shiftToastShown = true;
         showToast("Shift rules active");
       }
-    }
+    },
+    isOgCaptureMode() ? OG_CAPTURE_DAILY_MODIFIER : undefined
   );
 
   ($("usernameInput") as HTMLInputElement).value = username;
@@ -816,6 +880,11 @@ export function mountApp(): void {
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
 
   updateRankUI("Intern");
+  if (isOgCaptureMode()) {
+    mountOgCaptureMode();
+    return;
+  }
+
   refreshDailyShiftUI();
   syncTelegramBackButton("home");
 

@@ -360,6 +360,8 @@ git push origin main --tags
 
 Run **1–2 weeks** after v1.8.1 tag. Tracker: [docs/FF_TEST.md](docs/FF_TEST.md). Use results to inform v1.9 Must/Should cuts — not v1.8 backlog (complete).
 
+**Discoverability (not SEO):** Telegram-first distribution — bot + shares, not Google. Optional Phase 0 link-preview metadata during F&F; Phase 1 ecosystem blurb on Prompt Anatomy site after F&F review. Full plan: [docs/discoverability-plan.md](docs/discoverability-plan.md).
+
 1. Share bot with 5–10 testers  
 2. Track: session length (30–90s target), games/user, share rate, daily return  
 3. Log issues via [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)  
