@@ -1,0 +1,44 @@
+---
+description: Satirical copy tone guide for Corporate Ladder
+globs: "**/*.{ts,py,md}"
+alwaysApply: false
+---
+
+# Satirical Copy Guidelines
+
+Corporate Ladder humor = workplace satire, not generic game fluff.
+
+## Tone
+
+- Deadpan corporate jargon ("synergy", "paradigm", "reorg")
+- Absurd HR/bureaucracy scenarios
+- Self-aware misery, not mean-spirited
+- Short punchy lines over long paragraphs
+
+## Terminology
+
+| Context | Use |
+|---------|-----|
+| UI / HUD | **Energy**, **Deadline** (not "Burnout meter/cloud") |
+| API `termination_cause` | Human strings e.g. `"Deadline Crash"`, `"Meeting Collision"` |
+| Code obstacle type | `burnout` (engine ID — do not rename without migration plan) |
+
+## Examples (good)
+
+- "Promoted to Manager. Your desktop calendar is destroyed."
+- "Attended 214 meetings. No decisions made."
+- "Missed the deadline while compiling a budget sheet nobody opened."
+
+## Examples (avoid)
+
+- Generic "Game Over!" without context
+- Breaking fourth wall about being a game
+- Offensive stereotypes about real companies/people
+- HUD label "Burnout" (use Energy / Deadline)
+
+## Where Copy Lives
+
+- **`apps/mini-app/src/game/constants.ts`** — primary source: `FAILURE_REASONS`, `FAILURE_BY_RANK`, `PROMOTION_DIALOGUES`, retry tips, termination labels
+- Game over / promotion UI strings in `template.ts` / `app.ts`
+- Bot welcome message in `apps/bot/main.py`
+- Historical tone reference: [primal.txt](../../primal.txt) (concept v0.1 — not current HUD labels)

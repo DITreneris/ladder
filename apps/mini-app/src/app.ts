@@ -1,0 +1,650 @@
+import {
+  DEATH_EMOJI,
+  DEATH_LABELS,
+  MAX_VISIBLE_RUNGS,
+  PLAYER_LEFT,
+  PLAYER_RIGHT,
+  RETRY_TIPS,
+  milestoneLabel,
+  rankEmoji,
+  rankFromYears,
+} from "./game/constants";
+import { GameEngine } from "./game/engine";
+import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
+import { fetchLeaderboard, fetchProfile, submitRun, type LeaderboardEntry } from "./lib/api";
+import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
+import {
+  applyReorgSlide,
+  flashBurnoutStress,
+  spawnFloatingParticles,
+  triggerClimbPop,
+  triggerDeathEmoji,
+  triggerDeathFlash,
+  triggerMeterFlash,
+  triggerPromoConfetti,
+  triggerRankPop,
+  triggerReorgTelegraph,
+  triggerRungAdvance,
+  triggerShake,
+} from "./lib/effects";
+import {
+  disableVerticalSwipe,
+  enableVerticalSwipe,
+  getBotUsername,
+  getDisplayName,
+  getInitData,
+  hapticImpact,
+  hapticNotification,
+  initTelegram,
+  isTelegram,
+  shareText,
+} from "./lib/telegram";
+import { audio } from "./game/audio";
+
+type Screen = "home" | "game" | "gameover" | "leaderboard" | "howtoplay";
+type LeaderboardPeriod = "daily" | "weekly";
+
+let username = "CorporateSlave";
+let highScore = 0;
+let bestRank = "Intern";
+let lastGameResult: GameOverResult | null = null;
+let leaderboardPeriod: LeaderboardPeriod = "daily";
+let engine: GameEngine;
+let prevRungsSnapshot: Rung[] = [];
+let playerInPanic = false;
+let earlyTapsRemaining = 0;
+let playerEmojiFlashTimer: ReturnType<typeof setTimeout> | null = null;
+
+const $ = (id: string) => document.getElementById(id)!;
+
+function flashPlayerEmoji(emoji: string, ms: number): void {
+  if (playerEmojiFlashTimer) clearTimeout(playerEmojiFlashTimer);
+  $("playerActionEmoji").textContent = emoji;
+  playerEmojiFlashTimer = setTimeout(() => {
+    playerEmojiFlashTimer = null;
+    if (playerInPanic) {
+      $("playerActionEmoji").textContent = "😰";
+    } else if (engine?.isActive()) {
+      $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
+    }
+  }, ms);
+}
+
+function updateMilestoneChip(years: number): void {
+  $("milestoneChip").textContent = milestoneLabel(years);
+}
+
+function showToast(msg: string): void {
+  const toast = $("toastNotification");
+  $("toastText").textContent = msg;
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 2500);
+}
+
+function switchTab(tab: Screen): void {
+  ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
+    $(id).classList.add("hidden");
+    $(id).classList.remove("flex");
+  });
+
+  const map: Record<Screen, string> = {
+    home: "startScreen",
+    game: "gameScreen",
+    gameover: "gameOverScreen",
+    leaderboard: "leaderboardScreen",
+    howtoplay: "howToPlayScreen",
+  };
+  const el = $(map[tab]);
+  el.classList.remove("hidden");
+  el.classList.add("flex");
+  audio.nav();
+}
+
+const RANK_BADGE: Record<Rank, string> = {
+  Intern: "badge-rank-intern mt-0.5",
+  Manager: "badge-rank-manager mt-0.5",
+  CEO: "badge-rank-ceo mt-0.5",
+};
+
+function updateRankUI(rank: Rank, updatePlayer = true): void {
+  const emoji = rankEmoji(rank);
+  $("rankBadgeIcon").textContent = emoji;
+  $("rankBadgeText").textContent = rank;
+  if (updatePlayer && !playerInPanic) {
+    $("playerActionEmoji").textContent = emoji;
+  }
+  $("avatarIcon").textContent = emoji;
+  $("userTitleLabel").textContent = `Rank achieved: ${rank}`;
+  $("gameRankBadge").className = RANK_BADGE[rank];
+}
+
+function setPlayerPanic(on: boolean): void {
+  playerInPanic = on;
+  $("playerClimber").classList.toggle("player-panic", on);
+  if (on) {
+    $("playerActionEmoji").textContent = "😰";
+  } else {
+    $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
+  }
+}
+
+function createObstacleBadge(type: ObstacleType): HTMLElement {
+  const badge = document.createElement("div");
+  badge.className =
+    "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none obstacle-pulse";
+  if (type === "meeting") {
+    badge.className += " bg-red-100 border-red-300 text-red-700";
+    badge.innerHTML = `<span class="text-lg leading-none">📅</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Meeting</span>`;
+  } else if (type === "reorg") {
+    badge.className += " bg-amber-100 border-amber-300 text-amber-800";
+    badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
+  } else {
+    badge.className += " bg-red-100 border-red-400 text-red-900";
+    badge.innerHTML = `<span class="text-lg leading-none">⏰</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Deadline</span>`;
+  }
+  return badge;
+}
+
+function createCoffeeBadge(): HTMLElement {
+  const badge = document.createElement("div");
+  badge.className =
+    "w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center text-lg shadow-sm coffee-bounce select-none";
+  badge.textContent = "☕";
+  return badge;
+}
+
+function slotContentKey(rung: Rung, side: "left" | "right"): string {
+  if (side === "left") {
+    if (rung.obstacle === "left") return `obs-${rung.type}`;
+    if (rung.coffee === "left") return "coffee";
+    return "empty";
+  }
+  if (rung.obstacle === "right") return `obs-${rung.type}`;
+  if (rung.coffee === "right") return "coffee";
+  return "empty";
+}
+
+function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right"): void {
+  const key = slotContentKey(rung, side);
+  if (slotEl.dataset.contentKey === key) return;
+  slotEl.dataset.contentKey = key;
+  slotEl.innerHTML = "";
+  if (side === "left") {
+    if (rung.obstacle === "left") slotEl.appendChild(createObstacleBadge(rung.type!));
+    else if (rung.coffee === "left") slotEl.appendChild(createCoffeeBadge());
+  } else {
+    if (rung.obstacle === "right") slotEl.appendChild(createObstacleBadge(rung.type!));
+    else if (rung.coffee === "right") slotEl.appendChild(createCoffeeBadge());
+  }
+}
+
+function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
+  let rungEl = container.querySelector(`[data-rung-slot="${index}"]`) as HTMLElement | null;
+  if (rungEl) return rungEl;
+
+  rungEl = document.createElement("div");
+  rungEl.dataset.rungSlot = String(index);
+  rungEl.className =
+    "relative w-full flex justify-between items-center transition-all duration-75 select-none pointer-events-none";
+  rungEl.style.height = "52px";
+
+  const connector = document.createElement("div");
+  connector.className =
+    "absolute left-14 right-14 h-3 bg-gradient-to-r from-slate-400 to-slate-300 border border-slate-500 rounded-full z-0";
+  rungEl.appendChild(connector);
+
+  const leftSlot = document.createElement("div");
+  leftSlot.className = "left-slot w-14 h-12 flex items-center justify-center relative z-10";
+  rungEl.appendChild(leftSlot);
+
+  const center = document.createElement("div");
+  center.className =
+    "rung-center w-8 h-8 rounded-full bg-white border border-slate-300 shadow-sm flex items-center justify-center z-10";
+  rungEl.appendChild(center);
+
+  const rightSlot = document.createElement("div");
+  rightSlot.className = "right-slot w-14 h-12 flex items-center justify-center relative z-10";
+  rungEl.appendChild(rightSlot);
+
+  container.appendChild(rungEl);
+  return rungEl;
+}
+
+function diffReorgSwaps(prev: Rung[], next: Rung[]): { rungId: number; toSide: PlayerSide }[] {
+  const swaps: { rungId: number; toSide: PlayerSide }[] = [];
+  for (const nextRung of next) {
+    const prevRung = prev.find((r) => r.id === nextRung.id);
+    if (!prevRung || nextRung.type !== "reorg" || !nextRung.obstacle) continue;
+    if (prevRung.obstacle !== nextRung.obstacle) {
+      swaps.push({ rungId: nextRung.id, toSide: nextRung.obstacle });
+    }
+  }
+  return swaps;
+}
+
+function didAdvanceRungs(prev: Rung[], next: Rung[]): boolean {
+  return prev.length > 0 && next.length > 0 && prev.length === next.length && prev[1]?.id === next[0]?.id;
+}
+
+function renderRungsInner(): void {
+  const container = $("rungsContainer");
+  const rungs = engine.getRungs();
+  const reorgSwaps = diffReorgSwaps(prevRungsSnapshot, rungs);
+  const advanced = didAdvanceRungs(prevRungsSnapshot, rungs);
+
+  for (let i = 0; i < MAX_VISIBLE_RUNGS; i++) {
+    const rungEl = ensureRungSlot(container, i);
+    const rung = rungs[i];
+    if (!rung) {
+      rungEl.style.visibility = "hidden";
+      rungEl.classList.remove("next-rung");
+      continue;
+    }
+    rungEl.style.visibility = "visible";
+    rungEl.dataset.rungId = String(rung.id);
+    rungEl.classList.toggle("next-rung", i === 1);
+
+    const leftSlot = rungEl.querySelector(".left-slot") as HTMLElement;
+    const rightSlot = rungEl.querySelector(".right-slot") as HTMLElement;
+    fillSlot(leftSlot, rung, "left");
+    fillSlot(rightSlot, rung, "right");
+
+    leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn");
+    rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn");
+
+    if (earlyTapsRemaining > 0 && i === 1) {
+      leftSlot.classList.toggle("safe-side-hint", rung.obstacle !== "left");
+      rightSlot.classList.toggle("safe-side-hint", rung.obstacle !== "right");
+    }
+
+    if (i === 1 && rung.obstacle) {
+      const blockedSlot = rung.obstacle === "left" ? leftSlot : rightSlot;
+      const badge = blockedSlot.querySelector(".obstacle-badge") as HTMLElement | null;
+      badge?.classList.add("next-obstacle-warn");
+    }
+
+    const swap = reorgSwaps.find((s) => s.rungId === rung.id);
+    if (swap) {
+      const slotSelector = swap.toSide === "left" ? ".left-slot" : ".right-slot";
+      const badge = rungEl.querySelector(`${slotSelector} .obstacle-badge`) as HTMLElement | null;
+      if (badge) {
+        triggerReorgTelegraph(badge, swap.toSide, () => applyReorgSlide(badge, swap.toSide));
+      }
+    }
+  }
+
+  while (container.children.length > MAX_VISIBLE_RUNGS) {
+    container.removeChild(container.lastChild!);
+  }
+
+  if (advanced) triggerRungAdvance(container);
+  prevRungsSnapshot = rungs.map((r) => ({ ...r }));
+}
+
+function renderRungsWithReorgFeedback(): void {
+  const rungs = engine.getRungs();
+  const hadReorg = diffReorgSwaps(prevRungsSnapshot, rungs).length > 0;
+  renderRungsInner();
+  if (hadReorg && Math.random() < 0.3) {
+    hapticImpact("light");
+  }
+}
+
+function updatePlayerPosition(side: PlayerSide): void {
+  const climber = $("playerClimber");
+  climber.style.left = side === "left" ? PLAYER_LEFT : PLAYER_RIGHT;
+  triggerClimbPop(climber);
+  hapticImpact("light");
+}
+
+function renderLeaderboardSkeleton(list: HTMLElement): void {
+  list.innerHTML = "";
+  for (let i = 0; i < 5; i++) {
+    const row = document.createElement("div");
+    row.className = "lb-skeleton-row flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-white";
+    row.innerHTML = `
+      <div class="flex items-center space-x-3 flex-1">
+        <div class="w-6 h-3 bg-slate-200 rounded"></div>
+        <div class="w-8 h-8 bg-slate-200 rounded-full"></div>
+        <div class="flex-1 space-y-1.5">
+          <div class="h-3 bg-slate-200 rounded w-24"></div>
+          <div class="h-2 bg-slate-100 rounded w-16"></div>
+        </div>
+      </div>
+      <div class="h-4 bg-slate-200 rounded w-10"></div>`;
+    list.appendChild(row);
+  }
+}
+
+async function renderLeaderboard(): Promise<void> {
+  const list = $("leaderboardList");
+  renderLeaderboardSkeleton(list);
+
+  const entries = await fetchLeaderboard(leaderboardPeriod, getInitData());
+  list.innerHTML = "";
+
+  if (entries.length === 0) {
+    list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No climbers yet. Be the first!</p>';
+    return;
+  }
+
+  entries.forEach((player: LeaderboardEntry, index: number) => {
+    const item = document.createElement("div");
+    item.className = `lb-row flex items-center justify-between p-3 rounded-xl border transition duration-150 ${
+      player.is_current_user ? "lb-row-self" : "bg-white border-slate-200"
+    }`;
+    item.style.setProperty("--i", String(index));
+    const medal = player.rank === 1 ? "🥇" : player.rank === 2 ? "🥈" : player.rank === 3 ? "🥉" : `#${player.rank}`;
+    const emoji = rankEmoji(player.final_rank as Rank);
+    item.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <span class="w-6 text-xs font-bold text-slate-400 text-center">${medal}</span>
+        <span class="text-base">${emoji}</span>
+        <div>
+          <p class="text-xs font-extrabold ${player.is_current_user ? "text-indigo-900" : "text-slate-800"}">${player.username}</p>
+          <p class="text-nano text-slate-400 font-semibold uppercase">${player.final_rank}</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-black text-slate-900">${player.years_survived.toFixed(1)}</span>
+        <span class="text-nano font-bold text-slate-400 block">Years</span>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+function setLeaderboardPeriod(period: LeaderboardPeriod): void {
+  leaderboardPeriod = period;
+  document.querySelectorAll("[data-lb-tab]").forEach((btn) => {
+    const el = btn as HTMLElement;
+    if (el.dataset.lbTab === period) {
+      el.className = "lb-tab-active";
+    } else {
+      el.className = "lb-tab-inactive";
+    }
+  });
+  renderLeaderboard();
+}
+
+function startGame(): void {
+  $("burnoutMeter").className =
+    "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
+  $("burnoutMeter").style.width = "100%";
+  $("tapPrompt").classList.remove("hidden");
+  flashBurnoutStress(false);
+  playerInPanic = false;
+  $("playerClimber").classList.remove("player-panic");
+  $("playerActionEmoji").classList.add("idle-bob");
+  prevRungsSnapshot = [];
+  lastPointerTapAt = 0;
+  earlyTapsRemaining = 3;
+  disableVerticalSwipe();
+  engine.start();
+  updateRankUI("Intern");
+  updateMilestoneChip(0);
+  switchTab("game");
+}
+
+function goHome(): void {
+  engine.stop();
+  flashBurnoutStress(false);
+  playerInPanic = false;
+  enableVerticalSwipe();
+  switchTab("home");
+}
+
+async function onGameOver(result: GameOverResult): Promise<void> {
+  lastGameResult = result;
+  $("playerActionEmoji").classList.remove("idle-bob");
+
+  const previousBest = highScore;
+
+  if (result.yearsSurvived > highScore) {
+    highScore = result.yearsSurvived;
+    bestRank = result.finalRank;
+    $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+    if (!isTelegram()) {
+      localStorage.setItem("corp_ladder_highscore", String(highScore));
+    }
+  }
+
+  $("statYears").textContent = `${result.yearsSurvived.toFixed(1)} Years`;
+  $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
+  $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
+  $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
+  $("terminationReason").textContent = `"${result.terminationDetail}"`;
+  $("retryTip").textContent = RETRY_TIPS[result.deathType];
+  $("terminationFlavor").textContent = `"${result.terminationFlavor}"`;
+  $("reviewId").textContent = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
+
+  if (highScore > 0 && bestRank) {
+    $("careerHighLine").textContent = `Career high: ${bestRank} (${highScore.toFixed(1)}y)`;
+  } else {
+    $("careerHighLine").textContent = "";
+  }
+
+  if (result.yearsSurvived > previousBest) {
+    const delta = previousBest > 0 ? result.yearsSurvived - previousBest : result.yearsSurvived;
+    $("statBestDelta").textContent =
+      previousBest > 0 ? `+${delta.toFixed(1)} Years (new record!)` : "New personal best!";
+    $("statBestDelta").className = "text-nano font-bold text-emerald-600 mt-0.5";
+  } else if (previousBest > 0) {
+    $("statBestDelta").textContent = `${(previousBest - result.yearsSurvived).toFixed(1)} short of your best`;
+    $("statBestDelta").className = "text-nano font-bold text-slate-500 mt-0.5";
+  } else {
+    $("statBestDelta").textContent = "";
+  }
+
+  const initData = getInitData();
+  if (initData) {
+    const ok = await submitRun(initData, {
+      yearsSurvived: result.yearsSurvived,
+      finalRank: result.finalRank,
+      terminationCause: result.terminationCause,
+      rungsClimbed: result.rungsClimbed,
+    });
+    if (ok) showToast("Score submitted to the boardroom!");
+  }
+
+  flashBurnoutStress(false);
+  setPlayerPanic(false);
+  hapticNotification("error");
+  triggerDeathFlash();
+
+  triggerDeathEmoji(result.deathType, () => {
+    triggerShake($("gameScreen"), () => {
+      enableVerticalSwipe();
+      switchTab("gameover");
+    });
+  });
+}
+
+function buildShareText(): string {
+  const years = lastGameResult?.yearsSurvived.toFixed(1) ?? "0.0";
+  const rank = lastGameResult?.finalRank ?? "Intern";
+  const botUser = import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadderBot";
+  const detail = lastGameResult?.terminationDetail ?? "";
+  const flavor = lastGameResult?.terminationFlavor ?? "";
+
+  return (
+    `CORPORATE PERFORMANCE REVIEW\n` +
+    `Employee: ${username}\n` +
+    `${years} Years | Final Rank: ${rank}\n` +
+    `Cause: ${detail}\n` +
+    `"${flavor}"\n` +
+    `Play Corporate Ladder on Telegram @${botUser}\n` +
+    getPromptAnatomyShareLine()
+  );
+}
+
+function copyShareText(): void {
+  const text = buildShareText();
+  if (shareText(text)) {
+    showToast("Opening Telegram share...");
+    return;
+  }
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(
+      () => showToast("Review copied! Share on Telegram."),
+      () => showToast("Could not copy — try again.")
+    );
+  } else {
+    showToast("Could not copy — try again.");
+  }
+}
+
+function toggleMute(): void {
+  audio.setMuted(!audio.isMuted());
+  const icon = $("soundIcon");
+  if (audio.isMuted()) {
+    icon.className = "fa-solid fa-volume-xmark text-red-400";
+    showToast("Synthesizer Muted");
+  } else {
+    icon.className = "fa-solid fa-volume-high";
+    showToast("Synthesizer Unmuted");
+    audio.init();
+    audio.unmuteTest();
+  }
+}
+
+let lastPointerTapAt = 0;
+
+function bindTapButton(el: HTMLElement, side: PlayerSide): void {
+  el.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastPointerTapAt < 50) return;
+    lastPointerTapAt = now;
+    engine.handleTap(side);
+    if (earlyTapsRemaining > 0) earlyTapsRemaining--;
+  });
+}
+
+export function mountApp(): void {
+  initTelegram();
+  username = getDisplayName();
+  $("botHandleLabel").textContent = `@${getBotUsername()}`;
+
+  const usernameInput = $("usernameInput") as HTMLInputElement;
+  if (isTelegram()) {
+    usernameInput.readOnly = true;
+    usernameInput.classList.add("cursor-default");
+    usernameInput.title = "Name from your Telegram profile";
+  } else {
+    const saved = localStorage.getItem("corp_ladder_username");
+    if (saved) username = saved;
+  }
+
+  engine = new GameEngine(
+    {
+      onScoreUpdate: (years, energy) => {
+        $("gameYearsLabel").textContent = years.toFixed(1);
+        updateMilestoneChip(years);
+        $("burnoutMeter").style.width = `${energy}%`;
+        $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;
+        if (energy < 25) {
+          $("burnoutMeter").className = "h-full bg-red-600 rounded-full transition-all duration-75 obstacle-pulse";
+          flashBurnoutStress(true);
+          if (!playerInPanic) setPlayerPanic(true);
+        } else {
+          $("burnoutMeter").className =
+            "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
+          flashBurnoutStress(false);
+          if (playerInPanic) setPlayerPanic(false);
+        }
+      },
+      onRankChange: (rank, message) => {
+        updateRankUI(rank, false);
+        flashPlayerEmoji("😎", 400);
+        triggerRankPop($("playerActionEmoji"));
+        $("promoText").textContent = message;
+        if (rank === "Manager") showToast("Reorgs now swap sides. Time your climbs.");
+        else if (rank === "CEO") showToast("Deadlines joined the org chart. Good luck.");
+        const overlay = $("promoOverlay");
+        overlay.classList.remove("scale-0");
+        overlay.classList.add("scale-100");
+        triggerPromoConfetti(overlay);
+        hapticNotification("success");
+        const promoEmoji = rank === "Manager" ? "📋" : rank === "CEO" ? "👑" : "🎉";
+        spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
+        setTimeout(() => {
+          overlay.classList.remove("scale-100");
+          overlay.classList.add("scale-0");
+        }, 1500);
+      },
+      onGameOver,
+      onCoffee: () => {
+        flashPlayerEmoji("🤤", 200);
+        showToast("+25% Energy Recovery! ☕");
+        triggerMeterFlash($("burnoutMeter"));
+        spawnFloatingParticles($("playerClimber"), "☕", 4);
+        hapticImpact("medium");
+      },
+      onToast: showToast,
+    },
+    renderRungsWithReorgFeedback,
+    updatePlayerPosition,
+    () => $("tapPrompt").classList.add("hidden")
+  );
+
+  ($("usernameInput") as HTMLInputElement).value = username;
+  $("usernameInput").addEventListener("change", (e) => {
+    if (isTelegram()) return;
+    username = (e.target as HTMLInputElement).value.trim() || "CorporateSlave";
+    localStorage.setItem("corp_ladder_username", username);
+    showToast(`Profile Updated: ${username}`);
+  });
+
+  bindTapButton($("btnTapLeft"), "left");
+  bindTapButton($("btnTapRight"), "right");
+
+  window.addEventListener("keydown", (e) => {
+    if (!engine.isActive()) return;
+    if (e.key === "ArrowLeft") engine.handleTap("left");
+    if (e.key === "ArrowRight") engine.handleTap("right");
+  });
+
+  document.querySelectorAll("[data-lb-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => setLeaderboardPeriod(btn.getAttribute("data-lb-tab") as LeaderboardPeriod));
+  });
+
+  (window as unknown as Record<string, unknown>).goHome = goHome;
+  (window as unknown as Record<string, unknown>).startGame = startGame;
+  (window as unknown as Record<string, unknown>).switchTab = (tab: string) => {
+    if (tab === "leaderboard") {
+      switchTab("leaderboard");
+      renderLeaderboard();
+    } else if (tab === "howtoplay") {
+      switchTab("howtoplay");
+    }
+  };
+  (window as unknown as Record<string, unknown>).copyShareText = copyShareText;
+  (window as unknown as Record<string, unknown>).openPromptAnatomy = openPromptAnatomy;
+  (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
+
+  updateRankUI("Intern");
+
+  const initData = getInitData();
+  if (initData) {
+    fetchProfile(initData).then((profile) => {
+      if (profile) {
+        highScore = profile.best_score;
+        bestRank = profile.best_rank || "Intern";
+        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+        if (profile.first_name || profile.username) {
+          username = profile.username ?? profile.first_name ?? username;
+          ($("usernameInput") as HTMLInputElement).value = username;
+        }
+      }
+    });
+  } else {
+    const saved = localStorage.getItem("corp_ladder_highscore");
+    if (saved) {
+      highScore = parseFloat(saved);
+      bestRank = rankFromYears(Math.floor(highScore));
+      $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+    }
+  }
+}

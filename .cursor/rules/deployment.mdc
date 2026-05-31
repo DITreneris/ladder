@@ -1,0 +1,60 @@
+---
+description: Deployment checklist for Vercel, Railway, Supabase, BotFather
+globs: "{DEPLOY.md,docs/DEPLOY_STATUS.md,scripts/verify-deploy-config.*,scripts/smoke-local.*,railway.toml,**/Dockerfile,.env.example}"
+alwaysApply: false
+---
+
+# Deployment Checklist
+
+See [DEPLOY.md](../../DEPLOY.md) for the full cold-deploy and post-deploy verification checklist. Release train: [ROADMAP.md](../../ROADMAP.md) deploy gate (tag v1.5.0 + v1.6.0 after QA).
+
+## Environment (root `.env`)
+
+All services read a **single repo root** `.env` (see [.env.example](../../.env.example)). Optional sync: `scripts/setup-env.ps1` or `scripts/setup-env.sh`.
+
+## 1. Supabase
+
+1. Create project at supabase.com
+2. Run `supabase/migrations/001_initial_schema.sql`
+3. Copy URL + service role key
+
+## 2. Railway — API
+
+1. New service from `packages/api/` (Dockerfile)
+2. Set env: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBAPP_SECRET`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
+3. Verify `GET /health` returns `{"status":"ok"}`
+
+## 3. Vercel — Mini App
+
+1. Import repo, root directory `apps/mini-app`
+2. Set env: `VITE_API_URL` (Railway API URL), `VITE_BOT_USERNAME`, `VITE_PROMPT_ANATOMY_URL` (optional; defaults in code)
+3. Deploy, copy production URL
+
+## 4. Railway — Bot
+
+1. New service from `apps/bot/` (Dockerfile)
+2. Set env: `TELEGRAM_BOT_TOKEN`, `MINI_APP_URL` (Vercel URL)
+
+## 5. BotFather
+
+1. `/setdomain` — set Vercel domain
+2. Bot Settings → Menu Button → Configure Mini App URL
+3. Test `/start` in Telegram
+
+## 6. Preflight & smoke
+
+From repo root:
+
+```powershell
+.\scripts\verify-deploy-config.ps1
+.\scripts\smoke-local.ps1
+```
+
+Smoke runs: API `pytest`, bot import, mini-app `lint` + `test` + `build` + viewport QA, deploy preflight.
+
+## 7. Post-deploy smoke
+
+- Open Mini App from bot
+- Play one run, verify score on Daily leaderboard
+- Test share button
+- v1.6: milestone chip, death cause row, retry tip visible on game over

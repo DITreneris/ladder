@@ -1,0 +1,48 @@
+---
+description: Telegram Mini App frontend conventions
+globs: apps/mini-app/**
+alwaysApply: false
+---
+
+# Mini App Frontend
+
+## Structure
+
+- `src/game/` — engine, constants, audio (no DOM)
+- `src/lib/telegram.ts` — WebApp SDK wrapper
+- `src/lib/api.ts` — fetch calls to Railway API
+- `src/lib/branding.ts` — Prompt Anatomy co-branding (`VITE_PROMPT_ANATOMY_URL`)
+- `src/lib/effects.ts` — visual effects (reduced-motion aware)
+- `src/app.ts` — UI controller and DOM wiring
+- `src/template.ts` — HTML shell
+- `src/style.css` — design tokens and utilities
+
+## Rules
+
+- Never embed `TELEGRAM_BOT_TOKEN` or Supabase keys in client code.
+- Use `getInitData()` for all authenticated API calls.
+- Leaderboard tabs: Daily and Weekly only (v1).
+- Share: prefer `Telegram.WebApp.shareMessage()`, fallback to clipboard.
+- Styling: Tailwind utility classes via Vite plugin; no CDN Tailwind in production.
+- Game logic changes must maintain parity with [snippet.txt](../../snippet.txt) unless spec updated.
+
+## Shipped mechanics guardrails (v1.6)
+
+See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline. Do not regress without spec update:
+
+- Rank-gated obstacles: Meeting (Intern) → Reorg (Manager+) → Deadline (`burnout` type, CEO+)
+- Intern tutorial ramp: lower spawn rate first 12 rungs; guaranteed coffee by rung 8 if none collected
+- Reorg fairness: next rung (`rungs[1]`) exempt from swap during reorg ticks
+- 2s energy drain pause on promotion
+- HUD milestone chip; game-over death cause + retry tips
+- Code type `burnout` vs UI label **Deadline** — see [docs/mvp-scope.md](../../docs/mvp-scope.md) terminology table
+
+Do not add Legends tab or new control schemes without scope approval.
+
+## Local Dev
+
+```bash
+cd apps/mini-app && npm run dev
+```
+
+Set `VITE_API_URL=http://localhost:8000` in root `.env`.

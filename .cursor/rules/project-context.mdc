@@ -1,0 +1,57 @@
+---
+description: Corporate Ladder product context and MVP boundaries
+alwaysApply: true
+---
+
+# Corporate Ladder — Project Context
+
+Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. "Lumberjack meets modern office life."
+
+## Stack
+
+- Frontend: `apps/mini-app` (TypeScript, Vite, Tailwind) → Vercel
+- API: `packages/api` (FastAPI) → Railway
+- Bot: `apps/bot` (aiogram) → Railway
+- DB: Supabase Postgres (`supabase/migrations/`)
+
+## MVP v1 Scope
+
+**Shipped:** core gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot launch. v1.5 design polish and v1.6 fairness/onboarding complete in code.
+
+**Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
+
+**Next release train:** v1.7 daily replays — see [ROADMAP.md](../../ROADMAP.md). Match ROADMAP § Shipped baseline for v1.6+ mechanics.
+
+## Principles
+
+1. **Humor is the product** — preserve satirical tone in all copy.
+2. **No secrets in frontend** — bot token and Supabase service key stay on Railway only.
+3. **Minimal scope** — do not add v1.1 features without explicit approval.
+4. **Match prototype** — [`snippet.txt`](../../snippet.txt) is mechanics canon; port, don't reinvent (parity notes at file footer).
+5. **Terminology** — UI uses Energy / Deadline; code obstacle type `burnout` unchanged.
+
+## Family
+
+Sibling repo: [DITreneris/site](https://github.com/DITreneris/site) (Prompt Anatomy marketing). Shared doc/changelog/verifier habits; this repo keeps satirical Telegram game scope.
+
+## Key Docs
+
+- [DOCS_INDEX.md](../../DOCS_INDEX.md) — document map (update when adding docs, agents, or skills)
+- [ROADMAP.md](../../ROADMAP.md) — release train, shipped baseline, v1.7+ plan
+- [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) — mini-app visual canon
+- [DEPLOY.md](../../DEPLOY.md) — production deploy checklist
+- [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — deploy progress tracker
+- [docs/mvp-scope.md](../../docs/mvp-scope.md)
+- [docs/architecture.md](../../docs/architecture.md)
+- [CHANGELOG.md](../../CHANGELOG.md) — updated by Changelog Maintainer agent
+- [AGENTS.md](../../AGENTS.md)
+
+## Before finishing any task
+
+- User-visible changes → `[Unreleased]` entry in CHANGELOG.md
+- When touching API or mini-app: `pytest` and/or `npm run lint` / `test` / `build` as appropriate
+- Feature work → run or delegate `verifier` ([.cursor/agents/verifier.md](../agents/verifier.md))
+
+## Changelog
+
+User-facing changes require an `[Unreleased]` entry in CHANGELOG.md. Cyclic review: Changelog Maintainer agent — see [.cursor/agents/changelog-maintainer.md](../agents/changelog-maintainer.md) and `.cursor/skills/changelog-maintainer/SKILL.md`.

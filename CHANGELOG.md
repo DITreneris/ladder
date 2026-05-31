@@ -1,0 +1,160 @@
+# Changelog
+
+All notable changes to Corporate Ladder are documented here.
+
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+**Maintainer:** Changelog Maintainer agent — see [AGENTS.md](AGENTS.md#agent-roles) and [.cursor/skills/changelog-maintainer/SKILL.md](.cursor/skills/changelog-maintainer/SKILL.md).
+
+## [Unreleased]
+
+### Added
+- `.cursor/agents/changelog-maintainer.md` — agent file for Changelog Maintainer (was skill-only)
+- `docs/assets/gameplay.png` — README hero screenshot (generated via `capture:hero`)
+
+### Changed
+- Full refresh of [docs/mvp-scope.md](docs/mvp-scope.md) — shipped v1 product (Energy/Deadline, v1.5/v1.6 polish, co-branding, terminology table)
+- [AGENTS.md](AGENTS.md), [DOCS_INDEX.md](DOCS_INDEX.md), [README.md](README.md) — ROADMAP, DEPLOY_STATUS, task router rows, code map
+- [docs/architecture.md](docs/architecture.md) — `VITE_PROMPT_ANATOMY_URL`, root `.env`, known limits, leaderboard `initData`
+- [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) — v1.5 + v1.6 deploy gate, v1.6 QA smoke row
+- [DEPLOY.md](DEPLOY.md) — `VITE_PROMPT_ANATOMY_URL` on Vercel
+- Cursor rules: `project-context`, `mini-app-frontend`, `mini-app-ui`, `satirical-copy`, `python-api`, `deployment` (globs + env sync)
+- Skills: `mini-app-deploy`, `score-pipeline` — env vars, termination cause examples, leaderboard `initData`
+- [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) v1.6 — Game HUD & game-over patterns section
+- [verifier.md](.cursor/agents/verifier.md) — v1.6 gameplay checklist
+- [primal.txt](primal.txt), [snippet.txt](snippet.txt) — header/footer parity notes pointing to current spec
+
+### Added
+- Initial GitHub publish to [DITreneris/ladder](https://github.com/DITreneris/ladder); PA logo at `apps/mini-app/public/branding/prompt-anatomy-logo.png`
+
+### Planned (v1.1)
+- All-time / Legends tab
+- Analytics events
+- Server-side replay validation (anti-cheat)
+
+## [1.6.0] - 2026-05-31
+
+v1.6 — progress clarity and fairness polish on the v1.5 design baseline.
+
+### Added
+- HUD milestone chip — `Manager in X.y` / `CEO in X.y` / corner office secured during play
+- Game-over death cause icon + label and satirical retry tip per failure type
+- Career high line on performance card (best rank + years from profile)
+- Intern tutorial ramp — lower meeting spawn rate for first 12 rungs; one guaranteed coffee spawn if none collected by rung 8
+- 2s energy drain pause after promotion so new rank rules are readable
+- Character emoji flashes on coffee pickup and promotion; tap-zone active border glow
+- Reorg fairness — imminent next rung no longer swaps during reorg ticks; reorg SFX on every swap
+
+### Changed
+- Manager rank emoji to neutral `🧑‍💼`
+- Deadline obstacle badge — brighter red styling for CEO-phase readability
+
+## [1.5.0] - 2026-05-31
+
+v1.5 pre-release — polish, onboarding clarity, GitHub presentation, deploy readiness.
+
+### Added
+- Prompt Anatomy co-branding — footer with logo, “Powered by” link, and “Visit Prompt Anatomy” CTA on home, game over, leaderboard, and how-to-play; share text and bot welcome attribution
+- `apps/mini-app/public/branding/prompt-anatomy-logo.png` — fixes footer 404
+- `DESIGN_SYSTEM.md` — mini-app design tokens, utilities, a11y matrix
+- `.cursor/rules/mini-app-ui.mdc` — shell UI guardrails for agents
+- `apps/mini-app/scripts/viewport-qa.mjs` — Playwright horizontal overflow check for shell screens
+- `apps/mini-app/scripts/capture-hero.mjs` — README hero screenshot capture
+- `@theme` + `@utility` token layer in `apps/mini-app/src/style.css` (CL-native blue/amber, not PA gold)
+- `DOCS_INDEX.md` — monorepo document map, task router, DITreneris family charter
+- `DEPLOY.md` — cold-deploy and post-deploy verification checklist
+- `ROADMAP.md` — v1.5 status, v1.1 deferrals, deploy gate
+- `LICENSE` — proprietary, all rights reserved
+- `.github/ISSUE_TEMPLATE/` — bug report and feature request templates
+- `.cursor/agents/verifier.md` — read-only pre-merge QA agent
+- Expanded `AGENTS.md` with deployment table, workflow, and family cross-links
+- Climb squash animation, finite game-over shake, reorg slide, coffee/promo particles
+- Telegram haptic feedback and vertical-swipe lock during gameplay
+- `prefers-reduced-motion` support for accessibility
+- Leaderboard loading skeleton and row stagger animation
+- Home-screen one-line tutorial; CSS news ticker (replaces marquee)
+- Next-rung highlight, reorg telegraph flash, idle bob and panic character states
+- Death emoji flash per obstacle type; rank-specific promotion particles
+- Rank-gated obstacles (meetings only as Intern; reorgs at Manager; deadlines at CEO)
+- Pre-release QA checklist in mini-app README (automated vs manual split)
+- Safe-side green hint for first 3 taps; rank-unlock toasts (Manager/CEO)
+- Career phases section in How-to-Play; personal best delta on game over
+- Next-rung obstacle warn pulse; `docs/assets/gameplay.png` README hero
+
+### Changed
+- Mini-app shell UI refactored to design-system utilities (`btn-cl-primary`, `card-light`, `badge-rank-*`, typography tokens)
+- Font Awesome bundled via npm (CDN removed from `index.html`)
+- `README.md`, `project-context.mdc`, and deploy skill point to `DOCS_INDEX` / `DEPLOY`
+- Changelog Maintainer skill notes family alias `changelog-keeper` (mother repo)
+- Rung rendering uses incremental DOM updates instead of full rebuild each tap
+- Burnout meter renamed to **Energy**; burnout obstacle renamed to **Deadline** (UI)
+- Share text trimmed to 5-line performance review format
+- Enriched promotion and rank-flavored failure copy
+- Slower base energy drain (~15% buffer); CEO reorg interval 500ms
+- Full viewport layout in Telegram (phone shell hidden); shell kept for browser dev
+- Tap input uses single `pointerdown` handler (fixes mobile double-tap)
+- Promo overlay auto-dismiss reduced to 1.5s
+- Game-over card shows termination flavor quote (in addition to share text)
+- Obstacle badge micro-type uses `text-nano` per design system
+- Root `README.md` — how to play, live demo table, hero screenshot, known issues
+
+### Fixed
+- Player climber initial position aligned with tap positions
+- Reorg slide animates correct badge slot (left/right query fix)
+- Clipboard share failure shows error toast
+- Energy no longer drains before the player's first climb tap
+
+### Security
+- No change
+
+## [1.0.0] - 2026-05-31
+
+v1 launch hardening — env ergonomics, tests, Telegram theme, deploy tooling.
+
+### Added
+- **Unified env loading:** repo root `.env` read by API, bot, and mini-app (Vite `envDir`); `scripts/setup-env.ps1` / `setup-env.sh` for optional sync
+- **API integration tests:** `/auth/me`, `/runs` (valid, invalid hash, rung mismatch, rate limit, invalid rank), weekly leaderboard; expired `auth_date` unit test
+- **Deploy scripts:** `scripts/verify-deploy-config.*`, `scripts/smoke-local.*` for preflight and local smoke
+- **Telegram theme:** `themeParams` → `--cl-*` CSS variables; shell/header adapt to light/dark mode
+- **Mini-app README:** play instructions, folder map, env vars, commands
+- **Vitest:** rank thresholds, engine collision/coffee/stop tests; CI runs `npm test`
+
+### Fixed
+- Offline high score now persists to `localStorage` when not in Telegram
+- Burnout game-over copy typo ("Collant" → "Cognitive overload")
+- Bot handle in header uses `VITE_BOT_USERNAME` instead of hardcoded `@CorporateLadderBot`
+- Telegram username input is read-only when opened inside Telegram
+- `final_rank` validated as `Intern` | `Manager` | `CEO` on score submit
+
+### Changed
+- Documented in-memory rate limit caveat for multi-replica Railway in `docs/architecture.md`
+
+## [0.1.0] - 2026-05-31
+
+Initial monorepo scaffold — MVP v1 foundation.
+
+### Added
+- **Monorepo layout:** `apps/mini-app`, `apps/bot`, `packages/api`, `supabase/`
+- **Mini App (TypeScript + Vite + Tailwind):** game engine ported from prototype — tap left/right, 3 obstacles, coffee recovery, burnout meter, 3 ranks (Intern → Manager → CEO)
+- **Telegram integration:** WebApp SDK wrapper, initData auth, share with clipboard fallback
+- **FastAPI backend:** `POST /auth/me`, `POST /runs`, `GET /leaderboard?period=daily|weekly`, Telegram HMAC validation, score sanity checks
+- **Telegram bot (aiogram):** `/start` with Mini App launch button
+- **Supabase schema:** `users`, `game_runs` tables with RLS (public read, service-role writes)
+- **Docs:** `docs/mvp-scope.md`, `docs/architecture.md`, `README.md`, `AGENTS.md`
+- **Cursor config:** 6 rules, 3 project skills (telegram auth, score pipeline, deploy)
+- **CI:** GitHub Actions — API pytest, bot import smoke test, mini-app lint + build
+- **Deploy configs:** Railway Dockerfiles for API and bot, Vercel config for mini-app
+
+### Changed
+- Leaderboard UI: Daily + Weekly tabs only (Legends/All-time deferred to v1.1)
+- Score persistence: localStorage prototype replaced with API + Supabase path (localStorage fallback when outside Telegram)
+
+### Security
+- Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
+
+[Unreleased]: compare/v1.6.0...HEAD
+[1.6.0]: compare/v1.5.0...v1.6.0
+[1.5.0]: compare/v1.0.0...v1.5.0
+[1.0.0]: compare/v0.1.0...v1.0.0
+[0.1.0]: releases/tag/v0.1.0

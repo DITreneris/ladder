@@ -1,0 +1,283 @@
+# Corporate Ladder
+
+> **Historical concept v0.1.** Current product spec: [docs/mvp-scope.md](docs/mvp-scope.md) and [ROADMAP.md](ROADMAP.md) § Shipped baseline. UI uses Energy/Deadline; this file retains original Burnout naming for narrative context.
+
+## MVP Concept v0.1
+
+### One-Line Pitch
+
+A fast-paced Telegram Mini App where players climb the corporate ladder while avoiding meetings, reorganizations, and burnout.
+
+---
+
+# Core Idea
+
+Most mobile games simulate fantasy worlds.
+
+Corporate Ladder simulates modern work life.
+
+Players start as interns and attempt to climb to CEO before corporate chaos ends their career.
+
+The game combines:
+
+* Simple Lumberjack-style gameplay
+* Workplace satire
+* Competitive leaderboards
+* Shareable career stories
+
+---
+
+# Core Gameplay Loop
+
+1. Start as Intern
+2. Climb the ladder by tapping left or right
+3. Avoid corporate obstacles
+4. Earn promotions
+5. Increase score
+6. Fail through burnout, meetings, or reorganization
+7. Share results
+8. Play again
+
+Target session:
+
+30–90 seconds
+
+---
+
+# MVP Mechanics
+
+## Controls
+
+* Tap Left
+* Tap Right
+
+Each tap climbs one ladder rung.
+
+---
+
+## Obstacles
+
+Three obstacle types only:
+
+### Meeting
+
+Blocks one side.
+
+### Reorganization
+
+Forces quick decision.
+
+### Burnout
+
+Reduces available time.
+
+---
+
+## Timer
+
+Constant pressure.
+
+Promotions add time.
+
+Higher levels increase difficulty.
+
+---
+
+# Progression
+
+Only three ranks for MVP.
+
+## Intern
+
+Starting level.
+
+---
+
+## Manager
+
+Mid-game milestone.
+
+---
+
+## CEO
+
+Top achievement.
+
+---
+
+# Score System
+
+Primary metric:
+
+## Career Years Survived
+
+Example:
+
+42 Years Survived
+
+---
+
+Secondary metric:
+
+## Final Position
+
+Example:
+
+Manager
+
+Director
+
+CEO
+
+---
+
+# Game Over States
+
+Examples:
+
+* Burnout
+* Meeting Overload
+* Reorganization
+* Budget Cuts
+
+---
+
+# Humor System
+
+The humor is the product.
+
+Every promotion and failure generates satirical messages.
+
+Examples:
+
+"Promoted to Manager. Calendar destroyed."
+
+"Reached CEO. Budget denied."
+
+"Attended 214 meetings. No decisions made."
+
+"Burned out while updating spreadsheets."
+
+---
+
+# Telegram Integration
+
+## Login
+
+Telegram user authentication.
+
+## Leaderboards
+
+* Daily
+* Weekly
+* Friends
+
+## Sharing
+
+Players can share results directly in Telegram chats.
+
+Example:
+
+"I survived 57 corporate years. Can you beat me?"
+
+---
+
+# Visual Direction
+
+Style:
+
+* Clean cartoon
+* Minimalist
+* Office-themed
+
+Player evolves visually:
+
+Intern → Manager → CEO
+
+Simple, recognizable silhouettes.
+
+No complex animations required.
+
+---
+
+# Success Metrics
+
+## Day 1
+
+Playable prototype.
+
+---
+
+## Week 1
+
+Telegram launch.
+
+---
+
+## Validation Metrics
+
+Track:
+
+* Average session length
+* Games per user
+* Share rate
+* Daily retention
+* Leaderboard participation
+
+---
+
+# MVP Scope
+
+Included:
+
+✓ Core gameplay
+
+✓ Three obstacles
+
+✓ Three ranks
+
+✓ Score system
+
+✓ Telegram login
+
+✓ Leaderboards
+
+✓ Sharing
+
+---
+
+Not Included:
+
+✗ Virtual currency
+
+✗ Marketplace
+
+✗ Skins
+
+✗ Clans
+
+✗ Quests
+
+✗ NFTs
+
+✗ Blockchain
+
+✗ Complex progression
+
+---
+
+# Why This Can Work
+
+The gameplay is already proven.
+
+The differentiator is not the mechanic.
+
+The differentiator is workplace humor, career progression, and social sharing.
+
+Corporate Ladder is essentially:
+
+"Lumberjack meets modern office life."
+
+Simple to build.
+Easy to understand.
+Potentially highly shareable.
