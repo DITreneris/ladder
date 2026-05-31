@@ -12,6 +12,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - Prompt Anatomy footer — single compact link (logo + “Prompt Anatomy ↗”) instead of separate “Powered by” line and full-width CTA
 
+### Fixed
+- Bot Docker startup crash on Railway — skip repo-root `.env` lookup when `main.py` runs from `/app` (IndexError on `parents[2]`)
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

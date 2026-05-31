@@ -11,9 +11,10 @@ from aiogram.filters import CommandStart
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, WebAppInfo
 from dotenv import load_dotenv
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-load_dotenv(_REPO_ROOT / ".env")
-load_dotenv(Path(__file__).resolve().parent / ".env")
+_here = Path(__file__).resolve()
+load_dotenv(_here.parent / ".env")
+if len(_here.parents) >= 3:
+    load_dotenv(_here.parents[2] / ".env")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
