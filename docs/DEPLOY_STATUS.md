@@ -2,8 +2,11 @@
 
 Track manual deploy progress for **v1.5.0 + v1.6.0** (deploy gate per [ROADMAP.md](../ROADMAP.md)). Full steps: [DEPLOY.md](../DEPLOY.md).
 
+**GitHub:** [github.com/DITreneris/ladder](https://github.com/DITreneris/ladder) — `main` pushed (cold deploy).
+
 | Step | Service | Status | URL / notes |
 |------|---------|--------|-------------|
+| 0 | GitHub | **Done** | [DITreneris/ladder](https://github.com/DITreneris/ladder) — branch `main`, CI on push |
 | 1 | Supabase migration | Pending | Run `supabase/migrations/001_initial_schema.sql` |
 | 2 | Railway API | Pending | Set `TELEGRAM_*`, `SUPABASE_*` from `.env.example` |
 | 3 | Vercel Mini App | Pending | Root `apps/mini-app`; `VITE_API_URL`, `VITE_BOT_USERNAME`, `VITE_PROMPT_ANATOMY_URL` |

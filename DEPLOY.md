@@ -2,7 +2,7 @@
 
 Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and BotFather.
 
-**Deep reference:** [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) · **Doc map:** [DOCS_INDEX.md](DOCS_INDEX.md)
+**Deep reference:** [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) · **Doc map:** [DOCS_INDEX.md](DOCS_INDEX.md) · **First publish:** [docs/COLD_DEPLOY.md](docs/COLD_DEPLOY.md)
 
 ## Prerequisites
 
