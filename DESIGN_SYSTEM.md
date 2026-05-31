@@ -147,7 +147,7 @@ Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented
 - Floating `.sound-fab` for mute toggle (not duplicated in header)
 - Safe-area padding on `.cl-phone-shell` via `--tg-content-safe-area-inset-*` + `env(safe-area-inset-*)`
 - Home: compact hero + identity card (Employee Badge / ACTIVE EMPLOYMENT) + scrolling news strip + daily shift pill + description; rule above sticky `.start-cta-bar` (no scroll on default phones)
-- Game: compact `.game-hud`, slim `.tap-prompt-bar` below HUD, `#gamePlayArea` for ladder only, fixed `.tap-controls-bar` with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; keyboard hints hidden in Telegram
+- Game: compact `.game-hud` with optional `#hudTapHint` chip; `#hrMemoRail` below HUD for in-run People Ops memos (queued); `#gamePlayArea` for ladder only; fixed `.tap-controls-bar` with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; keyboard hints hidden in Telegram; bottom shell toast for non-game feedback only
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
 
 ### 8.2 Focus

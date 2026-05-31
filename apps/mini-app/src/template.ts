@@ -91,15 +91,6 @@ export const APP_SHELL = `
     </div>
     <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
-      <div id="promoOverlay" class="absolute top-16 left-4 right-4 bg-amber-50 border-2 border-amber-300 rounded-xl p-3 shadow-lg flex items-center gap-3 z-30 transform scale-0 transition-transform duration-300">
-        <div class="text-3xl">🎉</div>
-        <div class="flex-grow">
-          <h4 class="font-extrabold text-amber-900 text-xs uppercase tracking-wide">Promoted!</h4>
-          <p class="text-xs text-amber-800" id="promoText">You are now a Manager.</p>
-        </div>
-        <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-1 rounded rotate-12 shrink-0">PROMOTED</span>
-      </div>
-      <div id="tapPrompt" class="tap-prompt-bar hidden">Tap the empty side to climb</div>
       <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col">
       <div id="gameHud" class="game-hud z-10 flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
@@ -120,6 +111,19 @@ export const APP_SHELL = `
             <div id="burnoutMeter" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75" style="width: 100%;"></div>
           </div>
           <span id="burnoutPercentLabel" class="text-caption font-bold text-slate-500 w-8 text-right">100%</span>
+        </div>
+        <p id="hudTapHint" class="hud-tap-hint hidden">Tap the empty side to climb</p>
+      </div>
+      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
+        <div class="hr-memo-rail-body">
+          <span id="hrMemoFrom" class="hr-memo-from">People Ops</span>
+          <p id="hrMemoText" class="hr-memo-text">…</p>
+        </div>
+        <div class="hr-memo-rail-meta">
+          <span class="hr-memo-stamp-wrap hidden">
+            <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-0.5 rounded rotate-12 shrink-0">PROMOTED</span>
+          </span>
+          <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
         </div>
       </div>
         <div id="gamePlayArea" class="game-play-area">

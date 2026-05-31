@@ -32,6 +32,7 @@ import {
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type LeaderboardEntry } from "./lib/api";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
+import { hideHrMemo, showHrMemo } from "./lib/hr-memo";
 import {
   applyReorgSlide,
   flashBurnoutStress,
@@ -41,8 +42,6 @@ import {
   triggerDeathFlash,
   triggerDeathCauseHold,
   triggerMeterFlash,
-  triggerPromoConfetti,
-  triggerPromoStamp,
   triggerRankPop,
   triggerReorgTelegraph,
   triggerRungAdvance,
@@ -503,15 +502,27 @@ function setLeaderboardPeriod(period: LeaderboardPeriod): void {
   renderLeaderboard();
 }
 
-let tapPromptTimer: ReturnType<typeof setTimeout> | null = null;
+let tapHintTimer: ReturnType<typeof setTimeout> | null = null;
+
+function showHudTapHint(): void {
+  $("hudTapHint").classList.remove("hidden");
+  if (tapHintTimer) clearTimeout(tapHintTimer);
+  tapHintTimer = setTimeout(() => $("hudTapHint").classList.add("hidden"), 3000);
+}
+
+function hideHudTapHint(): void {
+  if (tapHintTimer) clearTimeout(tapHintTimer);
+  tapHintTimer = null;
+  $("hudTapHint").classList.add("hidden");
+}
 
 function startGame(): void {
+  hideHrMemo();
+  hideHudTapHint();
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
   $("burnoutMeter").style.width = "100%";
-  $("tapPrompt").classList.remove("hidden");
-  if (tapPromptTimer) clearTimeout(tapPromptTimer);
-  tapPromptTimer = setTimeout(() => $("tapPrompt").classList.add("hidden"), 3000);
+  showHudTapHint();
   flashBurnoutStress(false);
   playerInPanic = false;
   $("playerClimber").classList.remove("player-panic");
@@ -535,6 +546,8 @@ function startGame(): void {
 
 function goHome(): void {
   engine.stop();
+  hideHrMemo();
+  hideHudTapHint();
   flashBurnoutStress(false);
   playerInPanic = false;
   enableVerticalSwipe();
@@ -543,6 +556,8 @@ function goHome(): void {
 }
 
 async function onGameOver(result: GameOverResult): Promise<void> {
+  hideHrMemo();
+  hideHudTapHint();
   lastGameResult = result;
   $("playerActionEmoji").classList.remove("idle-bob");
 
@@ -715,8 +730,8 @@ function mountOgCaptureMode(): void {
 
   $("soundToggleBtn").classList.add("hidden");
   $("tapControlsBar").classList.add("hidden");
-  $("tapPrompt").classList.add("hidden");
-  $("promoOverlay").classList.add("hidden");
+  hideHudTapHint();
+  hideHrMemo();
 
   prevRungsSnapshot = [];
   earlyTapsRemaining = 0;
@@ -795,47 +810,38 @@ export function mountApp(): void {
         updateRankUI(rank, false);
         flashPlayerEmoji("😎", 400);
         triggerRankPop($("playerActionEmoji"));
-        $("promoText").textContent = message;
+        showHrMemo(message, { variant: "promo", durationMs: 2000 });
         if (rank === "Manager") {
-          showToast(MANAGER_NEMESIS_LINE);
-          setTimeout(() => showToast("Reorgs now swap sides. Time your climbs."), 2600);
+          showHrMemo(MANAGER_NEMESIS_LINE, { variant: "promo" });
+          showHrMemo("Reorgs now swap sides. Time your climbs.", { variant: "info" });
         } else if (rank === "CEO") {
-          showToast("Deadlines joined the org chart. Good luck.");
+          showHrMemo("Deadlines joined the org chart. Good luck.", { variant: "alert" });
           if (!ceoTrapShown) {
             ceoTrapShown = true;
-            showToast(CEO_TRAP_ANNOUNCEMENT);
+            showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo" });
           }
         }
-        const overlay = $("promoOverlay");
-        overlay.classList.remove("scale-0");
-        overlay.classList.add("scale-100");
-        triggerPromoConfetti(overlay);
-        triggerPromoStamp(overlay);
         hapticNotification("success");
         const promoEmoji = rank === "Manager" ? "📋" : rank === "CEO" ? "👑" : "🎉";
         spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
-        setTimeout(() => {
-          overlay.classList.remove("scale-100");
-          overlay.classList.add("scale-0");
-        }, 1500);
       },
       onGameOver,
       onCoffee: () => {
         flashPlayerEmoji("🤤", 200);
-        showToast("+25% Energy Recovery! ☕");
+        showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
         triggerMeterFlash($("burnoutMeter"));
         spawnFloatingParticles($("playerClimber"), "☕", 4);
         hapticImpact("medium");
       },
-      onToast: showToast,
+      onToast: (msg) => showHrMemo(msg, { variant: "info" }),
     },
     renderRungsWithReorgFeedback,
     updatePlayerPosition,
     () => {
-      $("tapPrompt").classList.add("hidden");
+      hideHudTapHint();
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
         shiftToastShown = true;
-        showToast("Shift rules active");
+        showHrMemo("Shift rules active", { variant: "alert" });
       }
     },
     isOgCaptureMode() ? OG_CAPTURE_DAILY_MODIFIER : undefined
