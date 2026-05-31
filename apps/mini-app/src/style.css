@@ -495,6 +495,37 @@ html.cl-in-telegram body {
     linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
 }
 
+.office-grid-reorg-week {
+  background-color: color-mix(in srgb, var(--color-cl-promo-bg) 12%, transparent);
+}
+
+@keyframes shift-badge-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.shift-badge-enter {
+  animation: shift-badge-enter 0.2s ease-out;
+}
+
+@keyframes ticker-shift-pulse {
+  0%,
+  100% {
+    border-color: color-mix(in srgb, var(--color-cl-promo) 30%, transparent);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--color-cl-promo) 65%, transparent);
+  }
+}
+.ticker-shift-emphasis {
+  animation: ticker-shift-pulse 2.5s ease-in-out infinite;
+}
+
 @keyframes obstacle-pulse {
   0%,
   100% {
@@ -562,6 +593,56 @@ html.cl-in-telegram body {
   display: none !important;
 }
 
+.reorg-hud-strip {
+  background: color-mix(in srgb, var(--color-cl-promo) 15%, white);
+  border: 1px solid color-mix(in srgb, var(--color-cl-promo) 40%, transparent);
+  border-radius: 9999px;
+  padding: 2px 8px;
+  text-align: center;
+}
+
+.reorg-hud-strip-label {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-cl-rank-manager-text);
+}
+
+.rank-prop {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.15));
+  pointer-events: none;
+}
+
+@keyframes promo-stamp-in {
+  from {
+    opacity: 0;
+    transform: rotate(-24deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(12deg) scale(1);
+  }
+}
+
+.promo-stamp-in {
+  animation: promo-stamp-in 0.35s ease-out forwards;
+}
+
+@keyframes death-cause-hold {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.death-cause-hold {
+  animation: death-cause-hold 0.45s ease-in-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .shake-element,
   .climb-pop,
@@ -581,7 +662,11 @@ html.cl-in-telegram body {
   .coffee-bounce,
   .news-ticker-text,
   .reorg-warning,
-  #playerActionEmoji.idle-bob {
+  #playerActionEmoji.idle-bob,
+  .shift-badge-enter,
+  .ticker-shift-emphasis,
+  .promo-stamp-in,
+  .death-cause-hold {
     animation: none !important;
   }
   .shake-element {

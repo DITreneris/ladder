@@ -9,7 +9,7 @@ if (-not (Test-Path $EnvFile)) {
         Write-Error ".env.example not found at $Example"
     }
     Copy-Item $Example $EnvFile
-    Write-Host "Created $EnvFile — fill in your credentials."
+    Write-Host "Created $EnvFile - fill in your credentials."
 }
 
 $targets = @(

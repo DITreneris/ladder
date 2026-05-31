@@ -104,6 +104,15 @@ npm run dev
 
 Outside Telegram, the app uses localStorage for nickname and high score. Inside Telegram, auth uses `initData` → `POST /auth/me`.
 
+### Daily shift (v1.7 dev QA)
+
+UTC date picks a spawn preset for all players. In dev:
+
+- URL: `?dailyPreset=meeting_monday` (also `coffee_break`, `reorg_week`, `standard`)
+- Or `localStorage.setItem('cl-daily-preset', 'reorg_week')` then reload
+
+Verify home badge, spawn feel, and share text includes `Shift:`.
+
 ## Telegram Integration
 
 - **Auth:** `getInitData()` on every authenticated API call

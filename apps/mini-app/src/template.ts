@@ -63,10 +63,17 @@ export const APP_SHELL = `
           <span class="font-bold text-slate-950" id="highScoreBadge">0.0 Years</span>
         </div>
       </div>
-      <div class="ticker-bar">
+      <div id="dailyShiftBlock" class="shift-badge-enter space-y-1">
+        <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5">
+          <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
+          <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+        </div>
+        <p id="dailyShiftDescription" class="text-center text-nano text-slate-500 px-2">Synergy optional. Attendance mandatory.</p>
+      </div>
+      <div id="tickerBar" class="ticker-bar">
         <span class="font-bold border-r border-amber-500/30 pr-2 mr-2 shrink-0">NEWS:</span>
         <div class="news-ticker-track">
-          <span class="news-ticker-text font-mono text-caption">* CEO bans all desks * VP of Coffee suggests double espressos * Reorg delayed due to unscheduled reorg * Burnout at optimal productivity *</span>
+          <span id="newsTickerText" class="news-ticker-text font-mono text-caption">* Loading corporate news feed *</span>
         </div>
       </div>
       <div class="space-y-2">
@@ -106,6 +113,9 @@ export const APP_SHELL = `
             <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-500"></i> Energy</span>
             <span id="burnoutPercentLabel">100%</span>
           </div>
+          <div id="reorgHudStrip" class="reorg-hud-strip hidden">
+            <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
+          </div>
           <div class="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200">
             <div id="burnoutMeter" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75" style="width: 100%;"></div>
           </div>
@@ -113,10 +123,11 @@ export const APP_SHELL = `
       </div>
       <div id="promoOverlay" class="absolute top-28 left-4 right-4 bg-amber-50 border-2 border-amber-300 rounded-xl p-3 shadow-lg flex items-center gap-3 z-30 transform scale-0 transition-transform duration-300">
         <div class="text-3xl">🎉</div>
-        <div>
+        <div class="flex-grow">
           <h4 class="font-extrabold text-amber-900 text-xs uppercase tracking-wide">Promoted!</h4>
           <p class="text-xs text-amber-800" id="promoText">You are now a Manager.</p>
         </div>
+        <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-1 rounded rotate-12 shrink-0">PROMOTED</span>
       </div>
       <div class="flex-grow relative bg-slate-100 flex flex-col justify-end overflow-hidden pb-4">
         <div class="absolute bottom-12 left-4 right-4 opacity-5 flex justify-between items-end pointer-events-none select-none">
@@ -128,9 +139,11 @@ export const APP_SHELL = `
         <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 w-48 flex flex-col-reverse justify-start items-center pb-20 select-none pointer-events-none">
           <div class="absolute top-0 bottom-0 left-12 w-2 bg-slate-300 border-x border-slate-400"></div>
           <div class="absolute top-0 bottom-0 right-12 w-2 bg-slate-300 border-x border-slate-400"></div>
+          <p id="floorLabel" class="absolute top-2 left-0 right-0 text-center text-nano font-bold uppercase tracking-wider text-slate-400/80">Floor 1 — Intern Pit</p>
           <div id="rungsContainer" class="relative w-full h-full flex flex-col-reverse justify-start"></div>
         </div>
         <div id="playerClimber" class="absolute bottom-20 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none" style="left: calc(50% - 92px);">
+          <span id="playerRankProp" class="absolute -top-1 -right-1 text-lg leading-none rank-prop" aria-hidden="true">🪪</span>
           <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
           <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>
         </div>
@@ -170,6 +183,8 @@ export const APP_SHELL = `
           <div><p class="text-slate-400 text-label-upper">Highest Level</p><p class="font-extrabold text-cl-primary text-lg flex items-center gap-1" id="statRank"><span>🧑‍💻</span> Intern</p></div>
         </div>
         <p id="careerHighLine" class="text-nano font-bold text-slate-500 -mt-1 mb-1"></p>
+        <p id="leaderboardGapLine" class="text-nano font-bold text-indigo-700 text-center hidden"></p>
+        <p id="reapplyFlavorLine" class="text-caption text-slate-600 italic text-center px-2"></p>
         <div class="bg-red-50/50 border border-red-100 p-3 rounded-lg text-xs">
           <p class="text-nano uppercase font-bold text-red-700 tracking-wider">Termination Cause</p>
           <div id="terminationCauseRow" class="flex items-center gap-2 mt-1 mb-1">

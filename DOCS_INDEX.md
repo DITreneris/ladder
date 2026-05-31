@@ -81,7 +81,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train; mechanics/graphics/animation/satire pillars; v1.7+ selection |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train; narrative thesis; v1.7 code done; v1.8 narrative beats + arena identity |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |

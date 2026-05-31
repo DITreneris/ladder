@@ -194,3 +194,23 @@ export function triggerReorgTelegraph(
     badge.classList.remove("reorg-warning");
   }, 150);
 }
+
+export function triggerPromoStamp(overlay: HTMLElement): void {
+  const stamp = overlay.querySelector(".promo-stamp");
+  if (!stamp || respectsReducedMotion()) return;
+  stamp.classList.remove("promo-stamp-in");
+  void (stamp as HTMLElement).offsetWidth;
+  stamp.classList.add("promo-stamp-in");
+}
+
+export function triggerDeathCauseHold(el: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  el.classList.remove("death-cause-hold");
+  void el.offsetWidth;
+  el.classList.add("death-cause-hold");
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove("death-cause-hold"),
+    { once: true }
+  );
+}

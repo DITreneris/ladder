@@ -12,10 +12,15 @@ vi.mock("./audio", () => ({
   },
 }));
 
+import { getDailyModifierById } from "./daily-modifier";
 import { GameEngine } from "./engine";
+import type { DailyModifier } from "./daily-modifier";
 import type { GameCallbacks, GameOverResult } from "./types";
 
-function createEngine(overrides: Partial<GameCallbacks> = {}) {
+function createEngine(
+  overrides: Partial<GameCallbacks> = {},
+  dailyModifier?: DailyModifier
+) {
   const callbacks: GameCallbacks = {
     onScoreUpdate: vi.fn(),
     onRankChange: vi.fn(),
@@ -24,7 +29,7 @@ function createEngine(overrides: Partial<GameCallbacks> = {}) {
     onToast: vi.fn(),
     ...overrides,
   };
-  const engine = new GameEngine(callbacks, vi.fn(), vi.fn(), vi.fn());
+  const engine = new GameEngine(callbacks, vi.fn(), vi.fn(), vi.fn(), dailyModifier);
   return { engine, callbacks };
 }
 
@@ -178,6 +183,14 @@ describe("GameEngine", () => {
     expect(engine.getTimeLeft()).toBeLessThan(afterPromo);
 
     vi.useRealTimers();
+  });
+
+  it("keeps reorg week preset across start()", () => {
+    const { engine } = createEngine({}, getDailyModifierById("reorg_week"));
+    expect(engine.getDailyModifier().allowEarlyReorg).toBe(true);
+    engine.start();
+    expect(engine.getDailyModifier().id).toBe("reorg_week");
+    expect(engine.getDailyModifier().meetingPickThreshold).toBe(0.38);
   });
 
   it("forces tutorial coffee between rungs 8 and 12 when none collected", () => {

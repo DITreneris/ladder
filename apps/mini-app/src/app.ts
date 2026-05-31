@@ -1,14 +1,24 @@
 import {
+  CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
+  MANAGER_NEMESIS_LINE,
   MAX_VISIBLE_RUNGS,
   PLAYER_LEFT,
   PLAYER_RIGHT,
+  REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
+  floorLabel,
+  formatTickerText,
   milestoneLabel,
+  pickTickerHeadline,
   rankEmoji,
   rankFromYears,
+  rankPropEmoji,
+  reappliesFlavor,
+  type TickerHeadline,
 } from "./game/constants";
+import { type DailyModifier, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type LeaderboardEntry } from "./lib/api";
@@ -20,8 +30,10 @@ import {
   triggerClimbPop,
   triggerDeathEmoji,
   triggerDeathFlash,
+  triggerDeathCauseHold,
   triggerMeterFlash,
   triggerPromoConfetti,
+  triggerPromoStamp,
   triggerRankPop,
   triggerReorgTelegraph,
   triggerRungAdvance,
@@ -54,6 +66,13 @@ let prevRungsSnapshot: Rung[] = [];
 let playerInPanic = false;
 let earlyTapsRemaining = 0;
 let playerEmojiFlashTimer: ReturnType<typeof setTimeout> | null = null;
+let activeDailyModifier: DailyModifier = resolveDailyModifier();
+let shiftToastShown = false;
+let activeTickerHeadline: TickerHeadline = pickTickerHeadline();
+let lastHeartbeatAt = 0;
+let ceoTrapShown = false;
+
+const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 
 const $ = (id: string) => document.getElementById(id)!;
 
@@ -68,6 +87,43 @@ function flashPlayerEmoji(emoji: string, ms: number): void {
       $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
     }
   }, ms);
+}
+
+function updateRankProp(rank: Rank): void {
+  $("playerRankProp").textContent = rankPropEmoji(rank);
+}
+
+function updateFloorLabel(years: number): void {
+  $("floorLabel").textContent = floorLabel(years);
+}
+
+function updateReorgHudStrip(rank: Rank): void {
+  const show = rank !== "Intern" || activeDailyModifier.allowEarlyReorg;
+  $("reorgHudStrip").classList.toggle("hidden", !show);
+}
+
+function mountTickerHeadline(): void {
+  activeTickerHeadline = pickTickerHeadline();
+  $("newsTickerText").textContent = formatTickerText(activeTickerHeadline);
+  engine?.setActiveTicker(activeTickerHeadline);
+}
+
+function getReapplyCount(): number {
+  try {
+    return parseInt(localStorage.getItem(REAPPLY_STORAGE_KEY) || "0", 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+function incrementReapplyCount(): number {
+  const next = getReapplyCount() + 1;
+  try {
+    localStorage.setItem(REAPPLY_STORAGE_KEY, String(next));
+  } catch {
+    /* ignore */
+  }
+  return next;
 }
 
 function updateMilestoneChip(years: number): void {
@@ -118,6 +174,8 @@ function updateRankUI(rank: Rank, updatePlayer = true): void {
   $("avatarIcon").textContent = emoji;
   $("userTitleLabel").textContent = `Rank achieved: ${rank}`;
   $("gameRankBadge").className = RANK_BADGE[rank];
+  updateRankProp(rank);
+  updateReorgHudStrip(rank);
 }
 
 function setPlayerPanic(on: boolean): void {
@@ -130,13 +188,44 @@ function setPlayerPanic(on: boolean): void {
   }
 }
 
+function refreshDailyShiftUI(): void {
+  activeDailyModifier = resolveDailyModifier();
+  $("dailyShiftLabel").textContent = activeDailyModifier.label;
+  $("dailyShiftDescription").textContent = activeDailyModifier.description;
+
+  const ticker = $("tickerBar");
+  ticker.classList.toggle("ticker-shift-emphasis", activeDailyModifier.id !== "standard");
+
+  const viewport = document.querySelector(".cl-viewport");
+  if (viewport) {
+    for (const cls of GRID_TINT_CLASSES) {
+      viewport.classList.remove(cls);
+    }
+    if (activeDailyModifier.gridTintClass) {
+      viewport.classList.add(activeDailyModifier.gridTintClass);
+    }
+  }
+
+  const block = $("dailyShiftBlock");
+  block.classList.remove("shift-badge-enter");
+  void block.offsetWidth;
+  block.classList.add("shift-badge-enter");
+  mountTickerHeadline();
+}
+
 function createObstacleBadge(type: ObstacleType): HTMLElement {
   const badge = document.createElement("div");
   badge.className =
     "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none obstacle-pulse";
   if (type === "meeting") {
     badge.className += " bg-red-100 border-red-300 text-red-700";
-    badge.innerHTML = `<span class="text-lg leading-none">📅</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Meeting</span>`;
+    if (activeDailyModifier.id === "meeting_monday" && Math.random() < 0.5) {
+      badge.innerHTML = `<span class="text-lg leading-none">📧</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reply-All</span>`;
+    } else if (activeDailyModifier.id === "meeting_monday") {
+      badge.innerHTML = `<span class="text-lg leading-none">🧍</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Standup</span>`;
+    } else {
+      badge.innerHTML = `<span class="text-lg leading-none">📅</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Meeting</span>`;
+    }
   } else if (type === "reorg") {
     badge.className += " bg-amber-100 border-amber-300 text-amber-800";
     badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
@@ -380,10 +469,16 @@ function startGame(): void {
   prevRungsSnapshot = [];
   lastPointerTapAt = 0;
   earlyTapsRemaining = 3;
+  shiftToastShown = false;
+  ceoTrapShown = false;
+  activeDailyModifier = engine.getDailyModifier();
+  engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
   engine.start();
   updateRankUI("Intern");
   updateMilestoneChip(0);
+  updateFloorLabel(0);
+  updateReorgHudStrip("Intern");
   switchTab("game");
 }
 
@@ -392,6 +487,7 @@ function goHome(): void {
   flashBurnoutStress(false);
   playerInPanic = false;
   enableVerticalSwipe();
+  refreshDailyShiftUI();
   switchTab("home");
 }
 
@@ -419,6 +515,9 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   $("terminationFlavor").textContent = `"${result.terminationFlavor}"`;
   $("reviewId").textContent = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
 
+  const reapplyCount = incrementReapplyCount();
+  $("reapplyFlavorLine").textContent = reappliesFlavor(reapplyCount);
+
   if (highScore > 0 && bestRank) {
     $("careerHighLine").textContent = `Career high: ${bestRank} (${highScore.toFixed(1)}y)`;
   } else {
@@ -438,6 +537,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   }
 
   const initData = getInitData();
+  const lbFetch = fetchLeaderboard("daily", initData || undefined);
   if (initData) {
     const ok = await submitRun(initData, {
       yearsSurvived: result.yearsSurvived,
@@ -446,6 +546,26 @@ async function onGameOver(result: GameOverResult): Promise<void> {
       rungsClimbed: result.rungsClimbed,
     });
     if (ok) showToast("Score submitted to the boardroom!");
+  }
+
+  const gapEl = $("leaderboardGapLine");
+  try {
+    const entries = await lbFetch;
+    const top = entries[0];
+    if (top && top.years_survived > result.yearsSurvived) {
+      const gap = top.years_survived - result.yearsSurvived;
+      gapEl.textContent = `#1 is ${gap.toFixed(1)}y ahead`;
+      gapEl.classList.remove("hidden");
+    } else if (top?.is_current_user) {
+      gapEl.textContent = "You're #1 on today's board.";
+      gapEl.classList.remove("hidden");
+    } else {
+      gapEl.textContent = "";
+      gapEl.classList.add("hidden");
+    }
+  } catch {
+    gapEl.textContent = "";
+    gapEl.classList.add("hidden");
   }
 
   flashBurnoutStress(false);
@@ -457,6 +577,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
     triggerShake($("gameScreen"), () => {
       enableVerticalSwipe();
       switchTab("gameover");
+      triggerDeathCauseHold($("terminationCauseRow"));
     });
   });
 }
@@ -468,10 +589,15 @@ function buildShareText(): string {
   const detail = lastGameResult?.terminationDetail ?? "";
   const flavor = lastGameResult?.terminationFlavor ?? "";
 
+  const shiftLabel = lastGameResult
+    ? engine.getDailyModifier().label
+    : activeDailyModifier.label;
+
   return (
     `CORPORATE PERFORMANCE REVIEW\n` +
     `Employee: ${username}\n` +
     `${years} Years | Final Rank: ${rank}\n` +
+    `Shift: ${shiftLabel}\n` +
     `Cause: ${detail}\n` +
     `"${flavor}"\n` +
     `Play Corporate Ladder on Telegram @${botUser}\n` +
@@ -542,6 +668,8 @@ export function mountApp(): void {
       onScoreUpdate: (years, energy) => {
         $("gameYearsLabel").textContent = years.toFixed(1);
         updateMilestoneChip(years);
+        updateFloorLabel(years);
+        updateReorgHudStrip(engine.getCurrentRank());
         $("burnoutMeter").style.width = `${energy}%`;
         $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;
         if (energy < 25) {
@@ -554,18 +682,34 @@ export function mountApp(): void {
           flashBurnoutStress(false);
           if (playerInPanic) setPlayerPanic(false);
         }
+        if (energy < 15 && engine.isActive()) {
+          const now = Date.now();
+          if (now - lastHeartbeatAt > 900) {
+            lastHeartbeatAt = now;
+            audio.heartbeat();
+          }
+        }
       },
       onRankChange: (rank, message) => {
         updateRankUI(rank, false);
         flashPlayerEmoji("😎", 400);
         triggerRankPop($("playerActionEmoji"));
         $("promoText").textContent = message;
-        if (rank === "Manager") showToast("Reorgs now swap sides. Time your climbs.");
-        else if (rank === "CEO") showToast("Deadlines joined the org chart. Good luck.");
+        if (rank === "Manager") {
+          showToast(MANAGER_NEMESIS_LINE);
+          setTimeout(() => showToast("Reorgs now swap sides. Time your climbs."), 2600);
+        } else if (rank === "CEO") {
+          showToast("Deadlines joined the org chart. Good luck.");
+          if (!ceoTrapShown) {
+            ceoTrapShown = true;
+            showToast(CEO_TRAP_ANNOUNCEMENT);
+          }
+        }
         const overlay = $("promoOverlay");
         overlay.classList.remove("scale-0");
         overlay.classList.add("scale-100");
         triggerPromoConfetti(overlay);
+        triggerPromoStamp(overlay);
         hapticNotification("success");
         const promoEmoji = rank === "Manager" ? "📋" : rank === "CEO" ? "👑" : "🎉";
         spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
@@ -586,7 +730,13 @@ export function mountApp(): void {
     },
     renderRungsWithReorgFeedback,
     updatePlayerPosition,
-    () => $("tapPrompt").classList.add("hidden")
+    () => {
+      $("tapPrompt").classList.add("hidden");
+      if (!shiftToastShown && activeDailyModifier.id !== "standard") {
+        shiftToastShown = true;
+        showToast("Shift rules active");
+      }
+    }
   );
 
   ($("usernameInput") as HTMLInputElement).value = username;
@@ -625,6 +775,7 @@ export function mountApp(): void {
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
 
   updateRankUI("Intern");
+  refreshDailyShiftUI();
 
   const initData = getInitData();
   if (initData) {

@@ -60,6 +60,10 @@ export const audio = {
   reorg(): void {
     playTone(300, "sine", 0.04);
   },
+  heartbeat(): void {
+    playTone(180, "triangle", 0.08);
+    setTimeout(() => playTone(160, "triangle", 0.06), 120);
+  },
   unmuteTest(): void {
     playTone(440, "sine", 0.1);
   },

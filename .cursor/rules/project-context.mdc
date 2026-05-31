@@ -16,11 +16,11 @@ Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. 
 
 ## MVP v1 Scope
 
-**Shipped:** core gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot launch. v1.5 design polish and v1.6 fairness/onboarding complete in code.
+**Shipped:** core gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot launch. v1.5 design polish, v1.6 fairness/onboarding, and v1.7 daily shift complete in code.
 
 **Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
 
-**Next release train:** v1.7 daily replays — see [ROADMAP.md](../../ROADMAP.md). Match ROADMAP § Shipped baseline for v1.6+ mechanics.
+**Next release train:** v1.7 tag/deploy gate → v1.8 narrative beats + arena identity — see [ROADMAP.md](../../ROADMAP.md). Match ROADMAP § Shipped baseline for v1.6+ mechanics.
 
 ## Principles
 
@@ -37,7 +37,7 @@ Sibling repo: [DITreneris/site](https://github.com/DITreneris/site) (Prompt Anat
 ## Key Docs
 
 - [DOCS_INDEX.md](../../DOCS_INDEX.md) — document map (update when adding docs, agents, or skills)
-- [ROADMAP.md](../../ROADMAP.md) — release train, shipped baseline, v1.7+ plan
+- [ROADMAP.md](../../ROADMAP.md) — release train, narrative thesis, shipped baseline, v1.8 plan
 - [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) — mini-app visual canon
 - [DEPLOY.md](../../DEPLOY.md) — production deploy checklist
 - [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — deploy progress tracker

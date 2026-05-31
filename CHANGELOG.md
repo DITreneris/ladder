@@ -9,11 +9,43 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Planned (v1.1)
+- All-time / Legends tab
+- Analytics events
+- Server-side replay validation (anti-cheat)
+
+## [1.8.0] - 2026-05-31
+
+v1.8 — narrative beats and arena identity (copy-first; no new obstacle logic).
+
 ### Added
+- Rotating home news ticker pool (15 headlines) with optional foreshadow payoff on game-over flavor (20% when headline matches death type)
+- Manager promotion nemesis one-liner (VP of People Ops); CEO corner-office trap announcement at 35y
+- RE-APPLY session counter in `localStorage` with tiered flavor on game-over (1 / 5 / 10+ runs)
+- Intern fake-promotion toasts at ~2y, ~5y, and ~9.9y before real Manager promo
+- Expanded rank-flavored failure lines; shift-specific death flavor for Meeting Monday, Coffee Break, and Reorg Week
+- Floor labels on ladder rail (years band → office floor name)
+- Rank props on player (Intern lanyard, Manager clipboard, CEO monocle)
+- Reorg HUD strip — `ORG CHART UNSTABLE` when reorgs are active
+- Promotion `PROMOTED` stamp animation on promo overlay
+- Heartbeat SFX under 15% energy; death-cause icon hold on game-over card
+- Game-over daily leaderboard gap line (`#1 is X.Xy ahead` or `#1 on today's board`)
+- Bot `/start` mentions today's shift label (UTC preset rotation)
+
+### Changed
+- [ROADMAP.md](ROADMAP.md) v1.8 Batch 1–3 implemented; [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) local smoke row
+
+## [1.7.0] - 2026-05-31
+
+v1.7 — daily replays via UTC shift presets (no new screens or API changes).
+
+### Added
+- Daily shift — UTC date picks spawn preset (Open Floor Plan, Meeting Monday, Coffee Break, Reorg Week); home badge, engine weight overrides, share `Shift:` line; dev `?dailyPreset=` override
 - `.cursor/agents/changelog-maintainer.md` — agent file for Changelog Maintainer (was skill-only)
 - `docs/assets/gameplay.png` — README hero screenshot (generated via `capture:hero`)
 
 ### Changed
+- [ROADMAP.md](ROADMAP.md) — narrative thesis section; v1.7 marked code done; v1.8 restructured (MoSCoW, Batch 1–3 plot-beat backlog)
 - Full refresh of [docs/mvp-scope.md](docs/mvp-scope.md) — shipped v1 product (Energy/Deadline, v1.5/v1.6 polish, co-branding, terminology table)
 - [AGENTS.md](AGENTS.md), [DOCS_INDEX.md](DOCS_INDEX.md), [README.md](README.md) — ROADMAP, DEPLOY_STATUS, task router rows, code map
 - [docs/architecture.md](docs/architecture.md) — `VITE_PROMPT_ANATOMY_URL`, root `.env`, known limits, leaderboard `initData`
@@ -24,14 +56,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) v1.6 — Game HUD & game-over patterns section
 - [verifier.md](.cursor/agents/verifier.md) — v1.6 gameplay checklist
 - [primal.txt](primal.txt), [snippet.txt](snippet.txt) — header/footer parity notes pointing to current spec
-
-### Added
 - Initial GitHub publish to [DITreneris/ladder](https://github.com/DITreneris/ladder); PA logo at `apps/mini-app/public/branding/prompt-anatomy-logo.png`
-
-### Planned (v1.1)
-- All-time / Legends tab
-- Analytics events
-- Server-side replay validation (anti-cheat)
 
 ## [1.6.0] - 2026-05-31
 
@@ -153,7 +178,9 @@ Initial monorepo scaffold — MVP v1 foundation.
 ### Security
 - Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
 
-[Unreleased]: compare/v1.6.0...HEAD
+[Unreleased]: compare/v1.8.0...HEAD
+[1.8.0]: compare/v1.7.0...v1.8.0
+[1.7.0]: compare/v1.6.0...v1.7.0
 [1.6.0]: compare/v1.5.0...v1.6.0
 [1.5.0]: compare/v1.0.0...v1.5.0
 [1.0.0]: compare/v0.1.0...v1.0.0

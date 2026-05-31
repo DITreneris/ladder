@@ -34,6 +34,26 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 - [ ] Game-over shows short detail; share has fuller flavor text
 - [ ] `prefers-reduced-motion`: game playable without motion-dependent feedback
 
+### v1.7 Daily shift
+
+- [ ] Home shows today's shift label and flavor before first play
+- [ ] Same UTC calendar day yields the same preset (or dev `?dailyPreset=` override)
+- [ ] Share text includes `Shift:` line with preset label
+- [ ] Reorg Week: next rung (`rungs[1]`) still does not swap during reorg tick
+- [ ] `prefers-reduced-motion`: shift badge / ticker emphasis do not block play
+- [ ] Bot `/start` mentions today's shift label
+
+### v1.8 Narrative beats
+
+- [ ] Home ticker rotates headline on each home mount
+- [ ] Foreshadow payoff possible when headline `deathType` matches failure (manual spot-check)
+- [ ] RE-APPLY counter persists in `localStorage`; flavor line on game-over
+- [ ] Manager nemesis line on promotion; CEO trap toast at 35y
+- [ ] Intern fake-promo toasts at ~2y / ~5y / ~9.9y
+- [ ] Floor label updates during play; reorg HUD strip when reorgs active
+- [ ] Game-over leaderboard gap line when daily LB reachable
+- [ ] `prefers-reduced-motion`: promo stamp / death hold / heartbeat do not block play
+
 ### v1.6 Gameplay
 
 - [ ] HUD milestone chip shows Manager/CEO countdown (or corner office secured at CEO)

@@ -47,6 +47,10 @@ describe("obstacle gating", () => {
     expect(allowedObstacleTypes("Intern")).toEqual(["meeting"]);
   });
 
+  it("intern allows reorg during reorg week preset", () => {
+    expect(allowedObstacleTypes("Intern", true)).toEqual(["meeting", "reorg"]);
+  });
+
   it("manager allows meetings and reorgs", () => {
     expect(allowedObstacleTypes("Manager")).toEqual(["meeting", "reorg"]);
   });
@@ -58,6 +62,12 @@ describe("obstacle gating", () => {
   it("pickObstacleType falls back to meeting for intern", () => {
     const spy = vi.spyOn(Math, "random").mockReturnValue(0.75);
     expect(pickObstacleType("Intern")).toBe("meeting");
+    spy.mockRestore();
+  });
+
+  it("pickObstacleType can return reorg for intern when early reorg allowed", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.55);
+    expect(pickObstacleType("Intern", { allowEarlyReorg: true, meetingPickThreshold: 0.38 })).toBe("reorg");
     spy.mockRestore();
   });
 

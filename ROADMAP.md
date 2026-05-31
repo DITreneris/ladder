@@ -19,19 +19,52 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 ---
 
+## Narrative thesis (plot beats without scope creep)
+
+Corporate Ladder's core twist: **climbing the ladder is Sisyphean** — CEO is not a win state; **RE-APPLY FOR ROLE** is the real loop ([`template.ts`](apps/mini-app/src/template.ts)). Promotion subverts expectation; failure is an HR process, not generic game over.
+
+**Delivery surfaces** (no new screens required):
+
+```mermaid
+flowchart TB
+  subgraph surfaces [Twist delivery surfaces]
+    Home[Home ticker + daily shift]
+    Run[Promotion toasts + milestone chip]
+    Death[Game-over HR card + share]
+    Retry[RE-APPLY counter flavor]
+  end
+  Thesis["Thesis: promotion ≠ victory"]
+  Thesis --> Home
+  Thesis --> Run
+  Thesis --> Death
+  Thesis --> Retry
+```
+
+**Implementation rule:** plot beats = **copy + timing + one visual beat**. Defer character systems to v1.9+ unless retention data says otherwise.
+
+**Existing seeds to amplify** ([`constants.ts`](apps/mini-app/src/game/constants.ts)):
+
+- Intern promo: *"Still an Intern. HR says your badge printer is 'in the queue.'"*
+- CEO promo: *"Reached CEO. Strategic budget requests denied. Monocle unlocked. The board is watching."*
+- Game-over framing: HR exit interview, termination detail + flavor quote
+
+---
+
 ## Release train
 
 | Version | Theme | Status | Tag when |
 |---------|--------|--------|----------|
 | **v1.5.0** | Design system, onboarding, effects baseline | Code done | Production deploy + device QA |
 | **v1.6.0** | Progress & fairness | Code done ([CHANGELOG.md](CHANGELOG.md) `[Unreleased]`) | After v1.5 tag + smoke |
-| **v1.7.0** | **Daily replays** (selected next) | Planned | After v1.6 tag |
-| **v1.8.0** | Arena identity + satire depth | Backlog | Data-informed |
+| **v1.7.0** | **Daily replays** | Code done ([CHANGELOG.md](CHANGELOG.md) `[Unreleased]`) | After deploy smoke |
+| **v1.8.0** | **Narrative beats + arena identity** | Backlog — selected next after v1.7 tag | Data-informed |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | Deferred — explicit approval | See below |
+
+*v1.8 prioritizes copy-first plot beats before new mechanics or NPC systems.*
 
 ---
 
-## Shipped baseline (v1.5 + v1.6)
+## Shipped baseline (v1.5 + v1.6 + v1.7 code)
 
 Inventory by pillar — do not regress without spec update.
 
@@ -45,6 +78,10 @@ Inventory by pillar — do not regress without spec update.
 | Intern tutorial ramp | 22% obstacle rate first 12 rungs; forced coffee if none by rung 8 |
 | Reorg fairness | Next rung (`rungs[1]`) does not swap during reorg ticks |
 | Milestone progression | Intern @ 0y → Manager @ 10y → CEO @ 35y |
+| Daily modifier resolver (v1.7) | UTC date → preset via [`daily-modifier.ts`](apps/mini-app/src/game/daily-modifier.ts) |
+| Spawn weight overrides (v1.7) | 4 presets; engine reads `dailyModifier` |
+| Reorg Week early reorg (v1.7) | `allowEarlyReorg`; fairness on `rungs[1]` unchanged |
+| Dev override (v1.7) | `?dailyPreset=` + localStorage in DEV |
 
 ### Graphics
 
@@ -55,6 +92,9 @@ Inventory by pillar — do not regress without spec update.
 | HUD | Longevity, rank pill, energy meter, **milestone chip** (v1.6) |
 | Game-over card | Performance review layout, REJECTED stamp, death cause row (v1.6) |
 | Climb arena | Office grid, skyline silhouettes, ladder rails — intentionally minimal |
+| Today's shift badge (v1.7) | [`template.ts`](apps/mini-app/src/template.ts) `#dailyShiftBlock` |
+| Reorg Week grid tint (v1.7) | `office-grid-reorg-week` via `gridTintClass` |
+| Meeting Monday reskins (v1.7) | Reply-All / Standup badges in [`createObstacleBadge`](apps/mini-app/src/app.ts) |
 
 ### Animation
 
@@ -71,6 +111,8 @@ Inventory by pillar — do not regress without spec update.
 | Character micro-states | `idle-bob`, emoji flashes 🤤/😎 (v1.6) | Personality |
 | Tap zone glow | `tap-zone-left/right:active` (v1.6) | Control feel |
 | Reduced motion | `@media (prefers-reduced-motion: reduce)` | A11y |
+| Shift badge entrance (v1.7) | `shift-badge-enter` | Home mount |
+| Ticker emphasis (v1.7) | `ticker-shift-emphasis` | Non-standard shift days |
 
 ### Satirical view
 
@@ -83,150 +125,114 @@ Inventory by pillar — do not regress without spec update.
 | Share text | Performance review block in `app.ts` |
 | Home ticker | CSS news scroll — corporate absurdity |
 | Employee badge | ACTIVE EMPLOYMENT, nickname, best career years |
+| Shift labels + descriptions (v1.7) | Per preset in `daily-modifier.ts` |
+| Share `Shift:` line (v1.7) | [`buildShareText`](apps/mini-app/src/app.ts) |
+| In-run shift toast (v1.7) | First tap when modifier ≠ standard |
 
----
-
-## v1.7.0 — Daily Replays (**selected — ship first**)
-
-**Goal:** Replay variety and daily retention **without** new screens, obstacle logic, or API changes.
-
-**Fastest path:** Client-side UTC date → deterministic spawn preset → one home-screen line. Effort **S** (1–2 days). Pairs with existing **Daily leaderboard**.
-
-### MoSCoW for v1.7
-
-| Idea | Must | Should | Want | v1.7 |
-|------|------|--------|------|------|
-| Daily spawn modifier | | **✓** | | **In** |
-| Obstacle reskins (copy/emoji only) | | **✓ stretch** | | Optional |
-| New obstacle mechanics | | | | **Out** |
-| Antagonist characters | | | | **Out** |
-| Level select / campaign | | | | **Out** |
-
----
-
-### v1.7 — Mechanics
-
-| Task | Detail | Files |
-|------|--------|-------|
-| Daily modifier resolver | `getDailyModifier(utcDate)` — hash `YYYY-MM-DD` to preset id | New `daily-modifier.ts` or `constants.ts` |
-| Spawn weight overrides | Per preset: adjust `OBSTACLE_SPAWN_RATE`, `COFFEE_SPAWN_THRESHOLD`, optional early reorg eligibility flag | [`engine.ts`](apps/mini-app/src/game/engine.ts) reads active preset |
-| Rank gates unchanged | Manager @ 10y, CEO @ 35y; modifiers tune density only | No change to `MANAGER_YEARS` / `CEO_YEARS` |
-| Share hook | Append `Shift: {modifierLabel}` to share text | [`app.ts`](apps/mini-app/src/app.ts) |
-
-**Launch presets (rotate by date):**
+**Daily shift presets (rotate by UTC date):**
 
 | Preset | Mechanic tweak | Satirical label |
 |--------|----------------|-----------------|
 | Standard | Default weights | Open Floor Plan |
 | Meeting Monday | Higher meeting spawn weight | Meeting Monday |
 | Coffee Break | Higher coffee spawn weight | Coffee Break |
-| Reorg Week | Reorgs can appear before Manager rank* | Reorg Week |
-
-\* *Reorg Week:* only if fairness holds — reorg grace on `rungs[1]` stays; test heavily on device.
-
-**Definition of done (mechanics):**
-
-- [ ] Same modifier for all players on a given UTC day
-- [ ] Left/right loop and collision rules unchanged
-- [ ] Unit tests for date → preset mapping and weight application
+| Reorg Week | Reorgs can appear before Manager rank | Reorg Week |
 
 ---
 
-### v1.7 — Graphics
+## v1.7.0 — Daily Replays (code done — ship gate)
 
-| Task | Detail | Files |
-|------|--------|-------|
-| Today's shift badge | Home screen pill under ticker: `Today's shift: Meeting Monday` | [`template.ts`](apps/mini-app/src/template.ts), [`app.ts`](apps/mini-app/src/app.ts) |
-| In-run hint (optional) | One-time toast on first tap: `Shift rules active` | `app.ts` |
-| Preset tint (optional) | Subtle `office-grid` hue per modifier — e.g. amber wash Reorg Week | [`style.css`](apps/mini-app/src/style.css) — **max one layer** |
-| Obstacle reskins (stretch) | Meeting → `📧 Reply-All` / `🧍 Standup` random label; same hitbox | [`createObstacleBadge`](apps/mini-app/src/app.ts) |
+**Goal:** Replay variety and daily retention **without** new screens, obstacle logic, or API changes. Pairs with existing **Daily leaderboard**.
 
-**Definition of done (graphics):**
+**Remaining before tag:**
 
-- [ ] Modifier visible before first play
-- [ ] No reduction in obstacle contrast on next rung
-- [ ] Reskins use existing badge layout (`text-nano` label)
+- [ ] Production deploy + device QA (Meeting Monday + Reorg Week presets)
+- [ ] Manual: share text includes shift name
+- [ ] Optional stretch: bot `/start` mentions today's shift ([`apps/bot/main.py`](apps/bot/main.py)) — coordinate Railway deploy
+- [ ] [CHANGELOG.md](CHANGELOG.md) cut `## [1.7.0]` from `[Unreleased]`
+- [ ] Tag `v1.7.0` per [DEPLOY.md](DEPLOY.md)
 
----
-
-### v1.7 — Animation
-
-| Task | Detail | Priority |
-|------|--------|----------|
-| Shift badge entrance | Short fade/slide on home mount | Nice-to-have |
-| Ticker emphasis | Pulse `ticker-bar` border on modifier days | Nice-to-have |
-| New climb animations | — | **Defer** — not required for v1.7 |
-
-Keep all new motion behind `prefers-reduced-motion` ([`effects.ts`](apps/mini-app/src/lib/effects.ts) pattern).
-
----
-
-### v1.7 — Satirical view
-
-| Task | Detail | Files |
-|------|--------|-------|
-| Modifier names | Deadpan HR shift titles (table above) | `constants.ts` or `daily-modifier.ts` |
-| Modifier descriptions | One-line flavor on home: *"Synergy optional. Attendance mandatory."* | `template.ts` |
-| Death/share copy | Reference shift in share block only — do not rewrite `FAILURE_REASONS` per day | `app.ts` |
-| Bot welcome (optional) | `/start` mentions today's shift | [`apps/bot/main.py`](apps/bot/main.py) — only if bot deploy is coordinated |
-
-**Copy rules:** [.cursor/rules/satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) — short, jargon-heavy, self-aware misery.
-
----
-
-### v1.7 release gate
+**Release gate:**
 
 ```bash
 cd apps/mini-app && npm run lint && npm test && npm run build
 ```
 
-- [ ] Manual: force two presets (dev flag or date mock); verify spawn feel
-- [ ] Manual: share text includes shift name
-- [ ] [CHANGELOG.md](CHANGELOG.md) → `## [1.7.0]`
-- [ ] Tag `v1.7.0` after deploy smoke ([DEPLOY.md](DEPLOY.md))
+---
+
+## v1.8.0 — Narrative beats + arena identity (backlog)
+
+**Goal:** Make runs feel less samey via **satirical subversion and arena personality** — emoji-first, no sprite pipeline, no new control schemes. Primary ROI: **copy-first plot beats**; graphics/animation support clarity and juice.
+
+### MoSCoW for v1.8
+
+| Idea | Must | Should | Want | v1.8 |
+|------|------|--------|------|------|
+| Rotating ticker pool + foreshadow payoff | **✓** | | | **In** |
+| Rank-up nemesis one-liner (Manager) | **✓** | | | **In** |
+| RE-APPLY session counter + flavor | **✓** | | | **In** |
+| Expand `FAILURE_BY_RANK` | | **✓** | | **In** |
+| Modifier-specific death flavor (`FAILURE_BY_SHIFT`) | | **✓** | | **In** |
+| Leaderboard gap on game over | | **✓** | | **In** |
+| Floor labels on ladder rail | | **✓** | | **In** |
+| Intern fake-promotion chain (2y/5y/9.9y toasts) | | **✓** | | **In** |
+| CEO corner-office trap beat (copy-only announcement) | | **✓** | | **In** |
+| Rank props, reorg HUD strip, decals | | | **✓** | Stretch |
+| Near-miss wince | | | **✓** | Stretch |
+| Synergy Sprint preset | | | | Defer v1.9 |
+| Random decaf coffee / negative pickup | | | | **Out** |
 
 ---
 
-## v1.8.0 — Arena identity & juice (backlog)
+### Batch 1 — Copy pack (effort S, ship first)
 
-**Goal:** Make the climb zone feel more *office* and the emoji actor more *memorable* — still emoji-first, no sprite pipeline.
-
-Prioritize **graphics + animation + satire**; mechanics only where they support clarity.
-
-### Mechanics (light)
-
-| Item | Effort | Notes |
+| Task | Detail | Files |
 |------|--------|-------|
-| Leaderboard gap on game over | S | *"#1 is 4.1y ahead"* — retention hook |
-| Soft drain cap after 20y | S | Expert runs fail to skill/obstacles, not timer only |
-| Synergy Sprint preset | M | 60s fixed timer — mode flag, not level select |
+| Ticker pool | 10–15 headlines in constants; pick one on home mount | New `NEWS_TICKER_HEADLINES` in [`constants.ts`](apps/mini-app/src/game/constants.ts); wire in [`app.ts`](apps/mini-app/src/app.ts) |
+| Foreshadow payoff | Optional: headline tagged with `deathType`; 20% chance flavor references active ticker on game-over | [`engine.ts`](apps/mini-app/src/game/engine.ts) `pickFlavorQuote` or `app.ts` `onGameOver` |
+| Nemesis line | One VP/HR line on Manager promotion only — toast or overlay subtitle | [`constants.ts`](apps/mini-app/src/game/constants.ts), [`app.ts`](apps/mini-app/src/app.ts) `onRankChange` |
+| RE-APPLY counter | `localStorage` run count; flavor line on game-over by tier (1 / 5 / 10+) | [`app.ts`](apps/mini-app/src/app.ts), new `REAPPLY_FLAVOR` in constants |
+| Expand failures | +2–3 lines per rank in `FAILURE_BY_RANK` | [`constants.ts`](apps/mini-app/src/game/constants.ts) |
+| Shift death flavor | `FAILURE_BY_SHIFT[presetId]` — 2 lines each; used when daily modifier active | [`constants.ts`](apps/mini-app/src/game/constants.ts), [`engine.ts`](apps/mini-app/src/game/engine.ts) |
+| Intern promo chain | Milestone toasts at ~2y, ~5y, ~9.9y before real Manager promo | [`engine.ts`](apps/mini-app/src/game/engine.ts) or callback in `app.ts` |
+| CEO trap beat | One-time toast at 35y: corner office secured; deadlines report to you | [`app.ts`](apps/mini-app/src/app.ts) `onRankChange` when rank === CEO |
 
-### Graphics
+**Copy rules:** [.cursor/rules/satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) — no fourth-wall *"this is a game"*; CEO trap beat is **announcement only** (no new drain mechanic in v1.8 Must).
 
-| Item | Effort | Notes |
+---
+
+### Batch 2 — Arena feel (effort S–M)
+
+| Task | Detail | Files |
 |------|--------|-------|
-| Floor labels on ladder rail | S | *Floor 12 — Open Office* tied to years |
-| Rank props | S | Intern lanyard dot; Manager clipboard; CEO monocle stack |
-| Reorg HUD strip | S | Amber micro-bar when reorgs active: *ORG CHART UNSTABLE* |
-| Sticky-note / coffee stain decals | S | Static arena decoration, low opacity |
+| Floor labels | Ladder rail label from years band (e.g. Floor 12 — Open Office) | [`app.ts`](apps/mini-app/src/app.ts), [`template.ts`](apps/mini-app/src/template.ts) |
+| Rank props | Intern lanyard / Manager clipboard / CEO monocle — CSS or emoji stack on player | [`app.ts`](apps/mini-app/src/app.ts), [`style.css`](apps/mini-app/src/style.css) |
+| Reorg HUD strip | Amber micro-bar when reorgs active: ORG CHART UNSTABLE | [`template.ts`](apps/mini-app/src/template.ts), [`app.ts`](apps/mini-app/src/app.ts) |
+| Promotion stamp | Rotate-in PROMOTED beside promo overlay | [`effects.ts`](apps/mini-app/src/lib/effects.ts), [`style.css`](apps/mini-app/src/style.css) |
+| Heartbeat SFX | Under 15% energy | [`audio.ts`](apps/mini-app/src/game/audio.ts) |
+| Death cause icon hold | 400ms+ hold on game-over card | [`effects.ts`](apps/mini-app/src/lib/effects.ts) |
 
-### Animation
+Keep all new motion behind `prefers-reduced-motion` ([`effects.ts`](apps/mini-app/src/lib/effects.ts) pattern).
 
-| Item | Effort | Notes |
+---
+
+### Batch 3 — Retention hook (effort S, needs API)
+
+| Task | Detail | Files |
 |------|--------|-------|
-| Heartbeat SFX under 15% energy | S | [`audio.ts`](apps/mini-app/src/game/audio.ts) — tension without visual noise |
-| Promotion stamp on overlay | S | Rotate-in *PROMOTED* beside 🎉 |
-| Death cause icon hold | S | Keep cause emoji on game-over card 400ms+ |
-| Near-miss wince (optional) | M | One-frame 😅 after safe pass — only if not noisy |
+| Leaderboard gap | Game-over line: *"#1 is X.Xy ahead"* — fetch daily LB top vs current run | [`app.ts`](apps/mini-app/src/app.ts), [`lib/api.ts`](apps/mini-app/src/lib/api.ts), [`packages/api/app/routes/leaderboard.py`](packages/api/app/routes/leaderboard.py) if new field needed |
 
-### Satirical view
+**Stretch (v1.8 or v1.9):** sticky-note decals, near-miss wince, modifier-specific `RETRY_TIPS`, soft drain cap after 20y.
 
-| Item | Effort | Notes |
-|------|--------|-------|
-| Expand `FAILURE_BY_RANK` | S | 2–3 more lines per rank |
-| Rank-up nemesis line | S | Copy-only VP/HR one-liner on Manager promotion — **not** a new character system |
-| Rotating news ticker pool | S | 10+ headlines in constants; random on load |
-| Modifier-specific death tips | M | After v1.7 presets prove stable |
+---
+
+### v1.8 definition of done
+
+- [ ] Batch 1 copy pack merged; no new obstacle logic
+- [ ] Ticker rotates; at least one foreshadow payoff path tested manually
+- [ ] RE-APPLY counter persists across sessions (localStorage)
+- [ ] `npm run lint && npm test && npm run build`; verifier on user-facing work
+- [ ] [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` + tag `v1.8.0` after deploy
 
 ---
 
@@ -237,16 +243,18 @@ Build only if friends-and-family or v1.1 analytics show retention plateau.
 | Item | Pillars | Trigger |
 |------|---------|---------|
 | Server-seeded daily + modifier LB | Mechanics + platform | Daily DAU &gt; threshold |
-| Antagonist beat (emoji NPC) | Graphics + satire | Sessions feel samey post–v1.7 |
+| Antagonist beat (emoji NPC) | Graphics + satire | Sessions still feel samey after v1.8 Batch 1+2 |
+| Synergy Sprint preset | Mechanics + UI | 60s fixed timer — mode flag, not level select |
 | 2–3 mode presets (Endless / Sprint / Today) | Mechanics + UI | Not a 5-level campaign |
 | Vector mascot | Graphics + animation | Art bandwidth; emoji ceiling hit |
 | Full level select / campaign map | All | **Avoid** unless product pivot |
+| Rejected: decaf trap, campaign map | — | See [Explicitly out of scope](#explicitly-out-of-scope) |
 
 ---
 
 ## v1.1 — Platform (deferred — explicit approval)
 
-From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7 game juice.
+From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7/v1.8 game juice.
 
 - All-time / Legends leaderboard tab
 - Friends leaderboard
@@ -258,7 +266,7 @@ From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7 game juic
 
 ---
 
-## Deploy gate (v1.5 / v1.6 — complete before v1.7)
+## Deploy gate (v1.5 / v1.6 — complete before v1.7 tag)
 
 | Step | Status |
 |------|--------|
@@ -268,6 +276,7 @@ From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7 game juic
 | Score on Daily leaderboard | [ ] |
 | Telegram iOS + Android QA ([apps/mini-app/README.md](apps/mini-app/README.md)) | [ ] |
 | Tag `v1.5.0` / `v1.6.0` with [CHANGELOG.md](CHANGELOG.md) | [ ] |
+| Tag `v1.7.0` after v1.7 device QA | [ ] |
 
 **Deploy checklist:** [DEPLOY.md](DEPLOY.md) · **Progress:** [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
@@ -282,7 +291,7 @@ git push origin main --tags
 1. Share bot with 5–10 testers  
 2. Track: session length (30–90s), games/user, share rate, daily return  
 3. Log issues via [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)  
-4. Use results to confirm or cut v1.8 items  
+4. Use results to confirm or cut v1.8 Batch 2/3 items  
 
 ---
 
@@ -295,6 +304,8 @@ Per [docs/mvp-scope.md](docs/mvp-scope.md) — do not slip into roadmap without 
 - New obstacle logic (both sides lethal, moving hazards, hold-to-dodge)  
 - Separate antagonist AI / combat  
 - Heavy parallax or full arena redesign  
+- Breaking fourth wall (*"this is a game"*) — per [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc)  
+- Random negative coffee / decaf trap — frustrating, not funny  
 
 ---
 
@@ -306,6 +317,7 @@ Before merging gameplay or UI work, ask:
 2. **Graphics** — Is the next rung still readable at a glance on mobile?  
 3. **Animation** — Is it &lt;200ms, optional under reduced motion?  
 4. **Satire** — Does copy sound like HR/bureaucracy, not generic game over text?  
+5. **Narrative** — Does this subvert a corporate expectation (promotion, retry, ticker) without new screens or mechanics?
 
 If any answer is no, cut scope or defer.
 
