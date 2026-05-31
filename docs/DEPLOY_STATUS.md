@@ -8,7 +8,7 @@ Track manual deploy progress for **v1.5.0 → v1.7.0** (deploy gate per [ROADMAP
 |------|---------|--------|-------------|
 | 0 | GitHub | **Done** | [DITreneris/ladder](https://github.com/DITreneris/ladder) — branch `main`, CI on push |
 | 0b | Local smoke | **Done** | `scripts/verify-deploy-config.ps1` + `scripts/smoke-local.ps1` passed (2026-05-31) |
-| 1 | Supabase migration | Pending | Run `supabase/migrations/001_initial_schema.sql` |
+| 1 | Supabase migration | **Done** | `001_initial_schema.sql` — `users` + `game_runs` verified |
 | 2 | Railway API | Pending | Set `TELEGRAM_*`, `SUPABASE_*` from `.env.example` |
 | 3 | Vercel Mini App | Pending | Root `apps/mini-app`; `VITE_API_URL`, `VITE_BOT_USERNAME`, `VITE_PROMPT_ANATOMY_URL` |
 | 4 | Railway Bot | Pending | `MINI_APP_URL` = Vercel production URL |
