@@ -25,7 +25,7 @@ Automated (run before tag):
 - [x] `prefers-reduced-motion`: no animations, game still playable — `effects.ts` + CSS
 - [x] Browser dev: phone shell still visible — `.cl-phone-shell` (hidden only in Telegram)
 
-Manual (requires Telegram on device — after production deploy):
+Manual (requires Telegram on device — [docs/DEVICE_QA_v1.8.1.md](../../docs/DEVICE_QA_v1.8.1.md)):
 
 - [ ] Telegram iOS: single tap = single climb (no double)
 - [ ] Telegram Android: same

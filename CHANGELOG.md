@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- [docs/FF_TEST.md](docs/FF_TEST.md) — friends-and-family protocol (2026-05-31 → 2026-06-14)
+- [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) — Telegram iOS/Android sign-off checklist
+
+### Changed
+- [ROADMAP.md](ROADMAP.md) — v1.9.0 provisional row; redeploy verified; F&F tracker link
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

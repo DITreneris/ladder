@@ -84,6 +84,8 @@ Use this table to pick the right skill, rules, and documents.
 | `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train through v1.8 shipped; v1.8.1 polish; v1.9 next |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
+| `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 Telegram device sign-off |
+| `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |
 | `changelog` | [CHANGELOG.md](CHANGELOG.md) | Everyone | Keep a Changelog; `[Unreleased]` |

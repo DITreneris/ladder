@@ -56,7 +56,8 @@ flowchart TB
 |---------|--------|--------|----------|
 | **v1.5.0–v1.7.0** | Design, fairness, daily replays | **Shipped** (tags local) | Push tags to origin if not already |
 | **v1.8.0** | Narrative beats + arena identity | **Shipped** (code + CHANGELOG) | Prod QA complete |
-| **v1.8.1** | Telegram mobile + playability polish | **Shipped** (CHANGELOG `[1.8.1]`) | Redeploy + device QA; push tag |
+| **v1.8.1** | Telegram mobile + playability polish | **Shipped** (tag on origin) | [DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) manual sign-off |
+| **v1.9.0** | Near-miss wince + Synergy Sprint (provisional) | **Planned** — confirm after [FF_TEST.md](docs/FF_TEST.md) | F&F review ~2026-06-14 |
 | **v1.9+** | Data-informed juice | **Next product train** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | Deferred — explicit approval | See below |
 
@@ -259,8 +260,8 @@ Keep all new motion behind `prefers-reduced-motion` ([`effects.ts`](apps/mini-ap
 **Ship gate checklist:**
 
 - [x] `scripts/smoke-local.ps1` green
-- [ ] Device QA: iOS + Android — overlay taps, 7 rungs visible, BackButton, safe-area, sound FAB
-- [ ] Redeploy Vercel + Railway bot (bot Docker fix)
+- [x] Redeploy Vercel + Railway bot (bot Docker fix) — prod bundle verified 2026-05-31
+- [ ] Device QA: iOS + Android — [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md)
 - [x] Cut `## [1.8.1]` in CHANGELOG; tag `v1.8.1` (local); push tag after device QA + redeploy
 - [x] Verifier pass — code + automated gates ([.cursor/agents/verifier.md](.cursor/agents/verifier.md)); device QA step 9 pending
 
@@ -277,6 +278,30 @@ cd apps/mini-app && npm run lint && npm test && npm run build
 - Gameplay visibility — overlay tap zones; dynamic rung scaling; tap-prompt bar; compact home (ticker hidden on home); safe-side hints for 5 taps
 - Viewport QA — 65% play-area ratio; seven-rung fit check
 - Bot Docker fix — skip repo-root `.env` lookup when `main.py` runs from `/app`
+
+---
+
+---
+
+## v1.9.0 — Near-miss wince + Synergy Sprint (provisional — confirm after F&F)
+
+**Goal:** Juice and session variety without new screens or control schemes. **Confirm or cut** after [docs/FF_TEST.md](docs/FF_TEST.md) review (~2026-06-14).
+
+| Item | Must | Notes |
+|------|------|-------|
+| Near-miss wince | **✓** | v1.8 stretch; `effects.ts` + CSS; reduced-motion safe |
+| Synergy Sprint preset | **✓** | 60s timer mode flag; new daily-modifier preset or run flag |
+| Sticky-note decals | | Cut unless F&F says arena flat |
+| Antagonist emoji NPC | | Cut unless F&F says samey |
+
+**Out for v1.9:** v1.1 analytics, Legends/Friends LB, anti-cheat — explicit approval required.
+
+**Definition of done (when implementing):**
+
+- [ ] F&F decision recorded in FF_TEST.md
+- [ ] `[Unreleased]` CHANGELOG entries
+- [ ] `npm run lint && npm test && npm run build`; verifier
+- [ ] No new obstacle logic; match [snippet.txt](snippet.txt)
 
 ---
 
@@ -320,7 +345,8 @@ From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.7/v1.8 game
 | Score on Daily leaderboard | [x] |
 | Telegram iOS + Android QA (v1.6–v1.8) | [x] |
 | Tags v1.5.0–v1.8.0 (local; push tags if not on origin) | [x] |
-| v1.8.1 redeploy + device QA → tag v1.8.1 | [ ] |
+| v1.8.1 redeploy | [x] |
+| v1.8.1 device QA (manual) | [ ] — [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) |
 
 **Deploy checklist:** [DEPLOY.md](DEPLOY.md) · **Progress:** [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
@@ -332,7 +358,7 @@ git push origin main --tags
 
 ### Friends-and-family test (post v1.8.1)
 
-Run **1–2 weeks** after v1.8.1 tag. Use results to inform v1.9 Must/Should cuts — not v1.8 backlog (complete).
+Run **1–2 weeks** after v1.8.1 tag. Tracker: [docs/FF_TEST.md](docs/FF_TEST.md). Use results to inform v1.9 Must/Should cuts — not v1.8 backlog (complete).
 
 1. Share bot with 5–10 testers  
 2. Track: session length (30–90s target), games/user, share rate, daily return  
