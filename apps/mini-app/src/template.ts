@@ -1,13 +1,9 @@
 export const BRAND_FOOTER = `
       <div class="brand-attribution">
-        <div class="flex items-center justify-center gap-2">
+        <button type="button" onclick="openPromptAnatomy()" class="brand-attribution-link" aria-label="Visit Prompt Anatomy">
           <img src="/branding/prompt-anatomy-logo.png" alt="" class="brand-attribution-logo" width="18" height="18" />
-          <button type="button" onclick="openPromptAnatomy()" class="brand-attribution-link" aria-label="Powered by Prompt Anatomy — visit website">
-            Powered by Prompt Anatomy
-          </button>
-        </div>
-        <button type="button" onclick="openPromptAnatomy()" class="brand-attribution-cta">
-          Visit Prompt Anatomy <i class="fa-solid fa-arrow-up-right-from-square text-micro"></i>
+          <span>Prompt Anatomy</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-nano opacity-60" aria-hidden="true"></i>
         </button>
       </div>`;
 

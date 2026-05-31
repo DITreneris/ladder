@@ -119,11 +119,7 @@
 }
 
 @utility brand-attribution-link {
-  @apply inline-flex min-h-[44px] items-center text-micro font-semibold text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline focus-ring;
-}
-
-@utility brand-attribution-cta {
-  @apply btn-cl-secondary mt-2 w-full py-2 text-xs;
+  @apply inline-flex min-h-[44px] items-center justify-center gap-1.5 text-micro font-semibold text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline focus-ring;
 }
 
 @utility card-light {

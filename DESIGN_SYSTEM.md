@@ -203,8 +203,7 @@ Attribution for the [Prompt Anatomy](https://www.promptanatomy.app/) ecosystem �
 |---------|--------|
 | `brand-attribution` | Subfooter container on shell screens |
 | `brand-attribution-logo` | PA logo icon (18×18, from `/branding/prompt-anatomy-logo.png`) |
-| `brand-attribution-link` | “Powered by Prompt Anatomy” text link |
-| `brand-attribution-cta` | Secondary “Visit Prompt Anatomy” button |
+| `brand-attribution-link` | Single-line logo + “Prompt Anatomy” link with external icon |
 
 **Surfaces:** home, game over, leaderboard, how-to-play — **not** active gameplay.
 

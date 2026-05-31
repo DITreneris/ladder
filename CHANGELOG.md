@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- Prompt Anatomy footer — single compact link (logo + “Prompt Anatomy ↗”) instead of separate “Powered by” line and full-width CTA
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events
