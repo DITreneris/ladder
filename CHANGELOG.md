@@ -9,24 +9,55 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Planned (v1.1)
+- All-time / Legends tab
+- Analytics events
+- Server-side replay validation (anti-cheat)
+
+## [1.8.2] - 2026-06-01
+
+v1.8.2 — F&F-ready bundle: mobile UX hotfix, trust UX, responsive ladder, discoverability (no new mechanics, screens, or API).
+
 ### Added
+- Vercel Web Analytics — `@vercel/analytics` on mini-app production deploy (page views; no dev tracking)
 - OG image pipeline — Playwright composite (`capture:og`, `og-preview.html`, `?og=1` seeded gameplay); `public/og.png` (1200×630); `.github/social-preview.png` (1280×640); `verify:og` CI check
 - Phase 0 discoverability — `index.html` meta description, Open Graph (`og:image` dimensions + alt), Twitter cards, `noindex`; `public/robots.txt`
 - [docs/discoverability-plan.md](docs/discoverability-plan.md) — Telegram-first discoverability roadmap (defers full SEO)
 - [docs/FF_TEST.md](docs/FF_TEST.md) — friends-and-family protocol (2026-05-31 → 2026-06-14)
+- [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) — F&F gate runbook (deploy smoke, QA sign-off, dogfood, monitor, review)
 - [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) — Telegram iOS/Android sign-off checklist
+- [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) — delta checklist for mobile UX hotfix and F&F trust UX
+- Viewport QA — 320×568 home CTA reachability; memo-visible play area ≥ 45%; HUD hint copy assertion; tap bar visibility check
+- `showHrMemoCombined()` — single memo from multiple lines to save vertical HUD budget
 
 ### Changed
 - In-run announcements — HR memo rail below game HUD (People Ops / HR Systems); tap hint folded into HUD; shell toast reserved for home/game-over actions; tap deck no longer covered during play
 - Home opening — compact amber news strip (headline pool), visible daily shift description, `ticker-shift-emphasis` on non-standard shifts, Employee Badge header, satirical rule line, hero entrance fade
 - Game controls — restore snippet-style bottom tap deck (`tap-controls-bar` + visible h-28 TAP LEFT / TAP RIGHT buttons); remove transparent play-area overlay
-- Viewport QA — play-area ratio 50% (tap deck outside `#gamePlayArea`); tap bar visibility check
-- [ROADMAP.md](ROADMAP.md) — v1.9.0 provisional row; redeploy verified; F&F tracker link
+- Coffee pickup — card badge with ☕ and **+25%** label (matches obstacle badges); green pulse on next rung; pickup pop and particles from the cup
+- Leaderboard — weekly tab **Last 7 Days** (rolling 7-day API); satirical empty state when no runs yet
+- First-run onboarding — `#hudTapHint` deck-first copy (TAP LEFT / TAP RIGHT); `.tap-deck-hint` pulse on tap bar for first 5 taps
+- Home (Telegram) — `#startScreen` scrolls on short viewports so primary CTA stays reachable
+- Manager promotion — one combined HR memo instead of three queued memos
+- CEO promotion — trap announcement deferred until first deadline on ladder
+- Mute during game — HR memo feedback instead of shell toast over tap deck
+- Telegram username field — solid border when read-only (not dashed editable affordance)
+- Viewport QA — play-area ratio 50% (tap deck outside `#gamePlayArea`); game HUD and play area share one content column at 320px and 390px
+- [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — deck-first onboarding and home scroll rules
+- [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) — row 5 references `#hudTapHint` not tap-prompt bar
+- [ROADMAP.md](ROADMAP.md) — one-page game research (2026-06-01): adoption map, F&F decision tree, v1.9 implementation sketches; v1.9 gate tied to [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) (~2026-06-14)
 
-### Planned (v1.1)
-- All-time / Legends tab
-- Analytics events
-- Server-side replay validation (anti-cheat)
+### Fixed
+- **Gameplay looked broken: narrow ladder in a wide frame** — HUD and tap deck spanned the phone width while the ladder stayed 192px (`w-48`) with grey dead zones on both sides. `#ladderTrack` now fills the shared content column; player position and reorg slide distance come from DOM layout; OG gameplay crop regenerated
+- Coffee visibility — player sprite no longer draws over next-rung coffee (`z-index`, `bottom-20`)
+- Score submit failures — game-over toasts for auth, rate limit, and network errors (not success-only)
+- Auth session degradation — dismissible home banner when Telegram profile sync fails; reopen-from-bot copy
+- Meeting Monday badges — Reply-All vs Standup derived from rung id (no re-render flicker)
+- Share toast — "Share sheet opened" instead of implying share succeeded
+- API `/runs` — reject `final_rank` inconsistent with `years_survived` (Intern < 10y, Manager 10–35y, CEO ≥ 35y)
+
+### Removed
+- Unused `.tap-prompt-bar` CSS (superseded by HUD hint + tap deck)
 
 ## [1.8.1] - 2026-05-31
 

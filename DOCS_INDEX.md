@@ -55,7 +55,7 @@ Use this table to pick the right skill, rules, and documents.
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md), [CHANGELOG.md](CHANGELOG.md) |
-| Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md) |
+| Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md), [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Co-branding / PA footer | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | `apps/mini-app/src/lib/branding.ts`, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §9 |
 
@@ -87,6 +87,7 @@ Use this table to pick the right skill, rules, and documents.
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 Telegram device sign-off |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
+| `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |

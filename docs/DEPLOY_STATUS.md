@@ -35,14 +35,13 @@ Track manual deploy progress for **v1.5.0 → v1.8.1** (deploy gate per [ROADMAP
 | 8 | v1.8 device QA | **Done** | Ticker foreshadow; RE-APPLY counter; LB gap; floor labels; rank props |
 
 | 9 | v1.8.1 redeploy + device QA | **Redeploy Done** / **Device QA Pending** | Prod bundle verified; manual checklist [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) |
+| 10 | v1.8.2 + F&F trust fixes redeploy | **Redeploy in progress** / **Device QA Pending** | Push `main` → Vercel + Railway API; then [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) + [FF_EXECUTION.md](FF_EXECUTION.md) post-deploy smoke |
+
+**Code readiness:** deploy configs verified; local CI parity (pytest 15 passed, lint/test/build 38 passed) green 2026-06-01. F&F trust UX shipped in `[Unreleased]`.
 
 
 
-**Code readiness:** deploy configs verified; local CI parity (pytest, lint, test, build) green.
-
-
-
-**Tag sequence:** `v1.5.0` → `v1.6.0` → `v1.7.0` → `v1.8.0` (push tags if not on origin) → `v1.8.1` after step 9.
+**Tag sequence:** `v1.5.0` → `v1.6.0` → `v1.7.0` → `v1.8.0` (push tags if not on origin) → `v1.8.1` after step 9 → `v1.8.2` after step 10 → F&F.
 
 
 

@@ -6,6 +6,7 @@ import { chromium } from "playwright";
 
 const BASE = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
 const VIEWPORTS = [
+  { width: 320, height: 568, label: "320x568" },
   { width: 320, height: 800, label: "320px" },
   { width: 360, height: 800, label: "360px" },
   { width: 390, height: 844, label: "390px" },
@@ -15,6 +16,7 @@ const VIEWPORTS = [
 
 // Bottom tap deck sits outside #gamePlayArea; rung-fit is the primary ladder guardrail.
 const MIN_PLAY_AREA_RATIO = 0.5;
+const MIN_MEMO_PLAY_AREA_RATIO = 0.45;
 const MIN_TAP_BUTTON_HEIGHT = 112;
 
 const SCREENS = [
@@ -76,6 +78,70 @@ async function tapBarVisible(page) {
   }, MIN_TAP_BUTTON_HEIGHT);
 }
 
+async function homeCtaReachable(page) {
+  return page.evaluate(() => {
+    const startScreen = document.getElementById("startScreen");
+    const cta = startScreen?.querySelector("button.cl-primary-btn");
+    if (!startScreen || !cta) return { ok: false, reason: "missing-cta" };
+
+    startScreen.scrollTop = startScreen.scrollHeight;
+    const rect = cta.getBoundingClientRect();
+    const containerRect = startScreen.getBoundingClientRect();
+    const inView = rect.top >= containerRect.top - 1 && rect.bottom <= containerRect.bottom + 1;
+
+    return {
+      ok: inView,
+      scrollHeight: startScreen.scrollHeight,
+      clientHeight: startScreen.clientHeight,
+    };
+  });
+}
+
+async function hudTapHintReferencesDeck(page) {
+  return page.evaluate(() => {
+    const hint = document.getElementById("hudTapHint");
+    if (!hint) return { ok: false, reason: "missing-hint" };
+    const text = hint.textContent ?? "";
+    const ok = text.includes("TAP LEFT") || text.includes("TAP RIGHT");
+    return { ok, text };
+  });
+}
+
+async function memoVisiblePlayAreaRatio(page) {
+  return page.evaluate(() => {
+    const rail = document.getElementById("hrMemoRail");
+    const textEl = document.getElementById("hrMemoText");
+    if (!rail || !textEl) return 0;
+    rail.classList.remove("hidden");
+    textEl.textContent = "Viewport QA memo — play area budget check.";
+    const gameScreen = document.getElementById("gameScreen");
+    const playArea = document.getElementById("gamePlayArea");
+    if (!gameScreen || !playArea) return 0;
+    return playArea.clientHeight / gameScreen.clientHeight;
+  });
+}
+
+async function contentColumnAlignment(page) {
+  return page.evaluate(() => {
+    const hud = document.getElementById("gameHud");
+    const playArea = document.getElementById("gamePlayArea");
+    if (!hud || !playArea) return { ok: true, skipped: true };
+
+    const hudRect = hud.getBoundingClientRect();
+    const playRect = playArea.getBoundingClientRect();
+    const hudPlayDelta = Math.abs(hudRect.width - playRect.width);
+    const hudPlayLeftDelta = Math.abs(hudRect.left - playRect.left);
+
+    return {
+      ok: hudPlayDelta <= 2 && hudPlayLeftDelta <= 2,
+      hudWidth: hudRect.width,
+      playWidth: playRect.width,
+      hudPlayDelta,
+      hudPlayLeftDelta,
+    };
+  });
+}
+
 async function waitForApp(page) {
   await page.waitForSelector("#startScreen", { timeout: 15000 });
   await page.waitForFunction(() => typeof window.switchTab === "function", { timeout: 5000 });
@@ -123,6 +189,18 @@ async function main() {
         });
       }
 
+      if (screen.id === "start") {
+        const homeCta = await homeCtaReachable(page);
+        if (!homeCta.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "home-cta-not-reachable",
+            ...homeCta,
+          });
+        }
+      }
+
       if (screen.id === "game") {
         const ratio = await playAreaRatio(page);
         if (ratio < MIN_PLAY_AREA_RATIO) {
@@ -133,6 +211,29 @@ async function main() {
             ratio,
             min: MIN_PLAY_AREA_RATIO,
           });
+        }
+
+        const hint = await hudTapHintReferencesDeck(page);
+        if (!hint.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "hud-tap-hint-copy",
+            ...hint,
+          });
+        }
+
+        if (vp.width === 320 && vp.height === 800) {
+          const memoRatio = await memoVisiblePlayAreaRatio(page);
+          if (memoRatio < MIN_MEMO_PLAY_AREA_RATIO) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "memo-play-area-ratio",
+              ratio: memoRatio,
+              min: MIN_MEMO_PLAY_AREA_RATIO,
+            });
+          }
         }
 
         const fit = await rungFit(page);
@@ -153,6 +254,18 @@ async function main() {
             type: "tap-bar-missing",
           });
         }
+
+        if (vp.width === 320 || vp.width === 390) {
+          const column = await contentColumnAlignment(page);
+          if (!column.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "content-column-mismatch",
+              ...column,
+            });
+          }
+        }
       }
     }
 
@@ -167,7 +280,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; game play area >= 50%; tap deck visible (h-28); 7 rungs fit in play area (Telegram mode)."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD and play area share content column at 320px and 390px."
   );
 }
 

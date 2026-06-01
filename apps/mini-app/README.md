@@ -16,7 +16,10 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 Automated (run before tag):
 
 - [x] No horizontal overflow at 320–768px (`npm run qa:viewport` with preview running)
+- [x] Home primary CTA reachable at 320×568 in Telegram mode (`viewport-qa.mjs` home-cta check)
 - [x] Game play area ≥ 50% of game screen height in Telegram mode (`viewport-qa.mjs`; tap deck outside play area)
+- [x] Memo-visible play area ≥ 45% at 320×800 (`viewport-qa.mjs`)
+- [x] HUD tap hint references TAP LEFT / TAP RIGHT (`viewport-qa.mjs`)
 - [x] Seven rungs fit inside `#gamePlayArea` at all QA viewports (`viewport-qa.mjs` rung-fit check)
 - [x] First runs: only meeting obstacles (Intern phase) — `engine.test.ts`
 - [x] Next rung visually highlighted — CSS `.next-rung`
@@ -25,7 +28,7 @@ Automated (run before tag):
 - [x] `prefers-reduced-motion`: no animations, game still playable — `effects.ts` + CSS
 - [x] Browser dev: phone shell still visible — `.cl-phone-shell` (hidden only in Telegram)
 
-Manual (requires Telegram on device — [docs/DEVICE_QA_v1.8.1.md](../../docs/DEVICE_QA_v1.8.1.md)):
+Manual (requires Telegram on device — [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md) runbook + [docs/DEVICE_QA_v1.8.1.md](../../docs/DEVICE_QA_v1.8.1.md) + [docs/DEVICE_QA_v1.8.2.md](../../docs/DEVICE_QA_v1.8.2.md)):
 
 - [ ] Telegram iOS: single tap = single climb (no double)
 - [ ] Telegram Android: same

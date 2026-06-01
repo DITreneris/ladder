@@ -2,9 +2,6 @@ import type { DeathType, ObstacleType, Rank } from "./types";
 
 export const MAX_VISIBLE_RUNGS = 7;
 
-export const PLAYER_LEFT = "calc(50% - 92px)";
-export const PLAYER_RIGHT = "calc(50% + 28px)";
-
 export const MANAGER_YEARS = 10;
 export const CEO_YEARS = 35;
 

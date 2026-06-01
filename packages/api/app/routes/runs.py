@@ -13,6 +13,19 @@ router = APIRouter()
 
 _submit_timestamps: dict[int, float] = defaultdict(float)
 SUBMIT_COOLDOWN_SECONDS = 10
+MANAGER_YEARS = 10
+CEO_YEARS = 35
+
+
+def _validate_rank_years(final_rank: str, years_survived: float) -> None:
+    if final_rank == "Intern" and years_survived >= MANAGER_YEARS:
+        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
+    if final_rank == "Manager" and (
+        years_survived < MANAGER_YEARS or years_survived >= CEO_YEARS
+    ):
+        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
+    if final_rank == "CEO" and years_survived < CEO_YEARS:
+        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
 
 
 def _get_user_from_init(init_data: str) -> dict:
@@ -35,6 +48,8 @@ def submit_run(body: RunSubmitRequest):
     expected_rungs = body.years_survived * 4
     if abs(body.rungs_climbed - expected_rungs) > 1:
         raise HTTPException(status_code=400, detail="Score inconsistent with rungs climbed")
+
+    _validate_rank_years(body.final_rank, body.years_survived)
 
     user = upsert_user(tg_user)
     user_id = user["id"]

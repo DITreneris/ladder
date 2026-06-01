@@ -28,13 +28,17 @@ export const APP_SHELL = `
         </p>
       </div>
     </div>
-    <div class="flex items-center space-x-3 cl-header-muted">
-      <i class="fa-solid fa-ellipsis-vertical text-sm cursor-pointer cl-header-muted"></i>
+    <div class="flex items-center space-x-3 cl-header-muted" aria-hidden="true">
+      <i class="fa-solid fa-ellipsis-vertical text-sm cl-header-muted"></i>
     </div>
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
-    <div id="startScreen" class="flex flex-col flex-grow min-h-0 select-none z-10 px-4 pt-4 pb-2">
-      <div class="space-y-2.5 flex-shrink-0">
+    <div id="startScreen" class="flex flex-col flex-grow min-h-0 min-w-0 select-none z-10 pt-4 pb-2 overflow-x-hidden">
+      <div id="authDegradedBanner" class="hidden cl-shell-gutter shrink-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 mb-2 flex items-start gap-2">
+        <p id="authDegradedText" class="text-caption font-semibold text-amber-900 flex-1 min-w-0"></p>
+        <button type="button" onclick="dismissAuthBanner()" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
+      </div>
+      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-x-hidden space-y-2.5 flex-shrink-0">
         <div class="text-center">
           <div class="home-hero-enter home-hero-enter-icon inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
             <i class="fa-solid fa-briefcase text-xl"></i>
@@ -73,7 +77,7 @@ export const APP_SHELL = `
           <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1"></p>
         </div>
       </div>
-      <div class="start-cta-bar shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
+      <div class="start-cta-bar cl-shell-gutter shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
         <p class="text-caption font-semibold text-slate-700 text-center px-1">One tap, one rung. Meetings terminate. Coffee negotiates.</p>
         <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
           <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
@@ -92,7 +96,7 @@ export const APP_SHELL = `
     <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
       <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col">
-      <div id="gameHud" class="game-hud z-10 flex flex-col gap-1.5">
+      <div id="gameHud" class="game-hud cl-shell-gutter z-10 flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-baseline gap-1 text-slate-900">
             <span class="text-2xl font-black leading-none" id="gameYearsLabel">0.0</span>
@@ -112,9 +116,9 @@ export const APP_SHELL = `
           </div>
           <span id="burnoutPercentLabel" class="text-caption font-bold text-slate-500 w-8 text-right">100%</span>
         </div>
-        <p id="hudTapHint" class="hud-tap-hint hidden">Tap the empty side to climb</p>
+        <p id="hudTapHint" class="hud-tap-hint hidden">Use TAP LEFT or TAP RIGHT below — pick the safe side</p>
       </div>
-      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
+      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info cl-shell-gutter hidden" aria-live="polite">
         <div class="hr-memo-rail-body">
           <span id="hrMemoFrom" class="hr-memo-from">People Ops</span>
           <p id="hrMemoText" class="hr-memo-text">…</p>
@@ -126,23 +130,23 @@ export const APP_SHELL = `
           <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
         </div>
       </div>
-        <div id="gamePlayArea" class="game-play-area">
+        <div id="gamePlayArea" class="game-play-area cl-shell-gutter">
           <div id="reorgHudStrip" class="reorg-hud-strip reorg-hud-overlay hidden">
             <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
           </div>
-          <div class="absolute bottom-8 left-4 right-4 opacity-5 flex justify-between items-end pointer-events-none select-none">
+          <div class="absolute bottom-8 left-0 right-0 opacity-5 flex justify-between items-end pointer-events-none select-none">
             <div class="w-12 h-36 bg-slate-900 rounded-t"></div>
             <div class="w-16 h-48 bg-slate-900 rounded-t"></div>
             <div class="w-8 h-24 bg-slate-900 rounded-t"></div>
             <div class="w-14 h-40 bg-slate-900 rounded-t"></div>
           </div>
-          <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 w-48 flex flex-col-reverse justify-start items-center pb-12 select-none pointer-events-none">
-            <div class="absolute top-0 bottom-0 left-12 w-2 bg-slate-300 border-x border-slate-400"></div>
-            <div class="absolute top-0 bottom-0 right-12 w-2 bg-slate-300 border-x border-slate-400"></div>
+          <div id="ladderTrack" class="ladder-track select-none pointer-events-none">
+            <div class="ladder-rail ladder-rail--left" aria-hidden="true"></div>
+            <div class="ladder-rail ladder-rail--right" aria-hidden="true"></div>
             <p id="floorLabel" class="absolute top-1 left-0 right-0 text-center text-nano font-bold uppercase tracking-wider text-slate-400/80">Floor 1 — Intern Pit</p>
             <div id="rungsContainer" class="relative w-full h-full flex flex-col-reverse justify-start"></div>
           </div>
-          <div id="playerClimber" class="absolute bottom-16 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none" style="left: calc(50% - 92px);">
+          <div id="playerClimber" class="absolute bottom-20 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none">
             <span id="playerRankProp" class="absolute -top-1 -right-1 text-lg leading-none rank-prop" aria-hidden="true">🪪</span>
             <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
             <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>
@@ -162,7 +166,7 @@ export const APP_SHELL = `
         </button>
       </div>
     </div>
-    <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between p-6 select-none overflow-y-auto">
+    <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto">
       <div class="text-center mt-2">
         <span class="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full mb-2">
           <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
@@ -221,7 +225,7 @@ export const APP_SHELL = `
         </div>
         <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-lg mb-4">
           <button data-lb-tab="daily" class="lb-tab-active">Daily</button>
-          <button data-lb-tab="weekly" class="lb-tab-inactive">Weekly</button>
+          <button data-lb-tab="weekly" class="lb-tab-inactive">Last 7 Days</button>
         </div>
         <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1" id="leaderboardList"></div>
       </div>

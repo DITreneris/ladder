@@ -172,6 +172,11 @@
   height: var(--size-icon-md);
 }
 
+@utility cl-shell-gutter {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 @utility tap-controls-bar {
   display: grid;
   flex-shrink: 0;
@@ -259,6 +264,9 @@ html.cl-in-telegram body {
 
 html.cl-in-telegram #startScreen {
   padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 html.cl-in-telegram .text-nano {
@@ -309,7 +317,8 @@ html.cl-in-telegram .text-micro {
   flex-shrink: 0;
   border-bottom: 1px solid #e2e8f0;
   background: #fff;
-  padding: 0.5rem 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .game-play-area {
@@ -318,6 +327,49 @@ html.cl-in-telegram .text-micro {
   flex: 1 1 0%;
   overflow: hidden;
   background: #f1f5f9;
+  border-left: 1px solid color-mix(in srgb, #e2e8f0 60%, transparent);
+  border-right: 1px solid color-mix(in srgb, #e2e8f0 60%, transparent);
+}
+
+.ladder-track {
+  position: absolute;
+  inset: 0;
+  bottom: 3rem;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.ladder-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.5rem;
+  background: #cbd5e1;
+  border-left: 1px solid #94a3b8;
+  border-right: 1px solid #94a3b8;
+}
+
+.ladder-rail--left {
+  left: var(--slot-width, 3.5rem);
+}
+
+.ladder-rail--right {
+  right: var(--slot-width, 3.5rem);
+}
+
+.ladder-rung-connector {
+  position: absolute;
+  top: 50%;
+  z-index: 0;
+  height: 0.75rem;
+  transform: translateY(-50%);
+  left: var(--slot-width, 3.5rem);
+  right: var(--slot-width, 3.5rem);
+  border: 1px solid #64748b;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #94a3b8, #cbd5e1);
 }
 
 .btn-tap-zone:active {
@@ -336,21 +388,18 @@ html.cl-in-telegram .text-micro {
   box-shadow: inset -4px 0 0 var(--color-cl-accent-indigo);
 }
 
-.cl-in-telegram .keyboard-hint {
-  display: none;
+.tap-deck-hint .btn-tap-zone {
+  animation: safe-side-hint 1.2s ease-in-out infinite;
 }
 
-.tap-prompt-bar {
-  flex-shrink: 0;
-  padding: 0.375rem 0.75rem;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #fff;
-  background: var(--color-cl-primary);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-cl-primary) 80%, black);
+#toastNotification.toast-above-tap-deck {
+  bottom: calc(7rem + 2rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
+.username-readonly {
+  border-bottom-style: solid;
+  border-bottom-color: #e2e8f0;
+  cursor: default;
 }
 
 .hud-tap-hint {
@@ -578,7 +627,7 @@ html.cl-in-telegram .text-micro {
 
 @keyframes reorg-slide-left {
   0% {
-    transform: translateX(56px);
+    transform: translateX(var(--reorg-slide-distance, 3.5rem));
     opacity: 0.6;
   }
   100% {
@@ -588,7 +637,7 @@ html.cl-in-telegram .text-micro {
 }
 @keyframes reorg-slide-right {
   0% {
-    transform: translateX(-56px);
+    transform: translateX(calc(-1 * var(--reorg-slide-distance, 3.5rem)));
     opacity: 0.6;
   }
   100% {
@@ -849,6 +898,48 @@ html.cl-in-telegram .text-micro {
   animation: coffee-bounce 1s ease-in-out infinite;
 }
 
+#playerClimber {
+  z-index: 5;
+}
+
+.left-slot,
+.right-slot {
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes next-coffee-hint {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgb(16 185 129 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgb(16 185 129 / 0.35);
+  }
+}
+.next-coffee-hint {
+  border-radius: 0.75rem;
+  animation: next-coffee-hint 0.85s ease-in-out infinite;
+}
+
+@keyframes coffee-pickup {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) translateY(-12px);
+    opacity: 0;
+  }
+}
+.coffee-pickup {
+  animation: coffee-pickup 0.28s ease-out forwards;
+}
+
 @keyframes safe-side-hint {
   0%,
   100% {
@@ -947,7 +1038,9 @@ html.cl-in-telegram .text-micro {
   .obstacle-pulse,
   .safe-side-hint,
   .next-obstacle-warn,
+  .next-coffee-hint,
   .coffee-bounce,
+  .coffee-pickup,
   .news-ticker-text,
   .reorg-warning,
   #playerActionEmoji.idle-bob,
@@ -955,7 +1048,8 @@ html.cl-in-telegram .text-micro {
   .ticker-shift-emphasis,
   .promo-stamp-in,
   .hr-memo-enter,
-  .death-cause-hold {
+  .death-cause-hold,
+  .tap-deck-hint .btn-tap-zone {
     animation: none !important;
   }
   .shake-element {

@@ -2,10 +2,7 @@ import {
   CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
-  MANAGER_NEMESIS_LINE,
   MAX_VISIBLE_RUNGS,
-  PLAYER_LEFT,
-  PLAYER_RIGHT,
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
   floorLabel,
@@ -30,9 +27,9 @@ import {
   OG_CAPTURE_YEARS,
 } from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchProfile, submitRun, type LeaderboardEntry } from "./lib/api";
+import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry } from "./lib/api";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
-import { hideHrMemo, showHrMemo } from "./lib/hr-memo";
+import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
   applyReorgSlide,
   flashBurnoutStress,
@@ -41,6 +38,7 @@ import {
   triggerDeathEmoji,
   triggerDeathFlash,
   triggerDeathCauseHold,
+  triggerCoffeePickup,
   triggerMeterFlash,
   triggerRankPop,
   triggerReorgTelegraph,
@@ -145,13 +143,40 @@ function updateMilestoneChip(years: number): void {
   $("milestoneChip").textContent = milestoneLabel(years);
 }
 
-function showToast(msg: string): void {
+function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   const toast = $("toastNotification");
+  const inGame = !$("gameScreen").classList.contains("hidden");
+  toast.classList.toggle("toast-above-tap-deck", inGame && opts?.surface !== "shell");
   $("toastText").textContent = msg;
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
   }, 2500);
+}
+
+function submitFailureMessage(reason: ApiFailureReason): string {
+  const bot = getBotUsername();
+  if (reason === "auth") {
+    return `HR couldn't verify your badge. Reopen from @${bot}.`;
+  }
+  if (reason === "rate_limit") {
+    return "Score filing cooldown. Retry from game over in a few seconds.";
+  }
+  return "Score not filed with HR. Check connection.";
+}
+
+function showAuthDegradedBanner(): void {
+  const bot = getBotUsername();
+  $("authDegradedText").textContent = `Session expired or offline. Reopen from @${bot} to sync scores.`;
+  $("authDegradedBanner").classList.remove("hidden");
+}
+
+function hideAuthDegradedBanner(): void {
+  $("authDegradedBanner").classList.add("hidden");
+}
+
+function dismissAuthBanner(): void {
+  hideAuthDegradedBanner();
 }
 
 function syncTelegramBackButton(tab: Screen): void {
@@ -246,13 +271,13 @@ function refreshDailyShiftUI(): void {
   mountTickerHeadline();
 }
 
-function createObstacleBadge(type: ObstacleType): HTMLElement {
+function createObstacleBadge(type: ObstacleType, rungId: number): HTMLElement {
   const badge = document.createElement("div");
   badge.className =
     "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none obstacle-pulse";
   if (type === "meeting") {
     badge.className += " bg-red-100 border-red-300 text-red-700";
-    if (activeDailyModifier.id === "meeting_monday" && Math.random() < 0.5) {
+    if (activeDailyModifier.id === "meeting_monday" && rungId % 2 === 0) {
       badge.innerHTML = `<span class="text-lg leading-none">📧</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reply-All</span>`;
     } else if (activeDailyModifier.id === "meeting_monday") {
       badge.innerHTML = `<span class="text-lg leading-none">🧍</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Standup</span>`;
@@ -272,19 +297,19 @@ function createObstacleBadge(type: ObstacleType): HTMLElement {
 function createCoffeeBadge(): HTMLElement {
   const badge = document.createElement("div");
   badge.className =
-    "w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 flex items-center justify-center text-lg shadow-sm coffee-bounce select-none";
-  badge.textContent = "☕";
+    "coffee-badge obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none coffee-bounce bg-emerald-100 border-emerald-400 text-emerald-800";
+  badge.innerHTML = `<span class="text-lg leading-none">☕</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">+25%</span>`;
   return badge;
 }
 
 function slotContentKey(rung: Rung, side: "left" | "right"): string {
   if (side === "left") {
     if (rung.obstacle === "left") return `obs-${rung.type}`;
-    if (rung.coffee === "left") return "coffee";
+    if (rung.coffee === "left") return `coffee-${rung.id}`;
     return "empty";
   }
   if (rung.obstacle === "right") return `obs-${rung.type}`;
-  if (rung.coffee === "right") return "coffee";
+  if (rung.coffee === "right") return `coffee-${rung.id}`;
   return "empty";
 }
 
@@ -294,15 +319,40 @@ function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right"): void
   slotEl.dataset.contentKey = key;
   slotEl.innerHTML = "";
   if (side === "left") {
-    if (rung.obstacle === "left") slotEl.appendChild(createObstacleBadge(rung.type!));
+    if (rung.obstacle === "left") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id));
     else if (rung.coffee === "left") slotEl.appendChild(createCoffeeBadge());
   } else {
-    if (rung.obstacle === "right") slotEl.appendChild(createObstacleBadge(rung.type!));
+    if (rung.obstacle === "right") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id));
     else if (rung.coffee === "right") slotEl.appendChild(createCoffeeBadge());
   }
 }
 
 const RUNG_HEIGHT_MAX = 52;
+
+function layoutTrackMetrics(): void {
+  const playArea = $("gamePlayArea");
+  const slot = playArea.querySelector(".left-slot") as HTMLElement | null;
+  if (!slot) return;
+  const width = Math.round(slot.getBoundingClientRect().width);
+  if (width <= 0) return;
+  playArea.style.setProperty("--slot-width", `${width}px`);
+  playArea.style.setProperty("--reorg-slide-distance", `${width}px`);
+}
+
+function layoutPlayerPosition(side: PlayerSide): void {
+  const playArea = $("gamePlayArea");
+  const climber = $("playerClimber");
+  const slot = playArea.querySelector(
+    side === "left" ? ".left-slot" : ".right-slot"
+  ) as HTMLElement | null;
+  if (!slot) return;
+
+  const slotRect = slot.getBoundingClientRect();
+  const playRect = playArea.getBoundingClientRect();
+  const climberW = climber.offsetWidth;
+  const left = slotRect.left + slotRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
+  climber.style.left = `${Math.round(left)}px`;
+}
 
 function layoutRungs(): void {
   const playArea = $("gamePlayArea");
@@ -312,6 +362,7 @@ function layoutRungs(): void {
   playArea.querySelectorAll("[data-rung-slot]").forEach((el) => {
     (el as HTMLElement).style.height = `${rungHeight}px`;
   });
+  layoutTrackMetrics();
 }
 
 function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
@@ -324,21 +375,22 @@ function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
     "relative w-full flex justify-between items-center transition-all duration-75 select-none pointer-events-none";
 
   const connector = document.createElement("div");
-  connector.className =
-    "absolute left-14 right-14 h-3 bg-gradient-to-r from-slate-400 to-slate-300 border border-slate-500 rounded-full z-0";
+  connector.className = "ladder-rung-connector";
   rungEl.appendChild(connector);
 
   const leftSlot = document.createElement("div");
-  leftSlot.className = "left-slot w-14 h-12 flex items-center justify-center relative z-10";
+  leftSlot.className =
+    "left-slot flex-1 min-w-0 max-w-[5.5rem] h-12 flex items-center justify-center relative z-10";
   rungEl.appendChild(leftSlot);
 
   const center = document.createElement("div");
   center.className =
-    "rung-center w-8 h-8 rounded-full bg-white border border-slate-300 shadow-sm flex items-center justify-center z-10";
+    "rung-center shrink-0 w-8 h-8 rounded-full bg-white border border-slate-300 shadow-sm flex items-center justify-center z-10";
   rungEl.appendChild(center);
 
   const rightSlot = document.createElement("div");
-  rightSlot.className = "right-slot w-14 h-12 flex items-center justify-center relative z-10";
+  rightSlot.className =
+    "right-slot flex-1 min-w-0 max-w-[5.5rem] h-12 flex items-center justify-center relative z-10";
   rungEl.appendChild(rightSlot);
 
   container.appendChild(rungEl);
@@ -384,8 +436,8 @@ function renderRungsInner(): void {
     fillSlot(leftSlot, rung, "left");
     fillSlot(rightSlot, rung, "right");
 
-    leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn");
-    rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn");
+    leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
+    rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
 
     if (earlyTapsRemaining > 0 && i === 1) {
       leftSlot.classList.toggle("safe-side-hint", rung.obstacle !== "left");
@@ -396,6 +448,11 @@ function renderRungsInner(): void {
       const blockedSlot = rung.obstacle === "left" ? leftSlot : rightSlot;
       const badge = blockedSlot.querySelector(".obstacle-badge") as HTMLElement | null;
       badge?.classList.add("next-obstacle-warn");
+    }
+
+    if (i === 1) {
+      if (rung.coffee === "left") leftSlot.classList.add("next-coffee-hint");
+      else if (rung.coffee === "right") rightSlot.classList.add("next-coffee-hint");
     }
 
     const swap = reorgSwaps.find((s) => s.rungId === rung.id);
@@ -415,6 +472,17 @@ function renderRungsInner(): void {
   if (advanced) triggerRungAdvance(container);
   prevRungsSnapshot = rungs.map((r) => ({ ...r }));
   layoutRungs();
+  if (engine.isActive()) layoutPlayerPosition(engine.getPlayerSide());
+  maybeShowCeoTrapMemo();
+}
+
+function maybeShowCeoTrapMemo(): void {
+  if (ceoTrapShown || engine.getCurrentRank() !== "CEO") return;
+  const next = engine.getRungs()[1];
+  if (next?.type === "burnout") {
+    ceoTrapShown = true;
+    showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+  }
 }
 
 function renderRungsWithReorgFeedback(): void {
@@ -427,9 +495,8 @@ function renderRungsWithReorgFeedback(): void {
 }
 
 function updatePlayerPosition(side: PlayerSide): void {
-  const climber = $("playerClimber");
-  climber.style.left = side === "left" ? PLAYER_LEFT : PLAYER_RIGHT;
-  triggerClimbPop(climber);
+  layoutPlayerPosition(side);
+  triggerClimbPop($("playerClimber"));
   hapticImpact("light");
 }
 
@@ -460,7 +527,8 @@ async function renderLeaderboard(): Promise<void> {
   list.innerHTML = "";
 
   if (entries.length === 0) {
-    list.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No climbers yet. Be the first!</p>';
+    list.innerHTML =
+      '<p class="text-xs text-slate-500 text-center py-4 italic">No terminations recorded yet. HR is optimistic.</p>';
     return;
   }
 
@@ -503,6 +571,19 @@ function setLeaderboardPeriod(period: LeaderboardPeriod): void {
 }
 
 let tapHintTimer: ReturnType<typeof setTimeout> | null = null;
+let tapDeckHintTimer: ReturnType<typeof setTimeout> | null = null;
+
+function showTapDeckHint(): void {
+  $("tapControlsBar").classList.add("tap-deck-hint");
+  if (tapDeckHintTimer) clearTimeout(tapDeckHintTimer);
+  tapDeckHintTimer = setTimeout(() => hideTapDeckHint(), 3000);
+}
+
+function hideTapDeckHint(): void {
+  if (tapDeckHintTimer) clearTimeout(tapDeckHintTimer);
+  tapDeckHintTimer = null;
+  $("tapControlsBar").classList.remove("tap-deck-hint");
+}
 
 function showHudTapHint(): void {
   $("hudTapHint").classList.remove("hidden");
@@ -519,10 +600,12 @@ function hideHudTapHint(): void {
 function startGame(): void {
   hideHrMemo();
   hideHudTapHint();
+  hideTapDeckHint();
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
   $("burnoutMeter").style.width = "100%";
   showHudTapHint();
+  showTapDeckHint();
   flashBurnoutStress(false);
   playerInPanic = false;
   $("playerClimber").classList.remove("player-panic");
@@ -541,13 +624,17 @@ function startGame(): void {
   updateFloorLabel(0);
   updateReorgHudStrip("Intern");
   switchTab("game");
-  requestAnimationFrame(() => layoutRungs());
+  requestAnimationFrame(() => {
+    layoutRungs();
+    layoutPlayerPosition(engine.getPlayerSide());
+  });
 }
 
 function goHome(): void {
   engine.stop();
   hideHrMemo();
   hideHudTapHint();
+  hideTapDeckHint();
   flashBurnoutStress(false);
   playerInPanic = false;
   enableVerticalSwipe();
@@ -605,13 +692,17 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   const initData = getInitData();
   const lbFetch = fetchLeaderboard("daily", initData || undefined);
   if (initData) {
-    const ok = await submitRun(initData, {
+    const submitResult = await submitRun(initData, {
       yearsSurvived: result.yearsSurvived,
       finalRank: result.finalRank,
       terminationCause: result.terminationCause,
       rungsClimbed: result.rungsClimbed,
     });
-    if (ok) showToast("Score submitted to the boardroom!");
+    if (submitResult.ok) {
+      showToast("Score submitted to the boardroom!", { surface: "shell" });
+    } else {
+      showToast(submitFailureMessage(submitResult.reason), { surface: "shell" });
+    }
   }
 
   const gapEl = $("leaderboardGapLine");
@@ -674,7 +765,7 @@ function buildShareText(): string {
 function copyShareText(): void {
   const text = buildShareText();
   if (shareText(text)) {
-    showToast("Opening Telegram share...");
+    showToast("Share sheet opened");
     return;
   }
   if (navigator.clipboard?.writeText) {
@@ -690,12 +781,21 @@ function copyShareText(): void {
 function toggleMute(): void {
   audio.setMuted(!audio.isMuted());
   const icon = $("soundIcon");
+  const inGame = engine?.isActive();
   if (audio.isMuted()) {
     icon.className = "fa-solid fa-volume-xmark text-red-400";
-    showToast("Synthesizer Muted");
+    if (inGame) {
+      showHrMemo("Synthesizer muted.", { variant: "info", durationMs: 1500 });
+    } else {
+      showToast("Synthesizer Muted");
+    }
   } else {
     icon.className = "fa-solid fa-volume-high";
-    showToast("Synthesizer Unmuted");
+    if (inGame) {
+      showHrMemo("Synthesizer live.", { variant: "info", durationMs: 1500 });
+    } else {
+      showToast("Synthesizer Unmuted");
+    }
     audio.init();
     audio.unmuteTest();
   }
@@ -710,7 +810,10 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
     if (now - lastPointerTapAt < 50) return;
     lastPointerTapAt = now;
     engine.handleTap(side);
-    if (earlyTapsRemaining > 0) earlyTapsRemaining--;
+    if (earlyTapsRemaining > 0) {
+      earlyTapsRemaining--;
+      if (earlyTapsRemaining === 0) hideTapDeckHint();
+    }
   });
 }
 
@@ -731,6 +834,7 @@ function mountOgCaptureMode(): void {
   $("soundToggleBtn").classList.add("hidden");
   $("tapControlsBar").classList.add("hidden");
   hideHudTapHint();
+  hideTapDeckHint();
   hideHrMemo();
 
   prevRungsSnapshot = [];
@@ -758,6 +862,7 @@ function mountOgCaptureMode(): void {
 
   requestAnimationFrame(() => {
     layoutRungs();
+    layoutPlayerPosition(OG_CAPTURE_PLAYER_SIDE);
     requestAnimationFrame(() => {
       (window as unknown as Record<string, unknown>).__CL_OG_READY__ = true;
     });
@@ -772,7 +877,7 @@ export function mountApp(): void {
   const usernameInput = $("usernameInput") as HTMLInputElement;
   if (isTelegram()) {
     usernameInput.readOnly = true;
-    usernameInput.classList.add("cursor-default");
+    usernameInput.classList.add("cursor-default", "username-readonly");
     usernameInput.title = "Name from your Telegram profile";
   } else {
     const saved = localStorage.getItem("corp_ladder_username");
@@ -810,16 +915,16 @@ export function mountApp(): void {
         updateRankUI(rank, false);
         flashPlayerEmoji("😎", 400);
         triggerRankPop($("playerActionEmoji"));
-        showHrMemo(message, { variant: "promo", durationMs: 2000 });
         if (rank === "Manager") {
-          showHrMemo(MANAGER_NEMESIS_LINE, { variant: "promo" });
-          showHrMemo("Reorgs now swap sides. Time your climbs.", { variant: "info" });
+          showHrMemoCombined([message, "Reorgs now swap sides. Time your climbs."], {
+            variant: "promo",
+            durationMs: 3500,
+          });
         } else if (rank === "CEO") {
-          showHrMemo("Deadlines joined the org chart. Good luck.", { variant: "alert" });
-          if (!ceoTrapShown) {
-            ceoTrapShown = true;
-            showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo" });
-          }
+          showHrMemo(message, { variant: "promo", durationMs: 2500 });
+          showHrMemo("Deadlines joined the org chart. Good luck.", { variant: "alert", durationMs: 2500 });
+        } else {
+          showHrMemo(message, { variant: "promo", durationMs: 2000 });
         }
         hapticNotification("success");
         const promoEmoji = rank === "Manager" ? "📋" : rank === "CEO" ? "👑" : "🎉";
@@ -827,10 +932,13 @@ export function mountApp(): void {
       },
       onGameOver,
       onCoffee: () => {
+        const nextRungEl = $("rungsContainer").querySelector(".next-rung");
+        const coffeeBadge = nextRungEl?.querySelector(".coffee-badge") as HTMLElement | null;
+        if (coffeeBadge) triggerCoffeePickup(coffeeBadge);
         flashPlayerEmoji("🤤", 200);
         showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
         triggerMeterFlash($("burnoutMeter"));
-        spawnFloatingParticles($("playerClimber"), "☕", 4);
+        spawnFloatingParticles(coffeeBadge ?? $("playerClimber"), "☕", 5);
         hapticImpact("medium");
       },
       onToast: (msg) => showHrMemo(msg, { variant: "info" }),
@@ -859,7 +967,10 @@ export function mountApp(): void {
   bindTapButton($("btnTapRight"), "right");
 
   const playArea = $("gamePlayArea");
-  new ResizeObserver(() => layoutRungs()).observe(playArea);
+  new ResizeObserver(() => {
+    layoutRungs();
+    if (engine.isActive()) layoutPlayerPosition(engine.getPlayerSide());
+  }).observe(playArea);
 
   window.addEventListener("keydown", (e) => {
     if (!engine.isActive()) return;
@@ -884,6 +995,7 @@ export function mountApp(): void {
   (window as unknown as Record<string, unknown>).copyShareText = copyShareText;
   (window as unknown as Record<string, unknown>).openPromptAnatomy = openPromptAnatomy;
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
+  (window as unknown as Record<string, unknown>).dismissAuthBanner = dismissAuthBanner;
 
   updateRankUI("Intern");
   if (isOgCaptureMode()) {
@@ -896,8 +1008,10 @@ export function mountApp(): void {
 
   const initData = getInitData();
   if (initData) {
-    fetchProfile(initData).then((profile) => {
-      if (profile) {
+    fetchProfile(initData).then((result) => {
+      if (result.ok) {
+        hideAuthDegradedBanner();
+        const profile = result.profile;
         highScore = profile.best_score;
         bestRank = profile.best_rank || "Intern";
         $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
@@ -905,6 +1019,8 @@ export function mountApp(): void {
           username = profile.username ?? profile.first_name ?? username;
           ($("usernameInput") as HTMLInputElement).value = username;
         }
+      } else {
+        showAuthDegradedBanner();
       }
     });
   } else {

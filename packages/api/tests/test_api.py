@@ -114,3 +114,18 @@ def test_runs_invalid_final_rank(mock_supabase, valid_init_data):
         },
     )
     assert response.status_code == 422
+
+
+def test_runs_rank_years_mismatch(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    response = client.post(
+        "/runs",
+        json={
+            "initData": valid_init_data,
+            "years_survived": 1,
+            "final_rank": "CEO",
+            "rungs_climbed": 4,
+        },
+    )
+    assert response.status_code == 400
+    assert "inconsistent" in response.json()["detail"].lower()

@@ -2,6 +2,8 @@
 
 **Release:** v1.8.1 (2026-05-31) · **Deploy:** https://www.promptanatomy.lol · **Bot:** `@CorporateLadderBot`
 
+**F&F gate:** Sign off before external invites · **Runbook:** [FF_EXECUTION.md](FF_EXECUTION.md) · **iOS owner:** core team
+
 Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 9 complete.
 
 ---
@@ -23,7 +25,7 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 | 2 | BackButton → home from game / LB / how-to-play | [ ] |
 | 3 | Bottom tap deck | TAP LEFT / TAP RIGHT visible; one tap = one climb | [ ] |
 | 4 | All 7 rungs visible | [ ] |
-| 5 | Tap-prompt bar on first run | [ ] |
+| 5 | HUD tap hint (`#hudTapHint`) references TAP LEFT / TAP RIGHT | [ ] |
 | 6 | Safe-side hints (first 5 taps) | [ ] |
 | 7 | Sound FAB not clipped by notch | [ ] |
 | 8 | `/start` → Mini App; today's shift in bot message | [ ] |
@@ -40,7 +42,7 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 | 2 | BackButton → home from game / LB / how-to-play | [ ] |
 | 3 | Bottom tap deck | TAP LEFT / TAP RIGHT visible; one tap = one climb | [ ] |
 | 4 | All 7 rungs visible | [ ] |
-| 5 | Tap-prompt bar on first run | [ ] |
+| 5 | HUD tap hint (`#hudTapHint`) references TAP LEFT / TAP RIGHT | [ ] |
 | 6 | Safe-side hints (first 5 taps) | [ ] |
 | 7 | Sound FAB not clipped by gesture bar | [ ] |
 | 8 | `/start` → Mini App; today's shift in bot message | [ ] |

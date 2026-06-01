@@ -144,6 +144,18 @@ export function triggerPromoConfetti(el: HTMLElement): void {
   );
 }
 
+export function triggerCoffeePickup(badge: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  badge.classList.remove("coffee-pickup");
+  void badge.offsetWidth;
+  badge.classList.add("coffee-pickup");
+  badge.addEventListener(
+    "animationend",
+    () => badge.classList.remove("coffee-pickup"),
+    { once: true }
+  );
+}
+
 export function triggerMeterFlash(el: HTMLElement): void {
   if (respectsReducedMotion()) return;
   el.classList.remove("meter-flash");

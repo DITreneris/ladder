@@ -121,6 +121,13 @@ export function showHrMemo(text: string, opts?: HrMemoOptions): void {
   hrMemo.show(text, opts);
 }
 
+/** Join lines into one memo (2-line clamp) to save vertical HUD budget. */
+export function showHrMemoCombined(lines: string[], opts?: HrMemoOptions): void {
+  const text = lines.filter(Boolean).join(" ");
+  if (!text) return;
+  hrMemo.show(text, opts);
+}
+
 export function hideHrMemo(): void {
   hrMemo.hide();
 }
