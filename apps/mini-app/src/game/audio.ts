@@ -1,10 +1,25 @@
 let audioCtx: AudioContext | null = null;
 let isMuted = false;
+let bgm: HTMLAudioElement | null = null;
+let bgmWanted = false;
+
+const BGM_URL = "/audio/bgm-streso-chorus.mp3";
+const BGM_VOLUME = 0.22;
 
 function initAudio(): void {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   }
+}
+
+function initBgm(): HTMLAudioElement {
+  if (!bgm) {
+    bgm = new Audio(BGM_URL);
+    bgm.loop = true;
+    bgm.volume = BGM_VOLUME;
+    bgm.preload = "auto";
+  }
+  return bgm;
 }
 
 function playTone(freq: number, type: OscillatorType, duration: number): void {
@@ -31,9 +46,31 @@ export const audio = {
   },
   setMuted(muted: boolean): void {
     isMuted = muted;
+    if (muted) {
+      bgm?.pause();
+      return;
+    }
+    if (bgmWanted) {
+      void initBgm().play().catch(() => {
+        /* iOS/Telegram gesture policy */
+      });
+    }
   },
   isMuted(): boolean {
     return isMuted;
+  },
+  startBgm(): void {
+    bgmWanted = true;
+    if (isMuted) return;
+    void initBgm().play().catch(() => {
+      /* iOS/Telegram gesture policy */
+    });
+  },
+  stopBgm(): void {
+    bgmWanted = false;
+    if (!bgm) return;
+    bgm.pause();
+    bgm.currentTime = 0;
   },
   tap(score: number): void {
     playTone(440 + score * 4, "sine", 0.15);
@@ -43,6 +80,7 @@ export const audio = {
     setTimeout(() => playTone(1200, "sine", 0.15), 50);
   },
   gameOver(): void {
+    this.stopBgm();
     playTone(220, "triangle", 0.3);
     setTimeout(() => playTone(150, "sawtooth", 0.4), 150);
   },

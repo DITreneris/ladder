@@ -51,17 +51,13 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 | Check | Result |
 |-------|--------|
-| Supabase `users` | **0** (no tester rows persisted) |
-| Supabase `game_runs` | **0** |
-| Prod `GET /leaderboard` daily + weekly | **200**, `entries: []` (consistent with empty DB) |
-| Prod `VITE_API_URL` in bundle | `ladder-production-642d.up.railway.app` — matches local `.env` |
-| Prod `POST /auth/me` + `/runs` (signed probe) | **500** — not 401 (secret OK); server crash on **new user** upsert |
+| Supabase `users` | **2** testers (+ audit probe on script run) |
+| Supabase `game_runs` | **12+** (same-day group + private plays) |
+| Prod `GET /leaderboard` daily + weekly | **200**, **2** entries each |
+| Prod `POST /auth/me` + `/runs` (signed probe) | **200** — `submit_pipeline_ok: true` |
+| Group launch | `/go@CorporateLadder_bot` in Prompt_Anatomy supergroup → Punch In → runs persisted |
 
-**Root cause (fixed in repo, pending Railway redeploy):** [`packages/api/app/routes/_users.py`](../packages/api/app/routes/_users.py) — Supabase Python client returns `None` from `maybe_single().execute()` when no row exists; code accessed `existing.data` → **500** for every first-time Telegram user. Explains why ~3–4 bot plays with game over left **no** `users` / `game_runs` rows.
-
-**After API redeploy:** re-run `scripts/ff-metrics.py` (`submit_pipeline_ok: true` expected) → ask testers to replay 1 run → refresh metrics SQL below.
-
-**Blocker:** Railway API must redeploy from `main` with upsert fix before F&F scores count.
+**Prior blocker (fixed):** new-user upsert 500 — resolved; scores now land in Supabase. Re-run `python scripts/ff-metrics.py` after deploy or tester sessions.
 
 
 ## Device QA assignment

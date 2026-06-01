@@ -195,7 +195,7 @@ Main session handles game/API/copy work inline using skills and rules above.
 └── .cursor/                # rules, skills, agents
 ```
 
-**Data flow:** Bot `/start` → Mini App (Vercel) → `POST /auth/me` → play → `POST /runs` → `GET /leaderboard`. See [docs/architecture.md](docs/architecture.md).
+**Data flow:** Bot `/start` (private) or `/go@bot` (group) → Mini App (Vercel) → `POST /auth/me` → play → `POST /runs` → `GET /leaderboard`. Group keyboard: `t.me?startapp` (not `web_app`). See [docs/architecture.md](docs/architecture.md).
 
 ---
 

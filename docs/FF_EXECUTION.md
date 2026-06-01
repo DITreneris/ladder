@@ -37,15 +37,15 @@
 | Viewport QA | Passed (preview; `PREVIEW_URL` if port ≠ 4173) |
 | Vercel redeploy | **Done** — `main` → `d862c3c`; prod bundle `main-BO_qJQT_.js` |
 | Railway API | Auto-deploy from `main` (rank validation on `/runs`) |
-| Telegram full run | **Manual** — steps 2–7 below |
+| Telegram full run | **Done** (2026-06-01) — private + Prompt_Anatomy group; Supabase ingest via `ff-metrics.py` |
 
 | # | Check | Pass |
 |---|-------|------|
 | 1 | `GET https://ladder-production-642d.up.railway.app/health` → ok | [x] |
-| 2 | `/start` → today's shift + WebApp button | [ ] manual |
+| 2 | `/start` (private) → shift + WebApp button; `/go@bot` (group) → `t.me?startapp` button | [x] |
 | 3 | Ladder fills column (no narrow 192px frame) | [ ] manual — **P0** |
-| 4 | Full run → game over → submit toast (success or explicit failure) | [ ] manual |
-| 5 | Score on Daily leaderboard | [ ] manual — **P0** |
+| 4 | Full run → game over → submit toast (success or explicit failure) | [x] |
+| 5 | Score on Daily leaderboard | [x] |
 | 6 | Share includes `Shift:` line | [ ] manual — **P0** |
 | 7 | Home auth banner hidden after fresh bot open | [ ] manual |
 

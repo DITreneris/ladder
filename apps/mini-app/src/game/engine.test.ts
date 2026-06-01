@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./audio", () => ({
   audio: {
     init: vi.fn(),
+    startBgm: vi.fn(),
+    stopBgm: vi.fn(),
     tap: vi.fn(),
     coffee: vi.fn(),
     promo: vi.fn(),

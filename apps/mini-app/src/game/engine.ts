@@ -195,6 +195,7 @@ export class GameEngine {
 
   start(): void {
     audio.init();
+    audio.startBgm();
     this.score = 0;
     this.timeLeft = 100;
     this.isPlaying = true;
@@ -264,6 +265,7 @@ export class GameEngine {
   stop(): void {
     this.isPlaying = false;
     this.stopLoops();
+    audio.stopBgm();
   }
 
   /** Frozen mid-game state for OG screenshot capture (`?og=1`). */

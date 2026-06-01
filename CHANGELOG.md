@@ -10,7 +10,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **Bot `/go` command** — opens Mini App like `/start`; use in groups where another bot also handles `/start`
+- **In-run background music** — chorus loop from *Mr. Bullet — Be Streso* (trimmed from 0:55); plays during gameplay; respects mute FAB; stops on game over / exit
+- **Bot `/go` command** — opens Mini App like `/start`; use in groups where another bot also handles `/start`; production verified in Prompt_Anatomy supergroup (2026-06-01)
 - **SEO / GEO hardening** — canonical URL, unified meta copy, JSON-LD (`WebApplication` + `VideoGame`), `sitemap.xml`, `llms.txt`, expanded `robots.txt`, `<noscript>` crawler fallback; CI `verify:seo`
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
@@ -18,7 +19,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
 ### Fixed
-- **Bot silent in groups (`BUTTON_TYPE_INVALID`)** — `web_app` inline buttons are private-chat only per Telegram API; groups now get `t.me/bot?startapp` URL button; command logging + send fallback
+- **Bot silent in groups (`BUTTON_TYPE_INVALID`)** — Telegram allows `web_app` inline buttons only in private chat; groups now get `t.me/bot?startapp` URL button; command logging + send fallback; verified `/go@CorporateLadder_bot` + score → Supabase (2026-06-01)
 - **X card validator robots.txt** — switch from `Allow: /` to empty `Disallow:` (legacy-compatible); list `Twitterbot` first for order-sensitive parsers
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
 - **Home scroll layout** — single scroll on `#startScreen` (no nested gutter scroll); `#homeGameplayPreview` full column width; clearer two-line auth banner when profile sync fails; compact shift description; Telegram Punch In hint when inline CTA hidden
@@ -28,6 +29,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
 ### Changed
+- **Production smoke signed (2026-06-01)** — prod API auth + `/runs` → Supabase (`scripts/ff-metrics.py` `submit_pipeline_ok: true`); Daily/Weekly leaderboard populated; private `/start` + group `/go`/`/play` with `@bot` handle; deploy docs for multi-bot groups ([DEPLOY.md](DEPLOY.md))
 - **Deploy post-deploy gate** — `DEPLOY.md` requires `scripts/ff-metrics.py` `submit_pipeline_ok: true` (not `/health` alone)
 - **Crawler access** — `robots.txt` now allows search, social preview (Twitter/Facebook/LinkedIn), and AI bots; shell `index.html` uses `index, follow` so card validators can fetch OG image
 - **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, mini-app URL in message (OG preview in chat); PA link button-only (no `.app` URL in body)

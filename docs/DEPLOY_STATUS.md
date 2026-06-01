@@ -24,11 +24,11 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 3 | Vercel Mini App | **Redeploy Done** | https://www.promptanatomy.lol — bundle `main-BVz1aF34.js` (2026-06-01); reaction/layout hotfix pending next deploy |
 
-| 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL |
+| 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL; group `t.me?startapp` keyboard (`39d8249`); `@CorporateLadder_bot` |
 
 | 5 | BotFather | **Done** | Menu button + `/setdomain`; botpic uploaded manually (briefcase mark); Description/About/Commands — paste from [DEPLOY.md](../DEPLOY.md) |
 
-| 6 | Post-deploy smoke | **Local Done** / **Prod manual pending** | Local: smoke-local + viewport QA + API health `{"status":"ok"}` (2026-06-01). After Vercel redeploy: `/start`, score → Daily LB, share clipboard on device |
+| 6 | Post-deploy smoke | **Prod Done** (2026-06-01) | `ff-metrics.py`: `submit_pipeline_ok: true`; 2 users / 12+ runs in Supabase; private `/start` + group `/go@CorporateLadder_bot` → Punch In → Daily LB; Prompt_Anatomy supergroup signed |
 
 | 7 | v1.6 + v1.7 device QA | **Done** | Milestone chip; death cause + retry tip; Meeting Monday + Reorg Week presets |
 
@@ -39,7 +39,8 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 | 10 | v1.8.2 + F&F trust fixes | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
 
 | 11 | v1.8.5 corridor + tutorial | **Tagged** / **Live** | Tag `v1.8.5` on `46abf19`; prod `main-7DTXR6XJ.js`; DEVICE_QA rows 1–5 signed |
-| 12 | v1.9.0 near-miss + Synergy Sprint | **Code Done** / **Deploy Pending** | `[Unreleased]` — bundle `main-BOIp6dYp.js`; redeploy + F&F review 2026-06-14 |
+| 12 | v1.9.0 near-miss + Synergy Sprint | **Code Done** / **Deploy Pending** | `[Unreleased]` — bundle `main-Bfn2Swgz.js`; redeploy + F&F review 2026-06-14 |
+| 13 | Group bot + `/go` | **Done** (2026-06-01) | `17c51c4` `/go`; `39d8249` group keyboard; prod smoke + Supabase ingest verified |
 
 **Tag sequence:** … → `v1.8.5` (done) → F&F → **`v1.9.0`** after Jun 14 review.
 

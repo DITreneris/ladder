@@ -51,8 +51,10 @@ Copy [.env.example](../../.env.example) to repo root `.env`. All services read t
 ## Step 4: Railway Bot
 
 1. New Service → `apps/bot`
-2. Environment variables: `TELEGRAM_BOT_TOKEN`, `MINI_APP_URL` = Vercel production URL
-3. Deploy
+2. Environment variables: `TELEGRAM_BOT_TOKEN`, `MINI_APP_URL` = Vercel production URL; optional `MINI_APP_SHORT_NAME` for group direct links
+3. Deploy — **one replica** only (duplicate polling → `TelegramConflictError`)
+
+**Groups:** bot sends `t.me/bot?startapp` URL button (not `web_app`). Test with `/go@bot`. See [DEPLOY.md](../../DEPLOY.md) § Group chats.
 
 ## Step 5: BotFather
 
@@ -74,7 +76,8 @@ CI parity ([.github/workflows/ci.yml](../../.github/workflows/ci.yml)): API `pyt
 ## Step 7: Post-deploy verify
 
 - [ ] `GET {API_URL}/health` returns ok
-- [ ] `/start` in Telegram shows "Punch In & Climb" button
+- [ ] `python scripts/ff-metrics.py` → `submit_pipeline_ok: true`
+- [ ] `/start` (private) and `/go@bot` (group) show "Punch In & Climb"
 - [ ] Mini App loads inside Telegram
 - [ ] Complete a run, score appears on Daily leaderboard
 - [ ] Weekly tab loads

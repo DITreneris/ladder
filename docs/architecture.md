@@ -21,12 +21,22 @@
 
 ## Data Flow
 
-1. User opens bot → `/start` → Mini App URL (Vercel)
+**Private chat**
+
+1. User opens bot → `/start` (or Menu Button) → inline **WebApp** button → Mini App (Vercel)
 2. Mini App loads Telegram WebApp SDK, reads `initData`
 3. On launch: `POST /auth/me` validates identity, returns profile + best score
 4. Player completes run → `POST /runs` with `initData` + run payload
 5. API validates HMAC, sanity-checks score, writes to Supabase
 6. Leaderboard: `GET /leaderboard?period=daily|weekly` (optional `initData` for current-user row highlight)
+
+**Group chat (multi-bot)**
+
+1. User sends `/go@bot` or `/play@bot` (avoid bare `/start` when another bot shares it)
+2. Bot replies with inline **URL** button `https://t.me/bot?startapp` — Telegram rejects `web_app` buttons in groups (`BUTTON_TYPE_INVALID`)
+3. Steps 2–6 same as private once Mini App opens
+
+**Ops audit:** `python scripts/ff-metrics.py` — Supabase row counts + prod `POST /auth/me` and `/runs` probe (`submit_pipeline_ok`).
 
 ## Environment Variables
 
@@ -38,7 +48,8 @@ All services can read a **single repo root** `.env` (see [.env.example](../.env.
 | `TELEGRAM_WEBAPP_SECRET` | Railway API | initData HMAC validation (same as bot token) |
 | `SUPABASE_URL` | Railway API | Database URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Railway API | Server-side writes (bypasses RLS) |
-| `MINI_APP_URL` | Railway Bot | Vercel production URL for web_app button |
+| `MINI_APP_URL` | Railway Bot | Vercel production URL for private-chat `web_app` button |
+| `MINI_APP_SHORT_NAME` | Railway Bot | Optional BotFather direct-link short name → `t.me/bot/appname` in groups |
 | `VITE_API_URL` | Vercel | Frontend → API base URL |
 | `VITE_BOT_USERNAME` | Vercel | Share deep links |
 | `VITE_PROMPT_ANATOMY_URL` | Vercel | Prompt Anatomy co-branding link (optional; defaults in `lib/branding.ts`) |

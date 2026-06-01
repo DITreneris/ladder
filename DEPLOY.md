@@ -101,13 +101,32 @@ play - Same as start
 help - How to play in 30 seconds
 ```
 
-After Railway bot redeploy, smoke `/start`, `/go`, `/play`, and `/help` — each should show **Punch In & Climb** (WebApp) and today's shift label should match the in-app pill.
+After Railway bot redeploy, smoke `/start`, `/go`, `/play`, and `/help` — each should show **Punch In & Climb** and today's shift label should match the in-app pill.
+
+## Group chats (multi-bot)
+
+Telegram **does not allow** `web_app` inline buttons in groups/supergroups (`BUTTON_TYPE_INVALID`). Private chat uses a WebApp button; groups use a **`t.me/bot?startapp`** URL button (see `apps/bot/main.py`).
+
+| Context | Launch command | Button type |
+|---------|----------------|-------------|
+| Private DM | `/start`, `/play`, or Menu Button | WebApp (`web_app`) |
+| Group with other bots | `/go@YourBot` or `/play@YourBot` | URL (`t.me/...?startapp`) |
+
+**Setup checklist (groups):**
+
+1. BotFather → `/setprivacy` → **Disable** for the game bot
+2. BotFather → `/setcommands` — include `go` (see above)
+3. If Rose (or similar) is in the group → allowlist the game bot
+4. Railway bot service → **one replica** only (avoid `TelegramConflictError` from duplicate polling)
+5. Do **not** tap the plain mini-app URL in the bot message body — use **Punch In & Climb**
+
+**Smoke in group:** `/go@YourBot` → welcome + Punch In → complete one run → `python scripts/ff-metrics.py` shows new `game_runs` row.
 
 ## 6. Post-deploy verification
 
 - [ ] `GET {API_URL}/health` returns ok over HTTPS
 - [ ] `python scripts/ff-metrics.py` → `submit_pipeline_ok: true` (prod `POST /auth/me` + `/runs`; not just health)
-- [ ] `/start`, `/go`, `/play`, and `/help` in Telegram show **Punch In & Climb** and open the Mini App
+- [ ] `/start` (private) and `/go@bot` (group) show **Punch In & Climb** and open the Mini App
 - [ ] Mini App loads inside Telegram (not broken blank screen)
 - [ ] Complete one run; score appears on **Daily** leaderboard
 - [ ] **Weekly** tab loads entries
@@ -156,8 +175,11 @@ Use ngrok or Telegram’s test environment for real `initData` against a local A
 
 ## Troubleshooting
 
-| Symptom | Skill / doc |
+| Symptom | Cause / fix |
 |---------|-------------|
+| Bot silent in group, `BUTTON_TYPE_INVALID` in Railway logs | Deploy bot with group keyboard fix (`t.me?startapp` URL button); see [Group chats](#group-chats-multi-bot) |
+| Bot silent in group, no log line for command | Wrong `@bot` handle, Group Privacy on, or anti-spam (Rose) blocking — use `/go@YourBot`, allowlist bot |
+| `TelegramConflictError` in logs | Two processes polling same bot token — one Railway replica; stop local `python main.py`; `deleteWebhook` if set |
 | Auth fails / invalid hash | [telegram-initdata-auth](.cursor/skills/telegram-initdata-auth/SKILL.md) |
-| Score not on leaderboard | [score-pipeline](.cursor/skills/score-pipeline/SKILL.md) |
+| Score not on leaderboard | [score-pipeline](.cursor/skills/score-pipeline/SKILL.md); run `python scripts/ff-metrics.py` |
 | Env matrix | [docs/architecture.md](docs/architecture.md) |
