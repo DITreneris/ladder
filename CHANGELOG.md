@@ -20,6 +20,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Home scroll layout** — single scroll on `#startScreen` (no nested gutter scroll); `#homeGameplayPreview` full column width; clearer two-line auth banner when profile sync fails; compact shift description; Telegram Punch In hint when inline CTA hidden
 - **Obstacle badge readability** — future rung dim no longer fades hazard badges; meeting/reorg stronger borders and text; imminent hazard red glow (mirrors coffee hint); softer obstacle pulse on distant rungs
 - **Score submit 500 for new Telegram users** — `upsert_user()` handles Supabase `maybe_single()` returning `None` when no row exists; unblocks `/auth/me` and `/runs` (F&F data audit 2026-06-01)
+- **Bot `/start` silent after deploy** — Dockerfile now copies `shifts.py` (was `main.py` only; import crash on Railway)
 
 ### Changed
 - **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, PA link button-only (no URL in message)
