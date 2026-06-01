@@ -2,10 +2,15 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, HTTPException, Query
 
-from app.auth.telegram import TelegramAuthError, validate_init_data
+from app.auth.session import resolve_session_token
 from app.config import settings
 from app.db.supabase import get_supabase
-from app.models import LeaderboardEntry, LeaderboardResponse
+from app.models import (
+    LeaderboardEntry,
+    LeaderboardMeRequest,
+    LeaderboardMeResponse,
+    LeaderboardResponse,
+)
 
 router = APIRouter()
 
@@ -19,19 +24,8 @@ def _period_start(period: str) -> datetime:
     raise HTTPException(status_code=400, detail="period must be daily or weekly")
 
 
-@router.get("", response_model=LeaderboardResponse)
-def get_leaderboard(
-    period: str = Query("daily", pattern="^(daily|weekly)$"),
-    limit: int = Query(50, ge=1, le=100),
-    init_data: str | None = Query(None, alias="initData"),
-):
-    since = _period_start(period)
-
-    try:
-        db = get_supabase()
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail="Database unavailable") from e
-
+def _fetch_best_by_user(since: datetime) -> dict[int, dict]:
+    db = get_supabase()
     runs = (
         db.table("game_runs")
         .select("years_survived, final_rank, created_at, users(username, first_name, telegram_id)")
@@ -41,15 +35,6 @@ def get_leaderboard(
         .execute()
     )
 
-    current_telegram_id: int | None = None
-    if init_data:
-        try:
-            user = validate_init_data(init_data, settings.webapp_secret)
-            current_telegram_id = user.get("id")
-        except TelegramAuthError:
-            pass
-
-    # Best run per user in period
     best_by_user: dict[int, dict] = {}
     for row in runs.data or []:
         user_info = row.get("users") or {}
@@ -65,7 +50,22 @@ def get_leaderboard(
                 "final_rank": row["final_rank"],
                 "telegram_id": tg_id,
             }
+    return best_by_user
 
+
+@router.get("", response_model=LeaderboardResponse)
+def get_leaderboard(
+    period: str = Query("daily", pattern="^(daily|weekly)$"),
+    limit: int = Query(50, ge=1, le=100),
+):
+    since = _period_start(period)
+
+    try:
+        get_supabase()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail="Database unavailable") from e
+
+    best_by_user = _fetch_best_by_user(since)
     sorted_entries = sorted(best_by_user.values(), key=lambda x: x["years_survived"], reverse=True)[:limit]
 
     entries = [
@@ -75,9 +75,35 @@ def get_leaderboard(
             first_name=e["first_name"],
             years_survived=e["years_survived"],
             final_rank=e["final_rank"],
-            is_current_user=current_telegram_id is not None and e["telegram_id"] == current_telegram_id,
+            is_current_user=False,
         )
         for i, e in enumerate(sorted_entries)
     ]
 
     return LeaderboardResponse(period=period, entries=entries)
+
+
+@router.post("/me", response_model=LeaderboardMeResponse)
+def get_leaderboard_me(body: LeaderboardMeRequest):
+    since = _period_start(body.period)
+    telegram_id = resolve_session_token(body.session_token)
+
+    try:
+        get_supabase()
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail="Database unavailable") from e
+
+    best_by_user = _fetch_best_by_user(since)
+    sorted_entries = sorted(best_by_user.values(), key=lambda x: x["years_survived"], reverse=True)
+
+    for i, entry in enumerate(sorted_entries):
+        if entry["telegram_id"] == telegram_id:
+            return LeaderboardMeResponse(
+                period=body.period,
+                rank=i + 1,
+                years_survived=entry["years_survived"],
+                final_rank=entry["final_rank"],
+                on_board=True,
+            )
+
+    return LeaderboardMeResponse(period=body.period, on_board=False)

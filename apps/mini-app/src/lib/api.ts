@@ -7,6 +7,7 @@ export interface UserProfile {
   first_name: string | null;
   best_score: number;
   best_rank: string;
+  session_token?: string | null;
 }
 
 export interface LeaderboardEntry {
@@ -23,10 +24,18 @@ export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
 }
 
+export interface LeaderboardMeResponse {
+  period: string;
+  rank: number | null;
+  years_survived: number | null;
+  final_rank: string | null;
+  on_board: boolean;
+}
+
 export type ApiFailureReason = "auth" | "rate_limit" | "network" | "server";
 
 export type ProfileResult =
-  | { ok: true; profile: UserProfile }
+  | { ok: true; profile: UserProfile; sessionToken: string | null }
   | { ok: false; reason: ApiFailureReason };
 
 export type SubmitRunResult =
@@ -36,6 +45,16 @@ export type SubmitRunResult =
 export type LeaderboardResult =
   | { ok: true; entries: LeaderboardEntry[] }
   | { ok: false; reason: ApiFailureReason };
+
+let cachedSessionToken: string | null = null;
+
+export function getSessionToken(): string | null {
+  return cachedSessionToken;
+}
+
+export function setSessionToken(token: string | null): void {
+  cachedSessionToken = token;
+}
 
 function statusToReason(status: number): ApiFailureReason {
   if (status === 401) return "auth";
@@ -81,7 +100,9 @@ export async function fetchProfile(initData: string): Promise<ProfileResult> {
   if (!initData) return { ok: false, reason: "auth" };
   const result = await apiPost<UserProfile>("/auth/me", { initData });
   if (!result.ok) return result;
-  return { ok: true, profile: result.data };
+  const token = result.data.session_token ?? null;
+  setSessionToken(token);
+  return { ok: true, profile: result.data, sessionToken: token };
 }
 
 export async function submitRun(
@@ -91,6 +112,7 @@ export async function submitRun(
     finalRank: string;
     terminationCause: string;
     rungsClimbed: number;
+    sprintMode?: boolean;
   }
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
@@ -100,24 +122,51 @@ export async function submitRun(
     final_rank: payload.finalRank,
     termination_cause: payload.terminationCause,
     rungs_climbed: payload.rungsClimbed,
+    sprint_mode: payload.sprintMode ?? false,
   });
   if (!result.ok) return result;
   return { ok: true };
 }
 
+async function fetchLeaderboardMe(
+  period: "daily" | "weekly",
+  sessionToken: string
+): Promise<LeaderboardMeResponse | null> {
+  const result = await apiPost<LeaderboardMeResponse>("/leaderboard/me", {
+    sessionToken,
+    period,
+  });
+  if (!result.ok) return null;
+  return result.data;
+}
+
 export async function fetchLeaderboard(
   period: "daily" | "weekly",
-  initData?: string
+  sessionToken?: string | null
 ): Promise<LeaderboardResult> {
   try {
     const params = new URLSearchParams({ period, limit: "50" });
-    if (initData) params.set("initData", initData);
     const res = await fetchWithTimeout(`${API_URL}/leaderboard?${params}`);
     if (!res.ok) {
       return { ok: false, reason: statusToReason(res.status) };
     }
     const data = (await res.json()) as LeaderboardResponse;
-    return { ok: true, entries: data.entries };
+    const entries = [...data.entries];
+
+    const token = sessionToken ?? cachedSessionToken;
+    if (token) {
+      const me = await fetchLeaderboardMe(period, token);
+      if (me?.on_board && me.rank != null) {
+        for (const entry of entries) {
+          if (entry.rank === me.rank) {
+            entry.is_current_user = true;
+            break;
+          }
+        }
+      }
+    }
+
+    return { ok: true, entries };
   } catch {
     return { ok: false, reason: "network" };
   }

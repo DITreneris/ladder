@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import time
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 import pytest
@@ -34,7 +35,7 @@ def configure_test_settings(monkeypatch):
 
 @pytest.fixture
 def valid_init_data() -> str:
-    return build_init_data(TEST_USER)
+    return build_init_data(TEST_USER, auth_date=int(time.time()) - 120)
 
 
 @pytest.fixture
@@ -43,6 +44,8 @@ def mock_supabase(monkeypatch):
     db = MagicMock()
     users_store: dict[int, dict] = {}
     runs_store: list[dict] = []
+    cooldowns: dict[int, str] = {}
+    sessions: dict[str, dict] = {}
 
     def table(name: str):
         chain = MagicMock()
@@ -95,6 +98,8 @@ def mock_supabase(monkeypatch):
                     def execute():
                         for tg_id, row in users_store.items():
                             if field == "id" and row.get("id") == value:
+                                row.update(payload)
+                            if field == "telegram_id" and tg_id == value:
                                 row.update(payload)
                         return MagicMock(data=[])
 
@@ -163,6 +168,106 @@ def mock_supabase(monkeypatch):
             chain.insert = insert
             chain.select = select
 
+        elif name == "submit_cooldowns":
+
+            def select(*_args, **_kwargs):
+                sel = MagicMock()
+
+                def eq(field, value):
+                    eq_chain = MagicMock()
+
+                    def maybe_single():
+                        ms = MagicMock()
+
+                        def execute():
+                            if field == "telegram_id" and value in cooldowns:
+                                return MagicMock(
+                                    data={"telegram_id": value, "last_submit_at": cooldowns[value]}
+                                )
+                            return None
+
+                        ms.execute = execute
+                        return ms
+
+                    eq_chain.maybe_single = maybe_single
+                    return eq_chain
+
+                sel.eq = eq
+                return sel
+
+            def insert(payload):
+                ins = MagicMock()
+
+                def execute():
+                    cooldowns[payload["telegram_id"]] = payload["last_submit_at"]
+                    return MagicMock(data=[payload])
+
+                ins.execute = execute
+                return ins
+
+            def update(payload):
+                upd = MagicMock()
+
+                def eq(field, value):
+                    eq_chain = MagicMock()
+
+                    def execute():
+                        if field == "telegram_id":
+                            cooldowns[value] = payload["last_submit_at"]
+                        return MagicMock(data=[])
+
+                    eq_chain.execute = execute
+                    return eq_chain
+
+                upd.eq = eq
+                return upd
+
+            chain.select = select
+            chain.insert = insert
+            chain.update = update
+
+        elif name == "api_sessions":
+
+            def insert(payload):
+                ins = MagicMock()
+
+                def execute():
+                    expires = datetime.now(timezone.utc) + timedelta(hours=24)
+                    sessions[payload["token"]] = {
+                        **payload,
+                        "expires_at": expires.isoformat(),
+                    }
+                    return MagicMock(data=[payload])
+
+                ins.execute = execute
+                return ins
+
+            def select(*_args, **_kwargs):
+                sel = MagicMock()
+
+                def eq(field, value):
+                    eq_chain = MagicMock()
+
+                    def maybe_single():
+                        ms = MagicMock()
+
+                        def execute():
+                            if field == "token" and value in sessions:
+                                return MagicMock(data=sessions[value])
+                            return None
+
+                        ms.execute = execute
+                        return ms
+
+                    eq_chain.maybe_single = maybe_single
+                    return eq_chain
+
+                sel.eq = eq
+                return sel
+
+            chain.insert = insert
+            chain.select = select
+
         return chain
 
     db.table = table
@@ -170,10 +275,11 @@ def mock_supabase(monkeypatch):
     def get_supabase():
         return db
 
-    monkeypatch.setattr("app.routes.auth.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes._users.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes.runs.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes.leaderboard.get_supabase", get_supabase)
+    monkeypatch.setattr("app.auth.session.get_supabase", get_supabase)
+    monkeypatch.setattr("app.routes._cooldowns.get_supabase", get_supabase)
     monkeypatch.setattr("app.db.supabase._client", None)
 
     return db

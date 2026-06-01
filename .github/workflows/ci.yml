@@ -35,6 +35,8 @@ jobs:
 
   mini-app:
     runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: https://ladder-production-642d.up.railway.app
     defaults:
       run:
         working-directory: apps/mini-app
@@ -46,6 +48,12 @@ jobs:
           cache: npm
           cache-dependency-path: apps/mini-app/package-lock.json
       - run: npm ci
+      - name: Verify VITE_API_URL for production build
+        run: |
+          if [ -z "$VITE_API_URL" ]; then
+            echo "VITE_API_URL must be set for CI build"
+            exit 1
+          fi
       - run: npm run lint
       - run: npm test
       - run: npm run build

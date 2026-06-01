@@ -44,4 +44,5 @@ def validate_init_data(init_data: str, bot_token: str, max_age_seconds: int = 86
     if "id" not in user:
         raise TelegramAuthError("Invalid user payload")
 
+    user["auth_date"] = auth_date
     return user

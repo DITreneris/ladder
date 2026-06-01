@@ -58,9 +58,9 @@
 ## Ship gate (v1.9.0)
 
 - [x] Decision recorded in [FF_TEST.md](FF_TEST.md) end-of-F&F section (provisional default)
-- [x] `[Unreleased]` CHANGELOG entries
-- [x] `npm run lint && npm test && npm run build` — 61 tests pass (2026-06-01)
-- [ ] Verifier pass before tag
-- [x] No new obstacle logic; [mvp-scope](mvp-scope.md) boundary OK; match [ROADMAP](../ROADMAP.md) § Shipped baseline
+- [x] `[Unreleased]` CHANGELOG entries → cut as [1.9.0](CHANGELOG.md#190---2026-06-01) + [2.0.0](CHANGELOG.md#200---2026-06-01)
+- [x] `npm run lint && npm test && npm run build` — 72 tests pass (2026-06-01)
+- [x] Verifier pass before tag — pytest 20 + vitest 72 + build green
+- [x] No new obstacle logic beyond v2 triage thesis; [mvp-scope](mvp-scope.md) boundary OK
 
-**Tag after verifier:** `git tag -a v1.9.0 -m "..."`
+**Tag after deploy + DEVICE_QA_v2.0:** `git tag -a v1.9.0` · `git tag -a v2.0.0`

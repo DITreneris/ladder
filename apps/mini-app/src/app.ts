@@ -7,6 +7,7 @@ import {
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
   SPRINT_SHARE_LINE,
+  TRIAGE_PROMPT,
   floorLabel,
   formatTickerText,
   milestoneLabel,
@@ -20,7 +21,7 @@ import {
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { fetchLeaderboard, fetchProfile, getSessionToken, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
 import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
@@ -638,7 +639,7 @@ async function renderLeaderboard(): Promise<void> {
   const list = $("leaderboardList");
   renderLeaderboardSkeleton(list);
 
-  const result = await fetchLeaderboard(leaderboardPeriod, getInitData());
+  const result = await fetchLeaderboard(leaderboardPeriod, getSessionToken());
   list.innerHTML = "";
 
   if (!result.ok) {
@@ -762,6 +763,7 @@ function startGame(): void {
   disableVerticalSwipe();
   audio.prepareBgmForRun();
   engine.start();
+  attachPlayAreaObserver();
   updateSprintTimerChip();
   updateRankUI("Intern");
   updateMilestoneChip(0);
@@ -776,6 +778,10 @@ function startGame(): void {
 
 function goHome(): void {
   engine.stop();
+  if (playAreaResizeObserver) {
+    playAreaResizeObserver.disconnect();
+    playAreaResizeObserver = null;
+  }
   $("sprintTimerChip").classList.add("hidden");
   hideHrMemo();
   hideHudTapHint();
@@ -831,7 +837,7 @@ async function runPostGameOverIo(
   result: GameOverResult,
   initData: string
 ): Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }> {
-  const lbPromise = fetchLeaderboard(leaderboardPeriod, initData || undefined);
+  const lbPromise = fetchLeaderboard(leaderboardPeriod, getSessionToken());
   let submitResult: SubmitRunResult | null = null;
 
   if (initData) {
@@ -840,6 +846,7 @@ async function runPostGameOverIo(
       finalRank: result.finalRank,
       terminationCause: result.terminationCause,
       rungsClimbed: result.rungsClimbed,
+      sprintMode: Boolean(activeDailyModifier.sprintDurationMs),
     });
     if (submitResult.ok) {
       const profileResult = await fetchProfile(initData);
@@ -991,24 +998,45 @@ function toggleMute(): void {
 }
 
 let lastPointerTapAt = 0;
+let playAreaResizeObserver: ResizeObserver | null = null;
+
+function attachPlayAreaObserver(): void {
+  const playArea = $("gamePlayArea");
+  if (playAreaResizeObserver) {
+    playAreaResizeObserver.disconnect();
+  }
+  playAreaResizeObserver = new ResizeObserver(() => {
+    layoutRungs();
+    if (engine.isActive()) {
+      layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
+    }
+  });
+  playAreaResizeObserver.observe(playArea);
+}
+
+function attemptGameTap(side: PlayerSide, source: "pointer" | "keyboard", buttonEl?: HTMLElement): void {
+  const now = Date.now();
+  if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) {
+    debugLog("tap", "ui throttle", { side, ms: now - lastPointerTapAt, source });
+    showToast("Too fast — one tap per beat", { surface: "game" });
+    if (source === "pointer" && buttonEl) {
+      hapticImpact("rigid");
+      triggerClimbPop(buttonEl);
+    }
+    return;
+  }
+  lastPointerTapAt = now;
+  engine.handleTap(side);
+  if (earlyTapsRemaining > 0) {
+    earlyTapsRemaining--;
+    if (earlyTapsRemaining === 0) hideTapDeckHint();
+  }
+}
 
 function bindTapButton(el: HTMLElement, side: PlayerSide): void {
   el.addEventListener("pointerdown", (e) => {
     e.preventDefault();
-    const now = Date.now();
-    if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) {
-      debugLog("tap", "ui throttle", { side, ms: now - lastPointerTapAt });
-      showToast("Too fast — one tap per beat", { surface: "game" });
-      hapticImpact("rigid");
-      triggerClimbPop(el);
-      return;
-    }
-    lastPointerTapAt = now;
-    engine.handleTap(side);
-    if (earlyTapsRemaining > 0) {
-      earlyTapsRemaining--;
-      if (earlyTapsRemaining === 0) hideTapDeckHint();
-    }
+    attemptGameTap(side, "pointer", el);
   });
 }
 
@@ -1270,6 +1298,13 @@ export function mountApp(): void {
         triggerNearMissWince($("playerClimber"));
         hapticImpact("light");
       },
+      onTriagePrompt: () => {
+        showHrMemoCombined([TRIAGE_PROMPT, "Your next tap assigns backlog — not a climb."], {
+          variant: "alert",
+          durationMs: 5000,
+        });
+        hapticImpact("medium");
+      },
     },
     renderRungsWithReorgFeedback,
     updatePlayerPosition,
@@ -1302,19 +1337,13 @@ export function mountApp(): void {
   bindTapButton($("btnTapLeft"), "left");
   bindTapButton($("btnTapRight"), "right");
 
-  const playArea = $("gamePlayArea");
-  new ResizeObserver(() => {
-    layoutRungs();
-    if (engine.isActive()) {
-      layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
-    }
-  }).observe(playArea);
+  attachPlayAreaObserver();
 
   window.addEventListener("keydown", (e) => {
     if (!engine.isActive()) return;
     if (e.repeat) return;
-    if (e.key === "ArrowLeft") engine.handleTap("left");
-    if (e.key === "ArrowRight") engine.handleTap("right");
+    if (e.key === "ArrowLeft") attemptGameTap("left", "keyboard");
+    if (e.key === "ArrowRight") attemptGameTap("right", "keyboard");
   });
 
   document.querySelectorAll("[data-lb-tab]").forEach((btn) => {

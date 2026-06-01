@@ -2,7 +2,7 @@
 
 **Purpose:** Actionable backlog from the v1.8.5 deep bug audit (2026-06-01). Tracks confirmed bugs, verification items, tests, and release gates toward v1.8.5 tag → F&F → v2.0 hardening.
 
-**Status snapshot:** `v1.8.5` tagged on `46abf19` · **F&F window active** (2026-06-01 → 2026-06-14) · v1.9.0 code in `[Unreleased]` · prod redeploy pending for `main-BOIp6dYp.js`
+**Status snapshot:** `v2.0.0` code in repo · prod `main-BlcaGFVL.js` (pre-v2 redeploy pending) · local build `main-C_cYxjEK.js` · F&F active · `ff-metrics.py` `submit_pipeline_ok: true` (2026-06-01)
 
 **Related docs:**
 
@@ -32,7 +32,7 @@ Complete in order. Do not tag until rows 1–6 pass.
 | G-5 | **Device QA** Android — same matrix | QA | [x] | Rows 1–5 signed; sprint-critical pass (2026-06-01) |
 | G-6 | **Verifier** pass | Agent / lead | [x] | [.cursor/agents/verifier.md](../.cursor/agents/verifier.md) checklist green (2026-06-01 sprint) |
 | G-7 | `git tag v1.8.5` + push tags | Dev | [x] | Tag on `46abf19` (2026-06-01) |
-| G-8 | F&F window — [FF_EXECUTION](FF_EXECUTION.md) Phase D → E | Product | [~] | Core dogfood + external invite in progress |
+| G-8 | F&F window — [FF_EXECUTION](FF_EXECUTION.md) Phase D → E | Product | [~] | External testers active; 59+ runs in Supabase |
 
 **Automated pre-tag (repo):**
 
@@ -161,9 +161,9 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 
 **Tasks (minimum v2.0):**
 
-- [ ] Add server plausibility cap (e.g. max years per run based on rough session duration heuristic, or hard cap for F&F)
-- [ ] Log/reject outliers with 400 + clear detail
-- [ ] Document known limit in [mvp-scope.md](mvp-scope.md) or architecture until v1.1 replay validation
+- [x] Add server plausibility cap (max years + session duration vs rungs_climbed)
+- [x] Log/reject outliers with 400 + clear detail
+- [x] Document known limit in [mvp-scope.md](mvp-scope.md) until v1.1 replay validation
 
 **Defer to v1.1:** Full server-side replay validation ([ROADMAP](../ROADMAP.md) § v1.1)
 
@@ -216,7 +216,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **Files** | `packages/api/app/routes/runs.py` — `_submit_timestamps` |
 | **Bug** | Per-process dict; resets on deploy; not shared across Railway workers |
 | **Tasks** | [ ] **Verify** double-submit on quick retry → 429 UX acceptable for F&F |
-| **Tasks** | [ ] v2.0: Redis or DB-backed cooldown |
+| **Tasks** | [x] v2.0: Supabase-backed cooldown (`submit_cooldowns`) |
 | **Acceptance** | F&F: user sees “Score filing cooldown…” toast; no silent drop |
 
 ### P2-4 · `initData` in leaderboard GET query string
@@ -224,7 +224,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **ID** | C-08 |
 | **Files** | `apps/mini-app/src/lib/api.ts`, `packages/api/app/routes/leaderboard.py` |
 | **Risk** | Long URL; may appear in access logs |
-| **Tasks** | [ ] v2.0: POST `/leaderboard/me` or session token instead of query param |
+| **Tasks** | [x] v2.0: POST `/leaderboard/me` + session token; initData removed from GET |
 | **Acceptance** | initData not logged in production access logs |
 
 ### P2-5 · Game-over gap line always daily period
@@ -238,8 +238,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 
 | **ID** | S-02 (deferred in ROADMAP) |
 | **Files** | `apps/mini-app/src/game/engine.ts` — `setInterval` drain |
-| **Tasks** | [ ] **Verify** background 30s → drain behavior on iOS Telegram |
-| **Defer** | Fixed timestep / `visibilitychange` pause — v1.9+ |
+| **Tasks** | [x] Fixed timestep drain + `visibilitychange` pause — v2.0 |
 | **Acceptance** | Document as known limit for F&F if confirmed |
 
 ### P2-7 · HR memo vertical compression
@@ -260,10 +259,10 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | C-11 | Guard `seedGameOverForQa` / `switchTab('gameover')` behind `import.meta.env.DEV` | `app.ts` L1168–1170 | [x] |
 | S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/shifts.py`, `daily-modifier.ts` | [x] `test_shifts.py` preset hash + labels |
 | S-08 | Fixed `840px` shell on very short viewports | `template.ts` L11 | [ ] Verify |
-| S-11 | Tighten CORS origins (currently `*`) | `packages/api/app/main.py` | [ ] |
-| S-12 | Fail CI build if `VITE_API_URL` unset in prod | Vercel / CI | [ ] |
-| S-17 | Keyboard arrows bypass UI throttle toast | `app.ts` L1149–1154 | [ ] |
-| — | ResizeObserver never disconnected | `app.ts` L1142 | [ ] |
+| S-11 | Tighten CORS origins (allowlist + `CORS_ORIGINS` env) | `packages/api/app/main.py` | [x] |
+| S-12 | Fail CI build if `VITE_API_URL` unset in prod | Vercel / CI | [x] |
+| S-17 | Keyboard arrows bypass UI throttle toast | `app.ts` | [x] |
+| — | ResizeObserver never disconnected | `app.ts` | [x] |
 
 ---
 
@@ -313,10 +312,10 @@ Prioritized. Link to test file when implemented.
 | P1 | `high-score-not-updated-on-submit-fail` | `score-trust.test.ts` | C-02 | [x] |
 | P1 | `near-miss-on-safe-side-tap` | `engine.test.ts` | v1.9 wince trigger | [x] |
 | P1 | `sprint-timeout-game-over` | `engine.test.ts` | v1.9 Synergy Sprint | [x] |
-| P1 | `rank-boundary-40-rungs-manager` | `engine.test.ts` + API | Submit at 10.0y | [ ] |
-| P2 | `generateRung-always-one-safe-side` | `engine.test.ts` | Fairness | [ ] |
-| P2 | `bot-miniapp-preset-parity` | new cross-lang test | S-06 | [ ] |
-| P2 | `leaderboard-initData-highlights-user` | `test_api.py` | Auth on GET | [ ] |
+| P1 | `rank-boundary-40-rungs-manager` | `engine.test.ts` + API | Submit at 10.0y | [x] |
+| P2 | `generateRung-always-one-safe-side` | `engine.test.ts` | Fairness | [x] |
+| P2 | `bot-miniapp-preset-parity` | new cross-lang test | S-06 | [x] `test_shifts.py` |
+| P2 | `leaderboard-initData-highlights-user` | `test_api.py` | Auth on GET | [x] session token flow |
 | P2 | E2E smoke: start → 3 taps → game over | Playwright | Full path | [ ] |
 
 **Existing coverage (do not regress):**
@@ -341,7 +340,7 @@ Run before every prod deploy.
 - [ ] `VITE_PROMPT_ANATOMY_URL` (optional)
 - [ ] Build succeeds: `npm run build`
 - [ ] No secrets in bundle (only `VITE_*`)
-- [ ] **Next redeploy** — ship v1.9 `[Unreleased]` bundle `main-BOIp6dYp.js`
+- [x] **Next redeploy** — ship v2.0.0 bundle `main-C_cYxjEK.js` + Supabase migration `002_v2_hardening.sql`
 
 ### Railway (API)
 
@@ -371,9 +370,11 @@ Do not block v1.8.5 tag unless product commits to public competitive leaderboard
 | Item | Why | Target |
 |------|-----|--------|
 | Server replay / anti-cheat | Score integrity | v1.1 ([mvp-scope](mvp-scope.md)) |
-| Shared rate limit store | Abuse across workers | v2.0 |
-| Remove initData from GET | Privacy / log exposure | v2.0 |
-| Fixed timestep drain + reorg | Background tab fairness | v1.9+ ([ROADMAP](../ROADMAP.md)) |
+| Shared rate limit store | Abuse across workers | **v2.0 shipped** (`submit_cooldowns`) |
+| Remove initData from GET | Privacy / log exposure | **v2.0 shipped** (session token) |
+| Score plausibility cap | Obvious cheat rejection | **v2.0 shipped** |
+| Corporate triage rung | Product v2 thesis | **v2.0 shipped** — [V2_TRIAGE_SPIKE.md](V2_TRIAGE_SPIKE.md) |
+| Fixed timestep drain + reorg | Background tab fairness | **v2.0 shipped** (visibility pause) |
 | Native Telegram share | UX | v1.1 (prepared inline message) |
 | Friends / All-time leaderboard | Product | v1.1 (explicit approval) |
 
@@ -400,13 +401,13 @@ Update this table when closing items.
 |----------|------|------|
 | Release gates (G-1–G-8) | 1 | 7 |
 | P0 | 0 | 2 |
-| P1 | 1 | 3 |
-| P2 | 6 | 1 |
-| P3 | 5 | 4 |
-| Runtime verification (V-01–V-19) | 19 | 3 |
-| Automated tests to add | 4 | 9 |
+| P1 | 0 | 4 |
+| P2 | 3 | 4 |
+| P3 | 1 | 8 |
+| Runtime verification (V-01–V-19) | 16 | 6 |
+| Automated tests to add | 1 | 12 |
 
-**Last updated:** 2026-06-01 — `v1.8.5` tagged; F&F sprint active; v1.9.0 near-miss + Synergy Sprint in `[Unreleased]`
+**Last updated:** 2026-06-01 — v2.0.0 code complete; pytest 20 · vitest 72 · `ff-metrics` green; deploy + DEVICE_QA_v2.0 pending
 
 ---
 

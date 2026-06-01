@@ -12,11 +12,11 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 | | |
 |---|---|
-| **Production** | `main` live — prod `main-7DTXR6XJ.js` (v1.8.5); v1.9 bundle `main-BOIp6dYp.js` pending redeploy |
-| **Tagged** | `v1.8.5` on `46abf19` |
+| **Production** | `main` live — prod `main-BlcaGFVL.js` (pre-v2.0); local v2.0 build `main-C_cYxjEK.js` pending redeploy + Supabase `002` migration |
+| **Tagged** | `v1.8.5` on `46abf19` · **v1.9.0 + v2.0.0** in CHANGELOG (tags pending deploy) |
 | **Active** | F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
-| **Next actions** | Phase D dogfood → Phase E invite · Tier A verification · optional DEVICE_QA rows 6–10 |
-| **Next product** | v1.9.0 coded in `[Unreleased]` — near-miss wince + Synergy Sprint; tag after F&F review **2026-06-14** |
+| **Next actions** | Deploy v2.0.0 · run [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · `git tag v1.9.0` + `v2.0.0` after device sign-off |
+| **Shipped in repo** | v1.9 juice + v2.0 hardening + Corporate triage rung — see [CHANGELOG 2.0.0](CHANGELOG.md#200---2026-06-01) |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
@@ -130,7 +130,8 @@ flowchart TB
 | **v1.8.3** | Shared content column + coffee pickup clear | **Code** · deploy folded into 1.8.4 | [CHANGELOG 1.8.3](CHANGELOG.md#183---2026-06-01) |
 | **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code** · folded into 1.8.5 deploy | [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01) |
 | **v1.8.5** | Corridor UX + scripted tutorial + badge gate / desk plant hazards | **Tagged** · **Live** | [Gate checklist](#v185-gate--open-items) · tag `v1.8.5` |
-| **v1.9.0** | Near-miss wince + Synergy Sprint | **Code in [Unreleased]** | F&F review ~2026-06-14 — [FF_TEST.md](docs/FF_TEST.md) |
+| **v1.9.0** | Near-miss wince + Synergy Sprint | **Code in CHANGELOG** | F&F review — [FF_TEST.md](docs/FF_TEST.md) |
+| **v2.0.0** | Platform hardening + Corporate triage rung | **Code in CHANGELOG** | [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · migration `002` |
 | **v1.9+** | Data-informed juice | **Backlog** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | **Deferred** | Explicit approval — [mvp-scope](docs/mvp-scope.md) |
 
@@ -352,7 +353,7 @@ flowchart TD
 | **Could** | Share challenge link, server-seeded daily LB | v1.9+ / v1.1 |
 | **Engineering** | Fixed timestep drain/reorg | v1.9+ |
 
-**v2 thesis (defer):** Corporate triage rung — binary spawn-bias choice, **new obstacle logic**; not v1.9.
+**v2 thesis (shipped v2.0.0):** Corporate triage rung — binary spawn-bias choice; see [V2_TRIAGE_SPIKE.md](docs/V2_TRIAGE_SPIKE.md).
 
 **Do not adopt:** tap-to-earn, swipe controls, perfect-timing tap, skins/clans, canvas rewrite, decaf trap — see [Explicitly out of scope](#explicitly-out-of-scope).
 

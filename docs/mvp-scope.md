@@ -23,10 +23,12 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 | Core L/R climb + rank-gated obstacles + energy + coffee | Friends / Legends leaderboard |
 | Daily + Weekly (Last 7 Days) leaderboards | All-time tab |
 | Telegram auth, share, bot `/start`, native shell (BackButton, safe areas) | Server analytics dashboard |
-| Daily shift presets (UTC) | Anti-cheat replay validation |
+| Daily shift presets (UTC) | Anti-cheat replay validation (full server replay — v1.1) |
 | Co-branding (Prompt Anatomy footer / bot link) | Currency, skins, clans, quests, NFTs |
 | Trust UX: score-submit toasts, auth banner, API rank/years check | New control schemes (swipe, hold-to-dodge, etc.) |
 | Three-lane **visual** corridor (v1.8.5) — center aisle + TAP LEFT/RIGHT only | Third tap / center spawn / stay-center mechanic |
+| **v2.0** score plausibility cap + session leaderboard tokens | — |
+| **v2.0** Corporate triage rung (Manager+ spawn bias) — [V2_TRIAGE_SPIKE.md](V2_TRIAGE_SPIKE.md) | Other new obstacle logic without product approval |
 
 **Everything shipped in v1.5–v1.8.5** (fairness, narrative, mobile UX, OG meta, corridor onboarding) is **polish on this boundary**, not a new product — see [CHANGELOG](../CHANGELOG.md) and ROADMAP release train.
 

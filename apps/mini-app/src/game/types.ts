@@ -27,4 +27,5 @@ export interface GameCallbacks {
   onCoffee: (side: PlayerSide, rungId: number) => void;
   onToast: (msg: string) => void;
   onNearMiss?: () => void;
+  onTriagePrompt?: () => void;
 }

@@ -9,12 +9,43 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Planned (v1.1)
+- All-time / Legends tab
+- Analytics events
+- Server-side replay validation (full anti-cheat)
+
+## [2.0.0] - 2026-06-01
+
+Public launch: platform hardening + Corporate triage rung. Requires Supabase migration `002_v2_hardening.sql`.
+
+### Added
+- **Corporate triage rung** — Manager+ HR prompt every 16 rungs; next tap overloads a lane with P1 backlog (75% hazard bias × 3 rungs); [V2_TRIAGE_SPIKE.md](docs/V2_TRIAGE_SPIKE.md)
+- **Score plausibility cap (C-06)** — API rejects outlier `years_survived` and impossible rungs/session duration; sprint mode flag for Synergy Sprint
+- **Supabase submit cooldown (C-07)** — shared 10s rate limit across Railway workers (`submit_cooldowns` table)
+- **Session token auth (C-08)** — `/auth/me` returns `session_token`; `POST /leaderboard/me` highlights user; `initData` removed from leaderboard GET
+- **Background tab fairness (S-02)** — energy drain pauses while document hidden
+- **DEVICE_QA_v2.0.md** — triage + hardening device matrix
+
+### Changed
+- **CORS** — allowlist prod + local dev origins (`CORS_ORIGINS` env override)
+- **CI** — `VITE_API_URL` required for mini-app build; API v2.0.0
+- **Leaderboard UX** — highlight current user via session token (no initData in URL logs)
+- **Keyboard throttle** — arrow keys show same “Too fast” toast as tap deck
+- **ResizeObserver** — disconnect on home; reattach on game start
+
+### Fixed
+- **P1-3 / C-06** — client-trusted scores mitigated with server plausibility (full replay deferred v1.1)
+
+## [1.9.0] - 2026-06-01
+
+F&F juice release: near-miss wince, Synergy Sprint, discoverability, and trust fixes from `[Unreleased]` sprint.
+
 ### Added
 - **In-run background music** — chorus loop from *Mr. Bullet — Be Streso* (trimmed from 0:55); respects mute FAB; stops on game over / exit
 - **Bot `/go` command** — opens Mini App like `/start`; use in groups where another bot also handles `/start`; production verified in Prompt_Anatomy supergroup (2026-06-01)
 - **SEO / GEO hardening** — canonical URL, unified meta copy, JSON-LD (`WebApplication` + `VideoGame`), `sitemap.xml`, `llms.txt`, expanded `robots.txt`, `<noscript>` crawler fallback; CI `verify:seo`
-- **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
-- **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
+- **Near-miss wince** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
+- **Synergy Sprint preset** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
 - **Marketing screenshot pipeline** — `?capture=home|game|gameover` seeds, `npm run capture:marketing` → `docs/assets/marketing/` (01-home, 02-gameplay-dodge, 03-game-over); OG crop uses marketing gameplay frame
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
@@ -44,11 +75,6 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 - **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)
 - **Tutorial visual clarity** — `.rung-future` dims rung rows 2–6 (hazard badges stay full contrast); `.next-rung` row emphasis; `safe-side-hint` through 12 rungs; `#imminentHint` on SE Telegram; HR memo scroll line on first tap
-
-### Planned (v1.1)
-- All-time / Legends tab
-- Analytics events
-- Server-side replay validation (anti-cheat)
 
 ## [1.8.5] - 2026-06-01
 

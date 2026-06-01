@@ -17,6 +17,7 @@ class UserProfile(BaseModel):
     first_name: str | None
     best_score: float
     best_rank: str
+    session_token: str | None = None
 
 
 class RunSubmitRequest(BaseModel):
@@ -25,6 +26,7 @@ class RunSubmitRequest(BaseModel):
     final_rank: FinalRank
     termination_cause: str | None = None
     rungs_climbed: int = Field(..., ge=0)
+    sprint_mode: bool = False
 
     model_config = {"populate_by_name": True}
 
@@ -41,3 +43,18 @@ class LeaderboardEntry(BaseModel):
 class LeaderboardResponse(BaseModel):
     period: str
     entries: list[LeaderboardEntry]
+
+
+class LeaderboardMeRequest(BaseModel):
+    session_token: str = Field(..., alias="sessionToken")
+    period: Literal["daily", "weekly"] = "daily"
+
+    model_config = {"populate_by_name": True}
+
+
+class LeaderboardMeResponse(BaseModel):
+    period: str
+    rank: int | None = None
+    years_survived: float | None = None
+    final_rank: str | None = None
+    on_board: bool = False

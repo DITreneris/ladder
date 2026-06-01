@@ -82,6 +82,8 @@ Log pain items in [FF_TEST.md](FF_TEST.md) feedback buckets. Fix P0/P1 before Ph
 
 **Tier A trust checks (during dogfood + first external runs):** V-08 profile load · V-10 submit toast · V-11 offline failure copy · V-12 429 toast · V-13 share clipboard · V-14 leaderboard — track in [todo.md](todo.md) §6.
 
+**Automated proxy (2026-06-01):** `python scripts/ff-metrics.py` → `submit_pipeline_ok: true` · pytest session-token + plausibility · vitest 72 (triage, throttle, rank boundary). Device sign-off still required for Tier A rows.
+
 ---
 
 ## Phase E — External F&F launch

@@ -389,4 +389,81 @@ describe("GameEngine", () => {
     expect(onGameOver).toHaveBeenCalledTimes(1);
     expect(onGameOver.mock.calls[0]![0].deathType).toBe("sprint");
   });
+
+  it("pauses energy drain while document is hidden", () => {
+    if (typeof document === "undefined") return;
+    const onScoreUpdate = vi.fn();
+    const { engine } = createEngine({ onScoreUpdate });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    const energyBefore = engine.getTimeLeft();
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+    vi.advanceTimersByTime(TICK_MS * 50);
+    Object.defineProperty(document, "hidden", { configurable: true, value: false });
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(engine.getTimeLeft()).toBe(energyBefore);
+  });
+
+  it("triggers triage prompt at Manager+ after interval rungs", () => {
+    const onTriagePrompt = vi.fn();
+    const { engine } = createEngine({ onTriagePrompt });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    for (let i = 0; i < 37; i++) {
+      tapWithCooldown(engine, i % 2 === 0 ? "left" : "right");
+    }
+    expect(engine.getCurrentRank()).toBe("Manager");
+    expect(onTriagePrompt).toHaveBeenCalled();
+    expect(engine.isAwaitingTriageChoice()).toBe(true);
+  });
+
+  it("triage choice tap does not climb and sets bias", () => {
+    const onToast = vi.fn();
+    const onTriagePrompt = vi.fn();
+    const { engine } = createEngine({ onToast, onTriagePrompt });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    for (let i = 0; i < 37; i++) {
+      tapWithCooldown(engine, i % 2 === 0 ? "left" : "right");
+    }
+    expect(onTriagePrompt).toHaveBeenCalled();
+    expect(engine.isAwaitingTriageChoice()).toBe(true);
+    const scoreBefore = engine.getRungsClimbed();
+    tapWithCooldown(engine, "right");
+    expect(engine.getRungsClimbed()).toBe(scoreBefore);
+    expect(engine.isAwaitingTriageChoice()).toBe(false);
+    expect(onToast).toHaveBeenCalled();
+  });
+
+  it("generateRung always leaves a dodge path on imminent rung", () => {
+    const { engine } = createEngine();
+    engine.start();
+    for (let i = 0; i < 30; i++) {
+      tapWithCooldown(engine, i % 2 === 0 ? "left" : "right");
+      const imminent = engine.getRungs()[1];
+      if (imminent?.obstacle) {
+        expect(["left", "right"]).toContain(imminent.obstacle);
+      }
+    }
+  });
+
+  it("promotes to Manager at 10.0 years (40 rungs)", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const { engine } = createEngine();
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    while (engine.getRungsClimbed() < 39) {
+      tapWithCooldown(engine, "left");
+    }
+    tapWithCooldown(engine, "left");
+    expect(engine.getCurrentRank()).toBe("Manager");
+    expect(engine.getRungsClimbed()).toBe(40);
+  });
 });

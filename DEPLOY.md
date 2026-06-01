@@ -15,7 +15,8 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 
 1. Create project at [supabase.com](https://supabase.com).
 2. SQL Editor → run [supabase/migrations/001_initial_schema.sql](supabase/migrations/001_initial_schema.sql).
-3. Save `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Settings → API).
+3. **v2.0+:** run [supabase/migrations/002_v2_hardening.sql](supabase/migrations/002_v2_hardening.sql) (`submit_cooldowns`, `api_sessions`).
+4. Save `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Settings → API).
 
 ## 2. Railway — API
 
@@ -28,6 +29,7 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 | `TELEGRAM_WEBAPP_SECRET` | Same as bot token (initData HMAC) |
 | `SUPABASE_URL` | Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service role key |
+| `CORS_ORIGINS` | Optional comma list (default: prod Vercel + local dev) |
 
 3. Deploy and note the public URL (e.g. `https://api-xxx.up.railway.app`).
 4. Verify: `GET {API_URL}/health` returns `{"status":"ok"}`.

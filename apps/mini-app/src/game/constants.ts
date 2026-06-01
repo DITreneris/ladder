@@ -20,6 +20,17 @@ export const COFFEE_SPAWN_THRESHOLD = 0.85;
 export const PROMO_DRAIN_PAUSE_MS = 2000;
 export const MIN_TAP_INTERVAL_MS = 120;
 
+/** Corporate triage rung (v2.0) — Manager+ spawn-bias choice every N rungs. */
+export const TRIAGE_RUNG_INTERVAL = 16;
+export const TRIAGE_BIAS_RUNGS = 3;
+export const TRIAGE_SPAWN_BIAS = 0.75;
+export const TRIAGE_PROMPT =
+  "HR triage: tap LEFT or RIGHT to overload that lane with P1 backlog.";
+export function triageConfirmCopy(side: "left" | "right"): string {
+  const lane = side === "left" ? "LEFT" : "RIGHT";
+  return `P1 backlog routed to the ${lane} lane for the next few rungs.`;
+}
+
 /** Scripted imminent rungs after foot (rungs[1..3]) — L/R spawn only. */
 export const TUTORIAL_RUNG_SPECS: Omit<Rung, "id">[] = [
   { obstacle: null, type: null, coffee: null },

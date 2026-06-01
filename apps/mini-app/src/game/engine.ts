@@ -17,6 +17,10 @@ import {
   PROMO_DRAIN_PAUSE_MS,
   SPRINT_GAME_OVER,
   TICK_MS,
+  TRIAGE_BIAS_RUNGS,
+  TRIAGE_RUNG_INTERVAL,
+  TRIAGE_SPAWN_BIAS,
+  triageConfirmCopy,
   OBSTACLE_DEATH_COPY,
   TUTORIAL_COFFEE_MIN_RUNG,
   TUTORIAL_RUNG_SPECS,
@@ -55,6 +59,14 @@ export class GameEngine {
   private internFakePromoShown = new Set<number>();
   private lastTapAt = 0;
   private runStartedAt = 0;
+  private documentHidden = false;
+  private awaitingTriageChoice = false;
+  private triageBiasSide: PlayerSide | null = null;
+  private triageBiasRemaining = 0;
+  private lastTriageAtScore = 0;
+  private visibilityHandler = (): void => {
+    this.documentHidden = document.hidden;
+  };
 
   constructor(
     callbacks: GameCallbacks,
@@ -114,6 +126,10 @@ export class GameEngine {
     return Boolean(this.dailyModifier.sprintDurationMs);
   }
 
+  isAwaitingTriageChoice(): boolean {
+    return this.awaitingTriageChoice;
+  }
+
   private obstacleSpawnRate(): number {
     if (this.currentRank === "Intern" && this.score < INTERN_TUTORIAL_RUNGS) {
       return this.dailyModifier.internObstacleSpawnRate;
@@ -160,7 +176,16 @@ export class GameEngine {
     if (!forceEmpty) {
       const rand = Math.random();
       if (rand < this.obstacleSpawnRate()) {
-        obstacle = Math.random() < 0.5 ? "left" : "right";
+        if (this.triageBiasRemaining > 0 && this.triageBiasSide) {
+          obstacle =
+            Math.random() < TRIAGE_SPAWN_BIAS
+              ? this.triageBiasSide
+              : this.triageBiasSide === "left"
+                ? "right"
+                : "left";
+        } else {
+          obstacle = Math.random() < 0.5 ? "left" : "right";
+        }
         type = pickObstacleType(this.currentRank, {
           allowEarlyReorg: this.dailyModifier.allowEarlyReorg,
           meetingPickThreshold: this.dailyModifier.meetingPickThreshold,
@@ -170,7 +195,20 @@ export class GameEngine {
       }
     }
 
+    if (this.triageBiasRemaining > 0 && obstacle) {
+      this.triageBiasRemaining--;
+    }
+
     return { id: this.nextRungId++, obstacle, type, coffee };
+  }
+
+  private maybeTriggerTriage(): void {
+    if (this.currentRank === "Intern") return;
+    if (this.awaitingTriageChoice) return;
+    if (this.score < INTERN_TUTORIAL_RUNGS) return;
+    if (this.score - this.lastTriageAtScore < TRIAGE_RUNG_INTERVAL) return;
+    this.awaitingTriageChoice = true;
+    this.callbacks.onTriagePrompt?.();
   }
 
   private startReorgLoop(): void {
@@ -208,6 +246,14 @@ export class GameEngine {
     this.internFakePromoShown.clear();
     this.lastTapAt = 0;
     this.runStartedAt = Date.now();
+    this.documentHidden = typeof document !== "undefined" ? document.hidden : false;
+    this.awaitingTriageChoice = false;
+    this.triageBiasSide = null;
+    this.triageBiasRemaining = 0;
+    this.lastTriageAtScore = 0;
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", this.visibilityHandler);
+    }
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
 
     this.rungs = [];
@@ -225,6 +271,7 @@ export class GameEngine {
     this.timerInterval = setInterval(() => {
       if (!this.isPlaying) return;
       if (!this.firstTapDone) return;
+      if (this.documentHidden) return;
       const sprintCap = this.dailyModifier.sprintDurationMs;
       if (sprintCap && Date.now() - this.runStartedAt >= sprintCap) {
         this.triggerGameOver(
@@ -290,6 +337,9 @@ export class GameEngine {
   }
 
   private stopLoops(): void {
+    if (typeof document !== "undefined") {
+      document.removeEventListener("visibilitychange", this.visibilityHandler);
+    }
     if (this.timerInterval) clearInterval(this.timerInterval);
     if (this.reorgInterval) clearInterval(this.reorgInterval);
     this.timerInterval = null;
@@ -319,6 +369,15 @@ export class GameEngine {
       return;
     }
     this.lastTapAt = now;
+
+    if (this.awaitingTriageChoice) {
+      this.triageBiasSide = side;
+      this.triageBiasRemaining = TRIAGE_BIAS_RUNGS;
+      this.awaitingTriageChoice = false;
+      this.lastTriageAtScore = this.score;
+      this.callbacks.onToast(triageConfirmCopy(side));
+      return;
+    }
 
     if (!this.firstTapDone) {
       this.firstTapDone = true;
@@ -358,6 +417,7 @@ export class GameEngine {
 
     this.rungs.shift();
     this.checkPromotions();
+    this.maybeTriggerTriage();
     if (this.shouldForceTutorialCoffee()) {
       this.injectTutorialCoffee();
     }
