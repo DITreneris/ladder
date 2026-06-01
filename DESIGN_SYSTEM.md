@@ -201,7 +201,7 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 | Pattern | Usage | Notes |
 |---------|--------|-------|
 | **Milestone chip** | HUD during play | `Manager in X.y` / `CEO in X.y` / corner office secured; `text-micro` |
-| **Death cause row** | Game-over card | Icon + label per failure type (Meeting, Reorg, Deadline, Energy) |
+| **Death cause row** | Game-over card | Icon + label per failure type (Meeting, Reorg, Deadline, Badge gate, Desk plant, Energy) |
 | **Retry tip** | Below death cause | Satirical one-liner from `constants.ts`; `text-caption` |
 | **Tap-zone glow** | Active tap feedback | `btn-tap-zone-left/right:active` inset accent |
 | **Career high line** | Performance card | Best rank + years from profile when available |
@@ -228,7 +228,7 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 | **Auth banner** | Home | Dismissible when profile sync fails |
 | **Home scroll** | `#startScreen` | `overflow-y: auto` on short Telegram viewports |
 
-Game-over: `card-performance` + REJECTED stamp. Obstacle badges: red meeting, amber reorg, bright red deadline. Weekly tab label: **Last 7 Days**.
+Game-over: `card-performance` + REJECTED stamp. Obstacle badges: red meeting, amber reorg, bright red deadline, slate gate (Manager+), emerald plant (CEO+). Corridor: `.rung-center--corridor`, `.player-at-corridor` (v1.8.5). Weekly tab label: **Last 7 Days**.
 
 ---
 

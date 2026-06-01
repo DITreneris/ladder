@@ -117,7 +117,8 @@ export const APP_SHELL = `
           </div>
           <span id="burnoutPercentLabel" class="text-caption font-bold text-slate-500 w-8 text-right">100%</span>
         </div>
-        <p id="hudTapHint" class="hud-tap-hint hidden">Use TAP LEFT or TAP RIGHT below — pick the safe side</p>
+        <p id="hudTapHint" class="hud-tap-hint hidden">Stand in the corridor. TAP LEFT or RIGHT for the next rung's safe side.</p>
+        <p id="imminentHint" class="imminent-hint hidden" aria-live="polite"></p>
       </div>
       <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
         <div class="hr-memo-rail-body">
@@ -248,7 +249,7 @@ export const APP_SHELL = `
         <div class="space-y-3.5 text-xs text-slate-600">
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🏃</span>
-            <div><h4 class="font-extrabold text-slate-800">Basic Climbing</h4><p class="mt-0.5 text-caption">Tap LEFT or RIGHT on the safe side. One rung per tap.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Basic Climbing</h4><p class="mt-0.5 text-caption">Three lanes, two taps: stand in the center corridor, then TAP LEFT or RIGHT for the next rung's safe side. One rung per tap.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">📅</span>
@@ -261,6 +262,14 @@ export const APP_SHELL = `
           <div class="card-light-sm">
             <span class="text-xl shrink-0">⏰</span>
             <div><h4 class="font-extrabold text-slate-800">Deadlines</h4><p class="mt-0.5 text-caption">Quarter-end blocks. Step on them = instant termination. Appear at CEO level.</p></div>
+          </div>
+          <div class="card-light-sm">
+            <span class="text-xl shrink-0">🪪</span>
+            <div><h4 class="font-extrabold text-slate-800">Badge Gates</h4><p class="mt-0.5 text-caption">Turnstile jams on one side. Dodge like a meeting — Manager rank and up.</p></div>
+          </div>
+          <div class="card-light-sm">
+            <span class="text-xl shrink-0">🪴</span>
+            <div><h4 class="font-extrabold text-slate-800">Desk Plants</h4><p class="mt-0.5 text-caption">Wellness obstruction on one aisle. Side-step — rare at CEO level.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">☕</span>
@@ -288,7 +297,7 @@ export const APP_SHELL = `
         ${BRAND_FOOTER}
       </div>
     </div>
-    <div id="debugStrip" class="hidden absolute top-14 left-2 right-2 z-50 rounded bg-slate-900/90 px-2 py-1 text-nano font-mono text-emerald-300 pointer-events-none truncate" aria-live="polite"></div>
+    <div id="debugStrip" class="debug-strip hidden" aria-live="polite"></div>
     <div id="toastNotification" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg z-50 flex items-center space-x-2 opacity-0 pointer-events-none transition-opacity duration-300">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
       <span id="toastText">Done!</span>

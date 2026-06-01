@@ -1,4 +1,4 @@
-import type { DeathType, ObstacleType, Rank } from "./types";
+import type { DeathType, ObstacleType, Rank, Rung } from "./types";
 
 export const MAX_VISIBLE_RUNGS = 7;
 
@@ -19,6 +19,13 @@ export const TUTORIAL_COFFEE_MIN_RUNG = 8;
 export const COFFEE_SPAWN_THRESHOLD = 0.85;
 export const PROMO_DRAIN_PAUSE_MS = 2000;
 export const MIN_TAP_INTERVAL_MS = 120;
+
+/** Scripted imminent rungs after foot (rungs[1..3]) — L/R spawn only. */
+export const TUTORIAL_RUNG_SPECS: Omit<Rung, "id">[] = [
+  { obstacle: null, type: null, coffee: null },
+  { obstacle: "right", type: "meeting", coffee: null },
+  { obstacle: null, type: null, coffee: "left" },
+];
 
 export const REAPPLY_STORAGE_KEY = "corp_ladder_reapply_count";
 
@@ -76,6 +83,8 @@ export const DEATH_EMOJI: Record<DeathType, string> = {
   meeting: "📅",
   reorg: "🔄",
   burnout: "⏰",
+  badge_gate: "🪪",
+  foliage: "🪴",
   energy: "⚡",
 };
 
@@ -83,6 +92,8 @@ export const DEATH_LABELS: Record<DeathType, string> = {
   meeting: "Meeting Overload",
   reorg: "Reorganization",
   burnout: "Deadline Crash",
+  badge_gate: "Badge Reader Jam",
+  foliage: "Wellness Obstruction",
   energy: "Energy Depleted",
 };
 
@@ -90,7 +101,43 @@ export const RETRY_TIPS: Record<DeathType, string> = {
   meeting: "Pick the side without the calendar. Revolutionary, we know.",
   reorg: "Next rung holds still — further rungs shuffle. Org charts lie.",
   burnout: "Deadlines look like meetings but mean business. Side-step.",
+  badge_gate: "Turnstile blocked the wrong aisle. Badge on the safe side only.",
+  foliage: "Mandatory desk plant owns that lane. Step to the open side.",
   energy: "Grab coffee when you can. Decaf is not a strategy.",
+};
+
+export interface ObstacleDeathCopy {
+  cause: string;
+  detail: string;
+  deathType: DeathType;
+}
+
+export const OBSTACLE_DEATH_COPY: Record<ObstacleType, ObstacleDeathCopy> = {
+  meeting: {
+    cause: "Meeting Overload",
+    detail: "Fell into an all-hands call on slide layout. Reached maximum agenda tolerance.",
+    deathType: "meeting",
+  },
+  reorg: {
+    cause: "Reorganization",
+    detail: "A massive department restructuring shuffled you out of direct reports.",
+    deathType: "reorg",
+  },
+  burnout: {
+    cause: "Deadline Crash",
+    detail: "Waded headfirst into a quarterly deadline with zero active coffee left.",
+    deathType: "burnout",
+  },
+  badge_gate: {
+    cause: "Badge Reader Jam",
+    detail: "Turnstile rejected your lanyard on the wrong aisle. Facilities filed a wellness ticket.",
+    deathType: "badge_gate",
+  },
+  foliage: {
+    cause: "Wellness Obstruction",
+    detail: "Mandatory desk plant blocked the corridor. HR cited biophilic compliance.",
+    deathType: "foliage",
+  },
 };
 
 export const FAILURE_REASONS = [
@@ -200,26 +247,53 @@ export function milestoneLabel(years: number): string {
 }
 
 export function allowedObstacleTypes(rank: Rank, allowEarlyReorg = false): ObstacleType[] {
-  if (rank === "CEO") return ["meeting", "reorg", "burnout"];
-  if (rank === "Manager") return ["meeting", "reorg"];
+  if (rank === "CEO") return ["meeting", "reorg", "burnout", "foliage"];
+  if (rank === "Manager") return ["meeting", "reorg", "badge_gate"];
   if (allowEarlyReorg) return ["meeting", "reorg"];
   return ["meeting"];
 }
+
+/** Weighted pick from rank-allowed types only (sums to 1 within each pool). */
+const OBSTACLE_WEIGHTS: Partial<Record<Rank, Partial<Record<ObstacleType, number>>>> = {
+  Intern: { meeting: 1 },
+  Manager: { meeting: 0.55, reorg: 0.3, badge_gate: 0.15 },
+  CEO: { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
+};
 
 export function pickObstacleType(
   rank: Rank,
   opts?: { allowEarlyReorg?: boolean; meetingPickThreshold?: number }
 ): ObstacleType {
   const allowEarlyReorg = opts?.allowEarlyReorg ?? false;
-  const meetingCut = opts?.meetingPickThreshold ?? 0.5;
   const allowed = allowedObstacleTypes(rank, allowEarlyReorg);
-  const typeRand = Math.random();
-  let type: ObstacleType;
-  if (typeRand < meetingCut) type = "meeting";
-  else if (typeRand < meetingCut + 0.3) type = "reorg";
-  else type = "burnout";
-  if (allowed.includes(type)) return type;
-  return allowed[0] ?? "meeting";
+
+  if (rank === "Intern" && allowEarlyReorg) {
+    const meetingCut = opts?.meetingPickThreshold ?? 0.5;
+    const typeRand = Math.random();
+    if (typeRand < meetingCut) return "meeting";
+    return "reorg";
+  }
+
+  const poolRank: Rank = rank === "Intern" ? "Intern" : rank;
+  const weights = OBSTACLE_WEIGHTS[poolRank] ?? { meeting: 1 };
+  let total = 0;
+  const entries: { type: ObstacleType; weight: number }[] = [];
+  for (const type of allowed) {
+    const w = weights[type] ?? 0;
+    if (w > 0) {
+      entries.push({ type, weight: w });
+      total += w;
+    }
+  }
+  if (entries.length === 0) return allowed[0] ?? "meeting";
+  if (total <= 0) return allowed[0] ?? "meeting";
+
+  let roll = Math.random() * total;
+  for (const { type, weight } of entries) {
+    roll -= weight;
+    if (roll <= 0) return type;
+  }
+  return entries[entries.length - 1]!.type;
 }
 
 export function reorgIntervalForRank(rank: Rank): number {

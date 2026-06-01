@@ -6,6 +6,7 @@ import {
   MANAGER_YEARS,
   REORG_INTERVAL_CEO_MS,
   REORG_INTERVAL_MS,
+  TUTORIAL_RUNG_SPECS,
   allowedObstacleTypes,
   milestoneLabel,
   pickObstacleType,
@@ -51,16 +52,16 @@ describe("obstacle gating", () => {
     expect(allowedObstacleTypes("Intern", true)).toEqual(["meeting", "reorg"]);
   });
 
-  it("manager allows meetings and reorgs", () => {
-    expect(allowedObstacleTypes("Manager")).toEqual(["meeting", "reorg"]);
+  it("manager allows meetings, reorgs, and badge gates", () => {
+    expect(allowedObstacleTypes("Manager")).toEqual(["meeting", "reorg", "badge_gate"]);
   });
 
-  it("CEO allows all obstacle types", () => {
-    expect(allowedObstacleTypes("CEO")).toEqual(["meeting", "reorg", "burnout"]);
+  it("CEO allows meetings, reorgs, deadlines, and foliage", () => {
+    expect(allowedObstacleTypes("CEO")).toEqual(["meeting", "reorg", "burnout", "foliage"]);
   });
 
-  it("pickObstacleType falls back to meeting for intern", () => {
-    const spy = vi.spyOn(Math, "random").mockReturnValue(0.75);
+  it("pickObstacleType returns only meeting for intern", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.99);
     expect(pickObstacleType("Intern")).toBe("meeting");
     spy.mockRestore();
   });
@@ -69,6 +70,25 @@ describe("obstacle gating", () => {
     const spy = vi.spyOn(Math, "random").mockReturnValue(0.55);
     expect(pickObstacleType("Intern", { allowEarlyReorg: true, meetingPickThreshold: 0.38 })).toBe("reorg");
     spy.mockRestore();
+  });
+
+  it("pickObstacleType can return badge_gate for manager", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.9);
+    expect(pickObstacleType("Manager")).toBe("badge_gate");
+    spy.mockRestore();
+  });
+
+  it("pickObstacleType can return foliage for CEO", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.95);
+    expect(pickObstacleType("CEO")).toBe("foliage");
+    spy.mockRestore();
+  });
+
+  it("tutorial rung specs only use left or right spawn", () => {
+    for (const spec of TUTORIAL_RUNG_SPECS) {
+      expect(spec.obstacle === null || spec.obstacle === "left" || spec.obstacle === "right").toBe(true);
+      expect(spec.coffee === null || spec.coffee === "left" || spec.coffee === "right").toBe(true);
+    }
   });
 
   it("reorgIntervalForRank returns CEO interval for CEO", () => {

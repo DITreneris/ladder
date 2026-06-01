@@ -142,6 +142,7 @@ Current gate: tag `v1.8.2` after [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.
 | Role | Responsibility | Skill / rule |
 |------|----------------|--------------|
 | **verifier** | Read-only pre-done QA (game, Telegram, API, leaderboards, CI) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) |
+| **debug-steward** | Debug triage order, incident postmortems, DEBUG_* doc accuracy | [.cursor/agents/debug-steward.md](.cursor/agents/debug-steward.md), [.cursor/skills/debug-triage/SKILL.md](.cursor/skills/debug-triage/SKILL.md), [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) |
 | **Changelog Maintainer** | CHANGELOG accuracy; weekly review; release cuts on tags | [.cursor/agents/changelog-maintainer.md](.cursor/agents/changelog-maintainer.md), [.cursor/skills/changelog-maintainer/SKILL.md](.cursor/skills/changelog-maintainer/SKILL.md), [.cursor/rules/changelog.mdc](.cursor/rules/changelog.mdc) |
 
 Family equivalent on [DITreneris/site](https://github.com/DITreneris/site): `changelog-keeper`.

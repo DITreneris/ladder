@@ -9,23 +9,33 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Fixed
-- **Game-over screen blocked on slow network** — death animation runs immediately; score submit and leaderboard fetch happen in background with 8s timeout; toasts show on game-over screen
-- **Share button no-op on modern Telegram** — removed invalid `shareMessage({ text })`; clipboard copy with paste-into-Telegram toast
-- **Score submit rate limit after validation failure** — `/runs` cooldown applies only after successful insert; validation 400 no longer triggers 10s lockout
-- **Leaderboard silent failure** — API returns 503 when database unavailable; client shows offline message instead of empty satirical state
-- **Profile stale after first run** — refresh profile after successful score submit; career-high line updates on game over
-- **Viewport QA game-over checks** — QA `switchTab('gameover')` seeds game-over state for REJECTED stamp layout checks
-- **REJECTED stamp viewport clip** — slightly smaller stamp inset (`right-3 bottom-3`) so rotated badge stays inside performance card bounds
-- **Death emoji restored too early** — `triggerDeathEmoji` holds collision emoji through shake sequence
-- **Coffee pickup felt invisible** — `onCoffee` fires before `renderRungs`; badge pickup animation restored; longer 🤤 flash with emoji lock during panic updates
-- **Tap throttle felt dead** — rejected taps get haptic + button pop feedback; optional `?debug=1` trace strip
-- **Four-band layout on game screen** — unified white game surface on `#gameContentColumn`; leaderboard/how-to use `cl-shell-gutter`
-
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events
 - Server-side replay validation (anti-cheat)
+
+## [1.8.5] - 2026-06-01
+
+F&F onboarding: three-lane corridor UX (two taps), scripted tutorial, office hazard reskins. No API or control-scheme change.
+
+### Added
+- **Three-lane corridor** — player starts in center aisle; TAP LEFT/RIGHT still picks the next rung side only (no center tap)
+- **Scripted tutorial rungs** — clear first climb, meeting on RIGHT (dodge LEFT), coffee on LEFT (+25% energy)
+- **Badge gate obstacles** — Manager+ turnstile jams (same L/R dodge rules as meetings)
+- **Desk plant obstacles** — CEO+ wellness blocks (same rules as deadlines)
+- **HR memo on first tap** — corridor + next-rung safe-side guidance
+- **Debug steward agent + incident doc** — [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md), [debug-steward](.cursor/agents/debug-steward.md), [debug-triage](.cursor/skills/debug-triage/SKILL.md) skill
+
+### Changed
+- **Obstacle picker** — weighted spawn from rank-allowed pool only (fixes intern fallback noise)
+- **How to Play** — three-lane metaphor; Gate and Plant cards
+- **Stronger climb feedback** — rung advance motion + Years label pop on early taps
+
+### Fixed
+- **Ladder narrows mid-run after first tap** — stable `#app` width via grid shell — [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md)
+- **Debug mode hard to read** — plain-English next-rung panel; `localStorage cl_debug=1` persistence
+- **Game logic unclear in first runs** — `#imminentHint` for first 12 rungs (and debug mode)
+- **Throttled taps silent** — “Too fast — one tap per beat” toast on UI throttle
 
 ## [1.8.4] - 2026-06-01
 

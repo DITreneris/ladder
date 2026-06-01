@@ -265,11 +265,22 @@
   box-shadow: none;
 }
 
+#app {
+  width: 100%;
+  max-width: 28rem;
+  min-width: 0;
+}
+
 html.cl-in-telegram,
 html.cl-in-telegram body {
   height: 100dvh;
   overflow: hidden;
   padding: 0;
+}
+
+html.cl-in-telegram #app {
+  max-width: none;
+  height: 100%;
 }
 
 html.cl-in-telegram #startScreen {
@@ -452,6 +463,35 @@ html.cl-in-telegram .text-micro {
   font-size: 11px;
   font-weight: 700;
   color: var(--color-cl-primary);
+}
+
+.imminent-hint {
+  margin: 0;
+  padding-top: 0.125rem;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #334155;
+}
+
+.debug-strip {
+  position: absolute;
+  top: 3.25rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 50;
+  max-height: 5.5rem;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: rgb(15 23 42 / 0.92);
+  padding: 0.375rem 0.5rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.625rem;
+  line-height: 1.35;
+  color: #6ee7b7;
+  white-space: pre-wrap;
+  pointer-events: none;
 }
 
 .hr-memo-rail {
@@ -778,17 +818,32 @@ html.cl-in-telegram .text-micro {
     transform: translateY(0);
   }
   40% {
-    transform: translateY(14px);
+    transform: translateY(20px);
   }
   100% {
     transform: translateY(0);
   }
 }
 .rung-advance {
-  animation: rung-advance 0.16s ease-in forwards;
+  animation: rung-advance 0.18s ease-in forwards;
 }
 
-.next-rung .rung-center {
+.rung-center--corridor {
+  border-style: dashed;
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.rung-center--corridor-imminent {
+  border-color: var(--color-cl-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-cl-primary) 25%, transparent);
+}
+
+#playerClimber.player-at-corridor {
+  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.12));
+}
+
+.next-rung .rung-center:not(.rung-center--corridor) {
   border-color: var(--color-cl-primary);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-cl-primary) 30%, transparent);
 }

@@ -92,6 +92,8 @@ const DEATH_EMOJI: Record<DeathType, string> = {
   meeting: "💥",
   reorg: "🌀",
   burnout: "📉",
+  badge_gate: "🪪",
+  foliage: "🪴",
   energy: "😵",
 };
 

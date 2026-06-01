@@ -1,5 +1,5 @@
 import { audio } from "./audio";
-import { debugLog } from "../lib/debug";
+import { debugTapContext, debugTapResult } from "../lib/debug";
 
 import {
   BASE_DRAIN_RATE,
@@ -16,7 +16,9 @@ import {
   PROMOTION_DIALOGUES,
   PROMO_DRAIN_PAUSE_MS,
   TICK_MS,
+  OBSTACLE_DEATH_COPY,
   TUTORIAL_COFFEE_MIN_RUNG,
+  TUTORIAL_RUNG_SPECS,
   pickObstacleType,
   rankFromYears,
   reorgIntervalForRank,
@@ -89,6 +91,10 @@ export class GameEngine {
 
   isActive(): boolean {
     return this.isPlaying;
+  }
+
+  getRungsClimbed(): number {
+    return this.score;
   }
 
   getTimeLeft(): number {
@@ -191,12 +197,13 @@ export class GameEngine {
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
 
     this.rungs = [];
-    this.rungs.push(this.generateRung(true), this.generateRung(true), this.generateRung(true));
-    for (let i = 3; i < MAX_VISIBLE_RUNGS; i++) {
+    this.rungs.push(this.generateRung(true));
+    for (const spec of TUTORIAL_RUNG_SPECS) {
+      this.rungs.push({ ...spec, id: this.nextRungId++ });
+    }
+    while (this.rungs.length < MAX_VISIBLE_RUNGS) {
       this.rungs.push(this.generateRung());
     }
-
-    this.updatePlayerPosition(this.playerSide);
     this.renderRungs();
     this.callbacks.onScoreUpdate(0, 100);
     this.stopLoops();
@@ -273,13 +280,13 @@ export class GameEngine {
 
   handleTap(side: PlayerSide): void {
     if (!this.isPlaying || this.isGameOverState) {
-      debugLog("tap", "ignored inactive", { side });
+      debugTapResult(side, this.rungs[1], "inactive");
       return;
     }
 
     const now = Date.now();
     if (now - this.lastTapAt < MIN_TAP_INTERVAL_MS) {
-      debugLog("tap", "ignored throttle", { side, ms: now - this.lastTapAt });
+      debugTapResult(side, this.rungs[1], "throttle");
       return;
     }
     this.lastTapAt = now;
@@ -293,26 +300,12 @@ export class GameEngine {
     this.updatePlayerPosition(side);
 
     const nextRung = this.rungs[1];
-    debugLog("tap", "handle", {
-      side,
-      obstacle: nextRung?.obstacle ?? null,
-      coffee: nextRung?.coffee ?? null,
-    });
 
     if (nextRung?.obstacle === this.playerSide) {
-      let cause = "Reorganization";
-      let detail = "A massive department restructuring shuffled you out of direct reports.";
-      let deathType: DeathType = "reorg";
-      if (nextRung.type === "meeting") {
-        cause = "Meeting Overload";
-        detail = "Fell into an all-hands call on slide layout. Reached maximum agenda tolerance.";
-        deathType = "meeting";
-      } else if (nextRung.type === "burnout") {
-        cause = "Deadline Crash";
-        detail = "Waded headfirst into a quarterly deadline with zero active coffee left.";
-        deathType = "burnout";
-      }
-      this.triggerGameOver(cause, detail, deathType);
+      const obstacleType = nextRung.type ?? "reorg";
+      const copy = OBSTACLE_DEATH_COPY[obstacleType] ?? OBSTACLE_DEATH_COPY.reorg;
+      this.triggerGameOver(copy.cause, copy.detail, copy.deathType);
+      debugTapResult(side, nextRung, "death");
       return;
     }
 
@@ -342,8 +335,12 @@ export class GameEngine {
     this.checkInternFakePromos(years);
     if (coffeePickup) {
       this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
+      debugTapResult(side, nextRung, "coffee");
+    } else {
+      debugTapResult(side, nextRung, "climb");
     }
     this.renderRungs();
+    debugTapContext(this.rungs[1]);
   }
 
   private checkPromotions(): void {

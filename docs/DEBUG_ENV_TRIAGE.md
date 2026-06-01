@@ -1,5 +1,7 @@
 # Environment triage — gameplay + layout audit (2026-06-01)
 
+**Postmortem (ladder width, debug session):** [DEBUG_FIX_2026-06-01.md](DEBUG_FIX_2026-06-01.md)
+
 Pass/fail after trust hotfix push (`c253d26`+). Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |

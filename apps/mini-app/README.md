@@ -6,10 +6,11 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 
 ## How to Play
 
-1. Tap **Punch In & Climb** — first tap starts the run.
-2. Tap **left** or **right** to climb one rung per tap; avoid obstacles on your side.
-3. Grab **coffee** (+25% energy recovery) when you can.
-4. Survive as many **Career Years** as possible before HR terminates you.
+1. Tap **Punch In & Climb** — you start in the center corridor; first tap starts energy drain.
+2. Tap **LEFT** or **RIGHT** for the **next** rung's safe side (three lanes visually, two buttons).
+3. First runs teach: clear rung → dodge meeting → grab coffee (+25% energy).
+4. Manager+ may see **badge gates**; CEO+ may see **desk plants** — dodge like meetings/deadlines.
+5. Survive as many **Career Years** as possible before HR terminates you.
 
 ## Pre-release QA
 

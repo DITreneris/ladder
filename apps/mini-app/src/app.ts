@@ -29,7 +29,7 @@ import {
 } from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
-import { debugLog, mountDebugStrip } from "./lib/debug";
+import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
@@ -81,6 +81,9 @@ let activeTickerHeadline: TickerHeadline = pickTickerHeadline();
 let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
 let emojiFlashLock = false;
+let playerAtCorridor = true;
+
+type PlayerLayout = PlayerSide | "center";
 
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 
@@ -148,6 +151,21 @@ function incrementReapplyCount(): number {
     /* ignore */
   }
   return next;
+}
+
+function updateImminentRungHint(): void {
+  const hint = $("imminentHint");
+  if (!engine?.isActive()) {
+    hint.classList.add("hidden");
+    return;
+  }
+  const next = engine.getRungs()[1];
+  if (!shouldShowImminentHint(engine.getRungsClimbed())) {
+    hint.classList.add("hidden");
+    return;
+  }
+  hint.textContent = describeNextRung(next);
+  hint.classList.remove("hidden");
 }
 
 function updateMilestoneChip(years: number): void {
@@ -308,6 +326,12 @@ function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = fa
     } else {
       badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
     }
+  } else if (type === "badge_gate") {
+    badge.className += " bg-slate-100 border-slate-400 text-slate-800";
+    badge.innerHTML = `<span class="text-lg leading-none">🪪</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Gate</span>`;
+  } else if (type === "foliage") {
+    badge.className += " bg-emerald-100 border-emerald-500 text-emerald-900";
+    badge.innerHTML = `<span class="text-lg leading-none">🪴</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Plant</span>`;
   } else {
     badge.className += " bg-red-100 border-red-400 text-red-900";
     badge.innerHTML = `<span class="text-lg leading-none">⏰</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Deadline</span>`;
@@ -361,18 +385,29 @@ function layoutTrackMetrics(): void {
   playArea.style.setProperty("--reorg-slide-distance", `${width}px`);
 }
 
-function layoutPlayerPosition(side: PlayerSide): void {
+function layoutPlayerPosition(side: PlayerLayout): void {
   const playArea = $("gamePlayArea");
   const climber = $("playerClimber");
-  const slot = playArea.querySelector(
-    side === "left" ? ".left-slot" : ".right-slot"
-  ) as HTMLElement | null;
-  if (!slot) return;
-
-  const slotRect = slot.getBoundingClientRect();
   const playRect = playArea.getBoundingClientRect();
   const climberW = climber.offsetWidth;
-  const rawLeft = slotRect.left + slotRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
+  let anchor: HTMLElement | null = null;
+
+  if (side === "center") {
+    anchor =
+      (playArea.querySelector(".next-rung .rung-center") as HTMLElement | null) ??
+      (playArea.querySelector("[data-rung-slot='1'] .rung-center") as HTMLElement | null) ??
+      ($("ladderTrack") as HTMLElement);
+  } else {
+    anchor = playArea.querySelector(
+      side === "left" ? ".left-slot" : ".right-slot"
+    ) as HTMLElement | null;
+  }
+
+  if (!anchor) return;
+
+  const anchorRect = anchor.getBoundingClientRect();
+  const rawLeft =
+    anchorRect.left + anchorRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
   const maxLeft = Math.max(0, playArea.clientWidth - climberW);
   const left = Math.max(0, Math.min(maxLeft, rawLeft));
   climber.style.left = `${Math.round(left)}px`;
@@ -480,6 +515,11 @@ function renderRungsInner(): void {
       else if (rung.coffee === "right") rightSlot.classList.add("next-coffee-hint");
     }
 
+    const centerEl = rungEl.querySelector(".rung-center") as HTMLElement;
+    const corridorClear = !rung.obstacle && !rung.coffee;
+    centerEl.classList.toggle("rung-center--corridor", corridorClear);
+    centerEl.classList.toggle("rung-center--corridor-imminent", i === 1 && corridorClear);
+
     const swap = reorgSwaps.find((s) => s.rungId === rung.id);
     if (swap && i !== 1) {
       const slotSelector = swap.toSide === "left" ? ".left-slot" : ".right-slot";
@@ -497,7 +537,10 @@ function renderRungsInner(): void {
   if (advanced) triggerRungAdvance(container);
   prevRungsSnapshot = rungs.map((r) => ({ ...r }));
   layoutRungs();
-  if (engine.isActive()) layoutPlayerPosition(engine.getPlayerSide());
+  if (engine.isActive()) {
+    layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
+  }
+  updateImminentRungHint();
   maybeShowCeoTrapMemo();
 }
 
@@ -520,6 +563,8 @@ function renderRungsWithReorgFeedback(): void {
 }
 
 function updatePlayerPosition(side: PlayerSide): void {
+  playerAtCorridor = false;
+  $("playerClimber").classList.remove("player-at-corridor");
   layoutPlayerPosition(side);
   triggerClimbPop($("playerClimber"));
   hapticImpact("light");
@@ -630,9 +675,14 @@ function hideHudTapHint(): void {
   $("hudTapHint").classList.add("hidden");
 }
 
+function hideImminentHint(): void {
+  $("imminentHint").classList.add("hidden");
+}
+
 function startGame(): void {
   hideHrMemo();
   hideHudTapHint();
+  hideImminentHint();
   hideTapDeckHint();
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
@@ -641,7 +691,9 @@ function startGame(): void {
   showTapDeckHint();
   flashBurnoutStress(false);
   playerInPanic = false;
+  playerAtCorridor = true;
   $("playerClimber").classList.remove("player-panic");
+  $("playerClimber").classList.add("player-at-corridor");
   $("playerActionEmoji").classList.add("idle-bob");
   prevRungsSnapshot = [];
   lastPointerTapAt = 0;
@@ -659,7 +711,7 @@ function startGame(): void {
   switchTab("game");
   requestAnimationFrame(() => {
     layoutRungs();
-    layoutPlayerPosition(engine.getPlayerSide());
+    layoutPlayerPosition("center");
   });
 }
 
@@ -776,6 +828,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   debugLog("gameover", "collision/death", { deathType: result.deathType });
   hideHrMemo();
   hideHudTapHint();
+  hideImminentHint();
   lastGameResult = result;
   $("playerActionEmoji").classList.remove("idle-bob");
 
@@ -910,6 +963,7 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
     const now = Date.now();
     if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) {
       debugLog("tap", "ui throttle", { side, ms: now - lastPointerTapAt });
+      showToast("Too fast — one tap per beat", { surface: "game" });
       hapticImpact("rigid");
       triggerClimbPop(el);
       return;
@@ -946,6 +1000,7 @@ function mountOgCaptureMode(): void {
   prevRungsSnapshot = [];
   earlyTapsRemaining = 0;
   playerInPanic = false;
+  playerAtCorridor = false;
   $("playerActionEmoji").classList.remove("idle-bob");
 
   engine.applyOgCaptureSnapshot(
@@ -968,7 +1023,7 @@ function mountOgCaptureMode(): void {
 
   requestAnimationFrame(() => {
     layoutRungs();
-    layoutPlayerPosition(OG_CAPTURE_PLAYER_SIDE);
+    layoutPlayerPosition("center");
     requestAnimationFrame(() => {
       (window as unknown as Record<string, unknown>).__CL_OG_READY__ = true;
     });
@@ -995,6 +1050,9 @@ export function mountApp(): void {
     {
       onScoreUpdate: (years, energy) => {
         $("gameYearsLabel").textContent = years.toFixed(1);
+        if (earlyTapsRemaining > 0 && engine.getRungsClimbed() > 0) {
+          triggerClimbPop($("gameYearsLabel"));
+        }
         updateMilestoneChip(years);
         updateFloorLabel(years);
         updateReorgHudStrip(engine.getCurrentRank());
@@ -1054,6 +1112,13 @@ export function mountApp(): void {
     updatePlayerPosition,
     () => {
       hideHudTapHint();
+      showHrMemoCombined(
+        [
+          "You are in the corridor. Each tap picks LEFT or RIGHT on the next rung.",
+          "Avoid hazards on the occupied side. Coffee on your side restores energy.",
+        ],
+        { variant: "info", durationMs: 4000 }
+      );
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
         shiftToastShown = true;
         showHrMemo("Shift rules active", { variant: "alert" });
@@ -1076,7 +1141,9 @@ export function mountApp(): void {
   const playArea = $("gamePlayArea");
   new ResizeObserver(() => {
     layoutRungs();
-    if (engine.isActive()) layoutPlayerPosition(engine.getPlayerSide());
+    if (engine.isActive()) {
+      layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
+    }
   }).observe(playArea);
 
   window.addEventListener("keydown", (e) => {

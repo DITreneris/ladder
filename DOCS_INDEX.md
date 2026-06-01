@@ -35,7 +35,8 @@
 | **Gameplay / engine** | [ROADMAP.md](ROADMAP.md) § Shipped baseline | [docs/mvp-scope.md](docs/mvp-scope.md) (boundaries only), `apps/mini-app/src/game/` |
 | **Auth / API / DB** | [docs/architecture.md](docs/architecture.md) | Matching skill in task router |
 | **Deploy / release** | [DEPLOY.md](DEPLOY.md) | [ROADMAP.md](ROADMAP.md) Status → [FF_EXECUTION](docs/FF_EXECUTION.md) |
-| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.4](docs/DEVICE_QA_v1.8.4.md) |
+| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md), [todo](docs/todo.md) |
+| **Bug fix backlog / release TODO** | [docs/todo.md](docs/todo.md) | P0–P3 queue, verification matrix, test gaps |
 
 ---
 
@@ -60,6 +61,7 @@ Use this table to pick the right skill, rules, and documents.
 | F&F gate / device QA / pre-tag | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md), [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
+| Debug triage / incident history | `debug-steward` | [project-context.mdc](.cursor/rules/project-context.mdc) | [debug-triage](.cursor/skills/debug-triage/SKILL.md), [DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md) |
 | Co-branding / PA footer | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | `apps/mini-app/src/lib/branding.ts`, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §9 |
 
 **Workflow (feature work):** change → `pytest` + mini-app `lint` / `test` / `build` → `smoke-local` if deploy-related → `[Unreleased]` in CHANGELOG → `verifier` on user-facing work.
@@ -87,9 +89,12 @@ Use this table to pick the right skill, rules, and documents.
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |
-| `device-qa-v184` | [docs/DEVICE_QA_v1.8.4.md](docs/DEVICE_QA_v1.8.4.md) | Release | v1.8.4 trust + layout delta — blocks tag `v1.8.4` |
+| `device-qa-v184` | [docs/DEVICE_QA_v1.8.4.md](docs/DEVICE_QA_v1.8.4.md) | Release | v1.8.4 trust + layout delta |
+| `device-qa-v185` | [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) | Release | v1.8.5 corridor + tutorial — blocks tag `v1.8.5` |
+| `todo` | [docs/todo.md](docs/todo.md) | Release / QA | v1.8.5 bug audit backlog — P0–P3 fixes, verification, tests, deploy gates |
 | `debug-repro` | [docs/DEBUG_REPRO.md](docs/DEBUG_REPRO.md) | QA | Manual R1–R5 reaction + L1–L5 layout checklist |
 | `debug-env` | [docs/DEBUG_ENV_TRIAGE.md](docs/DEBUG_ENV_TRIAGE.md) | QA | Prod bundle hash triage table |
+| `debug-incident-2026-06-01` | [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) | QA / agents | F&F debug postmortem — ladder width, lessons learned, CHANGELOG cross-links |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
@@ -125,6 +130,7 @@ Use this table to pick the right skill, rules, and documents.
 | `rules` | [.cursor/rules/](.cursor/rules/) | Scoped and always-on rules |
 | `skills` | [.cursor/skills/](.cursor/skills/) | Specialized workflows |
 | `verifier` | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) | Read-only QA agent |
+| `debug-steward` | [.cursor/agents/debug-steward.md](.cursor/agents/debug-steward.md) | Debug triage order, incident postmortems |
 | `changelog-maintainer` | [.cursor/agents/changelog-maintainer.md](.cursor/agents/changelog-maintainer.md) | Changelog release cuts and cyclic review |
 
 ---
@@ -136,6 +142,7 @@ Agents live in [.cursor/agents/](.cursor/agents/). Invoke by name in Cursor.
 | Agent | Mode | Skills | Owns |
 |-------|------|--------|------|
 | [verifier](.cursor/agents/verifier.md) | read-only | — | Pre-done QA: game, Telegram, API, leaderboards, CI commands |
+| [debug-steward](.cursor/agents/debug-steward.md) | write | [debug-triage](.cursor/skills/debug-triage/SKILL.md) | Debug triage order, incident docs ([DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md)) |
 | [Changelog Maintainer](.cursor/agents/changelog-maintainer.md) | write | [changelog-maintainer](.cursor/skills/changelog-maintainer/SKILL.md) | [CHANGELOG.md](CHANGELOG.md) — **family equivalent:** mother repo’s `changelog-keeper` |
 
 Main session handles game/API/copy work inline using skills and rules above.
@@ -150,6 +157,7 @@ Main session handles game/API/copy work inline using skills and rules above.
 | `score-pipeline` | [.cursor/skills/score-pipeline/SKILL.md](.cursor/skills/score-pipeline/SKILL.md) | Score submission, leaderboard, `game_runs` schema |
 | `mini-app-deploy` | [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) | Production setup, env vars, first launch |
 | `changelog-maintainer` | [.cursor/skills/changelog-maintainer/SKILL.md](.cursor/skills/changelog-maintainer/SKILL.md) | Changelog updates, weekly cyclic review, release cut |
+| `debug-triage` | [.cursor/skills/debug-triage/SKILL.md](.cursor/skills/debug-triage/SKILL.md) | Gameplay “feels broken”, layout shift, prod vs repo, postmortems |
 
 ---
 

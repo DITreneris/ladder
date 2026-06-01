@@ -12,18 +12,38 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 | | |
 |---|---|
-| **Production** | `main` — **v1.8.4 code done**; Vercel still on **v1.8.2** bundle until redeploy |
-| **Blocking F&F** | Deploy v1.8.4 → device QA iOS + Android → tag → F&F ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
-| **Next actions** | See [v1.8.4 gate — open items](#v184-gate--open-items) below |
+| **Production** | `main` — **v1.8.5 code done**; Vercel redeploy pending |
+| **Blocking F&F** | Deploy v1.8.5 → device QA iOS + Android → tag → F&F ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
+| **Next actions** | See [v1.8.5 gate — open items](#v185-gate--open-items) below |
 | **Next product** | v1.9 provisional — confirm at F&F review **2026-06-14** |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
 ---
 
-## v1.8.4 gate — open items
+## v1.8.5 gate — open items
 
-From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** — [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01). **Not done yet:**
+**Code shipped in repo** — [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01). **Not done yet:**
+
+**Full bug-fix backlog:** [docs/todo.md](docs/todo.md) (P0–P3, verification matrix, tests).
+
+### Operations (blocking F&F)
+
+| # | Item | Owner / notes |
+|---|------|----------------|
+| 1 | **Push `main`** (if local commits not on origin) | GitHub |
+| 2 | **Vercel redeploy** mini-app | Prod must serve v1.8.5 bundle |
+| 3 | **Telegram cache bust** | Hard refresh / reopen from bot after deploy |
+| 4 | **Device QA** iOS + Android | [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md) + prior deltas as needed |
+| 5 | **Verifier** pass | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) |
+| 6 | **`git tag v1.8.5`** + push tags | After device QA sign-off |
+| 7 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D |
+
+---
+
+## v1.8.4 gate — open items (superseded by 1.8.5 deploy)
+
+From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** — [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01). **Fold into 1.8.5 deploy if 1.8.4 never tagged:**
 
 ### Operations (blocking F&F)
 
@@ -111,23 +131,25 @@ flowchart TB
 | **v1.8.1** | Telegram mobile + playability polish | **Live** | [CHANGELOG](CHANGELOG.md#181---2026-05-31); device QA folded into v1.8.2 sign-off |
 | **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** — **QA + tag pending** | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) → tag `v1.8.2` (optional if superseded by 1.8.4) |
 | **v1.8.3** | Shared content column + coffee pickup clear | **Code** · deploy folded into 1.8.4 | [CHANGELOG 1.8.3](CHANGELOG.md#183---2026-06-01) |
-| **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code done** · **Deploy + QA pending** | [Gate checklist](#v184-gate--open-items) → tag `v1.8.4` |
+| **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code** · folded into 1.8.5 deploy | [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01) |
+| **v1.8.5** | Corridor UX + scripted tutorial + badge gate / desk plant hazards | **Code done** · **Deploy + QA pending** | [Gate checklist](#v185-gate--open-items) → tag `v1.8.5` |
 | **v1.9.0** | Near-miss wince + Synergy Sprint (provisional) | **Planned** | F&F review ~2026-06-14 — [FF_TEST.md](docs/FF_TEST.md) |
 | **v1.9+** | Data-informed juice | **Backlog** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | **Deferred** | Explicit approval — [mvp-scope](docs/mvp-scope.md) |
 
 ---
 
-## Shipped baseline (v1.5 → v1.8.4)
+## Shipped baseline (v1.5 → v1.8.5)
 
-Inventory by pillar — do not regress without spec update. Per-release detail: [CHANGELOG](CHANGELOG.md) `1.5.0`–`1.8.4`.
+Inventory by pillar — do not regress without spec update. Per-release detail: [CHANGELOG](CHANGELOG.md) `1.5.0`–`1.8.5`.
 
 ### Mechanics
 
 | Item | Notes |
 |------|--------|
-| Tap left/right, one rung per tap | Core loop unchanged |
-| Obstacles: Meeting, Reorg, Deadline (`burnout`) + Coffee | Rank-gated: Intern → meetings; Manager → +reorgs; CEO → +deadlines |
+| Tap left/right, one rung per tap | Core loop unchanged; **v1.8.5** center corridor visual only (no center tap) |
+| Obstacles: Meeting, Reorg, Deadline (`burnout`), Badge gate, Desk plant + Coffee | Rank-gated: Intern → meetings; Manager → +reorgs + gates; CEO → +deadlines + plants |
+| Scripted tutorial rungs (v1.8.5) | First 3 imminent rungs: clear → meeting RIGHT → coffee LEFT |
 | Energy drain + climb/coffee recovery | Pauses until first tap; 2s pause on promotion (v1.6) |
 | Intern tutorial ramp | 22% obstacle rate first 12 rungs; forced coffee inject on `rungs[2]` by rung 8 if none collected (v1.8.4) |
 | Reorg fairness | Next rung (`rungs[1]`) does not swap during reorg ticks; imminent reorg shows **Frozen** badge (v1.8.4) |
@@ -177,6 +199,7 @@ Inventory by pillar — do not regress without spec update. Per-release detail: 
 | Reorg slide + telegraph | `reorg-slide-*`, `reorg-warning` | Fairness feedback |
 | Safe-side hint (5 taps) | `safe-side-hint` | Onboarding (extended v1.8.1) |
 | Deck-first HUD hint (v1.8.2) | `#hudTapHint`, `.tap-deck-hint` | First-run guidance (replaces tap-prompt bar — removed in 1.8.2) |
+| Corridor start (v1.8.5) | `#playerClimber.player-at-corridor`, `.rung-center--corridor` | Center aisle before first tap; 2-tap control unchanged |
 | Next-rung warn | `next-obstacle-warn` | Threat read |
 | Panic / stress | `player-panic`, `burnout-stress` | Low energy |
 | Coffee / promo particles | `float-particle`, `promo-confetti` | Reward beats |

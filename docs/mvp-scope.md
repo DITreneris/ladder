@@ -12,7 +12,7 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 
 **Pitch:** Fast-paced office climb where your energy meter drains like a Friday afternoon.
 
-**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (prod v1.8.2 bundle; F&F gate).
+**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (v1.8.5 code; F&F gate).
 
 ---
 
@@ -26,8 +26,9 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 | Daily shift presets (UTC) | Anti-cheat replay validation |
 | Co-branding (Prompt Anatomy footer / bot link) | Currency, skins, clans, quests, NFTs |
 | Trust UX: score-submit toasts, auth banner, API rank/years check | New control schemes (swipe, hold-to-dodge, etc.) |
+| Three-lane **visual** corridor (v1.8.5) — center aisle + TAP LEFT/RIGHT only | Third tap / center spawn / stay-center mechanic |
 
-**Everything shipped in v1.5–v1.8.2** (fairness, narrative, mobile UX, OG meta) is **polish on this boundary**, not a new product — see [CHANGELOG](../CHANGELOG.md) and ROADMAP release train.
+**Everything shipped in v1.5–v1.8.5** (fairness, narrative, mobile UX, OG meta, corridor onboarding) is **polish on this boundary**, not a new product — see [CHANGELOG](../CHANGELOG.md) and ROADMAP release train.
 
 ---
 

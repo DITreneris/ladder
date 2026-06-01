@@ -51,27 +51,29 @@ describe("GameEngine", () => {
   });
 
   it("stops active play after collision game over", () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.1);
     const onGameOver = vi.fn();
     const { engine } = createEngine({ onGameOver });
 
     engine.start();
     tapWithCooldown(engine, "left");
-    tapWithCooldown(engine, "left");
-    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "right");
 
     expect(onGameOver).toHaveBeenCalledTimes(1);
+    expect(onGameOver.mock.calls[0]![0].deathType).toBe("meeting");
     expect(engine.isActive()).toBe(false);
   });
 
-  it("calls onCoffee when climbing onto a coffee rung", () => {
-    const onCoffee = vi.fn();
-    let randomCall = 0;
-    vi.spyOn(Math, "random").mockImplementation(() => {
-      const sequence = [0.9, 0.3, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99];
-      return sequence[randomCall++] ?? 0.99;
-    });
+  it("scripts tutorial rungs at start", () => {
+    const { engine } = createEngine();
+    engine.start();
+    expect(engine.getRungs()[1]?.obstacle).toBeNull();
+    expect(engine.getRungs()[2]?.obstacle).toBe("right");
+    expect(engine.getRungs()[2]?.type).toBe("meeting");
+    expect(engine.getRungs()[3]?.coffee).toBe("left");
+  });
 
+  it("calls onCoffee when climbing onto scripted tutorial coffee", () => {
+    const onCoffee = vi.fn();
     const { engine } = createEngine({ onCoffee });
     engine.start();
     tapWithCooldown(engine, "left");
@@ -84,12 +86,6 @@ describe("GameEngine", () => {
 
   it("clears coffee from the rung after pickup (no ghost badge on current slot)", () => {
     const onCoffee = vi.fn();
-    let randomCall = 0;
-    vi.spyOn(Math, "random").mockImplementation(() => {
-      const sequence = [0.9, 0.3, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99];
-      return sequence[randomCall++] ?? 0.99;
-    });
-
     const { engine } = createEngine({ onCoffee });
     engine.start();
     tapWithCooldown(engine, "left");
@@ -127,7 +123,8 @@ describe("GameEngine", () => {
 
     engine.start();
     tapWithCooldown(engine, "left");
-    tapWithCooldown(engine, "right");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
     engine.stop();
 
     engine.handleTap("left");
@@ -141,8 +138,7 @@ describe("GameEngine", () => {
     }).engine;
     engine2.start();
     tapWithCooldown(engine2, "left");
-    tapWithCooldown(engine2, "left");
-    tapWithCooldown(engine2, "left");
+    tapWithCooldown(engine2, "right");
 
     expect(result).not.toBeNull();
     expect(result!.rungsClimbed).toBeGreaterThan(0);
@@ -195,16 +191,18 @@ describe("GameEngine", () => {
     const { engine } = createEngine();
     engine.start();
     tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
 
     type EngineInternals = { score: number };
     const internal = engine as unknown as EngineInternals;
-    internal.score = 39;
-    tapWithCooldown(engine, "right");
+    internal.score = 40;
+    tapWithCooldown(engine, "left");
 
     const afterPromo = engine.getTimeLeft();
     vi.advanceTimersByTime(1500);
     expect(engine.getTimeLeft()).toBe(afterPromo);
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1500);
     expect(engine.getTimeLeft()).toBeLessThan(afterPromo);
   });
 
@@ -253,19 +251,30 @@ describe("GameEngine", () => {
   });
 
   it("uses manager obstacle pool on the rung generated at promotion", () => {
-    vi.spyOn(Math, "random").mockReturnValue(0.1);
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
     const { engine } = createEngine();
     engine.start();
     tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
 
-    type EngineInternals = { score: number; rungs: { type: string | null }[] };
+    while (engine.getRungsClimbed() < 39) {
+      tapWithCooldown(engine, "left");
+    }
+    vi.spyOn(Math, "random").mockReturnValue(0.1);
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = {
+      rungs: { type: string | null; obstacle: string | null }[];
+    };
     const internal = engine as unknown as EngineInternals;
-    internal.score = 39;
-    tapWithCooldown(engine, "right");
-
     const tail = internal.rungs[internal.rungs.length - 1];
     expect(engine.getCurrentRank()).toBe("Manager");
-    expect(tail?.type === "meeting" || tail?.type === "reorg").toBe(true);
+    const managerTypes = new Set(["meeting", "reorg", "badge_gate"]);
+    expect(tail?.type === null || managerTypes.has(tail?.type ?? "")).toBe(true);
+    if (tail?.obstacle) {
+      expect(managerTypes.has(tail.type ?? "")).toBe(true);
+    }
   });
 
   it("ignores taps faster than MIN_TAP_INTERVAL_MS", () => {
@@ -276,9 +285,9 @@ describe("GameEngine", () => {
 
     engine.handleTap("left");
     vi.advanceTimersByTime(50);
-    engine.handleTap("right");
+    engine.handleTap("left");
     vi.advanceTimersByTime(120);
-    engine.handleTap("right");
+    engine.handleTap("left");
 
     type EngineInternals = { score: number };
     const score = (engine as unknown as EngineInternals).score;
