@@ -41,4 +41,4 @@ Corporate Ladder humor = workplace satire, not generic game fluff.
 - **`apps/mini-app/src/game/constants.ts`** — primary source: `FAILURE_REASONS`, `FAILURE_BY_RANK`, `PROMOTION_DIALOGUES`, retry tips, termination labels
 - Game over / promotion UI strings in `template.ts` / `app.ts`
 - Bot welcome message in `apps/bot/main.py`
-- Historical tone reference: [primal.txt](../../primal.txt) (concept v0.1 — not current HUD labels)
+- Historical tone only (not routine audits): [docs/archive/primal.txt](../../docs/archive/primal.txt)

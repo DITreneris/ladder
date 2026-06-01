@@ -16,18 +16,18 @@ Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. 
 
 ## MVP v1 Scope
 
-**Shipped:** core gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot launch. v1.5–v1.8.1 complete in code; production live (v1.8.1 device QA pending).
+**Shipped:** core gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot launch. v1.5–v1.8.2 live on prod; device QA + tag `v1.8.2` pending before F&F.
 
 **Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
 
-**Next release train:** v1.8.1 redeploy + device QA → friends-and-family → v1.9 — see [ROADMAP.md](../../ROADMAP.md). Match ROADMAP § Shipped baseline for v1.6+ mechanics.
+**Next release train:** v1.8.2 device QA + tag → friends-and-family (→ 2026-06-14 review) → v1.9 provisional — see [ROADMAP.md](../../ROADMAP.md) **Status** and [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md). Match ROADMAP § Shipped baseline (v1.5 → v1.8.2).
 
 ## Principles
 
 1. **Humor is the product** — preserve satirical tone in all copy.
 2. **No secrets in frontend** — bot token and Supabase service key stay on Railway only.
 3. **Minimal scope** — do not add v1.1 features without explicit approval.
-4. **Match prototype** — [`snippet.txt`](../../snippet.txt) is mechanics canon; port, don't reinvent (parity notes at file footer).
+4. **Match shipped spec** — [ROADMAP.md](../../ROADMAP.md) § Shipped baseline; scope gates in [docs/mvp-scope.md](../../docs/mvp-scope.md). Do not read [docs/archive/](../../docs/archive/) unless researching v0.1 origin.
 5. **Terminology** — UI uses Energy / Deadline; code obstacle type `burnout` unchanged.
 
 ## Family
@@ -37,11 +37,12 @@ Sibling repo: [DITreneris/site](https://github.com/DITreneris/site) (Prompt Anat
 ## Key Docs
 
 - [DOCS_INDEX.md](../../DOCS_INDEX.md) — document map (update when adding docs, agents, or skills)
-- [ROADMAP.md](../../ROADMAP.md) — release train, narrative thesis, shipped baseline through v1.8, v1.9 plan
+- [ROADMAP.md](../../ROADMAP.md) — Status block, release train, shipped baseline through v1.8.2, v1.9 plan
+- [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md) — F&F runbook (current operational gate)
 - [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) — mini-app visual canon
 - [DEPLOY.md](../../DEPLOY.md) — production deploy checklist
 - [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — deploy progress tracker
-- [docs/mvp-scope.md](../../docs/mvp-scope.md)
+- [docs/mvp-scope.md](../../docs/mvp-scope.md) — scope boundaries only (inventory in ROADMAP)
 - [docs/architecture.md](../../docs/architecture.md)
 - [CHANGELOG.md](../../CHANGELOG.md) — updated by Changelog Maintainer agent
 - [AGENTS.md](../../AGENTS.md)

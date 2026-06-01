@@ -16,14 +16,14 @@ Follow [.cursor/skills/changelog-maintainer/SKILL.md](../skills/changelog-mainta
 
 - Any agent ships user-visible changes → ensure `[Unreleased]` entry exists
 - Weekly cyclic review via `/loop 7d` prompt (see [AGENTS.md](../../AGENTS.md))
-- Release tag cut (e.g. v1.6.0, v1.7.0)
+- Release tag cut (e.g. v1.8.2 after device QA)
 
 ## Release cut checklist
 
 1. Move completed `[Unreleased]` items into a new `## [X.Y.Z] - YYYY-MM-DD` section
 2. Leave v1.1 "Planned" items under `[Unreleased]` until implemented
 3. Update compare links at bottom (`[Unreleased]: compare/vX.Y.Z...HEAD`)
-4. Sync [ROADMAP.md](../../ROADMAP.md) release train status if version shipped
+4. Sync [ROADMAP.md](../../ROADMAP.md) **Status** + release train (Live / QA signed / Tagged) when version ships
 5. Do not edit frozen release sections except typos
 
 ## Format

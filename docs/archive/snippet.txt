@@ -1116,7 +1116,7 @@
   - UI renames: Burnout meter → Energy; Burnout obstacle → Deadline (code type ID still "burnout")
   - Rank-gated obstacles: meetings (Intern), reorgs (Manager+), deadlines (CEO+)
   - v1.6 fairness: next rung exempt from reorg swap; Intern tutorial ramp; 2s energy pause on promotion
-  - Current spec: docs/mvp-scope.md, ROADMAP.md § Shipped baseline
+  - Current spec: docs/mvp-scope.md, ROADMAP.md § Shipped baseline (this file archived under docs/archive/)
 -->
 </body>
 </html>

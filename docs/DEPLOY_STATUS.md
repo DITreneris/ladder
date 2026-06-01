@@ -2,7 +2,7 @@
 
 
 
-Track manual deploy progress for **v1.5.0 → v1.8.1** (deploy gate per [ROADMAP.md](../ROADMAP.md)). Full steps: [DEPLOY.md](../DEPLOY.md).
+Track manual deploy progress for **v1.5.0 → v1.8.2** (current gate per [ROADMAP.md](../ROADMAP.md)). Full steps: [DEPLOY.md](../DEPLOY.md).
 
 
 

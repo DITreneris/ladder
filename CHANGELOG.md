@@ -9,6 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- [ROADMAP.md](ROADMAP.md) — status block, consistent release-train vocabulary, shipped baseline through v1.8.2 aligned with CHANGELOG; current gate + F&F runbook pointers; deduplicated v1.9 backlog; release archive replaces per-version task dumps
+- Agent docs sync (v1.8.2 gate) — [DOCS_INDEX.md](DOCS_INDEX.md) F&F/device-QA task rows; [AGENTS.md](AGENTS.md), [docs/mvp-scope.md](docs/mvp-scope.md), [README.md](README.md), [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md); [.cursor/rules/project-context.mdc](.cursor/rules/project-context.mdc), [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc), [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [deployment.mdc](.cursor/rules/deployment.mdc); [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [changelog-maintainer.md](.cursor/agents/changelog-maintainer.md); [.cursor/skills/mini-app-deploy](.cursor/skills/mini-app-deploy/SKILL.md), [score-pipeline](.cursor/skills/score-pipeline/SKILL.md), [changelog-maintainer](.cursor/skills/changelog-maintainer/SKILL.md); [docs/discoverability-plan.md](docs/discoverability-plan.md)
+- [AGENTS.md](AGENTS.md) — compact layout; FF_EXECUTION + ROADMAP Status in source-of-truth; viewport QA in workflow
+- [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — status v1.8.2; §9 split v1.6 / v1.8 / v1.8.2 patterns; QA checklist + device QA gate
+- **Archive** — moved [snippet.txt](docs/archive/snippet.txt) and [primal.txt](docs/archive/primal.txt) to [docs/archive/](docs/archive/README.md); active audits use [mvp-scope](docs/mvp-scope.md) + [ROADMAP](ROADMAP.md) § Shipped baseline; updated DOCS_INDEX, AGENTS, rules, README
+- [docs/mvp-scope.md](docs/mvp-scope.md) — slim scope-boundary doc only (v1 in/out, v1.1, terminology, metrics); removed stale v1.6-only gameplay list; inventory → ROADMAP § Shipped baseline only
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

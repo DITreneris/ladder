@@ -60,6 +60,6 @@
 - [ ] Decision recorded in [FF_TEST.md](FF_TEST.md) end-of-F&F section
 - [ ] `[Unreleased]` CHANGELOG entries
 - [ ] `npm run lint && npm test && npm run build`; verifier
-- [ ] No new obstacle logic; match [snippet.txt](../snippet.txt)
+- [ ] No new obstacle logic; [mvp-scope](mvp-scope.md) boundary OK; match [ROADMAP](../ROADMAP.md) § Shipped baseline
 
 **Tag after verifier:** `git tag -a v1.9.0 -m "..."`

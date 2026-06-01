@@ -24,11 +24,11 @@ alwaysApply: false
 - Leaderboard tabs: Daily and Weekly only (v1).
 - Share: prefer `Telegram.WebApp.shareMessage()`, fallback to clipboard.
 - Styling: Tailwind utility classes via Vite plugin; no CDN Tailwind in production.
-- Game logic changes must maintain parity with [snippet.txt](../../snippet.txt) unless spec updated.
+- Game logic changes must match [ROADMAP.md](../../ROADMAP.md) § Shipped baseline; new features need [mvp-scope](../../docs/mvp-scope.md) boundary check.
 
-## Shipped mechanics guardrails (v1.6)
+## Shipped mechanics guardrails (v1.6+)
 
-See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline. Do not regress without spec update:
+See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline (through v1.8.2). Do not regress without spec update:
 
 - Rank-gated obstacles: Meeting (Intern) → Reorg (Manager+) → Deadline (`burnout` type, CEO+)
 - Intern tutorial ramp: lower spawn rate first 12 rungs; guaranteed coffee by rung 8 if none collected
@@ -38,6 +38,15 @@ See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline. Do not regress without s
 - Code type `burnout` vs UI label **Deadline** — see [docs/mvp-scope.md](../../docs/mvp-scope.md) terminology table
 
 Do not add Legends tab or new control schemes without scope approval.
+
+## Shipped UI guardrails (v1.8.2)
+
+- Bottom **tap deck** (`#tapControlsBar`) — visible h-28 buttons; no full-play-area transparent overlay
+- **Deck-first** onboarding: `#hudTapHint` + `.tap-deck-hint` (not tap-prompt bar)
+- `#ladderTrack` width from layout — player position from DOM, not fixed 192px
+- In-run copy via **HR memo rail** — avoid shell toasts over tap deck during play
+
+UI patterns: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Release Status: [ROADMAP.md](../../ROADMAP.md).
 
 ## Local Dev
 

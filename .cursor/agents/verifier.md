@@ -47,17 +47,23 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 
 - [ ] Headline picked on home mount (hidden `#newsTickerText`); foreshadow on game-over when `deathType` matches (manual spot-check)
 - [ ] RE-APPLY counter persists in `localStorage`; flavor line on game-over
-- [ ] Manager nemesis line on promotion; CEO trap toast at 35y
+- [ ] Manager nemesis line on promotion; CEO trap on first deadline (not 35y promo)
 - [ ] Intern fake-promo toasts at ~2y / ~5y / ~9.9y
 - [ ] Floor label updates during play; reorg HUD strip when reorgs active
 - [ ] Game-over leaderboard gap line when daily LB reachable
 - [ ] `prefers-reduced-motion`: promo stamp / death hold / heartbeat do not block play
 
-### v1.8.1 Telegram mobile polish
+### v1.8.1 / v1.8.2 Telegram + F&F bundle
 
 - [ ] In Telegram: no duplicate in-app header; native `BackButton` returns home from game / leaderboard / how-to-play
 - [ ] Visible TAP LEFT / TAP RIGHT bottom deck (`#tapControlsBar`); each button h-28; 7 rungs fit at 320px width
-- [ ] Tap-prompt bar on first run; safe-side hints for first 5 taps
+- [ ] `#ladderTrack` fills content column — no narrow ladder with grey dead zones (v1.8.2)
+- [ ] Deck-first onboarding: `#hudTapHint` + `.tap-deck-hint` pulse; safe-side hints for first 5 taps (no tap-prompt bar — removed 1.8.2)
+- [ ] In-run HR memo rail below HUD; mute feedback via memo, not toast over tap deck
+- [ ] CEO trap announcement on first deadline, not at 35y promotion (v1.8.2)
+- [ ] Home scrolls on short viewports; weekly tab label **Last 7 Days**
+- [ ] Score-submit toasts on auth/rate-limit/network failure; auth degradation banner on home when profile sync fails
+- [ ] Share toast says sheet opened (not implying success); Meeting Monday badges stable (rung id)
 - [ ] Sound FAB + safe-area padding on notched devices
 - [ ] Bot starts on Railway without Docker `.env` IndexError (`main.py` from `/app`)
 

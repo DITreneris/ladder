@@ -6,15 +6,15 @@
 
 **Prod bundle:** `d862c3c` (v1.8.2) · **Sign-off now:** run full checklist below on Telegram iOS, then fill tester/date at bottom.
 
-Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 9 complete.
+Sign off on real Telegram **iOS** and **Android** as **regression** before [DEVICE_QA_v1.8.2](DEVICE_QA_v1.8.2.md) delta. Release tag: `v1.8.2` after both checklists — [ROADMAP.md](../ROADMAP.md) Status.
 
 ---
 
-## Automated post-deploy (verified 2026-05-31)
+## Automated post-deploy (verified 2026-06-01)
 
-- [x] `main` pushed; tag `v1.8.1` on origin
+- [x] `main` @ `d862c3c` on origin (v1.8.2 bundle)
 - [x] API `GET /health` → `{"status":"ok"}`
-- [x] Production bundle includes v1.8.1 markers (`sound-fab`, `tapControlsBar`, `BackButton`, `viewport-fit=cover`)
+- [x] Production bundle includes v1.8.1+ markers (`sound-fab`, `tapControlsBar`, `BackButton`, `viewport-fit=cover`)
 - [x] Local smoke + viewport QA green
 
 ---
@@ -64,6 +64,6 @@ Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.
 ## On full pass
 
 1. Mark [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 9 **Done**
-2. Check ROADMAP v1.8.1 ship gate device QA + deploy gate last row
+2. Check [ROADMAP.md](../ROADMAP.md) current gate (v1.8.2) and [DEPLOY_STATUS.md](DEPLOY_STATUS.md) steps 9–10
 3. Check [apps/mini-app/README.md](../apps/mini-app/README.md) manual QA rows
 4. Start [FF_TEST.md](FF_TEST.md)

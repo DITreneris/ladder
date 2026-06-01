@@ -34,6 +34,7 @@ Game Over (engine.ts)
 
 - `years_survived`: 0–100
 - `rungs_climbed` ≈ `years_survived * 4` (±1 tolerance)
+- `final_rank` consistent with years (v1.8.2): Intern < 10y, Manager 10–<35y, CEO ≥ 35y — else 400
 - Rate limit: 1 submit per 10 seconds per telegram_id
 
 ## Leaderboard Query

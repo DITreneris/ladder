@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Deployment Checklist
 
-See [DEPLOY.md](../../DEPLOY.md) for the full cold-deploy and post-deploy verification checklist. Release train: [ROADMAP.md](../../ROADMAP.md) deploy gate (v1.8.1 tag after device QA).
+See [DEPLOY.md](../../DEPLOY.md) for the full cold-deploy and post-deploy verification checklist. Release train: [ROADMAP.md](../../ROADMAP.md) current gate (tag `v1.8.2` after device QA).
 
 ## Environment (root `.env`)
 

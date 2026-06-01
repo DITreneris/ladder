@@ -5,7 +5,7 @@ description: Deploy Corporate Ladder to Vercel, Railway, Supabase, and BotFather
 
 # Mini App Deploy Checklist
 
-**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Release train:** [ROADMAP.md](../../ROADMAP.md) — tag v1.5.0 + v1.6.0 after device QA.
+**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — tag `v1.8.2` after [DEVICE_QA_v1.8.2](../../docs/DEVICE_QA_v1.8.2.md); then [FF_EXECUTION](../../docs/FF_EXECUTION.md).
 
 ## Prerequisites
 
@@ -80,6 +80,7 @@ CI parity ([.github/workflows/ci.yml](../../.github/workflows/ci.yml)): API `pyt
 - [ ] Weekly tab loads
 - [ ] Share button works (native or clipboard fallback)
 - [ ] v1.6: milestone chip during play; death cause + retry tip on game over
+- [ ] v1.8.2: responsive ladder width; score-submit error toasts; share includes `Shift:` line
 - [ ] Prompt Anatomy footer opens co-branding URL
 
 ## Local Dev Env

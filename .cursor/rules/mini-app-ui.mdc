@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Design system doc
 
-Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.6). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
+Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.2). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
 
 ## v1.6 UI patterns
 
@@ -17,6 +17,17 @@ Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.6). Token so
 - **Retry tip** (game over) — satirical one-liner from `constants.ts`
 - **Tap-zone glow** — `tap-zone-left/right:active` border feedback
 - Co-branding: [`lib/branding.ts`](../../apps/mini-app/src/lib/branding.ts), `VITE_PROMPT_ANATOMY_URL` (optional env)
+
+## v1.8.2 UI patterns (F&F bundle)
+
+- **Tap deck** — `#tapControlsBar` with visible TAP LEFT / TAP RIGHT (snippet-style)
+- **HUD tap hint** — `#hudTapHint` + `.tap-deck-hint` pulse for first 5 taps
+- **HR memo rail** — in-run announcements below game HUD; `showHrMemoCombined()` for multi-line memos
+- **Responsive ladder** — `#ladderTrack` fills shared content column at 320px / 390px
+- **Home** — scroll on short Telegram viewports; amber news strip + shift description
+- **Viewport QA** — `npm run qa:viewport` after layout changes (50% play-area ratio; tap deck outside `#gamePlayArea`)
+
+Canonical: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Do not regress without [ROADMAP.md](../../ROADMAP.md) baseline update.
 
 ## Structure (unchanged)
 
@@ -39,7 +50,7 @@ See [mini-app-frontend.mdc](mini-app-frontend.mdc) for folder layout and game/AP
 - Duplicate card/button recipes inline (use `card-light`, `btn-cl-primary`, etc.)
 - Import Prompt Anatomy navy/gold brand or ecosystem phase colors **as game primary palette**
 - Redesign game HUD or tap zones without explicit request
-- Change mechanics per [snippet.txt](../../snippet.txt) unless spec updated
+- Change mechanics per [ROADMAP](../../ROADMAP.md) § Shipped baseline; scope check [mvp-scope](../../docs/mvp-scope.md)
 
 ## Allowed patterns
 

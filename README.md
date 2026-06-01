@@ -80,14 +80,12 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 | [DOCS_INDEX.md](DOCS_INDEX.md) | Document map and task router for humans and agents |
 
-| [ROADMAP.md](ROADMAP.md) | Release train (v1.5–v1.9), shipped baseline through v1.8.1 |
+| [ROADMAP.md](ROADMAP.md) | Status + release train; shipped baseline through v1.8.2; v1.9 after F&F |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails |
 
-| [primal.txt](primal.txt) | Product narrative and tone |
+| [docs/mvp-scope.md](docs/mvp-scope.md) | v1 in/out, v1.1 deferrals, terminology (inventory → ROADMAP) |
 
-| [snippet.txt](snippet.txt) | Game mechanics reference |
-
-| [docs/mvp-scope.md](docs/mvp-scope.md) | v1 / v1.1 boundaries |
+| [docs/archive/README.md](docs/archive/README.md) | Historical prototype + concept v0.1 (not routine audits) |
 
 | [docs/architecture.md](docs/architecture.md) | Stack, data flow, env vars |
 
@@ -285,9 +283,7 @@ Agents start at [DOCS_INDEX.md](DOCS_INDEX.md).
 
 - [CHANGELOG.md](CHANGELOG.md) — release history (maintained by Changelog Maintainer agent)
 
-- [snippet.txt](snippet.txt) — original HTML prototype (mechanics canon)
-
-- [primal.txt](primal.txt) — original product concept
+- [docs/archive/](docs/archive/README.md) — archived HTML prototype and concept v0.1 (open only for origin research)
 
 
 

@@ -174,8 +174,9 @@ Add `og:image` once `public/og.png` exists.
 
 | Milestone | Discoverability action |
 |-----------|------------------------|
-| **v1.8.1 device QA** (now) | None required — don't distract |
-| **F&F test** (2026-05-31 → 2026-06-14) | Phase 0 if bandwidth; bot-link recruitment |
+| **Phase 0** (shipped in v1.8.2) | OG/meta/`og.png`/`robots.txt` — done |
+| **v1.8.2 device QA + tag** (now) | No new discoverability work — finish [DEVICE_QA_v1.8.2](DEVICE_QA_v1.8.2.md) |
+| **F&F test** (2026-05-31 → 2026-06-14) | Bot-link recruitment; optional share copy tweaks from feedback |
 | **F&F review** (~2026-06-14) | Go/no-go on Phase 1 |
 | **v1.9** | Game juice if F&F weak; Phase 1 if widening audience |
 | **v1.1 platform** | Analytics (explicit approval) — separate from SEO |
@@ -197,7 +198,8 @@ Add `og:image` once `public/og.png` exists.
 ## Related documents
 
 - [docs/FF_TEST.md](FF_TEST.md) — F&F metrics and recruitment
-- [docs/DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) — ship gate (priority over Phase 0)
+- [docs/DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) — current release gate (after Phase 0 shipped)
+- [docs/FF_EXECUTION.md](FF_EXECUTION.md) — F&F runbook
 - [ROADMAP.md](../ROADMAP.md) — release train
 - [docs/mvp-scope.md](mvp-scope.md) — scope boundaries
 - [DITreneris/site](https://github.com/DITreneris/site) — ecosystem marketing (Phase 1)

@@ -56,6 +56,7 @@ When user says "release vX.Y.Z" or tags a version:
 2. Add fresh empty `[Unreleased]` with `### Planned` if v1.1 items still apply
 3. Update comparison links at bottom of CHANGELOG.md
 4. Optionally suggest git tag: `git tag -a vX.Y.Z -m "..."`
+5. Update [ROADMAP.md](../../ROADMAP.md) **Status** and release-train row (Tagged / QA signed) — see current gate in ROADMAP
 
 ## Out of Scope
 

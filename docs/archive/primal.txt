@@ -1,6 +1,6 @@
 # Corporate Ladder
 
-> **Historical concept v0.1.** Current product spec: [docs/mvp-scope.md](docs/mvp-scope.md) and [ROADMAP.md](ROADMAP.md) § Shipped baseline. UI uses Energy/Deadline; this file retains original Burnout naming for narrative context.
+> **Archived — historical concept v0.1.** Do not use in routine audits. Active spec: [docs/mvp-scope.md](../mvp-scope.md) and [ROADMAP.md](../../ROADMAP.md) § Shipped baseline. UI uses Energy/Deadline; this file retains original Burnout naming for narrative context.
 
 ## MVP Concept v0.1
 

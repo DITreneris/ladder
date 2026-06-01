@@ -22,7 +22,7 @@
 | [DITreneris/site](https://github.com/DITreneris/site) | Prompt Anatomy ecosystem marketing site | [promptanatomy.app](https://www.promptanatomy.app/) |
 | **This repo** | Corporate Ladder Telegram Mini App game | Mini App on Vercel (see table above) |
 
-**Corporate Ladder identity:** Satirical workplace arcade — *"Lumberjack meets modern office life."* Humor is the product. Do **not** import Prompt Anatomy’s 8-domain ecosystem, professional marketing tone, or `snippet.txt` palette guard (here, [`snippet.txt`](snippet.txt) is **mechanics** canon).
+**Corporate Ladder identity:** Satirical workplace arcade — *"Lumberjack meets modern office life."* Humor is the product. Do **not** import Prompt Anatomy’s 8-domain ecosystem or professional marketing tone. Mechanics and scope: [mvp-scope](docs/mvp-scope.md) + [ROADMAP](ROADMAP.md) § Shipped baseline (not root prototype files — see [archive](docs/archive/README.md)).
 
 ---
 
@@ -32,9 +32,10 @@
 |----------|------------|------|
 | **Human developer** | [README.md](README.md) | [DEPLOY.md](DEPLOY.md) → task row below |
 | **Coding agent** | [AGENTS.md](AGENTS.md) | Matching **skill** + **rules** from task router |
-| **Gameplay / engine** | [snippet.txt](snippet.txt) | [docs/mvp-scope.md](docs/mvp-scope.md) |
+| **Gameplay / engine** | [ROADMAP.md](ROADMAP.md) § Shipped baseline | [docs/mvp-scope.md](docs/mvp-scope.md) (boundaries only), `apps/mini-app/src/game/` |
 | **Auth / API / DB** | [docs/architecture.md](docs/architecture.md) | Matching skill in task router |
-| **Deploy / release** | [DEPLOY.md](DEPLOY.md) | [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) |
+| **Deploy / release** | [DEPLOY.md](DEPLOY.md) | [ROADMAP.md](ROADMAP.md) Status → [FF_EXECUTION](docs/FF_EXECUTION.md) |
+| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) |
 
 ---
 
@@ -44,9 +45,10 @@ Use this table to pick the right skill, rules, and documents.
 
 | Task | Agent / skill | Rule(s) | Primary documents |
 |------|---------------|---------|-------------------|
-| Game mechanics, engine, UI wiring | — (inline) | [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc) | [snippet.txt](snippet.txt), `apps/mini-app/src/game/`, `apps/mini-app/src/app.ts` |
+| Game mechanics, engine, UI wiring | — (inline) | [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc) | [ROADMAP](ROADMAP.md) § Shipped baseline, [mvp-scope](docs/mvp-scope.md) (in/out only), `game/`, `app.ts` |
+| Scope / v1.1 approval | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [mvp-scope](docs/mvp-scope.md) |
 | Design / UI / tokens | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md), `apps/mini-app/src/style.css` |
-| Satirical copy, promotions, failures | — | [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [primal.txt](primal.txt), `apps/mini-app/src/template.ts` |
+| Satirical copy, promotions, failures | — | [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | `constants.ts`, `template.ts`, [ROADMAP](ROADMAP.md) § Narrative thesis |
 | Telegram initData, `/auth/me` | `telegram-initdata-auth` | [python-api.mdc](.cursor/rules/python-api.mdc) | [docs/architecture.md](docs/architecture.md), `packages/api/`, `apps/mini-app/src/lib/telegram.ts` |
 | Score submit → leaderboard | `score-pipeline` | [python-api.mdc](.cursor/rules/python-api.mdc), [supabase-db.mdc](.cursor/rules/supabase-db.mdc) | `packages/api/`, [supabase/migrations/](supabase/migrations/) |
 | API routes, validation, rate limits | — | [python-api.mdc](.cursor/rules/python-api.mdc) | `packages/api/` |
@@ -54,7 +56,8 @@ Use this table to pick the right skill, rules, and documents.
 | Production deploy | `mini-app-deploy` | [deployment.mdc](.cursor/rules/deployment.mdc) | [DEPLOY.md](DEPLOY.md), [.env.example](.env.example) |
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
-| Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md), [CHANGELOG.md](CHANGELOG.md) |
+| Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + § Shipped baseline, [CHANGELOG.md](CHANGELOG.md) |
+| F&F gate / device QA / pre-tag | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md), [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Co-branding / PA footer | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | `apps/mini-app/src/lib/branding.ts`, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §9 |
@@ -69,12 +72,10 @@ Use this table to pick the right skill, rules, and documents.
 
 | ID | Path | What it governs | Update when |
 |----|------|-----------------|-------------|
-| `concept` | [primal.txt](primal.txt) | Brand narrative, tone, audience — **family alias:** mother repo’s `primal_concept.txt` | Product messaging changes |
-| `prototype` | [snippet.txt](snippet.txt) | Game mechanics reference (port, don’t reinvent) | Spec explicitly updated |
-| `scope` | [docs/mvp-scope.md](docs/mvp-scope.md) | v1 / v1.1 / out-of-scope boundaries | Scope decisions |
+| `scope` | [docs/mvp-scope.md](docs/mvp-scope.md) | v1 boundary, v1.1 deferrals, out-of-scope, terminology — **not** feature inventory | Scope / approval decisions |
 | `architecture` | [docs/architecture.md](docs/architecture.md) | Stack, data flow, env matrix, security | Infra or API contract changes |
 | `tokens` | [apps/mini-app/src/style.css](apps/mini-app/src/style.css) | Design tokens (`@theme`) and utilities (`@utility`) | New colors, spacing, shell component utilities |
-| `design-system` | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app visual canon, a11y matrix, agent guardrails | UI pattern or token changes |
+| `design-system` | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app visual canon (v1.8.2), a11y matrix, agent guardrails | UI pattern or token changes |
 | `env` | [.env.example](.env.example) | Required environment variable names | New env vars |
 
 ### Tier 2 — Human and agent guides
@@ -82,10 +83,11 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Release train through v1.8 shipped; v1.8.1 polish; v1.9 next |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.8.2 live (QA/tag pending); v1.9 after F&F |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
-| `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 Telegram device sign-off |
+| `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |
+| `device-qa-v182` | [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) | Release | v1.8.2 delta + F&F trust UX — blocks tag `v1.8.2` |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
@@ -95,6 +97,14 @@ Use this table to pick the right skill, rules, and documents.
 | `changelog` | [CHANGELOG.md](CHANGELOG.md) | Everyone | Keep a Changelog; `[Unreleased]` |
 | `docs-index` | DOCS_INDEX.md (this file) | Everyone | Update when adding docs/agents/skills |
 | `mini-app-readme` | [apps/mini-app/README.md](apps/mini-app/README.md) | Frontend | Play instructions, pre-release QA |
+
+### Tier 2b — Archive (historical — not in routine audits)
+
+| ID | Path | Notes |
+|----|------|-------|
+| `archive` | [docs/archive/README.md](docs/archive/README.md) | Policy + index; exclude from default agent context |
+| `prototype-html` | [docs/archive/snippet.txt](docs/archive/snippet.txt) | v0 HTML prototype — parity archaeology only |
+| `concept-v01` | [docs/archive/primal.txt](docs/archive/primal.txt) | Concept v0.1 — tone archaeology only |
 
 ### Tier 3 — Tooling and CI
 
@@ -183,7 +193,7 @@ Main session handles game/API/copy work inline using skills and rules above.
 
 Update **DOCS_INDEX.md** when you add or rename:
 
-- Root-level docs (`*.md`, concept/prototype files)
+- Root-level docs (`*.md`) or [docs/archive/](docs/archive/) (update README when adding historical files)
 - `.cursor/agents/` or `.cursor/skills/` entries
 - Deploy scripts or env vars that affect operators
 - Scope doc ([docs/mvp-scope.md](docs/mvp-scope.md)) full refresh — review registry and task router
