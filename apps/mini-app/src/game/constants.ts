@@ -86,6 +86,7 @@ export const DEATH_EMOJI: Record<DeathType, string> = {
   badge_gate: "🪪",
   foliage: "🪴",
   energy: "⚡",
+  sprint: "🏁",
 };
 
 export const DEATH_LABELS: Record<DeathType, string> = {
@@ -95,6 +96,7 @@ export const DEATH_LABELS: Record<DeathType, string> = {
   badge_gate: "Badge Reader Jam",
   foliage: "Wellness Obstruction",
   energy: "Energy Depleted",
+  sprint: "Sprint Standdown",
 };
 
 export const RETRY_TIPS: Record<DeathType, string> = {
@@ -104,7 +106,16 @@ export const RETRY_TIPS: Record<DeathType, string> = {
   badge_gate: "Turnstile blocked the wrong aisle. Badge on the safe side only.",
   foliage: "Mandatory desk plant owns that lane. Step to the open side.",
   energy: "Grab coffee when you can. Decaf is not a strategy.",
+  sprint: "The buzzer doesn't care about your pipeline. Climb faster next standup.",
 };
+
+export const SPRINT_GAME_OVER = {
+  cause: "Sprint Standdown",
+  detail: "Velocity review complete. HR archived your climb at the buzzer.",
+  deathType: "sprint" as const,
+};
+
+export const SPRINT_SHARE_LINE = "Sprint archived at the buzzer — velocity noted, outcomes pending.";
 
 export interface ObstacleDeathCopy {
   cause: string;
@@ -185,6 +196,10 @@ export const FAILURE_BY_SHIFT: Record<string, string[]> = {
   reorg_week: [
     "Reorg Week shuffled your exit interview ahead of schedule.",
     "Org chart unstable; your ladder rung reported to itself.",
+  ],
+  synergy_sprint: [
+    "Synergy Sprint ended at the buzzer. Standup velocity: archived.",
+    "Sprint retro filed. Your years survived are now a KPI.",
   ],
 };
 

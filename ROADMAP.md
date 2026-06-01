@@ -12,10 +12,11 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 | | |
 |---|---|
-| **Production** | `main` — **v1.8.5 code done**; Vercel redeploy pending |
-| **Blocking F&F** | Deploy v1.8.5 → device QA iOS + Android → tag → F&F ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
-| **Next actions** | See [v1.8.5 gate — open items](#v185-gate--open-items) below |
-| **Next product** | v1.9 provisional — confirm at F&F review **2026-06-14** |
+| **Production** | `main` live — prod `main-7DTXR6XJ.js` (v1.8.5); v1.9 bundle `main-BOIp6dYp.js` pending redeploy |
+| **Tagged** | `v1.8.5` on `46abf19` |
+| **Active** | F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
+| **Next actions** | Phase D dogfood → Phase E invite · Tier A verification · optional DEVICE_QA rows 6–10 |
+| **Next product** | v1.9.0 coded in `[Unreleased]` — near-miss wince + Synergy Sprint; tag after F&F review **2026-06-14** |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
@@ -23,21 +24,17 @@ Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.m
 
 ## v1.8.5 gate — open items
 
-**Code shipped in repo** — [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01). **Not done yet:**
-
-**Full bug-fix backlog:** [docs/todo.md](docs/todo.md) (P0–P3, verification matrix, tests).
+**Code shipped in repo** — [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01). **Remaining:**
 
 ### Operations (blocking F&F)
 
 | # | Item | Owner / notes |
 |---|------|----------------|
-| 1 | **Push `main`** (if local commits not on origin) | GitHub |
-| 2 | **Vercel redeploy** mini-app | Prod must serve v1.8.5 bundle |
-| 3 | **Telegram cache bust** | Hard refresh / reopen from bot after deploy |
-| 4 | **Device QA** iOS + Android | [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md) + prior deltas as needed |
-| 5 | **Verifier** pass | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) |
-| 6 | **`git tag v1.8.5`** + push tags | After device QA sign-off |
-| 7 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D |
+| 1 | ~~Push / redeploy / cache bust~~ | Done — `main-7DTXR6XJ.js` |
+| 2 | ~~Device QA rows 1–5~~ | Signed 2026-06-01 (Telegram) |
+| 3 | **`git tag v1.8.5`** + push tags | Done — `46abf19` |
+| 4 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D → E — active |
+| 5 | Optional: DEVICE_QA rows 6–10 | Gate / Plant / regressions spot-check by Jun 10 |
 
 ---
 
@@ -132,8 +129,8 @@ flowchart TB
 | **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** — **QA + tag pending** | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) → tag `v1.8.2` (optional if superseded by 1.8.4) |
 | **v1.8.3** | Shared content column + coffee pickup clear | **Code** · deploy folded into 1.8.4 | [CHANGELOG 1.8.3](CHANGELOG.md#183---2026-06-01) |
 | **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code** · folded into 1.8.5 deploy | [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01) |
-| **v1.8.5** | Corridor UX + scripted tutorial + badge gate / desk plant hazards | **Code done** · **Deploy + QA pending** | [Gate checklist](#v185-gate--open-items) → tag `v1.8.5` |
-| **v1.9.0** | Near-miss wince + Synergy Sprint (provisional) | **Planned** | F&F review ~2026-06-14 — [FF_TEST.md](docs/FF_TEST.md) |
+| **v1.8.5** | Corridor UX + scripted tutorial + badge gate / desk plant hazards | **Tagged** · **Live** | [Gate checklist](#v185-gate--open-items) · tag `v1.8.5` |
+| **v1.9.0** | Near-miss wince + Synergy Sprint | **Code in [Unreleased]** | F&F review ~2026-06-14 — [FF_TEST.md](docs/FF_TEST.md) |
 | **v1.9+** | Data-informed juice | **Backlog** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | **Deferred** | Explicit approval — [mvp-scope](docs/mvp-scope.md) |
 

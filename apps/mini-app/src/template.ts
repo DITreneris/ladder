@@ -108,6 +108,7 @@ export const APP_SHELL = `
               <span id="rankBadgeIcon">🧑‍💻</span> <span id="rankBadgeText">Intern</span>
             </span>
             <p id="milestoneChip" class="text-caption font-bold text-cl-primary truncate max-w-full">Manager in 10.0y</p>
+            <p id="sprintTimerChip" class="text-caption font-bold text-amber-600 hidden">Sprint: 60s</p>
           </div>
         </div>
         <div class="flex items-center gap-2">

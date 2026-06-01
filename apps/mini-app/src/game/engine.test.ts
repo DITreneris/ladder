@@ -345,4 +345,26 @@ describe("GameEngine", () => {
     const score = (engine as unknown as EngineInternals).score;
     expect(score).toBe(2);
   });
+
+  it("fires onNearMiss when tapping safe side past imminent hazard", () => {
+    const onNearMiss = vi.fn();
+    const { engine } = createEngine({ onNearMiss });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    expect(onNearMiss).toHaveBeenCalledTimes(1);
+  });
+
+  it("ends run at sprint duration with sprint death type", () => {
+    const onGameOver = vi.fn();
+    const sprintMod = getDailyModifierById("synergy_sprint");
+    const { engine } = createEngine({ onGameOver }, sprintMod);
+    engine.start();
+    tapWithCooldown(engine, "left");
+    vi.advanceTimersByTime(60_000 + TICK_MS);
+
+    expect(onGameOver).toHaveBeenCalledTimes(1);
+    expect(onGameOver.mock.calls[0]![0].deathType).toBe("sprint");
+  });
 });

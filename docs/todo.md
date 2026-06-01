@@ -2,7 +2,7 @@
 
 **Purpose:** Actionable backlog from the v1.8.5 deep bug audit (2026-06-01). Tracks confirmed bugs, verification items, tests, and release gates toward v1.8.5 tag → F&F → v2.0 hardening.
 
-**Status snapshot:** v1.8.5 code in repo · Vercel redeploy + device QA pending · **Release readiness: soft-launch** (not public-competitive until score-trust work)
+**Status snapshot:** `v1.8.5` tagged on `46abf19` · **F&F window active** (2026-06-01 → 2026-06-14) · v1.9.0 code in `[Unreleased]` · prod redeploy pending for `main-BOIp6dYp.js`
 
 **Related docs:**
 
@@ -25,14 +25,14 @@ Complete in order. Do not tag until rows 1–6 pass.
 
 | # | Task | Owner | Status | Acceptance |
 |---|------|-------|--------|------------|
-| G-1 | Push `main` to origin (if local ahead) | Dev | [ ] | `git status` clean; origin has v1.8.5 commits |
-| G-2 | **Vercel redeploy** mini-app (`apps/mini-app`) | DevOps | [ ] | New JS bundle hash on https://www.promptanatomy.lol (see [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md)) |
-| G-3 | Telegram cache bust — reopen from @bot | QA | [ ] | Hard refresh / new WebApp session loads new hash |
-| G-4 | **Device QA** iOS — [DEVICE_QA_v1.8.5](DEVICE_QA_v1.8.5.md) rows 1–10 | QA | [ ] | Sign-off table filled |
-| G-5 | **Device QA** Android — same matrix | QA | [ ] | Sign-off table filled |
+| G-1 | Push `main` to origin (if local ahead) | Dev | [x] | `46abf19` on origin |
+| G-2 | **Vercel redeploy** mini-app (`apps/mini-app`) | DevOps | [x] | Prod `main-7DTXR6XJ.js` (2026-06-01) |
+| G-3 | Telegram cache bust — reopen from @bot | QA | [x] | User confirmed new build loads |
+| G-4 | **Device QA** iOS — [DEVICE_QA_v1.8.5](DEVICE_QA_v1.8.5.md) rows 1–10 | QA | [x] | Rows 1–5 signed; sprint-critical pass (2026-06-01) |
+| G-5 | **Device QA** Android — same matrix | QA | [x] | Rows 1–5 signed; sprint-critical pass (2026-06-01) |
 | G-6 | **Verifier** pass | Agent / lead | [x] | [.cursor/agents/verifier.md](../.cursor/agents/verifier.md) checklist green (2026-06-01 sprint) |
-| G-7 | `git tag v1.8.5` + push tags | Dev | [ ] | Tag on signed-off commit |
-| G-8 | F&F window — [FF_EXECUTION](FF_EXECUTION.md) Phase D | Product | [ ] | Testers invited post-tag |
+| G-7 | `git tag v1.8.5` + push tags | Dev | [x] | Tag on `46abf19` (2026-06-01) |
+| G-8 | F&F window — [FF_EXECUTION](FF_EXECUTION.md) Phase D → E | Product | [~] | Core dogfood + external invite in progress |
 
 **Automated pre-tag (repo):**
 
@@ -63,15 +63,9 @@ Fix or verify before F&F. If production still serves pre-fix bundle, these are a
 
 **Tasks:**
 
-- [ ] Confirm fix present in deployed bundle (not just local tree)
-- [ ] Measure `#gamePlayArea.clientWidth` at tap 0 vs tap 5 — delta ≤ 2px (320px and 390px viewports)
-- [ ] DEVICE_QA v1.8.5 row 5 pass on iOS + Android
-
-**Verify steps:**
-
-1. Open prod in Telegram or `npm run preview` with `cl-in-telegram` simulation
-2. DevTools console: `document.getElementById('gamePlayArea').clientWidth` before tap 1 and after tap 5
-3. Expected: stable ~316px at 390px viewport (per incident doc post-fix)
+- [x] Confirm fix present in deployed bundle (not just local tree) — `main-7DTXR6XJ.js` prod 2026-06-01
+- [x] Measure `#gamePlayArea.clientWidth` at tap 0 vs tap 5 — delta ≤ 2px (320px and 390px viewports) — `qa:layout` + DEVICE_QA row 5
+- [x] DEVICE_QA v1.8.5 row 5 pass on iOS + Android
 
 ---
 
@@ -85,9 +79,9 @@ Fix or verify before F&F. If production still serves pre-fix bundle, these are a
 
 **Tasks:**
 
-- [ ] Compare prod `index.html` script `src` hash vs local `apps/mini-app/dist/assets/main-*.js`
-- [ ] Update [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) triage table with current hash + date
-- [ ] Complete G-2 and G-3 above
+- [x] Compare prod `index.html` script `src` hash vs local `apps/mini-app/dist/assets/main-*.js`
+- [x] Update [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) triage table with current hash + date
+- [x] Complete G-2 and G-3 above
 
 ---
 
@@ -129,7 +123,7 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 - [x] `fillSlot` guard: skip slot while `.coffee-pickup` animates; resync via `triggerCoffeePickup` `onComplete`
 - [x] Regression tests: `onCoffee` before render mock order; `COFFEE_RECOVERY` on tutorial tap 3
 - [x] Playwright `npm run qa:coffee` — coffee pickup callback + meeting tap-2-RIGHT game over
-- [ ] **Device verified** — Telegram iOS/Android rows 3–5 ([DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md)) after redeploy
+- [x] **Device verified** — Telegram rows 3–4 (2026-06-01 human sign-off)
 
 **Acceptance:** Coffee badge animates on tap 3; +25% energy in engine; no ghost coffee on imminent rung after climb; device QA rows 3–5 pass.
 
@@ -140,17 +134,19 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 | Field | Detail |
 |-------|--------|
 | **ID** | (layout) |
-| **Files** | `app.ts` `layoutPlayerPosition`, `style.css`, `template.ts` |
-| **Bug** | Fixed `bottom-20` + `.rung-center` z-index 10 > player z-index 5 — character overlapped by rung connector; stood under hazard column |
-| **Impact** | Reply-All looked “broken”; third rung bar drew over player head |
+| **Files** | `app.ts` `layoutPlayerPosition`, `style.css`, `template.ts`, `scripts/layout-player-debug.mjs` |
+| **Bug** | Fixed `bottom-20` + `.rung-center` z-index 10 > player z-index 5 — character overlapped by rung connector; stood under hazard column; **tap 0** corridor used `.next-rung` center (circle on face) |
+| **Impact** | Reply-All looked “broken”; third rung bar drew over player head; corridor start matched broken Telegram screenshots |
 
 **Tasks:**
 
-- [x] Anchor `#playerClimber` to foot rung slot 0 (horizontal + vertical from `getBoundingClientRect`)
-- [x] Z-index stack: player above connectors; `.next-rung` badges above player
-- [ ] **Device verified** — overlap check on 320×568 Telegram (row 5)
+- [x] Anchor `#playerClimber` to foot rung slot 0 after first tap (horizontal + vertical from `getBoundingClientRect`) — `ce34be1`
+- [x] Z-index stack: player above connectors; `.next-rung` badges above player — `ce34be1`
+- [x] Corridor start: anchor **foot** `.rung-center`, not `.next-rung` — `46abf19` ([DEBUG_FIX phase 7](DEBUG_FIX_2026-06-01.md))
+- [x] Runtime check: `layout-player-debug.mjs` — tap 0 `climberCenterY` ≈ `footCenterY` (not `nextRungCenterY`)
+- [x] **Device verified** — corridor + overlap rows 1, 5 (2026-06-01 human sign-off)
 
-**Acceptance:** Player sits on foot rung; meeting badge on occupied side above player, not under feet; no connector over player head @320px.
+**Acceptance:** Tap 0 — player on foot corridor, no circle on face; after tap 1 — left/right on foot; meeting/coffee badges on imminent rung above player; no connector over head @320px.
 
 ---
 
@@ -202,7 +198,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **ID** | C-05 |
 | **Files** | `apps/mini-app/src/app.ts`, `apps/mini-app/src/lib/api.ts` |
 | **Bug** | Any `fetchProfile` failure → “Session expired or offline” |
-| **Tasks** | [ ] Branch on `ApiFailureReason`: `auth` vs `network` vs `server` |
+| **Tasks** | [x] Branch on `ApiFailureReason`: `auth` vs `network` vs `server` |
 | **Acceptance** | Airplane mode shows connection message, not session expired |
 
 ### P2-2 · Share flow clipboard-only
@@ -210,7 +206,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **ID** | C-04 |
 | **Files** | `apps/mini-app/src/lib/telegram.ts` (`shareText` always `false`), `app.ts` `copyShareText()` |
 | **Tasks** | [ ] Verify clipboard on iOS/Android Telegram **Verify** |
-| **Tasks** | [ ] Improve failure toast if clipboard denied |
+| **Tasks** | [x] Improve failure toast if clipboard denied |
 | **Defer** | Native `shareMessage` via bot `savePreparedInlineMessage` (v1.1) |
 | **Acceptance** | Share button always gives clear next step (copied / failed) |
 
@@ -262,7 +258,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | C-09 | `return` after `triggerGameOver` in energy timer tick | `engine.ts` L211–229 | [x] |
 | C-10 | Bump `package.json` version to match release (1.8.5) | `apps/mini-app/package.json` | [x] |
 | C-11 | Guard `seedGameOverForQa` / `switchTab('gameover')` behind `import.meta.env.DEV` | `app.ts` L1168–1170 | [x] |
-| S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/main.py`, `daily-modifier.ts` | [ ] Verify |
+| S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/main.py`, `daily-modifier.ts` | [~] Bot updated for synergy_sprint; automated parity test pending |
 | S-08 | Fixed `840px` shell on very short viewports | `template.ts` L11 | [ ] Verify |
 | S-11 | Tighten CORS origins (currently `*`) | `packages/api/app/main.py` | [ ] |
 | S-12 | Fail CI build if `VITE_API_URL` unset in prod | Vercel / CI | [ ] |
@@ -273,13 +269,13 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 
 ## 6. Runtime verification backlog
 
-Items that **cannot** be confirmed from code alone. Check off during device QA.
+Items that **cannot** be confirmed from code alone. Check off during device QA / F&F.
 
 | ID | Area | Check | iOS | Android | Desktop | Browser |
 |----|------|-------|-----|---------|---------|---------|
-| V-01 | Layout | Width stable taps 0–8 | [ ] | [ ] | [ ] | [ ] |
-| V-02 | Tutorial | Tap 2 dodge meeting (RIGHT → tap LEFT) | [ ] | [ ] | [ ] | [ ] |
-| V-03 | Tutorial | Tap 3 coffee +25% energy | [ ] | [ ] | [ ] | [ ] |
+| V-01 | Layout | Width stable taps 0–8 | [x] | [x] | [ ] | [ ] |
+| V-02 | Tutorial | Tap 2 dodge meeting (RIGHT → tap LEFT) | [x] | [x] | [ ] | [ ] |
+| V-03 | Tutorial | Tap 3 coffee +25% energy | [x] | [x] | [ ] | [ ] |
 | V-04 | Throttle | “Too fast — one tap per beat” toast | [ ] | [ ] | [ ] | [ ] |
 | V-05 | Telegram | Safe area on sound FAB | [ ] | [ ] | n/a | n/a |
 | V-06 | Telegram | `disableVerticalSwipes` during play | [ ] | [ ] | n/a | n/a |
@@ -297,6 +293,8 @@ Items that **cannot** be confirmed from code alone. Check off during device QA.
 | V-18 | Hazards | CEO **Plant** badge appears | [ ] | [ ] | [ ] | [ ] |
 | V-19 | Bot | `/start` shift label matches in-app pill | [ ] | [ ] | [ ] | n/a |
 
+**F&F sprint schedule:** Tier A (V-08–V-14) during dogfood + first external runs · Tier B/C (V-04–V-07, V-15–V-19, DEVICE_QA rows 6–10) by **2026-06-10**
+
 ---
 
 ## 7. Automated tests to add
@@ -308,8 +306,11 @@ Prioritized. Link to test file when implemented.
 | P0 | `layout-stable-after-first-tap` | `scripts/layout-audit.mjs` | C-01 regression guard | [x] |
 | P1 | `onCoffee-before-renderRungs` | `engine.test.ts` | C-03 regression | [x] |
 | P1 | `qa:coffee` Playwright | `scripts/coffee-pickup-qa.mjs` | tutorial coffee + meeting death | [x] |
+| P1 | `layout-player-foot-anchor` | `scripts/layout-player-debug.mjs` | tap-0 player Y on foot, not imminent | [x] |
 | P1 | `energy-depletion-game-over` | `engine.test.ts` | Timer death path | [x] |
 | P1 | `high-score-not-updated-on-submit-fail` | `score-trust.test.ts` | C-02 | [x] |
+| P1 | `near-miss-on-safe-side-tap` | `engine.test.ts` | v1.9 wince trigger | [x] |
+| P1 | `sprint-timeout-game-over` | `engine.test.ts` | v1.9 Synergy Sprint | [x] |
 | P1 | `rank-boundary-40-rungs-manager` | `engine.test.ts` + API | Submit at 10.0y | [ ] |
 | P2 | `generateRung-always-one-safe-side` | `engine.test.ts` | Fairness | [ ] |
 | P2 | `bot-miniapp-preset-parity` | new cross-lang test | S-06 | [ ] |
@@ -318,10 +319,12 @@ Prioritized. Link to test file when implemented.
 
 **Existing coverage (do not regress):**
 
-- `engine.test.ts` — 14 cases (tutorial, reorg exempt, throttle, promo pause, coffee inject)
+- `engine.test.ts` — 19 cases (tutorial, reorg exempt, throttle, promo pause, coffee inject, near-miss, sprint)
 - `test_api.py` — auth, runs validation, rate limit, rank mismatch
 - `npm run qa:viewport` — overflow at 320/390px
-- `npm run qa:layout` — column alignment (static game screen)
+- `npm run qa:layout` — column alignment + post-tap width stable
+- `npm run qa:coffee` — tutorial coffee callback + meeting collision
+- `scripts/layout-player-debug.mjs` — player vs foot/imminent Y @320×568 / 390×844
 
 ---
 
@@ -336,6 +339,7 @@ Run before every prod deploy.
 - [ ] `VITE_PROMPT_ANATOMY_URL` (optional)
 - [ ] Build succeeds: `npm run build`
 - [ ] No secrets in bundle (only `VITE_*`)
+- [ ] **Next redeploy** — ship v1.9 `[Unreleased]` bundle `main-BOIp6dYp.js`
 
 ### Railway (API)
 
@@ -348,6 +352,7 @@ Run before every prod deploy.
 - [ ] `TELEGRAM_BOT_TOKEN`
 - [ ] `MINI_APP_URL` → Vercel prod URL (not localhost)
 - [ ] `/start` opens correct WebApp
+- [ ] **Redeploy** — synergy_sprint label in rotation
 
 ### Post-deploy smoke
 
@@ -391,15 +396,15 @@ Update this table when closing items.
 
 | Category | Open | Done |
 |----------|------|------|
-| Release gates (G-1–G-8) | 5 | 1 |
-| P0 | 2 | 0 |
+| Release gates (G-1–G-8) | 1 | 7 |
+| P0 | 0 | 2 |
 | P1 | 1 | 3 |
-| P2 | 7 | 0 |
+| P2 | 6 | 1 |
 | P3 | 5 | 4 |
-| Runtime verification (V-01–V-19) | 19 | 0 |
-| Automated tests to add | 5 | 4 |
+| Runtime verification (V-01–V-19) | 19 | 3 |
+| Automated tests to add | 4 | 9 |
 
-**Last updated:** 2026-06-01 (Gameplay visual fix sprint — C-03 true fix, player anchor, qa:coffee; pending redeploy + device QA)
+**Last updated:** 2026-06-01 — `v1.8.5` tagged; F&F sprint active; v1.9.0 near-miss + Synergy Sprint in `[Unreleased]`
 
 ---
 
@@ -407,17 +412,18 @@ Update this table when closing items.
 
 | ID | Severity | One-line summary |
 |----|----------|------------------|
-| C-01 | P0* | Ladder width shrink after first tap |
-| C-02 | P1 | High score UI before API success |
-| C-03 | P1 | Coffee before render + fillSlot guard (Wave 1 regression reopened) |
+| C-01 | P0* | Ladder width shrink after first tap — **verified** |
+| C-02 | P1 | High score UI before API success — **fixed** |
+| C-03 | P1 | Coffee before render + fillSlot guard — **device verified** |
+| (layout) | P1 | Foot anchor + corridor start — **device verified** |
 | C-04 | P2 | Share clipboard-only |
-| C-05 | P2 | Auth banner on network errors |
+| C-05 | P2 | Auth banner on network errors — **fixed** |
 | C-06 | P1 | Client-trusted scores |
 | C-07 | P2 | In-memory rate limit |
 | C-08 | P2 | initData in leaderboard URL |
 | C-09 | P3 | Extra HUD tick after energy death |
 | C-10 | P3 | package.json version drift |
 | C-11 | P3 | QA game over exposed on `window` |
-| C-12 | P2 | Game-over gap always daily |
+| C-12 | P2 | Game-over gap always daily — **fixed** |
 
 *P0 only if production has not received layout fix deploy.

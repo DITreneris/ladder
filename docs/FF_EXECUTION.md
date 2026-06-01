@@ -101,10 +101,10 @@ Run Supabase SQL from FF_TEST.md; update metrics table.
 
 | Check-in | Date | Runs (avg) | Shares | Pain items |
 |----------|------|------------|--------|------------|
-| Day 1 | 2026-06-01 | | | Deploy + device QA kickoff |
-| Day 4 | 2026-06-04 | | | |
-| Day 7 | 2026-06-07 | | | External F&F mid-window |
-| Day 10 | 2026-06-10 | | | |
+| Day 1 | 2026-06-01 | | | Tag v1.8.5 + F&F kickoff |
+| Day 4 | 2026-06-04 | | | Supabase metrics — [FF_TEST.md](FF_TEST.md) SQL |
+| Day 7 | 2026-06-07 | | | External F&F mid-window; Tier A verification due |
+| Day 10 | 2026-06-10 | | | DEVICE_QA rows 6–10 spot-check; pre-review snapshot |
 
 ---
 
@@ -122,17 +122,18 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 
 | Criterion | Status |
 |-----------|--------|
-| Prod = main with trust fixes | [ ] Vercel redeploy pending — push trust hotfix then redeploy mini-app |
-| Automated CI gates | [x] pytest 16, vitest 42, lint, build, smoke-local, viewport QA (2026-06-01) |
+| Prod = main with trust fixes | [x] `main-7DTXR6XJ.js` (2026-06-01) |
+| Automated CI gates | [x] vitest 61, lint, build (2026-06-01) |
 | API health | [x] `{"status":"ok"}` |
-| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) (+ v1.8.4 regressions) |
-| Android DEVICE_QA signed | [ ] — recruit signer; same checklists |
+| iOS DEVICE_QA signed | [x] rows 1–5 — [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) |
+| Android DEVICE_QA signed | [x] rows 1–5 — same checklist |
 | Submit/auth errors visible | [x] code shipped; toasts on game-over screen |
 | Share clipboard fallback | [x] code shipped (no bogus shareMessage) |
-| 5–10 testers invited | [ ] after Phase C pass |
-| ≥3 runs from majority | [ ] Phase E |
+| 5–10 testers invited | [~] Phase E — after Phase D dogfood |
+| ≥3 runs from majority | [ ] Phase E / F monitor |
 | Hotfix protocol active | [x] see FF_TEST hotfix policy |
 | Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
+| v1.8.5 tagged | [x] `git tag v1.8.5` on `46abf19` |
 
 ### After device QA pass — tag v1.8.5
 

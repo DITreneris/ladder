@@ -38,15 +38,10 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 10 | v1.8.2 + F&F trust fixes | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
 
-| 11 | v1.8.4 hotfix | **Code Done** / **Deploy Pending** | Layout + mechanics + trust UX (game-over I/O, share clipboard, rate limit, LB errors); run smoke before redeploy |
+| 11 | v1.8.5 corridor + tutorial | **Tagged** / **Live** | Tag `v1.8.5` on `46abf19`; prod `main-7DTXR6XJ.js`; DEVICE_QA rows 1–5 signed |
+| 12 | v1.9.0 near-miss + Synergy Sprint | **Code Done** / **Deploy Pending** | `[Unreleased]` — bundle `main-BOIp6dYp.js`; redeploy + F&F review 2026-06-14 |
 
-**Code readiness:** v1.8.4 + trust hotfix — run `scripts/smoke-local.ps1`, `pytest`, `npm run lint && npm test && npm run build`, `npm run qa:viewport` before Vercel redeploy.
-
-**Vercel redeploy (manual):** Push commits to `main`, trigger production deploy in Vercel (root `apps/mini-app`), confirm new bundle hash on https://www.promptanatomy.lol (not `main-BO_qJQT_.js`), then hard-reopen Mini App from bot.
-
-
-
-**Tag sequence:** … → `v1.8.2` → **`v1.8.4`** after device QA → F&F.
+**Tag sequence:** … → `v1.8.5` (done) → F&F → **`v1.9.0`** after Jun 14 review.
 
 
 

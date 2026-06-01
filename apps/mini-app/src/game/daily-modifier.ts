@@ -4,7 +4,12 @@ import {
   OBSTACLE_SPAWN_RATE,
 } from "./constants";
 
-export type DailyPresetId = "standard" | "meeting_monday" | "coffee_break" | "reorg_week";
+export type DailyPresetId =
+  | "standard"
+  | "meeting_monday"
+  | "coffee_break"
+  | "reorg_week"
+  | "synergy_sprint";
 
 export interface DailyModifier {
   id: DailyPresetId;
@@ -18,9 +23,17 @@ export interface DailyModifier {
   allowEarlyReorg: boolean;
   /** Optional CSS class on office-grid for preset tint */
   gridTintClass?: string;
+  /** Wall-clock run cap (ms); score = years at timeout */
+  sprintDurationMs?: number;
 }
 
-const PRESET_ORDER: DailyPresetId[] = ["standard", "meeting_monday", "coffee_break", "reorg_week"];
+const PRESET_ORDER: DailyPresetId[] = [
+  "standard",
+  "meeting_monday",
+  "coffee_break",
+  "reorg_week",
+  "synergy_sprint",
+];
 
 const PRESETS: Record<DailyPresetId, DailyModifier> = {
   standard: {
@@ -63,6 +76,17 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
     meetingPickThreshold: 0.38,
     allowEarlyReorg: true,
     gridTintClass: "office-grid-reorg-week",
+  },
+  synergy_sprint: {
+    id: "synergy_sprint",
+    label: "Synergy Sprint",
+    description: "60 seconds. Velocity is a feeling. Outcomes are quarterly.",
+    obstacleSpawnRate: 0.4,
+    internObstacleSpawnRate: 0.26,
+    coffeeSpawnThreshold: 0.8,
+    meetingPickThreshold: 0.55,
+    allowEarlyReorg: false,
+    sprintDurationMs: 60_000,
   },
 };
 

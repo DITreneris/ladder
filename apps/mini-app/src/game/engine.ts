@@ -15,6 +15,7 @@ import {
   MIN_TAP_INTERVAL_MS,
   PROMOTION_DIALOGUES,
   PROMO_DRAIN_PAUSE_MS,
+  SPRINT_GAME_OVER,
   TICK_MS,
   OBSTACLE_DEATH_COPY,
   TUTORIAL_COFFEE_MIN_RUNG,
@@ -53,6 +54,7 @@ export class GameEngine {
   private activeTicker: TickerHeadline | null = null;
   private internFakePromoShown = new Set<number>();
   private lastTapAt = 0;
+  private runStartedAt = 0;
 
   constructor(
     callbacks: GameCallbacks,
@@ -99,6 +101,17 @@ export class GameEngine {
 
   getTimeLeft(): number {
     return this.timeLeft;
+  }
+
+  getSprintSecondsRemaining(): number | null {
+    const cap = this.dailyModifier.sprintDurationMs;
+    if (!cap || !this.isPlaying) return null;
+    const remaining = cap - (Date.now() - this.runStartedAt);
+    return Math.max(0, Math.ceil(remaining / 1000));
+  }
+
+  isSprintMode(): boolean {
+    return Boolean(this.dailyModifier.sprintDurationMs);
   }
 
   private obstacleSpawnRate(): number {
@@ -194,6 +207,7 @@ export class GameEngine {
     this.drainPausedUntil = 0;
     this.internFakePromoShown.clear();
     this.lastTapAt = 0;
+    this.runStartedAt = Date.now();
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
 
     this.rungs = [];
@@ -211,6 +225,15 @@ export class GameEngine {
     this.timerInterval = setInterval(() => {
       if (!this.isPlaying) return;
       if (!this.firstTapDone) return;
+      const sprintCap = this.dailyModifier.sprintDurationMs;
+      if (sprintCap && Date.now() - this.runStartedAt >= sprintCap) {
+        this.triggerGameOver(
+          SPRINT_GAME_OVER.cause,
+          SPRINT_GAME_OVER.detail,
+          SPRINT_GAME_OVER.deathType
+        );
+        return;
+      }
       const years = Math.floor(this.score / 4);
       if (Date.now() < this.drainPausedUntil) {
         this.callbacks.onScoreUpdate(this.score / 4, this.timeLeft);
@@ -220,6 +243,10 @@ export class GameEngine {
       this.timeLeft -= drainRate;
       if (this.timeLeft <= 0) {
         this.timeLeft = 0;
+        if (sprintCap) {
+          this.callbacks.onScoreUpdate(this.score / 4, this.timeLeft);
+          return;
+        }
         this.triggerGameOver(
           "Energy Depleted",
           "Cognitive overload. Energy reserves fully exhausted before reaching promotion.",
@@ -302,12 +329,16 @@ export class GameEngine {
 
     const nextRung = this.rungs[1];
 
-    if (nextRung?.obstacle === this.playerSide) {
+    if (nextRung?.obstacle === side) {
       const obstacleType = nextRung.type ?? "reorg";
       const copy = OBSTACLE_DEATH_COPY[obstacleType] ?? OBSTACLE_DEATH_COPY.reorg;
       this.triggerGameOver(copy.cause, copy.detail, copy.deathType);
       debugTapResult(side, nextRung, "death");
       return;
+    }
+
+    if (nextRung?.obstacle && nextRung.obstacle !== side) {
+      this.callbacks.onNearMiss?.();
     }
 
     this.score++;

@@ -22,12 +22,13 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 MINI_APP_URL = os.getenv("MINI_APP_URL", "http://localhost:5173")
 
-PRESET_ORDER = ("standard", "meeting_monday", "coffee_break", "reorg_week")
+PRESET_ORDER = ("standard", "meeting_monday", "coffee_break", "reorg_week", "synergy_sprint")
 PRESET_LABELS = {
     "standard": "Open Floor Plan",
     "meeting_monday": "Meeting Monday",
     "coffee_break": "Coffee Break",
     "reorg_week": "Reorg Week",
+    "synergy_sprint": "Synergy Sprint",
 }
 
 

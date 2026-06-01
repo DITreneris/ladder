@@ -6,8 +6,8 @@ Pass/fail after trust hotfix push (`c253d26`+). Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |
 |---------|-------------|------------|----------------|-----------------|-------|
-| Telegram prod | `main-BWQOXY_x.js` (2026-06-01 curl) | Retest on device | Retest rows 3–4 | Retest row 3 | **Redeploy required** — visual fix sprint (`main-C4C8kB58.js`) not on prod yet |
-| Local build (visual fix sprint) | `main-C4C8kB58.js` (2026-06-01) | `qa:layout` pass | `qa:coffee` pass — onCoffee before render | `qa:coffee` pass — tap 2 RIGHT → game over | `npm run preview` + `qa:coffee` |
+| Telegram prod | `main-7DTXR6XJ.js` (2026-06-01) | pass (rows 1–5) | pass (row 4) | pass (row 3) | Human sign-off 2026-06-01 |
+| Local build | `main-BOIp6dYp.js` (v1.9 unreleased) | `qa:layout` pass | `qa:coffee` pass | `qa:coffee` pass | Redeploy pending |
 | Browser preview | local `npm run build` | Run `npm run qa:layout` | `?qa=1` + `npm run qa:coffee` | same | |
 | npm run dev | n/a (HMR) | Visual | `?debug=1` | `?debug=1` | |
 

@@ -749,6 +749,25 @@ html.cl-in-telegram .text-micro {
   transform-origin: bottom center;
 }
 
+@keyframes near-miss-wince {
+  0% {
+    transform: scaleX(1) rotate(0deg);
+  }
+  30% {
+    transform: scaleX(0.92) rotate(-4deg);
+  }
+  60% {
+    transform: scaleX(1.04) rotate(3deg);
+  }
+  100% {
+    transform: scaleX(1) rotate(0deg);
+  }
+}
+.near-miss-wince #playerActionEmoji {
+  animation: near-miss-wince 0.18s ease-out;
+  transform-origin: bottom center;
+}
+
 @keyframes reorg-slide-left {
   0% {
     transform: translateX(var(--reorg-slide-distance, 3.5rem));
@@ -1172,6 +1191,7 @@ html.cl-in-telegram .text-micro {
 @media (prefers-reduced-motion: reduce) {
   .shake-element,
   .climb-pop,
+  .near-miss-wince #playerActionEmoji,
   .reorg-slide-left,
   .reorg-slide-right,
   .float-particle,

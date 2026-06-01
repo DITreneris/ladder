@@ -9,21 +9,15 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
+- **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
+
 ### Fixed
-- **Coffee pickup (C-03)** — `onCoffee` fires **before** `renderRungs()` so `findImminentCoffeeBadge()` still sees `.next-rung`; `fillSlot` skips animating `.coffee-pickup`; resync after animation via `triggerCoffeePickup` callback ([DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) phase 6)
-- **Player vs rung layering** — foot-rung anchor (dynamic `bottom` from slot 0); z-index stack so `#playerClimber` sits above rung connectors but hazard/coffee badges stay visible on `.next-rung` (same postmortem)
-- **Corridor start anchor** — before first tap, player anchors to **foot** `.rung-center`, not `.next-rung` (fixes circle-over-face at game start)
-- **Career high trust** — home badge and career-high line update only after successful score submit, not on game-over screen open
-- **Game-over gap copy** — leaderboard gap line respects Daily vs Weekly tab (`leaderboardPeriod`)
-- **Energy death HUD tick** — no extra score update after energy-depletion game over
-- **Layout CI guard** — `qa:layout` taps once and fails if `#gamePlayArea` width shrinks >2px (C-01 regression)
-- **Dev-only QA hook** — `switchTab('gameover')` via `window` only in `import.meta.env.DEV`
-- **320×568 viewport QA** — compact game HUD and tap deck on short Telegram viewports; rung rows scale down to 32px min so seven rungs fit the play area
+- **Auth degraded banner (P2-1 / C-05)** — home banner branches on `ApiFailureReason`: session expired vs connection issue
 
 ### Changed
-- **package.json version** — aligned to `1.8.5`
-- **CI** — `npm run qa:coffee` (Playwright tutorial coffee + meeting collision) on preview
-- **Cursor agent layer** — rules, verifier, deploy/debug/score skills, `AGENTS.md`, `DOCS_INDEX`, `DESIGN_SYSTEM`, `FF_EXECUTION` synced to v1.8.5 gate and shipped baseline
+- **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 
 ### Planned (v1.1)
 - All-time / Legends tab
@@ -32,7 +26,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.8.5] - 2026-06-01
 
-F&F onboarding: three-lane corridor UX (two taps), scripted tutorial, office hazard reskins. No API or control-scheme change.
+F&F onboarding: three-lane corridor UX (two taps), scripted tutorial, office hazard reskins, trust/layout hotfixes. No API or control-scheme change.
 
 ### Added
 - **Three-lane corridor** — player starts in center aisle; TAP LEFT/RIGHT still picks the next rung side only (no center tap)
@@ -46,11 +40,25 @@ F&F onboarding: three-lane corridor UX (two taps), scripted tutorial, office haz
 - **Obstacle picker** — weighted spawn from rank-allowed pool only (fixes intern fallback noise)
 - **How to Play** — three-lane metaphor; Gate and Plant cards
 - **Stronger climb feedback** — rung advance motion + Years label pop on early taps
+- **package.json version** — aligned to `1.8.5`
+- **CI** — `npm run qa:coffee` (Playwright tutorial coffee + meeting collision) on preview
+- **Layout debug script** — `scripts/layout-player-debug.mjs` measures player vs foot/imminent rung Y after each tutorial tap
+- **Device QA** — Telegram iOS + Android rows 1–5 signed 2026-06-01 (corridor, tutorial, width); prod `main-7DTXR6XJ.js`
+- **Cursor agent layer** — rules, verifier, deploy/debug/score skills, `AGENTS.md`, `DOCS_INDEX`, `DESIGN_SYSTEM`, `FF_EXECUTION` synced to v1.8.5 gate
 
 ### Fixed
-- **Ladder narrows mid-run after first tap** — stable `#app` width via grid shell — [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md)
+- **Ladder narrows mid-run after first tap (C-01)** — stable `#app` width via grid shell — [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md)
+- **Coffee pickup (C-03)** — `onCoffee` fires **before** `renderRungs()`; `fillSlot` guard + animation resync (phase 6)
+- **Player vs rung layering** — foot-rung anchor; z-index stack (phase 6)
+- **Corridor start anchor** — player anchors to foot `.rung-center` before first tap (phase 7, `46abf19`)
+- **Career high trust (C-02)** — home badge updates only after successful score submit
+- **Game-over gap copy (C-12)** — respects Daily vs Weekly tab
+- **Energy death HUD tick (C-09)** — no extra score update after energy-depletion game over
+- **Layout CI guard** — `qa:layout` post-tap width stable check
+- **Dev-only QA hook (C-11)** — `switchTab('gameover')` via `window` only in DEV
+- **320×568 viewport QA** — compact HUD and tap deck on short Telegram viewports
 - **Debug mode hard to read** — plain-English next-rung panel; `localStorage cl_debug=1` persistence
-- **Game logic unclear in first runs** — `#imminentHint` for first 12 rungs (and debug mode)
+- **Game logic unclear in first runs** — `#imminentHint` for first 12 rungs
 - **Throttled taps silent** — “Too fast — one tap per beat” toast on UI throttle
 
 ## [1.8.4] - 2026-06-01

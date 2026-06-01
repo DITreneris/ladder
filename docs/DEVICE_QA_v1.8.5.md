@@ -4,7 +4,7 @@
 
 **F&F gate:** [FF_EXECUTION.md](FF_EXECUTION.md) · **Tag after pass:** `v1.8.5`
 
-**Prod bundle:** redeploy from `main` — verify new JS hash on https://www.promptanatomy.lol
+**Prod bundle:** `main-7DTXR6XJ.js` (2026-06-01 curl) — https://www.promptanatomy.lol
 
 Sign off on real Telegram **iOS** and **Android** after Vercel redeploy.
 
@@ -16,15 +16,14 @@ Repo gates green before device sign-off:
 
 | Check | Result |
 |-------|--------|
-| `pytest` (API) | run before device QA |
+| `pytest` (API) | 16 passed |
 | `npm run lint` / `test` / `build` | pass |
 | `npm run qa:viewport` | pass |
 | `npm run qa:layout` (post-tap width) | pass |
-| `npm run qa:coffee` (tutorial coffee + meeting collision) | pass — `?qa=1` hook; coffee callback + tap-2-RIGHT game over |
-| Local bundle | `main-C4C8kB58.js` — **redeploy Vercel before device QA** |
-| Prod bundle (pre-redeploy) | `main-mUiaglh1.js` (or newer after push) |
+| `npm run qa:coffee` (tutorial coffee + meeting collision) | pass |
+| Prod bundle | `main-7DTXR6XJ.js` (post-`46abf19`) |
 
-**Human steps after redeploy:** G-3 cache bust → fill rows 1–10 below on iOS + Android → G-7 tag → G-8 F&F.
+**Human sign-off:** Telegram rows 1–5 confirmed 2026-06-01. Rows 6–10 optional / spot-check before public launch.
 
 ---
 
@@ -32,18 +31,18 @@ Repo gates green before device sign-off:
 
 | # | Test | Pass |
 |---|------|------|
-| 1 | Player starts in **center corridor** before first tap | [ ] |
-| 2 | Tap 1: either side climbs; Years tick; HR memo explains corridor | [ ] |
-| 3 | Tap 2: meeting on RIGHT → must TAP LEFT to survive | [ ] |
-| 4 | Tap 3: coffee on LEFT → TAP LEFT picks up +25% energy | [ ] |
-| 5 | Play-area width stable taps 0–8 (no ladder shrink) | [ ] |
+| 1 | Player starts in **center corridor** before first tap | [x] |
+| 2 | Tap 1: either side climbs; Years tick; HR memo explains corridor | [x] |
+| 3 | Tap 2: meeting on RIGHT → must TAP LEFT to survive | [x] |
+| 4 | Tap 3: coffee on LEFT → TAP LEFT picks up +25% energy | [x] |
+| 5 | Play-area width stable taps 0–8 (no ladder shrink) | [x] |
 | 6 | `#imminentHint` readable first ~12 rungs | [ ] |
 | 7 | Throttle toast on double-tap (“Too fast”) | [ ] |
 | 8 | Manager+ run: occasional **Gate** badge (not more deaths than v1.8.4) | [ ] |
 | 9 | CEO run: occasional **Plant** badge | [ ] |
 | 10 | v1.8.4 regressions still pass (REJECTED stamp, Frozen reorg, score submit) | [ ] |
 
-**Tester / date:** _______________
+**Tester / date:** Tomas — 2026-06-01 (Telegram confirmed)
 
 ---
 
@@ -51,18 +50,18 @@ Repo gates green before device sign-off:
 
 | # | Test | Pass |
 |---|------|------|
-| 1 | Player starts in **center corridor** before first tap | [ ] |
-| 2 | Tap 1: either side climbs; Years tick; HR memo explains corridor | [ ] |
-| 3 | Tap 2: meeting on RIGHT → must TAP LEFT to survive | [ ] |
-| 4 | Tap 3: coffee on LEFT → TAP LEFT picks up +25% energy | [ ] |
-| 5 | Play-area width stable taps 0–8 (no ladder shrink) | [ ] |
+| 1 | Player starts in **center corridor** before first tap | [x] |
+| 2 | Tap 1: either side climbs; Years tick; HR memo explains corridor | [x] |
+| 3 | Tap 2: meeting on RIGHT → must TAP LEFT to survive | [x] |
+| 4 | Tap 3: coffee on LEFT → TAP LEFT picks up +25% energy | [x] |
+| 5 | Play-area width stable taps 0–8 (no ladder shrink) | [x] |
 | 6 | `#imminentHint` readable first ~12 rungs | [ ] |
 | 7 | Throttle toast on double-tap (“Too fast”) | [ ] |
 | 8 | Manager+ run: occasional **Gate** badge | [ ] |
 | 9 | CEO run: occasional **Plant** badge | [ ] |
 | 10 | v1.8.4 regressions still pass | [ ] |
 
-**Tester / date:** _______________
+**Tester / date:** Tomas — 2026-06-01 (Telegram confirmed)
 
 ---
 
@@ -81,6 +80,8 @@ cd apps/mini-app && npm run qa:viewport && npm run qa:layout && npm run qa:coffe
 
 | Platform | Pass | Notes |
 |----------|------|-------|
-| iOS | [ ] | |
-| Android | [ ] | |
-| Viewport QA script | [ ] | |
+| iOS | [x] | Rows 1–5 pass — corridor, tutorial, width (2026-06-01) |
+| Android | [x] | Rows 1–5 pass — corridor, tutorial, width (2026-06-01) |
+| Viewport QA script | [x] | CI + local |
+
+**Gate:** Ready for `git tag v1.8.5` → F&F ([FF_EXECUTION.md](FF_EXECUTION.md)).

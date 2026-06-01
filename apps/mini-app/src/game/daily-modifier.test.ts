@@ -32,6 +32,12 @@ describe("daily-modifier", () => {
     expect(mod.label).toBe("Reorg Week");
   });
 
+  it("synergy sprint enables 60s wall-clock cap", () => {
+    const mod = getDailyModifierById("synergy_sprint");
+    expect(mod.label).toBe("Synergy Sprint");
+    expect(mod.sprintDurationMs).toBe(60_000);
+  });
+
   it("coffee break lowers coffee spawn threshold", () => {
     const mod = getDailyModifierById("coffee_break");
     expect(mod.coffeeSpawnThreshold).toBeLessThan(0.85);

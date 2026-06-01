@@ -1,7 +1,7 @@
 export type PlayerSide = "left" | "right";
 export type ObstacleType = "meeting" | "reorg" | "burnout" | "badge_gate" | "foliage";
 export type Rank = "Intern" | "Manager" | "CEO";
-export type DeathType = ObstacleType | "energy";
+export type DeathType = ObstacleType | "energy" | "sprint";
 
 export interface Rung {
   id: number;
@@ -26,4 +26,5 @@ export interface GameCallbacks {
   onGameOver: (result: GameOverResult) => void;
   onCoffee: (side: PlayerSide, rungId: number) => void;
   onToast: (msg: string) => void;
+  onNearMiss?: () => void;
 }

@@ -6,6 +6,7 @@ import {
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
+  SPRINT_SHARE_LINE,
   floorLabel,
   formatTickerText,
   milestoneLabel,
@@ -43,6 +44,7 @@ import {
   triggerDeathFlash,
   triggerDeathCauseHold,
   triggerMeterFlash,
+  triggerNearMissWince,
   triggerRankPop,
   triggerReorgTelegraph,
   triggerRungAdvance,
@@ -198,9 +200,15 @@ function submitFailureMessage(reason: ApiFailureReason): string {
   return "Score not filed with HR. Check connection.";
 }
 
-function showAuthDegradedBanner(): void {
+function showAuthDegradedBanner(reason?: ApiFailureReason): void {
   const bot = getBotUsername();
-  $("authDegradedText").textContent = `Session expired or offline. Reopen from @${bot} to sync scores.`;
+  if (reason === "auth") {
+    $("authDegradedText").textContent = `Session expired. Reopen from @${bot} to sync scores.`;
+  } else if (reason === "network" || reason === "server") {
+    $("authDegradedText").textContent = `Connection issue — scores may not sync. Check network and reopen from @${bot}.`;
+  } else {
+    $("authDegradedText").textContent = `Session expired or offline. Reopen from @${bot} to sync scores.`;
+  }
   $("authDegradedBanner").classList.remove("hidden");
 }
 
@@ -691,6 +699,17 @@ function hideImminentHint(): void {
   $("imminentHint").classList.add("hidden");
 }
 
+function updateSprintTimerChip(): void {
+  const chip = $("sprintTimerChip");
+  const remaining = engine.getSprintSecondsRemaining();
+  if (remaining === null) {
+    chip.classList.add("hidden");
+    return;
+  }
+  chip.textContent = `Sprint: ${remaining}s`;
+  chip.classList.remove("hidden");
+}
+
 function startGame(): void {
   hideHrMemo();
   hideHudTapHint();
@@ -717,6 +736,7 @@ function startGame(): void {
   engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
   engine.start();
+  updateSprintTimerChip();
   updateRankUI("Intern");
   updateMilestoneChip(0);
   updateFloorLabel(0);
@@ -730,6 +750,7 @@ function startGame(): void {
 
 function goHome(): void {
   engine.stop();
+  $("sprintTimerChip").classList.add("hidden");
   hideHrMemo();
   hideHudTapHint();
   hideTapDeckHint();
@@ -911,12 +932,15 @@ function buildShareText(): string {
   const shiftLabel = lastGameResult
     ? engine.getDailyModifier().label
     : activeDailyModifier.label;
+  const sprintLine =
+    lastGameResult?.deathType === "sprint" ? `\n${SPRINT_SHARE_LINE}\n` : "";
 
   return (
     `CORPORATE PERFORMANCE REVIEW\n` +
     `Employee: ${username}\n` +
     `${years} Years | Final Rank: ${rank}\n` +
     `Shift: ${shiftLabel}\n` +
+    sprintLine +
     `Cause: ${detail}\n` +
     `"${flavor}"\n` +
     `Play Corporate Ladder on Telegram @${botUser}\n` +
@@ -1053,6 +1077,7 @@ export function mountApp(): void {
   engine = new GameEngine(
     {
       onScoreUpdate: (years, energy) => {
+        updateSprintTimerChip();
         $("gameYearsLabel").textContent = years.toFixed(1);
         if (earlyTapsRemaining > 0 && engine.getRungsClimbed() > 0) {
           triggerClimbPop($("gameYearsLabel"));
@@ -1114,6 +1139,10 @@ export function mountApp(): void {
         hapticImpact("medium");
       },
       onToast: (msg) => showHrMemo(msg, { variant: "info" }),
+      onNearMiss: () => {
+        triggerNearMissWince($("playerClimber"));
+        hapticImpact("light");
+      },
     },
     renderRungsWithReorgFeedback,
     updatePlayerPosition,
@@ -1223,7 +1252,7 @@ export function mountApp(): void {
           ($("usernameInput") as HTMLInputElement).value = username;
         }
       } else {
-        showAuthDegradedBanner();
+        showAuthDegradedBanner(result.reason);
       }
     });
   } else {

@@ -56,11 +56,11 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 |----------|--------|--------|
 
-| **iOS** | Core team | Pending — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) + [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) |
+| **iOS** | Core team | **Signed** — [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–5 (2026-06-01) |
 
-| **Android** | Recruit before external invite | Pending — same checklists |
+| **Android** | Core team | **Signed** — same checklist (2026-06-01) |
 
-**Automated gates (2026-06-01):** pytest 16 passed · vitest 42 passed · lint/build green · smoke-local passed · viewport QA passed · API health ok.
+**Automated gates (2026-06-01):** vitest 61 passed · lint/build green · `qa:layout` + `qa:coffee` · API health ok · **`v1.8.5` tagged** on `46abf19`.
 
 
 
@@ -112,14 +112,17 @@ Mix **iOS + Android**; not all on the core team.
 
 ## Internal dogfood (core team, before external invite)
 
+**Phase D runbook** — map to [todo.md](todo.md) verification IDs:
 
+| Run | Goal | Verify |
+|-----|------|--------|
+| 1 | Intern death; tap deck + HUD hint | V-04, V-06, V-15, V-08 |
+| 2 | Manager/reorg; HR memo layout | V-17, P2-7, V-10 |
+| 3 | Share + performance review text | V-13, V-14 |
 
 | Member | Run 1 | Run 2 | Run 3 + share | Date |
-
 |--------|-------|-------|---------------|------|
-
-| | [ ] | [ ] | [ ] | |
-
+| Tomas | [ ] | [ ] | [ ] | |
 | | [ ] | [ ] | [ ] | |
 
 
@@ -130,19 +133,15 @@ Mix **iOS + Android**; not all on the core team.
 
 ## Metrics (targets from [mvp-scope.md](mvp-scope.md))
 
+**Check-in dates:** Jun 4 · Jun 7 · Jun 10 · Jun 14 review — see [FF_EXECUTION.md](FF_EXECUTION.md) Phase F.
 
-
-| Metric | Target | Actual | How measured |
-
-|--------|--------|--------|--------------|
-
-| Session length | 30–90s | | Ask / observe |
-
-| Games per user (wk1) | ≥3 | | Supabase query below |
-
-| Share rate | Any shares | | Ask testers |
-
-| Daily return (engaged) | ≥2 days/wk | | `game_runs` timestamps |
+| Metric | Target | Jun 4 | Jun 7 | Jun 10 | How measured |
+|--------|--------|-------|-------|--------|--------------|
+| Session length | 30–90s | | | | Ask / observe |
+| Games per user (wk1) | ≥3 | | | | Supabase query below |
+| Share rate | Any shares | | | | Ask testers |
+| Daily return (engaged) | ≥2 days/wk | | | | `game_runs` timestamps |
+| Tier A verification | V-08–V-14 | | | | [todo.md](todo.md) §6 |
 
 
 
@@ -282,14 +281,10 @@ Answer:
 
 
 
-- [ ] Review date: **2026-06-14**
-
-- [ ] v1.9 item 1: _______________
-
-- [ ] v1.9 item 2 (optional): _______________
-
+- [x] Review date: **2026-06-14** (scheduled)
+- [x] v1.9 item 1: **Near-miss wince** — implemented in `[Unreleased]`; confirm at review
+- [x] v1.9 item 2: **Synergy Sprint preset** — implemented in `[Unreleased]`; confirm at review
 - [ ] Verifier pass before tag: [ ]
-
-- [ ] CHANGELOG cut + git tag: _______________
+- [ ] CHANGELOG cut + git tag: `v1.9.0` (post-review)
 
 

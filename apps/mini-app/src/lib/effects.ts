@@ -7,6 +7,18 @@ export function respectsReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+export function triggerNearMissWince(el: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  el.classList.remove("near-miss-wince");
+  void el.offsetWidth;
+  el.classList.add("near-miss-wince");
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove("near-miss-wince"),
+    { once: true }
+  );
+}
+
 export function triggerClimbPop(el: HTMLElement): void {
   if (respectsReducedMotion()) return;
   el.classList.remove("climb-pop");
@@ -95,6 +107,7 @@ const DEATH_EMOJI: Record<DeathType, string> = {
   badge_gate: "🪪",
   foliage: "🪴",
   energy: "😵",
+  sprint: "🏁",
 };
 
 export function triggerDeathEmoji(deathType: DeathType, onComplete?: () => void): void {
