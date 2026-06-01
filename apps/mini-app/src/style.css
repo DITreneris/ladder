@@ -950,7 +950,8 @@ html.cl-in-telegram .cl-telegram-cta-hint {
 }
 
 .rung-future .obstacle-badge {
-  opacity: 0.85;
+  opacity: 1;
+  animation: none;
 }
 
 @keyframes reorg-warning-pulse {
@@ -1081,7 +1082,7 @@ html.cl-in-telegram .cl-telegram-cta-hint {
     opacity: 1;
   }
   50% {
-    opacity: 0.65;
+    opacity: 0.85;
   }
 }
 .obstacle-pulse {
@@ -1166,6 +1167,16 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   animation: safe-side-hint 1.2s ease-in-out infinite;
 }
 
+@keyframes next-obstacle-hint {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgb(239 68 68 / 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgb(239 68 68 / 0.35);
+  }
+}
+
 @keyframes next-obstacle-warn {
   0%,
   100% {
@@ -1176,7 +1187,8 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   }
 }
 .next-obstacle-warn {
-  animation: next-obstacle-warn 0.7s ease-in-out 2;
+  border-radius: 0.75rem;
+  animation: next-obstacle-warn 0.7s ease-in-out 2, next-obstacle-hint 0.85s ease-in-out infinite;
 }
 
 .hidden {

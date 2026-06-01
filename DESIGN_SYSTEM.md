@@ -234,12 +234,13 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 |---------|--------|-------|
 | **Center corridor** | `.rung-center--corridor`, `.player-at-corridor` | Player starts center aisle; L/R tap only |
 | **Imminent hint** | `#imminentHint` | Next-rung panel first ~12 rungs; compact 2-line on SE Telegram |
-| **Future rung de-emphasis** | `.rung-future` | Rungs index 2–6 at reduced opacity; `.next-rung` row outline |
+| **Future rung de-emphasis** | `.rung-future` | Rungs index 2–6 at reduced row opacity; hazard badges stay full contrast (no double fade) |
+| **Imminent hazard warn** | `.next-obstacle-warn` | Red box-shadow pulse on next-rung obstacle (mirrors coffee hint) |
 | **Safe-side hint** | `.safe-side-hint` on imminent rung | Tutorial window aligned to 12 rungs (tap-deck pulse still 5 taps) |
 | **Gate badge** | Manager+ obstacles | Slate badge; same dodge as meetings |
 | **Plant badge** | CEO+ obstacles | Emerald badge; same dodge as deadlines |
 
-Game-over: `card-performance` + REJECTED stamp. Obstacle badges: red meeting, amber reorg, bright red deadline, slate gate (Manager+), emerald plant (CEO+). Weekly tab label: **Last 7 Days**.
+Game-over: `card-performance` + REJECTED stamp. Obstacle badges: bright red meeting (`border-red-400`), amber reorg (`border-amber-500`), bright red deadline, slate gate (Manager+), emerald plant (CEO+). Weekly tab label: **Last 7 Days**.
 
 ---
 

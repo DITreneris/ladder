@@ -360,9 +360,9 @@ function refreshDailyShiftUI(): void {
 function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = false): HTMLElement {
   const badge = document.createElement("div");
   badge.className =
-    "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none obstacle-pulse";
+    "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-md text-center select-none obstacle-pulse";
   if (type === "meeting") {
-    badge.className += " bg-red-100 border-red-300 text-red-700";
+    badge.className += " bg-red-100 border-red-400 text-red-900";
     if (activeDailyModifier.id === "meeting_monday" && rungId % 2 === 0) {
       badge.innerHTML = `<span class="text-lg leading-none">📧</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reply-All</span>`;
     } else if (activeDailyModifier.id === "meeting_monday") {
@@ -371,7 +371,7 @@ function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = fa
       badge.innerHTML = `<span class="text-lg leading-none">📅</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Meeting</span>`;
     }
   } else if (type === "reorg") {
-    badge.className += " bg-amber-100 border-amber-300 text-amber-800";
+    badge.className += " bg-amber-100 border-amber-500 text-amber-900";
     if (isImminent) {
       badge.innerHTML = `<span class="text-lg leading-none">🧊</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Frozen</span>`;
     } else {
