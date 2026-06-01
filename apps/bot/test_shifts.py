@@ -29,8 +29,9 @@ def test_preset_for_date_uses_utc_hash():
 def test_build_welcome_text_includes_controls_and_shift():
     preset = PRESETS["meeting_monday"]
     text = build_welcome_text(preset)
-    assert "Tap LEFT or RIGHT" in text
-    assert "Energy" in text
+    assert "Can you survive" in text
+    assert "Intern" in text
+    assert "+25% Energy" in text
     assert preset["label"] in text
     assert preset["description"] in text
     assert "Punch In & Climb" in text

@@ -33,12 +33,12 @@ def build_welcome_text(preset: ShiftPreset | None = None) -> str:
     shift = preset or today_preset()
     play_url = MINI_APP_URL.rstrip("/")
     return (
-        "Welcome to Corporate Ladder.\n\n"
-        "Tap LEFT or RIGHT on each rung — pick the safe side. "
-        "Dodge meetings, reorgs, and deadlines. Watch your Energy.\n\n"
+        "Can you survive the Corporate Ladder?\n\n"
+        "Start as an Intern. Dodge meetings, reorgs, and office chaos.\n"
+        "Coffee gives +25% Energy. Most players never reach Manager.\n\n"
         f"Today's shift: {shift['label']}\n"
         f"{shift['description']}\n\n"
-        "Tap Punch In & Climb below to start.\n\n"
+        "👇 Punch In & Climb:\n"
         f"{play_url}"
     )
 
