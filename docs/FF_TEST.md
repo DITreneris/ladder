@@ -32,7 +32,7 @@ Use results to pick **1–2 v1.9 items** — see [ROADMAP.md](../ROADMAP.md) § 
 
 - [x] API rank vs years validation
 
-- [x] Production redeploy from `main` (Vercel + Railway API) — `d862c3c` 2026-06-01
+- [x] Production redeploy from `main` (Vercel + Railway API) — `d862c3c` 2026-06-01 *(API upsert fix `786d6d8` requires separate Railway redeploy — see data audit below)*
 - [x] Post-deploy smoke — API health + OG meta (automated); Telegram steps 2–7 manual in [FF_EXECUTION.md](FF_EXECUTION.md) Phase B
 
 ### Known limits for F&F (documented — not blockers)

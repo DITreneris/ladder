@@ -27,6 +27,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
 ### Changed
+- **Deploy post-deploy gate** — `DEPLOY.md` requires `scripts/ff-metrics.py` `submit_pipeline_ok: true` (not `/health` alone)
 - **Crawler access** — `robots.txt` now allows search, social preview (Twitter/Facebook/LinkedIn), and AI bots; shell `index.html` uses `index, follow` so card validators can fetch OG image
 - **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, mini-app URL in message (OG preview in chat); PA link button-only (no `.app` URL in body)
 - **Bot commands** — `/help` (30-second rules) and `/play` (alias of `/start`); shift presets in `apps/bot/shifts.py` mirror mini-app copy

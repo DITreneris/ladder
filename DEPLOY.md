@@ -103,6 +103,7 @@ After Railway bot redeploy, smoke `/start`, `/go`, `/play`, and `/help` — each
 ## 6. Post-deploy verification
 
 - [ ] `GET {API_URL}/health` returns ok over HTTPS
+- [ ] `python scripts/ff-metrics.py` → `submit_pipeline_ok: true` (prod `POST /auth/me` + `/runs`; not just health)
 - [ ] `/start`, `/go`, `/play`, and `/help` in Telegram show **Punch In & Climb** and open the Mini App
 - [ ] Mini App loads inside Telegram (not broken blank screen)
 - [ ] Complete one run; score appears on **Daily** leaderboard
