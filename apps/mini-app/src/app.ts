@@ -400,9 +400,8 @@ function layoutPlayerPosition(side: PlayerLayout): void {
 
   if (side === "center") {
     anchor =
-      (playArea.querySelector(".next-rung .rung-center") as HTMLElement | null) ??
-      (playArea.querySelector("[data-rung-slot='1'] .rung-center") as HTMLElement | null) ??
       (footRung?.querySelector(".rung-center") as HTMLElement | null) ??
+      (playArea.querySelector("[data-rung-slot='1'] .rung-center") as HTMLElement | null) ??
       ($("ladderTrack") as HTMLElement);
   } else {
     anchor = footRung?.querySelector(

@@ -10,8 +10,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
-- **Coffee pickup (C-03)** — `onCoffee` fires **before** `renderRungs()` so `findImminentCoffeeBadge()` still sees `.next-rung`; `fillSlot` skips animating `.coffee-pickup`; resync after animation via `triggerCoffeePickup` callback
-- **Player vs rung layering** — foot-rung anchor (dynamic `bottom` from slot 0); z-index stack so `#playerClimber` sits above rung connectors but hazard/coffee badges stay visible on `.next-rung`
+- **Coffee pickup (C-03)** — `onCoffee` fires **before** `renderRungs()` so `findImminentCoffeeBadge()` still sees `.next-rung`; `fillSlot` skips animating `.coffee-pickup`; resync after animation via `triggerCoffeePickup` callback ([DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) phase 6)
+- **Player vs rung layering** — foot-rung anchor (dynamic `bottom` from slot 0); z-index stack so `#playerClimber` sits above rung connectors but hazard/coffee badges stay visible on `.next-rung` (same postmortem)
+- **Corridor start anchor** — before first tap, player anchors to **foot** `.rung-center`, not `.next-rung` (fixes circle-over-face at game start)
 - **Career high trust** — home badge and career-high line update only after successful score submit, not on game-over screen open
 - **Game-over gap copy** — leaderboard gap line respects Daily vs Weekly tab (`leaderboardPeriod`)
 - **Energy death HUD tick** — no extra score update after energy-depletion game over
