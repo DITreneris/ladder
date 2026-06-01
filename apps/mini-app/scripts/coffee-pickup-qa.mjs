@@ -6,20 +6,22 @@ import { chromium } from "playwright";
 
 const BASE = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
 const TAP_GAP_MS = 250;
+const WAIT_MS = 8000;
 
 function qaUrl() {
   const url = new URL(BASE);
   url.searchParams.set("qa", "1");
+  url.searchParams.set("dailyPreset", "standard");
   return url.toString();
 }
 
 async function tapLeft(page) {
-  await page.keyboard.press("ArrowLeft");
+  await page.click("#btnTapLeft");
   await page.waitForTimeout(TAP_GAP_MS);
 }
 
 async function tapRight(page) {
-  await page.keyboard.press("ArrowRight");
+  await page.click("#btnTapRight");
   await page.waitForTimeout(TAP_GAP_MS);
 }
 
@@ -37,21 +39,23 @@ async function runCoffeePickup(page) {
   await page.waitForFunction(() => {
     const hint = document.getElementById("imminentHint")?.textContent ?? "";
     return /Coffee on/i.test(hint);
-  });
+  }, null, { timeout: WAIT_MS });
 
   const before = await snapshot(page);
   if (!before?.rungs?.[1]?.coffee) {
     throw new Error("imminent rung has no coffee before pickup tap");
   }
 
-  await page.keyboard.press("ArrowLeft");
+  await page.click("#gamePlayArea");
+  await tapLeft(page);
+
   await page.waitForFunction(() => (window.clQa?.getCoffeePickups?.() ?? 0) >= 1, null, {
-    timeout: 2000,
+    timeout: WAIT_MS,
   });
   await page.waitForFunction(
     () => document.querySelectorAll(".next-rung .coffee-badge").length === 0,
     null,
-    { timeout: 2000 }
+    { timeout: WAIT_MS }
   );
 }
 

@@ -21,6 +21,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Obstacle badge readability** — future rung dim no longer fades hazard badges; meeting/reorg stronger borders and text; imminent hazard red glow (mirrors coffee hint); softer obstacle pulse on distant rungs
 - **Score submit 500 for new Telegram users** — `upsert_user()` handles Supabase `maybe_single()` returning `None` when no row exists; unblocks `/auth/me` and `/runs` (F&F data audit 2026-06-01)
 - **Bot `/start` silent after deploy** — Dockerfile now copies `shifts.py` (was `main.py` only; import crash on Railway)
+- **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
 ### Changed
 - **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, mini-app URL in message (OG preview in chat); PA link button-only (no `.app` URL in body)
