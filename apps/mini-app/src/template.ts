@@ -153,7 +153,7 @@ export const APP_SHELL = `
           </div>
         </div>
       </div>
-      <div id="tapControlsBar" class="tap-controls-bar select-none">
+      <div id="tapControlsBar" class="tap-controls-bar cl-shell-gutter select-none">
         <button id="btnTapLeft" type="button" aria-label="Climb left" class="btn-tap-zone btn-tap-zone-left touch-none focus-ring">
           <i class="fa-solid fa-arrow-left icon-md text-slate-700" aria-hidden="true"></i>
           <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
@@ -166,8 +166,8 @@ export const APP_SHELL = `
         </button>
       </div>
     </div>
-    <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto">
-      <div class="text-center mt-2">
+    <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto min-w-0">
+      <div class="text-center mt-2 w-full min-w-0">
         <span class="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full mb-2">
           <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
         </span>
@@ -198,7 +198,7 @@ export const APP_SHELL = `
         <p class="text-caption text-slate-600 font-semibold text-center px-2 mt-2" id="retryTip"></p>
         <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">"Your synergy did not scale optimally with our paradigms."</p>
       </div>
-      <div class="space-y-2 mt-auto">
+      <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
         <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md">
           <i class="fa-solid fa-rotate-right"></i><span>RE-APPLY FOR ROLE (TRY AGAIN)</span>
         </button>

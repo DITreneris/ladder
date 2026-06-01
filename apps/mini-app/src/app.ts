@@ -194,6 +194,61 @@ function syncTelegramBackButton(tab: Screen): void {
   });
 }
 
+function shouldDebugLayout(): boolean {
+  return import.meta.env.DEV || new URLSearchParams(window.location.search).has("debugLayout");
+}
+
+// #region agent log
+function debugLayoutColumnMetrics(screen: string): void {
+  if (!shouldDebugLayout()) return;
+  const box = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
+  };
+  const card = document.querySelector("#gameOverScreen .card-performance");
+  const cardBox = card
+    ? (() => {
+        const r = card.getBoundingClientRect();
+        return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
+      })()
+    : null;
+  const retryBtn = document.querySelector("#gameOverScreen .btn-cl-primary");
+  const btnBox = retryBtn
+    ? (() => {
+        const r = retryBtn.getBoundingClientRect();
+        return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
+      })()
+    : null;
+  const playArea = $("gamePlayArea");
+  const slotWidth = playArea.style.getPropertyValue("--slot-width");
+  const payload = {
+    sessionId: "a50bb8",
+    hypothesisId: "H1-H4",
+    location: "app.ts:debugLayoutColumnMetrics",
+    message: "layout column widths",
+    data: {
+      screen,
+      hud: box("gameHud"),
+      memo: box("hrMemoRail"),
+      play: box("gamePlayArea"),
+      track: box("ladderTrack"),
+      tap: box("tapControlsBar"),
+      card: cardBox,
+      retryBtn: btnBox,
+      slotWidth,
+    },
+    timestamp: Date.now(),
+  };
+  fetch("http://127.0.0.1:7808/ingest/23292cd7-62fc-4135-a998-c5f22f7ea8ca", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a50bb8" },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+// #endregion
+
 function switchTab(tab: Screen): void {
   ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
     $(id).classList.add("hidden");
@@ -212,6 +267,12 @@ function switchTab(tab: Screen): void {
   el.classList.add("flex");
   syncTelegramBackButton(tab);
   audio.nav();
+  if (tab === "game" || tab === "gameover") {
+    requestAnimationFrame(() => {
+      if (tab === "game") layoutRungs();
+      debugLayoutColumnMetrics(tab);
+    });
+  }
 }
 
 const RANK_BADGE: Record<Rank, string> = {

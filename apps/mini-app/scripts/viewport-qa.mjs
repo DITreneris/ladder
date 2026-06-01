@@ -36,6 +36,11 @@ const SCREENS = [
     label: "How to Play",
     setup: () => window.switchTab("howtoplay"),
   },
+  {
+    id: "gameover",
+    label: "Game Over",
+    setup: () => window.switchTab("gameover"),
+  },
 ];
 
 async function hasHorizontalOverflow(page) {
@@ -121,23 +126,50 @@ async function memoVisiblePlayAreaRatio(page) {
   });
 }
 
-async function contentColumnAlignment(page) {
+async function gameStackColumnAlignment(page) {
   return page.evaluate(() => {
     const hud = document.getElementById("gameHud");
     const playArea = document.getElementById("gamePlayArea");
-    if (!hud || !playArea) return { ok: true, skipped: true };
+    const tapBar = document.getElementById("tapControlsBar");
+    if (!hud || !playArea || !tapBar) return { ok: false, reason: "missing-game-stack" };
 
-    const hudRect = hud.getBoundingClientRect();
-    const playRect = playArea.getBoundingClientRect();
-    const hudPlayDelta = Math.abs(hudRect.width - playRect.width);
-    const hudPlayLeftDelta = Math.abs(hudRect.left - playRect.left);
+    const boxes = [hud, playArea, tapBar].map((el) => {
+      const r = el.getBoundingClientRect();
+      return { w: r.width, l: r.left };
+    });
+    const widths = boxes.map((b) => b.w);
+    const lefts = boxes.map((b) => b.l);
+    const widthDelta = Math.max(...widths) - Math.min(...widths);
+    const leftDelta = Math.max(...lefts) - Math.min(...lefts);
 
     return {
-      ok: hudPlayDelta <= 2 && hudPlayLeftDelta <= 2,
-      hudWidth: hudRect.width,
-      playWidth: playRect.width,
-      hudPlayDelta,
-      hudPlayLeftDelta,
+      ok: widthDelta <= 2 && leftDelta <= 2,
+      hudWidth: widths[0],
+      playWidth: widths[1],
+      tapWidth: widths[2],
+      widthDelta,
+      leftDelta,
+    };
+  });
+}
+
+async function gameOverColumnAlignment(page) {
+  return page.evaluate(() => {
+    const card = document.querySelector("#gameOverScreen .card-performance");
+    const btn = document.querySelector("#gameOverScreen .btn-cl-primary");
+    if (!card || !btn) return { ok: false, reason: "missing-game-over" };
+
+    const cr = card.getBoundingClientRect();
+    const br = btn.getBoundingClientRect();
+    const widthDelta = Math.abs(cr.width - br.width);
+    const leftDelta = Math.abs(cr.left - br.left);
+
+    return {
+      ok: widthDelta <= 2 && leftDelta <= 2,
+      cardWidth: cr.width,
+      btnWidth: br.width,
+      widthDelta,
+      leftDelta,
     };
   });
 }
@@ -256,15 +288,27 @@ async function main() {
         }
 
         if (vp.width === 320 || vp.width === 390) {
-          const column = await contentColumnAlignment(page);
+          const column = await gameStackColumnAlignment(page);
           if (!column.ok) {
             failures.push({
               viewport: vp.label,
               screen: screen.label,
-              type: "content-column-mismatch",
+              type: "game-stack-column-mismatch",
               ...column,
             });
           }
+        }
+      }
+
+      if (screen.id === "gameover" && (vp.width === 320 || vp.width === 390)) {
+        const goAlign = await gameOverColumnAlignment(page);
+        if (!goAlign.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "game-over-column-mismatch",
+            ...goAlign,
+          });
         }
       }
     }
@@ -280,7 +324,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD and play area share content column at 320px and 390px."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width."
   );
 }
 

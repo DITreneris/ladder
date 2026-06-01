@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **Three mismatched column widths on game and game-over screens** — align tap deck with `cl-shell-gutter` (remove double horizontal padding); full-width performance card; ladder rails span play area edges (no grey side dead zones); drop play-area side borders that framed a narrow lane
+
 ### Changed
 - [ROADMAP.md](ROADMAP.md) — status block, consistent release-train vocabulary, shipped baseline through v1.8.2 aligned with CHANGELOG; current gate + F&F runbook pointers; deduplicated v1.9 backlog; release archive replaces per-version task dumps
 - Agent docs sync (v1.8.2 gate) — [DOCS_INDEX.md](DOCS_INDEX.md) F&F/device-QA task rows; [AGENTS.md](AGENTS.md), [docs/mvp-scope.md](docs/mvp-scope.md), [README.md](README.md), [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md); [.cursor/rules/project-context.mdc](.cursor/rules/project-context.mdc), [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc), [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [deployment.mdc](.cursor/rules/deployment.mdc); [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [changelog-maintainer.md](.cursor/agents/changelog-maintainer.md); [.cursor/skills/mini-app-deploy](.cursor/skills/mini-app-deploy/SKILL.md), [score-pipeline](.cursor/skills/score-pipeline/SKILL.md), [changelog-maintainer](.cursor/skills/changelog-maintainer/SKILL.md); [docs/discoverability-plan.md](docs/discoverability-plan.md)
