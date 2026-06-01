@@ -21,6 +21,16 @@ interface TelegramBackButton {
   offClick: (callback: () => void) => void;
 }
 
+interface TelegramMainButton {
+  show: () => void;
+  hide: () => void;
+  enable: () => void;
+  disable: () => void;
+  setText: (text: string) => void;
+  onClick: (callback: () => void) => void;
+  offClick: (callback: () => void) => void;
+}
+
 declare global {
   interface Window {
     Telegram?: {
@@ -32,7 +42,7 @@ declare global {
         shareMessage?: (params: { text: string }) => void;
         openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink?: (url: string) => void;
-        MainButton: { hide: () => void };
+        MainButton: TelegramMainButton;
         BackButton?: TelegramBackButton;
         themeParams: Record<string, string>;
         safeAreaInset?: SafeAreaInset;
@@ -53,6 +63,7 @@ declare global {
 }
 
 let backButtonHandler: (() => void) | null = null;
+let mainButtonHandler: (() => void) | null = null;
 
 function setThemeVar(root: HTMLElement, cssVar: string, value: string | undefined, fallback: string): void {
   root.style.setProperty(cssVar, value && value.length > 0 ? value : fallback);
@@ -148,6 +159,29 @@ export function hideTelegramBack(): void {
   bb.hide();
 }
 
+export function showHomeMainButton(onPlay: () => void): void {
+  const mb = window.Telegram?.WebApp?.MainButton;
+  if (!mb || !isTelegram()) return;
+  if (mainButtonHandler) {
+    mb.offClick(mainButtonHandler);
+  }
+  mainButtonHandler = onPlay;
+  mb.setText("PUNCH IN & CLIMB");
+  mb.enable();
+  mb.onClick(onPlay);
+  mb.show();
+}
+
+export function hideHomeMainButton(): void {
+  const mb = window.Telegram?.WebApp?.MainButton;
+  if (!mb) return;
+  if (mainButtonHandler) {
+    mb.offClick(mainButtonHandler);
+    mainButtonHandler = null;
+  }
+  mb.hide();
+}
+
 export function hapticImpact(style: HapticImpact): void {
   try {
     window.Telegram?.WebApp?.HapticFeedback?.impactOccurred(style);
@@ -186,7 +220,7 @@ export function initTelegram(): void {
   if (tg) {
     tg.ready();
     tg.expand();
-    tg.MainButton.hide();
+    hideHomeMainButton();
     applyTelegramTheme();
     onThemeChanged(applyTelegramTheme);
     onSafeAreaChanged(applySafeAreaInsets);

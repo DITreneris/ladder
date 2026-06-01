@@ -39,7 +39,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   standard: {
     id: "standard",
     label: "Open Floor Plan",
-    description: "Synergy optional. Attendance mandatory.",
+    description: "Synergy optional. Attendance mandatory. Noise +20%. Privacy −80%. Promotion odds unchanged.",
     obstacleSpawnRate: OBSTACLE_SPAWN_RATE,
     internObstacleSpawnRate: INTERN_OBSTACLE_SPAWN_RATE,
     coffeeSpawnThreshold: COFFEE_SPAWN_THRESHOLD,
@@ -49,7 +49,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   meeting_monday: {
     id: "meeting_monday",
     label: "Meeting Monday",
-    description: "Your calendar owns you now. Blockers are decorative.",
+    description: "Your calendar owns you now. Blockers are decorative. Meeting density +35%. Focus −100%.",
     obstacleSpawnRate: 0.42,
     internObstacleSpawnRate: 0.28,
     coffeeSpawnThreshold: COFFEE_SPAWN_THRESHOLD,
@@ -59,7 +59,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   coffee_break: {
     id: "coffee_break",
     label: "Coffee Break",
-    description: "HR approved hydration. Decaf still not a strategy.",
+    description: "HR approved hydration. Decaf still not a strategy. Coffee spawns +40%. Sleep debt unchanged.",
     obstacleSpawnRate: OBSTACLE_SPAWN_RATE,
     internObstacleSpawnRate: INTERN_OBSTACLE_SPAWN_RATE,
     coffeeSpawnThreshold: 0.72,
@@ -69,7 +69,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   reorg_week: {
     id: "reorg_week",
     label: "Reorg Week",
-    description: "Org chart unstable. Reporting lines are suggestions.",
+    description: "Org chart unstable. Reporting lines are suggestions. Reorg probability rising. Titles fluid.",
     obstacleSpawnRate: 0.38,
     internObstacleSpawnRate: INTERN_OBSTACLE_SPAWN_RATE,
     coffeeSpawnThreshold: COFFEE_SPAWN_THRESHOLD,
@@ -80,7 +80,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   synergy_sprint: {
     id: "synergy_sprint",
     label: "Synergy Sprint",
-    description: "60 seconds. Velocity is a feeling. Outcomes are quarterly.",
+    description: "60 seconds. Velocity is a feeling. Outcomes are quarterly. Timer − mercy. Score = years at buzzer.",
     obstacleSpawnRate: 0.4,
     internObstacleSpawnRate: 0.26,
     coffeeSpawnThreshold: 0.8,

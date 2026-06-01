@@ -86,11 +86,18 @@ async function tapBarVisible(page) {
 async function homeCtaReachable(page) {
   return page.evaluate(() => {
     const startScreen = document.getElementById("startScreen");
-    const cta = startScreen?.querySelector("button.cl-primary-btn");
-    if (!startScreen || !cta) return { ok: false, reason: "missing-cta" };
+    if (!startScreen) return { ok: false, reason: "missing-start-screen" };
+
+    const inlineCta = startScreen.querySelector("button.cl-primary-btn");
+    const inlineVisible =
+      inlineCta && window.getComputedStyle(inlineCta).display !== "none";
+    const scrollTarget =
+      inlineVisible && inlineCta ? inlineCta : startScreen.querySelector(".start-cta-bar");
+    if (!scrollTarget) return { ok: false, reason: "missing-cta" };
 
     startScreen.scrollTop = startScreen.scrollHeight;
-    const rect = cta.getBoundingClientRect();
+    scrollTarget.scrollIntoView({ block: "nearest" });
+    const rect = scrollTarget.getBoundingClientRect();
     const containerRect = startScreen.getBoundingClientRect();
     const inView = rect.top >= containerRect.top - 1 && rect.bottom <= containerRect.bottom + 1;
 
@@ -99,6 +106,16 @@ async function homeCtaReachable(page) {
       scrollHeight: startScreen.scrollHeight,
       clientHeight: startScreen.clientHeight,
     };
+  });
+}
+
+async function homeMechanicCopyVisible(page) {
+  return page.evaluate(() => {
+    const startScreen = document.getElementById("startScreen");
+    if (!startScreen) return { ok: false, reason: "missing-start-screen" };
+    const text = startScreen.textContent ?? "";
+    const ok = text.includes("Tap left") || text.includes("Tap left or right");
+    return { ok, text: text.slice(0, 120) };
   });
 }
 
@@ -130,10 +147,10 @@ async function homeColumnAlignment(page) {
   return page.evaluate(() => {
     const badge = document.querySelector("#startScreen .card-light");
     const ticker = document.getElementById("homeNewsTicker");
-    const cta = document.querySelector("#startScreen button.cl-primary-btn");
-    if (!badge || !ticker || !cta) return { ok: false, reason: "missing-home-blocks" };
+    const ctaBar = document.querySelector("#startScreen .start-cta-bar");
+    if (!badge || !ticker || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
 
-    const boxes = [badge, ticker, cta].map((el) => {
+    const boxes = [badge, ticker, ctaBar].map((el) => {
       const r = el.getBoundingClientRect();
       return { w: r.width, l: r.left };
     });
@@ -146,7 +163,7 @@ async function homeColumnAlignment(page) {
       ok: widthDelta <= 2 && leftDelta <= 2,
       badgeWidth: widths[0],
       tickerWidth: widths[1],
-      ctaWidth: widths[2],
+      ctaBarWidth: widths[2],
       widthDelta,
       leftDelta,
     };
@@ -326,6 +343,16 @@ async function main() {
               screen: screen.label,
               type: "home-column-mismatch",
               ...homeAlign,
+            });
+          }
+
+          const homeCopy = await homeMechanicCopyVisible(page);
+          if (!homeCopy.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "home-mechanic-copy",
+              ...homeCopy,
             });
           }
         }

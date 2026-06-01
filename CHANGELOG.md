@@ -18,6 +18,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
+- **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)
 
 ### Planned (v1.1)
 - All-time / Legends tab

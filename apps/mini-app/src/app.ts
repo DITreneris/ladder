@@ -59,8 +59,10 @@ import {
   hapticImpact,
   hapticNotification,
   hideTelegramBack,
+  hideHomeMainButton,
   initTelegram,
   isTelegram,
+  showHomeMainButton,
   showTelegramBack,
 } from "./lib/telegram";
 import { audio } from "./game/audio";
@@ -70,7 +72,7 @@ type LeaderboardPeriod = "daily" | "weekly";
 
 let username = "CorporateSlave";
 let highScore = 0;
-let bestRank = "Intern";
+let bestRank: Rank = "Intern";
 let lastGameResult: GameOverResult | null = null;
 let leaderboardPeriod: LeaderboardPeriod = "daily";
 let engine: GameEngine;
@@ -135,7 +137,9 @@ function updateReorgHudStrip(rank: Rank): void {
 function mountTickerHeadline(): void {
   activeTickerHeadline = pickTickerHeadline();
   const formatted = formatTickerText(activeTickerHeadline);
-  $("newsTickerText").textContent = `${formatted}     ${formatted}`;
+  const tickerEl = $("newsTickerText");
+  tickerEl.textContent = formatted;
+  tickerEl.classList.add("news-ticker-text--static");
   engine?.setActiveTicker(activeTickerHeadline);
 }
 
@@ -235,6 +239,17 @@ function syncTelegramBackButton(tab: Screen): void {
   });
 }
 
+function syncTelegramMainButton(tab: Screen): void {
+  if (tab === "home") {
+    showHomeMainButton(() => {
+      hapticImpact("medium");
+      startGame();
+    });
+    return;
+  }
+  hideHomeMainButton();
+}
+
 function switchTab(tab: Screen): void {
   ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
     $(id).classList.add("hidden");
@@ -252,6 +267,7 @@ function switchTab(tab: Screen): void {
   el.classList.remove("hidden");
   el.classList.add("flex");
   syncTelegramBackButton(tab);
+  syncTelegramMainButton(tab);
   audio.nav();
   if (tab === "game") {
     requestAnimationFrame(() => layoutRungs());
@@ -264,6 +280,14 @@ const RANK_BADGE: Record<Rank, string> = {
   CEO: "badge-rank-ceo mt-0.5",
 };
 
+function refreshHomeBadgeUI(): void {
+  $("avatarIcon").textContent = rankEmoji(bestRank);
+  $("userTitleLabel").textContent =
+    highScore > 0 ? `Current rank: ${bestRank}` : `Starting rank: Intern`;
+  $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
+  $("highScoreBadge").textContent = highScore.toFixed(1);
+}
+
 function updateRankUI(rank: Rank, updatePlayer = true): void {
   const emoji = rankEmoji(rank);
   $("rankBadgeIcon").textContent = emoji;
@@ -271,8 +295,6 @@ function updateRankUI(rank: Rank, updatePlayer = true): void {
   if (updatePlayer && !playerInPanic && !emojiFlashLock) {
     $("playerActionEmoji").textContent = emoji;
   }
-  $("avatarIcon").textContent = emoji;
-  $("userTitleLabel").textContent = `Rank achieved: ${rank}`;
   $("gameRankBadge").className = RANK_BADGE[rank];
   updateRankProp(rank);
   updateReorgHudStrip(rank);
@@ -758,6 +780,7 @@ function goHome(): void {
   playerInPanic = false;
   enableVerticalSwipe();
   refreshDailyShiftUI();
+  refreshHomeBadgeUI();
   switchTab("home");
 }
 
@@ -819,11 +842,12 @@ async function runPostGameOverIo(
       const profileBest = profileResult.ok ? profileResult.profile.best_score : undefined;
       highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, profileBest);
       if (profileResult.ok) {
-        bestRank = profileResult.profile.best_rank || result.finalRank;
+        bestRank = (profileResult.profile.best_rank as Rank) || result.finalRank;
       } else if (result.yearsSurvived >= highScore) {
         bestRank = result.finalRank;
       }
-      $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+      $("highScoreBadge").textContent = highScore.toFixed(1);
+      refreshHomeBadgeUI();
       refreshCareerHighOnGameOver();
     }
   }
@@ -1230,6 +1254,7 @@ export function mountApp(): void {
   }
 
   updateRankUI("Intern");
+  refreshHomeBadgeUI();
   if (isOgCaptureMode()) {
     mountOgCaptureMode();
     return;
@@ -1237,6 +1262,7 @@ export function mountApp(): void {
 
   refreshDailyShiftUI();
   syncTelegramBackButton("home");
+  syncTelegramMainButton("home");
 
   const initData = getInitData();
   if (initData) {
@@ -1245,8 +1271,8 @@ export function mountApp(): void {
         hideAuthDegradedBanner();
         const profile = result.profile;
         highScore = profile.best_score;
-        bestRank = profile.best_rank || "Intern";
-        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+        bestRank = (profile.best_rank as Rank) || "Intern";
+        refreshHomeBadgeUI();
         if (profile.first_name || profile.username) {
           username = profile.username ?? profile.first_name ?? username;
           ($("usernameInput") as HTMLInputElement).value = username;
@@ -1260,7 +1286,7 @@ export function mountApp(): void {
     if (saved) {
       highScore = parseFloat(saved);
       bestRank = rankFromYears(Math.floor(highScore));
-      $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+      refreshHomeBadgeUI();
     }
   }
 }

@@ -45,6 +45,7 @@ export const APP_SHELL = `
           </div>
           <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
           <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Simulating modern work chaos</p>
+          <p class="home-hero-enter text-caption font-semibold text-slate-600 text-center px-2 mt-2">Tap left or right. Dodge meetings. Survive the org chart.</p>
         </div>
         <div class="card-light space-y-2 py-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -55,11 +56,13 @@ export const APP_SHELL = `
             <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0" id="avatarIcon">🧑‍💻</div>
             <div class="flex-grow min-w-0">
               <input type="text" id="usernameInput" value="CorporateSlave" class="font-bold text-slate-800 border-b border-dashed border-slate-300 focus:border-cl-primary focus:outline-none focus-ring bg-transparent w-full min-h-[44px]" placeholder="Enter Nickname...">
-              <p class="text-xs text-slate-500 mt-0.5 truncate" id="userTitleLabel">Starting Rank: Intern</p>
+              <p class="text-xs text-slate-500 mt-0.5 truncate" id="userTitleLabel">Starting rank: Intern</p>
+              <p class="text-caption text-cl-primary font-bold mt-0.5 truncate" id="homeMilestoneLabel">Manager in 10.0y</p>
             </div>
             <div class="text-right shrink-0">
-              <p class="text-nano font-bold uppercase text-slate-400">Best</p>
-              <p class="text-xs font-bold text-slate-950" id="highScoreBadge">0.0 Years</p>
+              <p class="text-nano font-bold uppercase text-slate-400">Best career</p>
+              <p class="text-xs font-bold text-slate-950" id="highScoreBadge">0.0</p>
+              <p class="text-nano font-bold uppercase text-slate-400">years</p>
             </div>
           </div>
         </div>
@@ -76,8 +79,16 @@ export const APP_SHELL = `
           </div>
           <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1"></p>
         </div>
-        <div class="start-cta-bar shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
-          <p class="text-caption font-semibold text-slate-700 text-center px-1">One tap, one rung. Meetings terminate. Coffee negotiates.</p>
+        <div id="homeGameplayPreview" class="card-light-sm shrink-0">
+          <span class="text-xl shrink-0" aria-hidden="true">🏃</span>
+          <div class="min-w-0 flex-1 space-y-1">
+            <p class="text-caption font-extrabold text-slate-800">Avoid</p>
+            <p class="text-caption text-slate-600">Meetings · Reorgs · Deadlines</p>
+            <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
+            <p class="text-caption text-slate-600">Intern → Manager (10y) → CEO (35y)</p>
+          </div>
+        </div>
+        <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
           <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
             <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
           </button>
@@ -86,7 +97,7 @@ export const APP_SHELL = `
               <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard
             </button>
             <button onclick="switchTab('howtoplay')" class="btn-cl-secondary py-2 px-3 text-xs">
-              <i class="fa-solid fa-circle-question text-cl-primary"></i> How to Play
+              <i class="fa-solid fa-circle-question text-cl-primary"></i> How to Survive
             </button>
           </div>
           ${BRAND_FOOTER}

@@ -285,6 +285,7 @@ html.cl-in-telegram #app {
 
 html.cl-in-telegram #startScreen {
   padding: 0;
+  padding-bottom: calc(4.5rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -328,6 +329,10 @@ html.cl-in-telegram .text-micro {
 .cl-in-telegram .sound-fab {
   top: calc(0.5rem + var(--tg-content-safe-area-inset-top, env(safe-area-inset-top, 0px)));
   right: calc(0.5rem + var(--tg-content-safe-area-inset-right, env(safe-area-inset-right, 0px)));
+}
+
+.cl-in-telegram #startScreen .cl-primary-btn {
+  display: none;
 }
 
 .start-cta-bar {
@@ -687,6 +692,11 @@ html.cl-in-telegram .text-micro {
   display: inline-block;
   white-space: nowrap;
   animation: ticker-scroll 20s linear infinite;
+}
+
+.news-ticker-text--static {
+  animation: none;
+  transform: none;
 }
 
 @keyframes ticker-scroll {

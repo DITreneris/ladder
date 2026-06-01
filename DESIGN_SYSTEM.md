@@ -148,7 +148,7 @@ Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented
 - Hide in-app `.cl-header` — use Telegram native title + `BackButton` API
 - Floating `.sound-fab` for mute toggle (not duplicated in header)
 - Safe-area padding on `.cl-phone-shell` via `--tg-content-safe-area-inset-*` + `env(safe-area-inset-*)`
-- Home: compact hero + identity card (Employee Badge / ACTIVE EMPLOYMENT) + scrolling news strip + daily shift pill + description; rule above sticky `.start-cta-bar`; `#startScreen` scrolls on short viewports in Telegram (`overflow-y: auto`)
+- Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + static news strip (`news-ticker-text--static`) + daily shift pill + `#homeGameplayPreview` + sticky `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden); `#startScreen` scrolls on short viewports with MainButton bottom padding
 - Game: compact `.game-hud` with optional `#hudTapHint` chip (deck-first copy: TAP LEFT / TAP RIGHT); first-run `.tap-deck-hint` pulse on `#tapControlsBar`; `#hrMemoRail` below HUD for in-run People Ops memos (queued, consolidated on promotion); `#gamePlayArea` for responsive full-column ladder (`cl-shell-gutter`, `#ladderTrack` width 100%); fixed `.tap-controls-bar` full-bleed with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; player position from DOM slot centers; keyboard hints hidden in Telegram; shell toast on home/game-over only — mute feedback uses HR memo in-run
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
 
