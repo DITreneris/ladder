@@ -88,7 +88,8 @@ npm run test     # Vitest (engine + constants)
 npm run build    # Production bundle → dist/
 npm run preview  # Preview production build
 npm run qa:viewport  # Playwright overflow check (preview must be running)
-npm run capture:hero  # README portrait → docs/assets/gameplay.png
+npm run capture:marketing  # Marketing set → docs/assets/marketing/
+npm run capture:hero  # Legacy alias → copies 01-home to docs/assets/gameplay.png
 npm run capture:og    # Link previews → public/og.png + .github/social-preview.png
 npm run verify:og     # Assert OG PNG dimensions (CI)
 ```
@@ -105,12 +106,13 @@ Regenerate after shell/game UI changes:
 
 ```bash
 npm run build && npm run preview -- --host 127.0.0.1 --port 4173
-# terminal 2 (set PREVIEW_URL if preview picked another port)
-npm run capture:og
+# terminal 2
+npm run capture:marketing   # docs/assets/marketing/ (home, gameplay, game over)
+npm run capture:og          # public/og.png + .github/social-preview.png
 npm run verify:og
 ```
 
-Outputs: `public/og.png` (1200×630), `.github/social-preview.png` (1280×640). Intermediate crop in `public/og-cache/` (gitignored).
+Outputs: `docs/assets/marketing/01-home.png`, `02-gameplay-dodge.png`, `03-game-over.png`; `public/og.png` (1200×630); `.github/social-preview.png` (1280×640). Rubric and captions: [../../docs/assets/marketing/README.md](../../docs/assets/marketing/README.md). Intermediate crop in `public/og-cache/` (gitignored).
 
 ## Local Development
 

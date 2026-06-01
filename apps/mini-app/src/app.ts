@@ -20,6 +20,20 @@ import {
 import { type DailyModifier, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import {
+  buildMarketingGameRungs,
+  getMarketingCaptureMode,
+  MARKETING_GAME_ENERGY,
+  MARKETING_GAME_MODIFIER,
+  MARKETING_GAME_PLAYER_SIDE,
+  MARKETING_GAME_RANK,
+  MARKETING_GAME_SCORE,
+  MARKETING_GAME_YEARS,
+  MARKETING_GAMEOVER,
+  MARKETING_HOME_HIGH_SCORE,
+  MARKETING_HOME_MODIFIER,
+  MARKETING_HOME_USERNAME,
+} from "./game/marketing-capture";
+import {
   buildOgCaptureRungs,
   OG_CAPTURE_DAILY_MODIFIER,
   OG_CAPTURE_ENERGY,
@@ -547,7 +561,7 @@ function renderRungsInner(): void {
     leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
     rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
 
-    if (shouldShowImminentHint(engine.getRungsClimbed()) && i === 1) {
+    if ((shouldShowImminentHint(engine.getRungsClimbed()) || getMarketingCaptureMode() === "game") && i === 1) {
       leftSlot.classList.toggle("safe-side-hint", rung.obstacle !== "left");
       rightSlot.classList.toggle("safe-side-hint", rung.obstacle !== "right");
     }
@@ -863,28 +877,7 @@ async function runPostGameOverIo(
 }
 
 function seedGameOverForQa(): void {
-  lastGameResult = {
-    yearsSurvived: 4.5,
-    finalRank: "Intern",
-    deathType: "meeting",
-    terminationCause: "Meeting collision",
-    terminationDetail: "Attended one meeting too many.",
-    terminationFlavor: "Your calendar owned you.",
-    rungsClimbed: 18,
-  };
-  $("statYears").textContent = "4.5 Years";
-  $("statRank").innerHTML = `<span>${rankEmoji("Intern")}</span> Intern`;
-  $("terminationCauseIcon").textContent = DEATH_EMOJI.meeting;
-  $("terminationCauseLabel").textContent = DEATH_LABELS.meeting;
-  $("terminationReason").textContent = `"${lastGameResult.terminationDetail}"`;
-  $("retryTip").textContent = RETRY_TIPS.meeting;
-  $("terminationFlavor").textContent = `"${lastGameResult.terminationFlavor}"`;
-  $("reviewId").textContent = "REF-89412";
-  $("statBestDelta").textContent = "";
-  $("careerHighLine").textContent = "";
-  $("leaderboardGapLine").textContent = "";
-  $("leaderboardGapLine").classList.add("hidden");
-  $("reapplyFlavorLine").textContent = reappliesFlavor(1);
+  applyMarketingGameOverUi();
 }
 
 async function onGameOver(result: GameOverResult): Promise<void> {
@@ -1033,6 +1026,119 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
       if (earlyTapsRemaining === 0) hideTapDeckHint();
     }
   });
+}
+
+function signalCaptureReady(delayMs = 0): void {
+  window.setTimeout(() => {
+    requestAnimationFrame(() => {
+      layoutRungs();
+      requestAnimationFrame(() => {
+        (window as unknown as Record<string, unknown>).__CL_CAPTURE_READY__ = true;
+      });
+    });
+  }, delayMs);
+}
+
+function applyDailyModifierUi(modifier: DailyModifier): void {
+  activeDailyModifier = modifier;
+  $("dailyShiftLabel").textContent = modifier.label;
+  $("dailyShiftDescription").textContent = modifier.description;
+  const pill = $("dailyShiftPill");
+  if (pill) {
+    pill.title = modifier.description;
+    pill.classList.toggle("ticker-shift-emphasis", modifier.id !== "standard");
+  }
+
+  const viewport = document.querySelector(".cl-viewport");
+  if (viewport) {
+    for (const cls of GRID_TINT_CLASSES) {
+      viewport.classList.remove(cls);
+    }
+    if (modifier.gridTintClass) {
+      viewport.classList.add(modifier.gridTintClass);
+    }
+  }
+}
+
+function mountMarketingHomeCapture(): void {
+  hideAuthDegradedBanner();
+  username = MARKETING_HOME_USERNAME;
+  ($("usernameInput") as HTMLInputElement).value = username;
+  highScore = MARKETING_HOME_HIGH_SCORE;
+  bestRank = rankFromYears(Math.floor(highScore));
+  applyDailyModifierUi(MARKETING_HOME_MODIFIER);
+  mountTickerHeadline();
+  refreshHomeBadgeUI();
+  switchTab("home");
+  $("startScreen").scrollTop = 0;
+  signalCaptureReady(500);
+}
+
+function mountMarketingGameCapture(): void {
+  document.documentElement.dataset.ogCapture = "1";
+  document.documentElement.dataset.captureVariant = "marketing";
+  applyDailyModifierUi(MARKETING_GAME_MODIFIER);
+
+  $("soundToggleBtn").classList.add("hidden");
+  hideHudTapHint();
+  hideTapDeckHint();
+  hideHrMemo();
+
+  prevRungsSnapshot = [];
+  earlyTapsRemaining = 0;
+  playerInPanic = false;
+  playerAtCorridor = false;
+  $("playerActionEmoji").classList.remove("idle-bob");
+
+  engine.applyOgCaptureSnapshot(
+    buildMarketingGameRungs(),
+    MARKETING_GAME_SCORE,
+    MARKETING_GAME_ENERGY,
+    MARKETING_GAME_PLAYER_SIDE,
+    MARKETING_GAME_RANK
+  );
+
+  updateRankUI(MARKETING_GAME_RANK);
+  updateMilestoneChip(MARKETING_GAME_YEARS);
+  updateFloorLabel(MARKETING_GAME_YEARS);
+  updateReorgHudStrip(MARKETING_GAME_RANK);
+  $("burnoutMeter").style.width = `${MARKETING_GAME_ENERGY}%`;
+  $("burnoutPercentLabel").textContent = `${MARKETING_GAME_ENERGY}%`;
+  $("gameYearsLabel").textContent = MARKETING_GAME_YEARS.toFixed(1);
+  updateImminentRungHint();
+
+  switchTab("game");
+
+  requestAnimationFrame(() => {
+    layoutRungs();
+    layoutPlayerPosition("center");
+    signalCaptureReady();
+  });
+}
+
+function applyMarketingGameOverUi(): void {
+  const result = MARKETING_GAMEOVER;
+  lastGameResult = result;
+  $("statYears").textContent = `${result.yearsSurvived.toFixed(1)} Years`;
+  $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
+  $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
+  $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
+  $("terminationReason").textContent = `"${result.terminationDetail}"`;
+  $("retryTip").textContent = RETRY_TIPS[result.deathType];
+  $("terminationFlavor").textContent = `"${result.terminationFlavor}"`;
+  $("reviewId").textContent = "REF-89412";
+  $("statBestDelta").textContent = "";
+  $("careerHighLine").textContent = "Career high: Intern (3.5y)";
+  $("leaderboardGapLine").textContent = "";
+  $("leaderboardGapLine").classList.add("hidden");
+  $("reapplyFlavorLine").textContent = reappliesFlavor(1);
+}
+
+function mountMarketingGameOverCapture(): void {
+  hideAuthDegradedBanner();
+  applyMarketingGameOverUi();
+  switchTab("gameover");
+  signalCaptureReady(300);
 }
 
 function mountOgCaptureMode(): void {
@@ -1264,6 +1370,20 @@ export function mountApp(): void {
   refreshHomeBadgeUI();
   if (isOgCaptureMode()) {
     mountOgCaptureMode();
+    return;
+  }
+
+  const marketingCaptureMode = getMarketingCaptureMode();
+  if (marketingCaptureMode === "home") {
+    mountMarketingHomeCapture();
+    return;
+  }
+  if (marketingCaptureMode === "game") {
+    mountMarketingGameCapture();
+    return;
+  }
+  if (marketingCaptureMode === "gameover") {
+    mountMarketingGameOverCapture();
     return;
   }
 

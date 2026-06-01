@@ -12,6 +12,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
+- **Marketing screenshot pipeline** — `?capture=home|game|gameover` seeds, `npm run capture:marketing` → `docs/assets/marketing/` (01-home, 02-gameplay-dodge, 03-game-over); OG crop uses marketing gameplay frame
 
 ### Fixed
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)

@@ -13,6 +13,7 @@
     "qa:layout": "node scripts/layout-audit.mjs",
     "qa:coffee": "node scripts/coffee-pickup-qa.mjs",
     "capture:hero": "node scripts/capture-hero.mjs",
+    "capture:marketing": "node scripts/capture-marketing.mjs",
     "capture:og": "node scripts/capture-og.mjs",
     "verify:og": "node scripts/verify-og.mjs"
   },

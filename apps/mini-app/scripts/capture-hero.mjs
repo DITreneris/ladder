@@ -1,26 +1,28 @@
 /**
- * Capture home-screen hero image for README.
- * Usage: npm run build && npx vite preview --host 127.0.0.1 --port 4173 &
- *        node scripts/capture-hero.mjs
+ * Capture home-screen hero image for README (delegates to marketing home shot).
+ * Usage: npm run build && npm run preview -- --host 127.0.0.1 --port 4173 &
+ *        npm run capture:hero
  */
-import { chromium } from "playwright";
-import { mkdir } from "node:fs/promises";
+import { copyFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.resolve(__dirname, "../../../docs/assets");
-const url = process.env.HERO_URL ?? "http://127.0.0.1:4173/";
+const marketingHome = path.resolve(__dirname, "../../../docs/assets/marketing/01-home.png");
+const legacyOut = path.resolve(__dirname, "../../../docs/assets/gameplay.png");
 
-await mkdir(outDir, { recursive: true });
+await mkdir(path.dirname(legacyOut), { recursive: true });
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-await page.goto(url, { waitUntil: "networkidle" });
-await page.waitForSelector("#startScreen");
-await page.screenshot({
-  path: path.join(outDir, "gameplay.png"),
-  fullPage: false,
+await new Promise((resolve, reject) => {
+  const child = spawn("node", ["scripts/capture-marketing.mjs"], {
+    cwd: path.resolve(__dirname, ".."),
+    stdio: "inherit",
+    shell: true,
+  });
+  child.on("error", reject);
+  child.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`capture:marketing exited ${code}`))));
 });
-await browser.close();
-console.log("Saved docs/assets/gameplay.png");
+
+await copyFile(marketingHome, legacyOut);
+console.log("Saved docs/assets/gameplay.png (copy of marketing/01-home.png)");

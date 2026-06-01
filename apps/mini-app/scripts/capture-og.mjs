@@ -27,12 +27,12 @@ const browser = await chromium.launch();
 
 try {
   const cropPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await cropPage.goto(`${previewUrl}/?og=1`, { waitUntil: "networkidle" });
-  await cropPage.waitForFunction(() => window.__CL_OG_READY__ === true, {
+  await cropPage.goto(`${previewUrl}/?capture=game`, { waitUntil: "networkidle" });
+  await cropPage.waitForFunction(() => window.__CL_CAPTURE_READY__ === true, {
     timeout: 15000,
   });
-  await cropPage.waitForSelector("#ogCaptureFrame");
-  await cropPage.locator("#ogCaptureFrame").screenshot({ path: cropPath });
+  await cropPage.waitForSelector("#gameContentColumn");
+  await cropPage.locator("#gameContentColumn").screenshot({ path: cropPath });
   await copyFile(cropPath, distCropPath);
   await cropPage.close();
   console.log(`Saved ${path.relative(repoRoot, cropPath)}`);

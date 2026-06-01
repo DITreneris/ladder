@@ -691,6 +691,10 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   display: none !important;
 }
 
+[data-og-capture="1"][data-capture-variant="marketing"] #tapControlsBar {
+  display: grid !important;
+}
+
 [data-og-capture="1"] #ogCaptureFrame {
   min-height: 520px;
 }
