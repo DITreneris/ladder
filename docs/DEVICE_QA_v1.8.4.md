@@ -52,7 +52,7 @@ Sign off on real Telegram **iOS** and **Android** after Vercel redeploy.
 
 - [ ] `cd apps/mini-app && npm run lint && npm test && npm run build`
 - [ ] `cd packages/api && pytest`
-- [ ] `npm run preview` → `npm run qa:viewport`
+- [ ] `npm run preview` → `npm run qa:viewport` + `npm run qa:layout`
 - [ ] `scripts/smoke-local.ps1` from repo root
 
 ---

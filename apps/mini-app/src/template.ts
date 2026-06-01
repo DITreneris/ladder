@@ -216,7 +216,7 @@ export const APP_SHELL = `
         ${BRAND_FOOTER}
       </div>
     </div>
-    <div id="leaderboardScreen" class="hidden flex-col flex-grow justify-between p-5 select-none overflow-y-auto">
+    <div id="leaderboardScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-5 select-none overflow-y-auto min-w-0">
       <div>
         <div class="flex items-center space-x-3 mb-4">
           <span class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">🏆</span>
@@ -236,7 +236,7 @@ export const APP_SHELL = `
         ${BRAND_FOOTER}
       </div>
     </div>
-    <div id="howToPlayScreen" class="hidden flex-col flex-grow justify-between p-5 select-none overflow-y-auto">
+    <div id="howToPlayScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-5 select-none overflow-y-auto min-w-0">
       <div class="space-y-4">
         <div class="flex items-center space-x-3">
           <span class="w-10 h-10 bg-blue-100 text-cl-primary rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">💡</span>
@@ -288,6 +288,7 @@ export const APP_SHELL = `
         ${BRAND_FOOTER}
       </div>
     </div>
+    <div id="debugStrip" class="hidden absolute top-14 left-2 right-2 z-50 rounded bg-slate-900/90 px-2 py-1 text-nano font-mono text-emerald-300 pointer-events-none truncate" aria-live="polite"></div>
     <div id="toastNotification" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg z-50 flex items-center space-x-2 opacity-0 pointer-events-none transition-opacity duration-300">
       <i class="fa-solid fa-circle-check text-emerald-400"></i>
       <span id="toastText">Done!</span>

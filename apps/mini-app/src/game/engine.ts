@@ -1,4 +1,5 @@
 import { audio } from "./audio";
+import { debugLog } from "../lib/debug";
 
 import {
   BASE_DRAIN_RATE,
@@ -271,10 +272,16 @@ export class GameEngine {
   }
 
   handleTap(side: PlayerSide): void {
-    if (!this.isPlaying || this.isGameOverState) return;
+    if (!this.isPlaying || this.isGameOverState) {
+      debugLog("tap", "ignored inactive", { side });
+      return;
+    }
 
     const now = Date.now();
-    if (now - this.lastTapAt < MIN_TAP_INTERVAL_MS) return;
+    if (now - this.lastTapAt < MIN_TAP_INTERVAL_MS) {
+      debugLog("tap", "ignored throttle", { side, ms: now - this.lastTapAt });
+      return;
+    }
     this.lastTapAt = now;
 
     if (!this.firstTapDone) {
@@ -286,6 +293,12 @@ export class GameEngine {
     this.updatePlayerPosition(side);
 
     const nextRung = this.rungs[1];
+    debugLog("tap", "handle", {
+      side,
+      obstacle: nextRung?.obstacle ?? null,
+      coffee: nextRung?.coffee ?? null,
+    });
+
     if (nextRung?.obstacle === this.playerSide) {
       let cause = "Reorganization";
       let detail = "A massive department restructuring shuffled you out of direct reports.";
@@ -306,13 +319,13 @@ export class GameEngine {
     this.score++;
     audio.tap(this.score);
 
-    let collectedCoffee = false;
+    let coffeePickup: { side: PlayerSide; rungId: number } | null = null;
     if (nextRung?.coffee === this.playerSide) {
       this.timeLeft = Math.min(100, this.timeLeft + COFFEE_RECOVERY);
       this.coffeeCollected = true;
+      coffeePickup = { side: this.playerSide, rungId: nextRung.id };
       nextRung.coffee = null;
       audio.coffee();
-      collectedCoffee = true;
     } else {
       this.timeLeft = Math.min(100, this.timeLeft + CLIMB_RECOVERY);
     }
@@ -327,10 +340,10 @@ export class GameEngine {
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
     this.checkInternFakePromos(years);
-    this.renderRungs();
-    if (collectedCoffee) {
-      this.callbacks.onCoffee();
+    if (coffeePickup) {
+      this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
     }
+    this.renderRungs();
   }
 
   private checkPromotions(): void {

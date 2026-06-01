@@ -102,22 +102,15 @@ export function triggerDeathEmoji(deathType: DeathType, onComplete?: () => void)
     return;
   }
 
-  const emoji = DEATH_EMOJI[deathType];
-  const prev = el.textContent;
-  el.textContent = emoji;
+  el.textContent = DEATH_EMOJI[deathType];
   el.classList.remove("idle-bob");
 
-  const finish = () => {
-    if (prev) el.textContent = prev;
-    onComplete?.();
-  };
-
   if (respectsReducedMotion()) {
-    finish();
+    onComplete?.();
     return;
   }
 
-  setTimeout(finish, 200);
+  setTimeout(() => onComplete?.(), 350);
 }
 
 export function triggerRankPop(el: HTMLElement): void {

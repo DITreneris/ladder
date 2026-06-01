@@ -29,6 +29,7 @@ import {
 } from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { debugLog, mountDebugStrip } from "./lib/debug";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
@@ -36,6 +37,7 @@ import {
   flashBurnoutStress,
   spawnFloatingParticles,
   triggerClimbPop,
+  triggerCoffeePickup,
   triggerDeathEmoji,
   triggerDeathFlash,
   triggerDeathCauseHold,
@@ -78,6 +80,7 @@ let shiftToastShown = false;
 let activeTickerHeadline: TickerHeadline = pickTickerHeadline();
 let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
+let emojiFlashLock = false;
 
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 
@@ -89,15 +92,24 @@ function isOgCaptureMode(): boolean {
 
 function flashPlayerEmoji(emoji: string, ms: number): void {
   if (playerEmojiFlashTimer) clearTimeout(playerEmojiFlashTimer);
+  emojiFlashLock = true;
   $("playerActionEmoji").textContent = emoji;
   playerEmojiFlashTimer = setTimeout(() => {
     playerEmojiFlashTimer = null;
+    emojiFlashLock = false;
     if (playerInPanic) {
       $("playerActionEmoji").textContent = "😰";
     } else if (engine?.isActive()) {
       $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
     }
   }, ms);
+}
+
+function findImminentCoffeeBadge(side: PlayerSide): HTMLElement | null {
+  const imminent = $("rungsContainer").querySelector(".next-rung");
+  if (!imminent) return null;
+  const slot = imminent.querySelector(side === "left" ? ".left-slot" : ".right-slot");
+  return slot?.querySelector(".coffee-badge") as HTMLElement | null;
 }
 
 function updateRankProp(rank: Rank): void {
@@ -228,7 +240,7 @@ function updateRankUI(rank: Rank, updatePlayer = true): void {
   const emoji = rankEmoji(rank);
   $("rankBadgeIcon").textContent = emoji;
   $("rankBadgeText").textContent = rank;
-  if (updatePlayer && !playerInPanic) {
+  if (updatePlayer && !playerInPanic && !emojiFlashLock) {
     $("playerActionEmoji").textContent = emoji;
   }
   $("avatarIcon").textContent = emoji;
@@ -241,6 +253,7 @@ function updateRankUI(rank: Rank, updatePlayer = true): void {
 function setPlayerPanic(on: boolean): void {
   playerInPanic = on;
   $("playerClimber").classList.toggle("player-panic", on);
+  if (emojiFlashLock) return;
   if (on) {
     $("playerActionEmoji").textContent = "😰";
   } else {
@@ -760,6 +773,7 @@ function seedGameOverForQa(): void {
 }
 
 async function onGameOver(result: GameOverResult): Promise<void> {
+  debugLog("gameover", "collision/death", { deathType: result.deathType });
   hideHrMemo();
   hideHudTapHint();
   lastGameResult = result;
@@ -894,7 +908,12 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
   el.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     const now = Date.now();
-    if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) return;
+    if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) {
+      debugLog("tap", "ui throttle", { side, ms: now - lastPointerTapAt });
+      hapticImpact("rigid");
+      triggerClimbPop(el);
+      return;
+    }
     lastPointerTapAt = now;
     engine.handleTap(side);
     if (earlyTapsRemaining > 0) {
@@ -958,6 +977,7 @@ function mountOgCaptureMode(): void {
 
 export function mountApp(): void {
   initTelegram();
+  mountDebugStrip();
   username = getDisplayName();
   $("botHandleLabel").textContent = `@${getBotUsername()}`;
 
@@ -1018,8 +1038,11 @@ export function mountApp(): void {
         spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
       },
       onGameOver,
-      onCoffee: () => {
-        flashPlayerEmoji("🤤", 200);
+      onCoffee: (side, rungId) => {
+        debugLog("coffee", "callback", { side, rungId });
+        const badge = findImminentCoffeeBadge(side);
+        if (badge) triggerCoffeePickup(badge);
+        flashPlayerEmoji("🤤", 550);
         showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
         triggerMeterFlash($("burnoutMeter"));
         spawnFloatingParticles($("playerClimber"), "☕", 5);

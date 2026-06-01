@@ -79,6 +79,7 @@ describe("GameEngine", () => {
     tapWithCooldown(engine, "left");
 
     expect(onCoffee).toHaveBeenCalledTimes(1);
+    expect(onCoffee).toHaveBeenCalledWith("left", expect.any(Number));
   });
 
   it("clears coffee from the rung after pickup (no ghost badge on current slot)", () => {
@@ -97,6 +98,7 @@ describe("GameEngine", () => {
 
     const rungs = engine.getRungs();
     expect(onCoffee).toHaveBeenCalledTimes(1);
+    expect(onCoffee).toHaveBeenCalledWith("left", expect.any(Number));
     expect(rungs.some((r) => r.coffee === "left")).toBe(false);
   });
 

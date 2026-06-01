@@ -24,6 +24,6 @@ export interface GameCallbacks {
   onScoreUpdate: (years: number, energy: number) => void;
   onRankChange: (rank: Rank, message: string) => void;
   onGameOver: (result: GameOverResult) => void;
-  onCoffee: () => void;
+  onCoffee: (side: PlayerSide, rungId: number) => void;
   onToast: (msg: string) => void;
 }

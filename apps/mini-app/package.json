@@ -10,6 +10,7 @@
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "qa:viewport": "node scripts/viewport-qa.mjs",
+    "qa:layout": "node scripts/layout-audit.mjs",
     "capture:hero": "node scripts/capture-hero.mjs",
     "capture:og": "node scripts/capture-og.mjs",
     "verify:og": "node scripts/verify-og.mjs"

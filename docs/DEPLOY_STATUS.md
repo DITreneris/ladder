@@ -22,7 +22,7 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 2 | Railway API | **Done** | https://ladder-production-642d.up.railway.app — `GET /health` → `{"status":"ok"}` |
 
-| 3 | Vercel Mini App | **Redeploy pending** | https://www.promptanatomy.lol — v1.8.4 + trust hotfix; prod still on v1.8.2 bundle until redeploy |
+| 3 | Vercel Mini App | **Redeploy Done** | https://www.promptanatomy.lol — bundle `main-BVz1aF34.js` (2026-06-01); reaction/layout hotfix pending next deploy |
 
 | 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL |
 

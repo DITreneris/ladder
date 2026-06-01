@@ -349,6 +349,17 @@ html.cl-in-telegram .text-micro {
   white-space: nowrap;
 }
 
+#gameContentColumn {
+  background: #fff;
+}
+
+.game-hud,
+.hr-memo-rail,
+.game-play-area,
+.tap-controls-bar {
+  background: #fff;
+}
+
 .game-play-area {
   position: relative;
   min-height: 0;
@@ -359,7 +370,8 @@ html.cl-in-telegram .text-micro {
   box-sizing: border-box;
   padding-left: 4px;
   padding-right: 4px;
-  background: #f1f5f9;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .ladder-track {

@@ -17,6 +17,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Profile stale after first run** — refresh profile after successful score submit; career-high line updates on game over
 - **Viewport QA game-over checks** — QA `switchTab('gameover')` seeds game-over state for REJECTED stamp layout checks
 - **REJECTED stamp viewport clip** — slightly smaller stamp inset (`right-3 bottom-3`) so rotated badge stays inside performance card bounds
+- **Death emoji restored too early** — `triggerDeathEmoji` holds collision emoji through shake sequence
+- **Coffee pickup felt invisible** — `onCoffee` fires before `renderRungs`; badge pickup animation restored; longer 🤤 flash with emoji lock during panic updates
+- **Tap throttle felt dead** — rejected taps get haptic + button pop feedback; optional `?debug=1` trace strip
+- **Four-band layout on game screen** — unified white game surface on `#gameContentColumn`; leaderboard/how-to use `cl-shell-gutter`
 
 ### Planned (v1.1)
 - All-time / Legends tab

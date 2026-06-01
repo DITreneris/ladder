@@ -88,6 +88,8 @@ Use this table to pick the right skill, rules, and documents.
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |
 | `device-qa-v184` | [docs/DEVICE_QA_v1.8.4.md](docs/DEVICE_QA_v1.8.4.md) | Release | v1.8.4 trust + layout delta — blocks tag `v1.8.4` |
+| `debug-repro` | [docs/DEBUG_REPRO.md](docs/DEBUG_REPRO.md) | QA | Manual R1–R5 reaction + L1–L5 layout checklist |
+| `debug-env` | [docs/DEBUG_ENV_TRIAGE.md](docs/DEBUG_ENV_TRIAGE.md) | QA | Prod bundle hash triage table |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
