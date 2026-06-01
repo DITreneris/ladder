@@ -5,22 +5,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { triggerDeathEmoji } from "./effects";
 
 describe("triggerDeathEmoji", () => {
+  const mockMediaQueryList = {
+    matches: false,
+    media: "",
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  } as MediaQueryList;
+
   beforeEach(() => {
     document.body.innerHTML = '<span id="playerActionEmoji">🧑‍💻</span>';
-    vi.spyOn(window, "matchMedia").mockReturnValue({
-      matches: false,
-      media: "",
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    } as MediaQueryList);
+    vi.stubGlobal("matchMedia", vi.fn().mockReturnValue(mockMediaQueryList));
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("keeps death emoji until onComplete (does not restore rank emoji early)", () => {
