@@ -29,6 +29,7 @@ import {
 } from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
@@ -731,6 +732,7 @@ function goHome(): void {
 
 function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult): void {
   const gapEl = $("leaderboardGapLine");
+  const boardLabel = leaderboardPeriod === "weekly" ? "the weekly board" : "today's board";
   if (!lbResult.ok) {
     gapEl.textContent = "";
     gapEl.classList.add("hidden");
@@ -739,10 +741,10 @@ function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult
   const top = lbResult.entries[0];
   if (top && top.years_survived > result.yearsSurvived) {
     const gap = top.years_survived - result.yearsSurvived;
-    gapEl.textContent = `#1 is ${gap.toFixed(1)}y ahead`;
+    gapEl.textContent = `#1 on ${boardLabel} is ${gap.toFixed(1)}y ahead`;
     gapEl.classList.remove("hidden");
   } else if (top?.is_current_user) {
-    gapEl.textContent = "You're #1 on today's board.";
+    gapEl.textContent = `You're #1 on ${boardLabel}.`;
     gapEl.classList.remove("hidden");
   } else {
     gapEl.textContent = "";
@@ -771,7 +773,7 @@ async function runPostGameOverIo(
   result: GameOverResult,
   initData: string
 ): Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }> {
-  const lbPromise = fetchLeaderboard("daily", initData || undefined);
+  const lbPromise = fetchLeaderboard(leaderboardPeriod, initData || undefined);
   let submitResult: SubmitRunResult | null = null;
 
   if (initData) {
@@ -782,18 +784,16 @@ async function runPostGameOverIo(
       rungsClimbed: result.rungsClimbed,
     });
     if (submitResult.ok) {
-      if (result.yearsSurvived > highScore) {
-        highScore = result.yearsSurvived;
-        bestRank = result.finalRank;
-        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
-      }
       const profileResult = await fetchProfile(initData);
+      const profileBest = profileResult.ok ? profileResult.profile.best_score : undefined;
+      highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, profileBest);
       if (profileResult.ok) {
-        highScore = profileResult.profile.best_score;
         bestRank = profileResult.profile.best_rank || result.finalRank;
-        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
-        refreshCareerHighOnGameOver();
+      } else if (result.yearsSurvived >= highScore) {
+        bestRank = result.finalRank;
       }
+      $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+      refreshCareerHighOnGameOver();
     }
   }
 
@@ -835,15 +835,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   $("playerActionEmoji").classList.remove("idle-bob");
 
   const previousBest = highScore;
-
-  if (result.yearsSurvived > highScore) {
-    highScore = result.yearsSurvived;
-    bestRank = result.finalRank;
-    $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
-    if (!isTelegram()) {
-      localStorage.setItem("corp_ladder_highscore", String(highScore));
-    }
-  }
+  const previousBestRank = bestRank;
 
   $("statYears").textContent = `${result.yearsSurvived.toFixed(1)} Years`;
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
@@ -857,8 +849,8 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   const reapplyCount = incrementReapplyCount();
   $("reapplyFlavorLine").textContent = reappliesFlavor(reapplyCount);
 
-  if (highScore > 0 && bestRank) {
-    $("careerHighLine").textContent = `Career high: ${bestRank} (${highScore.toFixed(1)}y)`;
+  if (previousBest > 0 && previousBestRank) {
+    $("careerHighLine").textContent = `Career high: ${previousBestRank} (${previousBest.toFixed(1)}y)`;
   } else {
     $("careerHighLine").textContent = "";
   }
@@ -1167,7 +1159,7 @@ export function mountApp(): void {
       renderLeaderboard();
     } else if (tab === "howtoplay") {
       switchTab("howtoplay");
-    } else if (tab === "gameover") {
+    } else if (tab === "gameover" && import.meta.env.DEV) {
       seedGameOverForQa();
       switchTab("gameover");
     }

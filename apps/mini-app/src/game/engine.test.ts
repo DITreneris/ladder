@@ -14,7 +14,7 @@ vi.mock("./audio", () => ({
 
 import { getDailyModifierById } from "./daily-modifier";
 import { GameEngine } from "./engine";
-import { MIN_TAP_INTERVAL_MS } from "./constants";
+import { MIN_TAP_INTERVAL_MS, TICK_MS } from "./constants";
 import type { DailyModifier } from "./daily-modifier";
 import type { GameCallbacks, GameOverResult } from "./types";
 
@@ -82,6 +82,49 @@ describe("GameEngine", () => {
 
     expect(onCoffee).toHaveBeenCalledTimes(1);
     expect(onCoffee).toHaveBeenCalledWith("left", expect.any(Number));
+  });
+
+  it("invokes onCoffee after renderRungs on coffee pickup", () => {
+    const callOrder: string[] = [];
+    const renderRungs = vi.fn(() => callOrder.push("renderRungs"));
+    const onCoffee = vi.fn(() => callOrder.push("onCoffee"));
+    const callbacks: GameCallbacks = {
+      onScoreUpdate: vi.fn(),
+      onRankChange: vi.fn(),
+      onGameOver: vi.fn(),
+      onCoffee,
+      onToast: vi.fn(),
+    };
+    const engine = new GameEngine(callbacks, vi.fn(), vi.fn(), renderRungs);
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    const lastRenderIdx = callOrder.lastIndexOf("renderRungs");
+    const lastCoffeeIdx = callOrder.lastIndexOf("onCoffee");
+    expect(lastCoffeeIdx).toBeGreaterThanOrEqual(0);
+    expect(lastRenderIdx).toBeLessThan(lastCoffeeIdx);
+  });
+
+  it("does not call onScoreUpdate after energy depletion game over", () => {
+    const onScoreUpdate = vi.fn();
+    const onGameOver = vi.fn();
+    const { engine } = createEngine({ onScoreUpdate, onGameOver });
+
+    engine.start();
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { timeLeft: number };
+    const internal = engine as unknown as EngineInternals;
+    internal.timeLeft = 0.1;
+
+    onScoreUpdate.mockClear();
+    vi.advanceTimersByTime(TICK_MS);
+
+    expect(onGameOver).toHaveBeenCalledTimes(1);
+    expect(onGameOver.mock.calls[0]![0].deathType).toBe("energy");
+    expect(onScoreUpdate).not.toHaveBeenCalled();
   });
 
   it("clears coffee from the rung after pickup (no ghost badge on current slot)", () => {

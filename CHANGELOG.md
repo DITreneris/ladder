@@ -10,7 +10,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- **Coffee pickup animation** — `onCoffee` fires after `renderRungs()` again (v1.8.4 order restored)
+- **Career high trust** — home badge and career-high line update only after successful score submit, not on game-over screen open
+- **Game-over gap copy** — leaderboard gap line respects Daily vs Weekly tab (`leaderboardPeriod`)
+- **Energy death HUD tick** — no extra score update after energy-depletion game over
+- **Layout CI guard** — `qa:layout` taps once and fails if `#gamePlayArea` width shrinks >2px (C-01 regression)
+- **Dev-only QA hook** — `switchTab('gameover')` via `window` only in `import.meta.env.DEV`
 - **320×568 viewport QA** — compact game HUD and tap deck on short Telegram viewports; rung rows scale down to 32px min so seven rungs fit the play area
+
+### Changed
+- **package.json version** — aligned to `1.8.5`
 
 ### Planned (v1.1)
 - All-time / Legends tab

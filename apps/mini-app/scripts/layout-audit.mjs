@@ -1,5 +1,6 @@
 /**
  * Layout audit — verifies game column width alignment at key viewports.
+ * After first tap, play-area width must stay stable (C-01 regression guard).
  * Run: npm run preview then npm run qa:layout
  */
 import { chromium } from "playwright";
@@ -21,12 +22,14 @@ async function measureGameColumn(page) {
     const tap = document.getElementById("tapControlsBar");
     const home = document.querySelector("#startScreen .cl-shell-gutter");
     const rect = (el) => (el ? el.getBoundingClientRect().width : 0);
+    const playClient = play ? play.clientWidth : 0;
     return {
       hasGameColumn: Boolean(column),
       game: {
         column: rect(column),
         hud: rect(hud),
         play: rect(play),
+        playClient,
         tap: rect(tap),
       },
       homeGutter: rect(home),
@@ -51,8 +54,13 @@ async function main() {
 
     await page.evaluate(() => window.startGame());
     await page.waitForSelector("#gameScreen:not(.hidden)");
-    const game = await measureGameColumn(page);
-    report.push({ viewport: vp.label, screen: "game", ...game });
+    const gameBeforeTap = await measureGameColumn(page);
+    report.push({ viewport: vp.label, screen: "game-before-tap", ...gameBeforeTap });
+
+    await page.click("#btnTapLeft");
+    await page.waitForTimeout(200);
+    const gameAfterTap = await measureGameColumn(page);
+    report.push({ viewport: vp.label, screen: "game-after-tap", ...gameAfterTap });
 
     await context.close();
   }
@@ -61,7 +69,7 @@ async function main() {
 
   const failures = [];
   for (const row of report) {
-    if (row.screen !== "game") continue;
+    if (row.screen !== "game-before-tap" && row.screen !== "game-after-tap") continue;
     const { hud, play, tap } = row.game;
     const widths = [hud, play, tap].filter((w) => w > 0);
     const max = Math.max(...widths);
@@ -75,6 +83,23 @@ async function main() {
     }
   }
 
+  for (const vp of VIEWPORTS) {
+    const before = report.find((r) => r.viewport === vp.label && r.screen === "game-before-tap");
+    const after = report.find((r) => r.viewport === vp.label && r.screen === "game-after-tap");
+    if (!before || !after) continue;
+    const delta = Math.abs(after.game.playClient - before.game.playClient);
+    if (delta > MAX_WIDTH_DELTA) {
+      failures.push({
+        viewport: vp.label,
+        screen: "post-tap-shrink",
+        reason: "play-area-width-shrink-after-tap",
+        before: before.game.playClient,
+        after: after.game.playClient,
+        delta,
+      });
+    }
+  }
+
   writeFileSync("layout-audit-report.json", JSON.stringify({ report, failures }, null, 2));
 
   if (failures.length) {
@@ -82,7 +107,9 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("LAYOUT AUDIT PASSED: #gameContentColumn present; HUD/play/tap widths aligned within 2px at 320/390.");
+  console.log(
+    "LAYOUT AUDIT PASSED: #gameContentColumn present; HUD/play/tap aligned; play-area width stable after first tap at 320/390."
+  );
 }
 
 main().catch((err) => {

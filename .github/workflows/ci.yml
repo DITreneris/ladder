@@ -55,5 +55,10 @@ jobs:
           npx vite preview --host 127.0.0.1 --port 4173 &
           sleep 5
           npm run qa:viewport
+      - name: Layout QA
+        run: |
+          npx vite preview --host 127.0.0.1 --port 4173 &
+          sleep 5
+          npm run qa:layout
       - name: OG asset check
         run: npm run verify:og

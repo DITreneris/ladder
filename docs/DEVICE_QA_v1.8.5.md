@@ -10,6 +10,23 @@ Sign off on real Telegram **iOS** and **Android** after Vercel redeploy.
 
 ---
 
+## Automated preflight (2026-06-01 Wave 1 sprint)
+
+Repo gates green before device sign-off:
+
+| Check | Result |
+|-------|--------|
+| `pytest` (API) | 16 passed |
+| `npm run lint` / `test` / `build` | pass (57 tests) |
+| `npm run qa:viewport` | pass |
+| `npm run qa:layout` (post-tap width) | pass — 390px: 316→316px; 320px: 246→246px |
+| Local bundle | `main-BWQOXY_x.js` — **redeploy Vercel before device QA** |
+| Prod bundle (pre-redeploy) | `main-mUiaglh1.js` |
+
+**Human steps after redeploy:** G-3 cache bust → fill rows 1–10 below on iOS + Android → G-7 tag → G-8 F&F.
+
+---
+
 ## v1.8.5 delta — Telegram iOS
 
 | # | Test | Pass |

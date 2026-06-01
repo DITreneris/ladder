@@ -225,6 +225,7 @@ export class GameEngine {
           "Cognitive overload. Energy reserves fully exhausted before reaching promotion.",
           "energy"
         );
+        return;
       }
       this.callbacks.onScoreUpdate(this.score / 4, this.timeLeft);
       if (this.timeLeft < 25 && Math.random() < 0.2) audio.stress();
@@ -333,13 +334,13 @@ export class GameEngine {
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
     this.checkInternFakePromos(years);
+    this.renderRungs();
     if (coffeePickup) {
       this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
       debugTapResult(side, nextRung, "coffee");
     } else {
       debugTapResult(side, nextRung, "climb");
     }
-    this.renderRungs();
     debugTapContext(this.rungs[1]);
   }
 

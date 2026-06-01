@@ -35,9 +35,16 @@ Use results to pick **1–2 v1.9 items** — see [ROADMAP.md](../ROADMAP.md) § 
 - [x] Production redeploy from `main` (Vercel + Railway API) — `d862c3c` 2026-06-01
 - [x] Post-deploy smoke — API health + OG meta (automated); Telegram steps 2–7 manual in [FF_EXECUTION.md](FF_EXECUTION.md) Phase B
 
+### Known limits for F&F (documented — not blockers)
 
+| ID | Limit | Target fix |
+|----|-------|------------|
+| C-06 | Client-trusted scores (no server replay) | v1.1 anti-cheat |
+| C-07 | In-memory 10s submit cooldown (per Railway worker) | v2.0 shared store |
+| S-02 | Background tab energy drain (wall-clock `setInterval`) | v1.9+ fixed timestep |
 
----
+Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation order, C-01 layout CI guard (`qa:layout` post-tap), C-09/C-10/C-11/C-12 hygiene.
+
 
 
 

@@ -30,7 +30,7 @@ Complete in order. Do not tag until rows 1–6 pass.
 | G-3 | Telegram cache bust — reopen from @bot | QA | [ ] | Hard refresh / new WebApp session loads new hash |
 | G-4 | **Device QA** iOS — [DEVICE_QA_v1.8.5](DEVICE_QA_v1.8.5.md) rows 1–10 | QA | [ ] | Sign-off table filled |
 | G-5 | **Device QA** Android — same matrix | QA | [ ] | Sign-off table filled |
-| G-6 | **Verifier** pass | Agent / lead | [ ] | [.cursor/agents/verifier.md](../.cursor/agents/verifier.md) checklist green |
+| G-6 | **Verifier** pass | Agent / lead | [x] | [.cursor/agents/verifier.md](../.cursor/agents/verifier.md) checklist green (2026-06-01 sprint) |
 | G-7 | `git tag v1.8.5` + push tags | Dev | [ ] | Tag on signed-off commit |
 | G-8 | F&F window — [FF_EXECUTION](FF_EXECUTION.md) Phase D | Product | [ ] | Testers invited post-tag |
 
@@ -106,9 +106,9 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 
 **Tasks:**
 
-- [ ] Move local `highScore` / badge update to after `submitResult.ok` (+ optional `fetchProfile`)
-- [ ] Keep game-over *run* stats (`statYears`, delta vs `previousBest`) unchanged
-- [ ] Add unit/integration test: mock failed submit → `highScore` unchanged
+- [x] Move local `highScore` / badge update to after `submitResult.ok` (+ optional `fetchProfile`)
+- [x] Keep game-over *run* stats (`statYears`, delta vs `previousBest`) unchanged
+- [x] Add unit/integration test: mock failed submit → `highScore` unchanged
 
 **Acceptance:** Failed submit (401, 429, network) — home badge and career high line match last server-confirmed score.
 
@@ -125,9 +125,9 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 
 **Tasks:**
 
-- [ ] Move `callbacks.onCoffee(...)` to after `this.renderRungs()` (restore v1.8.4 order)
-- [ ] Re-run tutorial test: tap 3 picks up coffee; animation visible
-- [ ] Add regression test in `engine.test.ts`: `onCoffee` invoked after render mock order
+- [x] Move `callbacks.onCoffee(...)` to after `this.renderRungs()` (restore v1.8.4 order)
+- [x] Re-run tutorial test: tap 3 picks up coffee; animation visible
+- [x] Add regression test in `engine.test.ts`: `onCoffee` invoked after render mock order
 
 **Acceptance:** Coffee badge animates on tap 3; no ghost coffee on imminent rung after climb.
 
@@ -164,9 +164,9 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 
 **Tasks:**
 
-- [ ] Extend `layout-audit.mjs`: `startGame()` → one `handleTap` or button click → re-measure `#gamePlayArea` width
-- [ ] Fail CI if width delta > 2px
-- [ ] Wire into `.github/workflows/ci.yml` if not already
+- [x] Extend `layout-audit.mjs`: `startGame()` → one `handleTap` or button click → re-measure `#gamePlayArea` width
+- [x] Fail CI if width delta > 2px
+- [x] Wire into `.github/workflows/ci.yml` if not already
 
 **Acceptance:** `npm run qa:layout` fails if C-01 regresses.
 
@@ -214,7 +214,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 
 | **ID** | C-12 |
 | **Files** | `apps/mini-app/src/app.ts` — `runPostGameOverIo()` |
-| **Tasks** | [ ] Use `leaderboardPeriod` or label “today’s board” explicitly |
+| **Tasks** | [x] Use `leaderboardPeriod` or label “today’s board” explicitly |
 | **Acceptance** | Copy matches user expectation when weekly tab was last viewed |
 
 ### P2-6 · Background tab energy drain unfairness
@@ -238,9 +238,9 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 
 | ID | Task | File(s) | Status |
 |----|------|---------|--------|
-| C-09 | `return` after `triggerGameOver` in energy timer tick | `engine.ts` L211–229 | [ ] |
-| C-10 | Bump `package.json` version to match release (1.8.5) | `apps/mini-app/package.json` | [ ] |
-| C-11 | Guard `seedGameOverForQa` / `switchTab('gameover')` behind `import.meta.env.DEV` | `app.ts` L1168–1170 | [ ] |
+| C-09 | `return` after `triggerGameOver` in energy timer tick | `engine.ts` L211–229 | [x] |
+| C-10 | Bump `package.json` version to match release (1.8.5) | `apps/mini-app/package.json` | [x] |
+| C-11 | Guard `seedGameOverForQa` / `switchTab('gameover')` behind `import.meta.env.DEV` | `app.ts` L1168–1170 | [x] |
 | S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/main.py`, `daily-modifier.ts` | [ ] Verify |
 | S-08 | Fixed `840px` shell on very short viewports | `template.ts` L11 | [ ] Verify |
 | S-11 | Tighten CORS origins (currently `*`) | `packages/api/app/main.py` | [ ] |
@@ -284,10 +284,10 @@ Prioritized. Link to test file when implemented.
 
 | Priority | Test name | File (target) | Purpose | Status |
 |----------|-----------|---------------|---------|--------|
-| P0 | `layout-stable-after-first-tap` | `scripts/layout-audit.mjs` | C-01 regression guard | [ ] |
-| P1 | `onCoffee-after-renderRungs` | `engine.test.ts` | C-03 regression | [ ] |
-| P1 | `energy-depletion-game-over` | `engine.test.ts` | Timer death path | [ ] |
-| P1 | `high-score-not-updated-on-submit-fail` | `app.test.ts` (new) or mock | C-02 | [ ] |
+| P0 | `layout-stable-after-first-tap` | `scripts/layout-audit.mjs` | C-01 regression guard | [x] |
+| P1 | `onCoffee-after-renderRungs` | `engine.test.ts` | C-03 regression | [x] |
+| P1 | `energy-depletion-game-over` | `engine.test.ts` | Timer death path | [x] |
+| P1 | `high-score-not-updated-on-submit-fail` | `score-trust.test.ts` | C-02 | [x] |
 | P1 | `rank-boundary-40-rungs-manager` | `engine.test.ts` + API | Submit at 10.0y | [ ] |
 | P2 | `generateRung-always-one-safe-side` | `engine.test.ts` | Fairness | [ ] |
 | P2 | `bot-miniapp-preset-parity` | new cross-lang test | S-06 | [ ] |
@@ -369,16 +369,15 @@ Update this table when closing items.
 
 | Category | Open | Done |
 |----------|------|------|
-| Release gates (G-1–G-8) | 8 | 0 |
+| Release gates (G-1–G-8) | 5 | 1 |
 | P0 | 2 | 0 |
-| P1 | 4 | 0 |
+| P1 | 1 | 3 |
 | P2 | 7 | 0 |
-| P3 | 9 | 0 |
+| P3 | 5 | 4 |
 | Runtime verification (V-01–V-19) | 19 | 0 |
-| Automated tests to add | 9 | 0 |
+| Automated tests to add | 5 | 4 |
 
-**Last updated:** 2026-06-01  
-**Audit source:** v1.8.5 deep bug audit (static code review + DEBUG incident docs)
+**Last updated:** 2026-06-01 (Wave 1 sprint — C-02/C-03/P1-4/P3; verifier green; pending redeploy + device QA)
 
 ---
 
@@ -397,6 +396,6 @@ Update this table when closing items.
 | C-09 | P3 | Extra HUD tick after energy death |
 | C-10 | P3 | package.json version drift |
 | C-11 | P3 | QA game over exposed on `window` |
-| C-12 | P3 | Game-over gap always daily |
+| C-12 | P2 | Game-over gap always daily |
 
 *P0 only if production has not received layout fix deploy.
