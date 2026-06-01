@@ -195,7 +195,6 @@ export class GameEngine {
 
   start(): void {
     audio.init();
-    audio.startBgm();
     this.score = 0;
     this.timeLeft = 100;
     this.isPlaying = true;
@@ -386,6 +385,9 @@ export class GameEngine {
       this.drainPausedUntil = Date.now() + PROMO_DRAIN_PAUSE_MS;
       const msg = PROMOTION_DIALOGUES[this.currentRank] ?? "You have survived organizational hurdles!";
       this.callbacks.onRankChange(this.currentRank, msg);
+      if (prevRank === "Intern" && this.currentRank === "Manager") {
+        audio.startManagerBgmRamp();
+      }
       this.startReorgLoop();
     }
   }

@@ -198,8 +198,12 @@ function updateMilestoneChip(years: number): void {
 
 function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   const toast = $("toastNotification");
-  const inGame = !$("gameScreen").classList.contains("hidden");
-  toast.classList.toggle("toast-above-tap-deck", inGame && opts?.surface !== "shell");
+  const onGame = !$("gameScreen").classList.contains("hidden");
+  const onGameOver = !$("gameOverScreen").classList.contains("hidden");
+  const aboveTapDeck = onGame && opts?.surface !== "shell";
+  const aboveGameOverActions = onGameOver && !onGame;
+  toast.classList.toggle("toast-above-tap-deck", aboveTapDeck);
+  toast.classList.toggle("toast-above-game-over-actions", aboveGameOverActions);
   $("toastText").textContent = msg;
   toast.style.opacity = "1";
   setTimeout(() => {
@@ -288,6 +292,11 @@ function switchTab(tab: Screen): void {
   syncTelegramBackButton(tab);
   syncTelegramMainButton(tab);
   audio.nav();
+  if (tab === "home") {
+    audio.startHomeBgm();
+  } else if (tab !== "game") {
+    audio.stopBgm();
+  }
   if (tab === "game") {
     requestAnimationFrame(() => layoutRungs());
   }
@@ -777,6 +786,7 @@ function startGame(): void {
   activeDailyModifier = engine.getDailyModifier();
   engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
+  audio.fadeOutForRun();
   engine.start();
   updateSprintTimerChip();
   updateRankUI("Intern");
@@ -1416,4 +1426,6 @@ export function mountApp(): void {
       refreshHomeBadgeUI();
     }
   }
+
+  audio.startHomeBgm();
 }

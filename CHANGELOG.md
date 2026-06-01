@@ -10,7 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **In-run background music** — chorus loop from *Mr. Bullet — Be Streso* (trimmed from 0:55); plays during gameplay; respects mute FAB; stops on game over / exit
+- **In-run background music** — chorus loop from *Mr. Bullet — Be Streso* (trimmed from 0:55); respects mute FAB; stops on game over / exit
 - **Bot `/go` command** — opens Mini App like `/start`; use in groups where another bot also handles `/start`; production verified in Prompt_Anatomy supergroup (2026-06-01)
 - **SEO / GEO hardening** — canonical URL, unified meta copy, JSON-LD (`WebApplication` + `VideoGame`), `sitemap.xml`, `llms.txt`, expanded `robots.txt`, `<noscript>` crawler fallback; CI `verify:seo`
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
@@ -19,6 +19,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
 ### Fixed
+- **Game over toast overlap** — submit/share shell toast lifted above RE-APPLY and action buttons (`.toast-above-game-over-actions`); home/leaderboard toasts unchanged
 - **Bot silent in groups (`BUTTON_TYPE_INVALID`)** — Telegram allows `web_app` inline buttons only in private chat; groups now get `t.me/bot?startapp` URL button; command logging + send fallback; verified `/go@CorporateLadder_bot` + score → Supabase (2026-06-01)
 - **X card validator robots.txt** — switch from `Allow: /` to empty `Disallow:` (legacy-compatible); list `Twitterbot` first for order-sensitive parsers
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
@@ -29,6 +30,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
 ### Changed
+- **Layered BGM** — lounge chorus on home (~14%); silent run until Manager promo (10y / Floor 11); then quiet ramp to full background level (~14%) over ~12s; CEO unchanged; leaderboard/game over stop BGM
 - **Production smoke signed (2026-06-01)** — prod API auth + `/runs` → Supabase (`scripts/ff-metrics.py` `submit_pipeline_ok: true`); Daily/Weekly leaderboard populated; private `/start` + group `/go`/`/play` with `@bot` handle; deploy docs for multi-bot groups ([DEPLOY.md](DEPLOY.md))
 - **Deploy post-deploy gate** — `DEPLOY.md` requires `scripts/ff-metrics.py` `submit_pipeline_ok: true` (not `/health` alone)
 - **Crawler access** — `robots.txt` now allows search, social preview (Twitter/Facebook/LinkedIn), and AI bots; shell `index.html` uses `index, follow` so card validators can fetch OG image

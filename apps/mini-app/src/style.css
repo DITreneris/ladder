@@ -465,6 +465,10 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   bottom: calc(7rem + 2rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
 }
 
+#toastNotification.toast-above-game-over-actions {
+  bottom: calc(12rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
 .username-readonly {
   border-bottom-style: solid;
   border-bottom-color: #e2e8f0;
@@ -516,6 +520,10 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   html.cl-in-telegram .tap-controls-bar {
     padding-top: 0.5rem;
     gap: 0.5rem;
+  }
+
+  html.cl-in-telegram #toastNotification.toast-above-game-over-actions {
+    bottom: calc(10.5rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   }
 
   html.cl-in-telegram .hr-memo-rail {

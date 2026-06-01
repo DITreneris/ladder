@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./audio", () => ({
   audio: {
     init: vi.fn(),
-    startBgm: vi.fn(),
+    startHomeBgm: vi.fn(),
+    fadeOutForRun: vi.fn(),
+    startManagerBgmRamp: vi.fn(),
     stopBgm: vi.fn(),
     tap: vi.fn(),
     coffee: vi.fn(),
@@ -15,6 +17,7 @@ vi.mock("./audio", () => ({
 }));
 
 import { getDailyModifierById } from "./daily-modifier";
+import { audio } from "./audio";
 import { GameEngine } from "./engine";
 import { COFFEE_RECOVERY, MIN_TAP_INTERVAL_MS, TICK_MS } from "./constants";
 import type { DailyModifier } from "./daily-modifier";
@@ -329,6 +332,24 @@ describe("GameEngine", () => {
     if (tail?.obstacle) {
       expect(managerTypes.has(tail.type ?? "")).toBe(true);
     }
+  });
+
+  it("starts BGM ramp when promoted Intern to Manager", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const { engine } = createEngine();
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    while (engine.getRungsClimbed() < 39) {
+      tapWithCooldown(engine, "left");
+    }
+    vi.mocked(audio.startManagerBgmRamp).mockClear();
+    tapWithCooldown(engine, "left");
+
+    expect(engine.getCurrentRank()).toBe("Manager");
+    expect(audio.startManagerBgmRamp).toHaveBeenCalledTimes(1);
   });
 
   it("ignores taps faster than MIN_TAP_INTERVAL_MS", () => {
