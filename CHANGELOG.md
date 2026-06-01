@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **320×568 viewport QA** — compact game HUD and tap deck on short Telegram viewports; rung rows scale down to 32px min so seven rungs fit the play area
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

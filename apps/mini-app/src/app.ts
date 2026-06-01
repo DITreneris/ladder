@@ -374,6 +374,7 @@ function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right", isImm
 }
 
 const RUNG_HEIGHT_MAX = 52;
+const RUNG_HEIGHT_MIN = 32;
 
 function layoutTrackMetrics(): void {
   const playArea = $("gamePlayArea");
@@ -417,7 +418,8 @@ function layoutRungs(): void {
   const playArea = $("gamePlayArea");
   const h = playArea.clientHeight;
   if (h <= 0) return;
-  const rungHeight = Math.max(40, Math.min(RUNG_HEIGHT_MAX, Math.floor(h / MAX_VISIBLE_RUNGS)));
+  const perRung = Math.floor(h / MAX_VISIBLE_RUNGS);
+  const rungHeight = Math.min(RUNG_HEIGHT_MAX, Math.max(RUNG_HEIGHT_MIN, perRung));
   playArea.querySelectorAll("[data-rung-slot]").forEach((el) => {
     (el as HTMLElement).style.height = `${rungHeight}px`;
   });
