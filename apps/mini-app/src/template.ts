@@ -34,11 +34,11 @@ export const APP_SHELL = `
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
     <div id="startScreen" class="flex flex-col flex-grow min-h-0 min-w-0 select-none z-10 pt-4 pb-2 overflow-x-hidden">
-      <div id="authDegradedBanner" class="hidden cl-shell-gutter shrink-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 mb-2 flex items-start gap-2">
+      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-y-auto overflow-x-hidden space-y-2.5">
+      <div id="authDegradedBanner" class="hidden shrink-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
         <p id="authDegradedText" class="text-caption font-semibold text-amber-900 flex-1 min-w-0"></p>
         <button type="button" onclick="dismissAuthBanner()" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
-      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-x-hidden space-y-2.5 flex-shrink-0">
         <div class="text-center">
           <div class="home-hero-enter home-hero-enter-icon inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
             <i class="fa-solid fa-briefcase text-xl"></i>
@@ -76,37 +76,38 @@ export const APP_SHELL = `
           </div>
           <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1"></p>
         </div>
-      </div>
-      <div class="start-cta-bar cl-shell-gutter shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
-        <p class="text-caption font-semibold text-slate-700 text-center px-1">One tap, one rung. Meetings terminate. Coffee negotiates.</p>
-        <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
-          <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
-        </button>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2 px-3 text-xs">
-            <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard
+        <div class="start-cta-bar shrink-0 pb-4 pt-3 mt-auto space-y-2 border-t border-slate-200">
+          <p class="text-caption font-semibold text-slate-700 text-center px-1">One tap, one rung. Meetings terminate. Coffee negotiates.</p>
+          <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
+            <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
           </button>
-          <button onclick="switchTab('howtoplay')" class="btn-cl-secondary py-2 px-3 text-xs">
-            <i class="fa-solid fa-circle-question text-cl-primary"></i> How to Play
-          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2 px-3 text-xs">
+              <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard
+            </button>
+            <button onclick="switchTab('howtoplay')" class="btn-cl-secondary py-2 px-3 text-xs">
+              <i class="fa-solid fa-circle-question text-cl-primary"></i> How to Play
+            </button>
+          </div>
+          ${BRAND_FOOTER}
         </div>
-        ${BRAND_FOOTER}
       </div>
     </div>
     <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
-      <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col">
-      <div id="gameHud" class="game-hud cl-shell-gutter z-10 flex flex-col gap-1.5">
+      <div id="gameContentColumn" class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 w-full">
+      <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col min-w-0 w-full">
+      <div id="gameHud" class="game-hud z-10 flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-baseline gap-1 text-slate-900">
             <span class="text-2xl font-black leading-none" id="gameYearsLabel">0.0</span>
             <span class="text-caption font-bold text-slate-500">Years</span>
           </div>
-          <div class="text-right min-w-0">
+          <div class="game-hud-rank-stack">
             <span class="badge-rank-intern mt-0.5" id="gameRankBadge">
               <span id="rankBadgeIcon">🧑‍💻</span> <span id="rankBadgeText">Intern</span>
             </span>
-            <p id="milestoneChip" class="text-caption font-bold text-cl-primary truncate">Manager in 10.0y</p>
+            <p id="milestoneChip" class="text-caption font-bold text-cl-primary truncate max-w-full">Manager in 10.0y</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -118,7 +119,7 @@ export const APP_SHELL = `
         </div>
         <p id="hudTapHint" class="hud-tap-hint hidden">Use TAP LEFT or TAP RIGHT below — pick the safe side</p>
       </div>
-      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info cl-shell-gutter hidden" aria-live="polite">
+      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
         <div class="hr-memo-rail-body">
           <span id="hrMemoFrom" class="hr-memo-from">People Ops</span>
           <p id="hrMemoText" class="hr-memo-text">…</p>
@@ -130,7 +131,7 @@ export const APP_SHELL = `
           <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
         </div>
       </div>
-        <div id="gamePlayArea" class="game-play-area cl-shell-gutter">
+        <div id="gamePlayArea" class="game-play-area">
           <div id="reorgHudStrip" class="reorg-hud-strip reorg-hud-overlay hidden">
             <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
           </div>
@@ -153,7 +154,7 @@ export const APP_SHELL = `
           </div>
         </div>
       </div>
-      <div id="tapControlsBar" class="tap-controls-bar cl-shell-gutter select-none">
+      <div id="tapControlsBar" class="tap-controls-bar select-none">
         <button id="btnTapLeft" type="button" aria-label="Climb left" class="btn-tap-zone btn-tap-zone-left touch-none focus-ring">
           <i class="fa-solid fa-arrow-left icon-md text-slate-700" aria-hidden="true"></i>
           <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
@@ -165,6 +166,7 @@ export const APP_SHELL = `
           <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: →</span>
         </button>
       </div>
+      </div>
     </div>
     <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto min-w-0">
       <div class="text-center mt-2 w-full min-w-0">
@@ -175,7 +177,7 @@ export const APP_SHELL = `
         <p class="text-micro text-slate-500 font-bold uppercase mt-1 tracking-wide">HR Exit Interview in Progress</p>
       </div>
       <div class="card-performance">
-        <div class="absolute -right-6 -bottom-6 w-24 h-24 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-lg transform -rotate-12 pointer-events-none">REJECTED</div>
+        <div class="absolute right-1 bottom-1 w-20 h-20 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-sm transform -rotate-12 pointer-events-none select-none">REJECTED</div>
         <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
           <span class="text-caption font-extrabold uppercase text-slate-500">Corporate Performance Card</span>
           <span class="text-micro font-mono text-slate-400" id="reviewId">REF-89412</span>

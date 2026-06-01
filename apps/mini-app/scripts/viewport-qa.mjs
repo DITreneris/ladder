@@ -126,14 +126,14 @@ async function memoVisiblePlayAreaRatio(page) {
   });
 }
 
-async function gameStackColumnAlignment(page) {
+async function homeColumnAlignment(page) {
   return page.evaluate(() => {
-    const hud = document.getElementById("gameHud");
-    const playArea = document.getElementById("gamePlayArea");
-    const tapBar = document.getElementById("tapControlsBar");
-    if (!hud || !playArea || !tapBar) return { ok: false, reason: "missing-game-stack" };
+    const badge = document.querySelector("#startScreen .card-light");
+    const ticker = document.getElementById("homeNewsTicker");
+    const cta = document.querySelector("#startScreen button.cl-primary-btn");
+    if (!badge || !ticker || !cta) return { ok: false, reason: "missing-home-blocks" };
 
-    const boxes = [hud, playArea, tapBar].map((el) => {
+    const boxes = [badge, ticker, cta].map((el) => {
       const r = el.getBoundingClientRect();
       return { w: r.width, l: r.left };
     });
@@ -144,11 +144,52 @@ async function gameStackColumnAlignment(page) {
 
     return {
       ok: widthDelta <= 2 && leftDelta <= 2,
+      badgeWidth: widths[0],
+      tickerWidth: widths[1],
+      ctaWidth: widths[2],
+      widthDelta,
+      leftDelta,
+    };
+  });
+}
+
+async function gameStackColumnAlignment(page) {
+  return page.evaluate(() => {
+    const column = document.getElementById("gameContentColumn");
+    const hud = document.getElementById("gameHud");
+    const playArea = document.getElementById("gamePlayArea");
+    const tapBar = document.getElementById("tapControlsBar");
+    const leftBtn = document.getElementById("btnTapLeft");
+    if (!column || !hud || !playArea || !tapBar || !leftBtn) {
+      return { ok: false, reason: "missing-game-stack" };
+    }
+
+    const measure = (el) => {
+      const r = el.getBoundingClientRect();
+      return { w: r.width, l: r.left };
+    };
+
+    const stack = [hud, playArea, tapBar].map(measure);
+    const widths = stack.map((b) => b.w);
+    const lefts = stack.map((b) => b.l);
+    const widthDelta = Math.max(...widths) - Math.min(...widths);
+    const leftDelta = Math.max(...lefts) - Math.min(...lefts);
+
+    const col = measure(column);
+    const tapBtn = measure(leftBtn);
+    const columnWrapsTap =
+      tapBtn.l >= col.l - 1 &&
+      tapBtn.l + tapBtn.w <= col.l + col.w + 1;
+
+    return {
+      ok: widthDelta <= 2 && leftDelta <= 2 && columnWrapsTap,
+      columnWidth: col.w,
       hudWidth: widths[0],
       playWidth: widths[1],
       tapWidth: widths[2],
       widthDelta,
       leftDelta,
+      columnWrapsTap,
     };
   });
 }
@@ -171,6 +212,51 @@ async function gameOverColumnAlignment(page) {
       widthDelta,
       leftDelta,
     };
+  });
+}
+
+async function gameHudClipCheck(page) {
+  return page.evaluate(() => {
+    const chip = document.getElementById("milestoneChip");
+    const badge = document.getElementById("gameRankBadge");
+    if (!chip || !badge) return { ok: false, reason: "missing-hud" };
+
+    const chipOk = chip.scrollWidth <= chip.clientWidth + 1;
+    const badgeOk = badge.scrollWidth <= badge.clientWidth + 1;
+    return { ok: chipOk && badgeOk, chipOk, badgeOk };
+  });
+}
+
+async function playerClimberClipCheck(page) {
+  return page.evaluate(() => {
+    const playArea = document.getElementById("gamePlayArea");
+    const climber = document.getElementById("playerClimber");
+    if (!playArea || !climber) return { ok: false, reason: "missing-player" };
+
+    const playRect = playArea.getBoundingClientRect();
+    const climberRect = climber.getBoundingClientRect();
+    const ok =
+      climberRect.left >= playRect.left - 1 &&
+      climberRect.right <= playRect.right + 1;
+    return { ok, left: climberRect.left, right: climberRect.right, playLeft: playRect.left, playRight: playRect.right };
+  });
+}
+
+async function rejectedStampClipCheck(page) {
+  return page.evaluate(() => {
+    const card = document.querySelector("#gameOverScreen .card-performance");
+    if (!card) return { ok: false, reason: "missing-card" };
+    const stamp = card.querySelector(".rounded-full.font-black");
+    if (!stamp) return { ok: false, reason: "missing-stamp" };
+
+    const cardRect = card.getBoundingClientRect();
+    const stampRect = stamp.getBoundingClientRect();
+    const ok =
+      stampRect.left >= cardRect.left - 1 &&
+      stampRect.right <= cardRect.right + 1 &&
+      stampRect.top >= cardRect.top - 1 &&
+      stampRect.bottom <= cardRect.bottom + 1;
+    return { ok };
   });
 }
 
@@ -230,6 +316,18 @@ async function main() {
             type: "home-cta-not-reachable",
             ...homeCta,
           });
+        }
+
+        if (vp.width === 320 || vp.width === 390) {
+          const homeAlign = await homeColumnAlignment(page);
+          if (!homeAlign.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "home-column-mismatch",
+              ...homeAlign,
+            });
+          }
         }
       }
 
@@ -297,6 +395,26 @@ async function main() {
               ...column,
             });
           }
+
+          const hudClip = await gameHudClipCheck(page);
+          if (!hudClip.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "game-hud-text-clip",
+              ...hudClip,
+            });
+          }
+
+          const playerClip = await playerClimberClipCheck(page);
+          if (!playerClip.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "player-climber-clip",
+              ...playerClip,
+            });
+          }
         }
       }
 
@@ -308,6 +426,16 @@ async function main() {
             screen: screen.label,
             type: "game-over-column-mismatch",
             ...goAlign,
+          });
+        }
+
+        const stampClip = await rejectedStampClipCheck(page);
+        if (!stampClip.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "rejected-stamp-clip",
+            ...stampClip,
           });
         }
       }
@@ -324,7 +452,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
   );
 }
 

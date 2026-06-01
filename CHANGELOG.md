@@ -9,22 +9,41 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Fixed
-- **Coffee pickup left a ghost ☕ on the current rung** — engine now clears `coffee` on the rung when collected; pickup animation removes the badge (including reduced-motion)
-- **Three mismatched column widths on game and game-over screens** — align tap deck with `cl-shell-gutter` (remove double horizontal padding); full-width performance card; ladder rails span play area edges (no grey side dead zones); drop play-area side borders that framed a narrow lane
-
-### Changed
-- [ROADMAP.md](ROADMAP.md) — status block, consistent release-train vocabulary, shipped baseline through v1.8.2 aligned with CHANGELOG; current gate + F&F runbook pointers; deduplicated v1.9 backlog; release archive replaces per-version task dumps
-- Agent docs sync (v1.8.2 gate) — [DOCS_INDEX.md](DOCS_INDEX.md) F&F/device-QA task rows; [AGENTS.md](AGENTS.md), [docs/mvp-scope.md](docs/mvp-scope.md), [README.md](README.md), [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md); [.cursor/rules/project-context.mdc](.cursor/rules/project-context.mdc), [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc), [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [deployment.mdc](.cursor/rules/deployment.mdc); [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [changelog-maintainer.md](.cursor/agents/changelog-maintainer.md); [.cursor/skills/mini-app-deploy](.cursor/skills/mini-app-deploy/SKILL.md), [score-pipeline](.cursor/skills/score-pipeline/SKILL.md), [changelog-maintainer](.cursor/skills/changelog-maintainer/SKILL.md); [docs/discoverability-plan.md](docs/discoverability-plan.md)
-- [AGENTS.md](AGENTS.md) — compact layout; FF_EXECUTION + ROADMAP Status in source-of-truth; viewport QA in workflow
-- [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) — status v1.8.2; §9 split v1.6 / v1.8 / v1.8.2 patterns; QA checklist + device QA gate
-- **Archive** — moved [snippet.txt](docs/archive/snippet.txt) and [primal.txt](docs/archive/primal.txt) to [docs/archive/](docs/archive/README.md); active audits use [mvp-scope](docs/mvp-scope.md) + [ROADMAP](ROADMAP.md) § Shipped baseline; updated DOCS_INDEX, AGENTS, rules, README
-- [docs/mvp-scope.md](docs/mvp-scope.md) — slim scope-boundary doc only (v1 in/out, v1.1, terminology, metrics); removed stale v1.6-only gameplay list; inventory → ROADMAP § Shipped baseline only
-
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events
 - Server-side replay validation (anti-cheat)
+
+## [1.8.4] - 2026-06-01
+
+Pre–F&F hotfix: layout clip regressions, tutorial coffee reachability, promotion spawn order, tap cooldown, imminent reorg UX (no new screens or API).
+
+### Fixed
+- **REJECTED stamp cropped on game over** — performance card uses visible overflow; stamp positioned inside card padding
+- **HUD rank / milestone clipped on narrow phones** — stacked rank column with truncate + title tooltip
+- **Player sprite and hint glow cropped at play-area edges** — horizontal inset padding and climber position clamp
+- **Tutorial coffee arrived too late** — injects on `rungs[2]` (or `rungs[1]` at rung 12) instead of queue tail; re-injects if missed until rung 12
+- **Rank-gated obstacles lagged one rung after promotion** — `checkPromotions()` runs before `generateRung()`
+- **Coffee pickup animation wiped by render** — `onCoffee` fires after `renderRungs()`
+- **Tap spam could outpace energy drain** — engine `MIN_TAP_INTERVAL_MS` (120ms); keyboard repeat ignored; pointer debounce aligned
+- **Imminent reorg badge misleading** — next rung shows **Frozen** label (no shuffle telegraph); retry tip clarifies next rung holds still
+
+### Changed
+- Viewport QA — REJECTED stamp, HUD text, and player sprite clip checks at 320px and 390px
+
+## [1.8.3] - 2026-06-01
+
+Post–v1.8.2 hotfix: one shared content column on game screens and coffee pickup that actually clears (no new mechanics, screens, or API).
+
+### Fixed
+- **Coffee looked unpicked after a climb** — engine clears `coffee` on the rung when collected; pickup animation removes the badge (including `prefers-reduced-motion`)
+- **Three mismatched column widths** (HUD, grey ladder lane, tap deck, game-over card vs buttons) — `#gameContentColumn` (`cl-shell-gutter`) wraps HUD + play + tap (not per-section gutters); ladder rails span play-area edges; full-width performance card; play-area side borders removed
+- **Home screen two widths** (Employee Badge vs News / PUNCH IN) — single scroll column wraps badge, ticker, shift, and CTA bar; `card-light` is full column width
+
+### Changed
+- Viewport QA — home (badge vs ticker vs CTA); game stack asserts `#gameContentColumn` wraps tap controls; HUD + play + tap width at 320px and 390px; game-over card vs CTA width
+- Removed dev-only layout debug `fetch` to localhost from mini-app
+- [ROADMAP.md](ROADMAP.md) — Status block, release train vocabulary, shipped baseline through v1.8.2; archive + slim [docs/mvp-scope.md](docs/mvp-scope.md); agent/docs index sync for F&F gate
 
 ## [1.8.2] - 2026-06-01
 
@@ -250,7 +269,10 @@ Initial monorepo scaffold — MVP v1 foundation.
 ### Security
 - Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
 
-[Unreleased]: compare/v1.8.1...HEAD
+[Unreleased]: compare/v1.8.4...HEAD
+[1.8.4]: compare/v1.8.3...v1.8.4
+[1.8.3]: compare/v1.8.2...v1.8.3
+[1.8.2]: compare/v1.8.1...v1.8.2
 [1.8.1]: compare/v1.8.0...v1.8.1
 [1.8.0]: compare/v1.7.0...v1.8.0
 [1.7.0]: compare/v1.6.0...v1.7.0

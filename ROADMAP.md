@@ -12,12 +12,55 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 | | |
 |---|---|
-| **Production** | `main` @ `d862c3c` — bundle [1.8.2](CHANGELOG.md#182---2026-06-01) live on Vercel + Railway |
-| **Blocking F&F** | Device QA iOS + Android — [DEVICE_QA_v1.8.1](docs/DEVICE_QA_v1.8.1.md) regression + [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) delta |
-| **Next actions** | 1) Sign device QA 2) `git tag v1.8.2` + push tags 3) Invite F&F per [FF_EXECUTION](docs/FF_EXECUTION.md) |
+| **Production** | `main` — **v1.8.4 code done**; Vercel still on **v1.8.2** bundle until redeploy |
+| **Blocking F&F** | Deploy v1.8.4 → device QA iOS + Android → tag → F&F ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
+| **Next actions** | See [v1.8.4 gate — open items](#v184-gate--open-items) below |
 | **Next product** | v1.9 provisional — confirm at F&F review **2026-06-14** |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
+
+---
+
+## v1.8.4 gate — open items
+
+From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** — [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01). **Not done yet:**
+
+### Operations (blocking F&F)
+
+| # | Item | Owner / notes |
+|---|------|----------------|
+| 1 | **Push `main`** (if local commits not on origin) | GitHub |
+| 2 | **Vercel redeploy** mini-app | Prod must not serve `main-BO_qJQT_.js` (v1.8.2); verify new bundle hash on https://www.promptanatomy.lol |
+| 3 | **Telegram cache bust** | Hard refresh / reopen from bot after deploy |
+| 4 | **Device QA** iOS + Android | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) regression + v1.8.4 delta: one content column, REJECTED not clipped, HUD readable, tutorial coffee by ~rung 10, Frozen on imminent reorg |
+| 5 | **Verifier** pass | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) before tag |
+| 6 | **`git tag v1.8.4`** + push tags | After device QA sign-off |
+| 7 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D — invite testers |
+
+**Optional tags (never cut):** `v1.8.2`, `v1.8.3` if you want CHANGELOG anchors on origin; F&F gate is **v1.8.4 live + QA**.
+
+### Shipped in v1.8.4 (do not re-open unless regression)
+
+| Area | Fix |
+|------|-----|
+| Layout | REJECTED stamp clip; HUD rank/milestone stack; play-area player/hint clip; viewport QA clip checks |
+| Mechanics | Tutorial coffee inject on `rungs[2]` (retry to rung 12); promotion before `generateRung()`; tap cooldown 120ms |
+| UX | Imminent reorg → **Frozen** badge (no shuffle telegraph on `rungs[1]`); reorg retry tip updated |
+| v1.8.3 (included) | `#gameContentColumn` single width; coffee clear on pickup |
+
+### Deferred — not v1.8.4 (track in v1.9+)
+
+| Item | Why deferred | Target |
+|------|----------------|--------|
+| Fixed timestep drain/reorg | Background-tab unfair timing; engineering | [v1.9+ backlog](#v19-backlog-data-informed) |
+| Near-miss wince | New animation + callback | [v1.9.0](#v190--near-miss-wince--synergy-sprint-provisional) |
+| Synergy Sprint preset | New daily/run mode | v1.9.0 |
+| Soft drain cap @ ~20y | Session length tuning | v1.9.0 stretch |
+| Clean-climb streak | Copy-only retention | v1.9.0 stretch |
+| Server anti-cheat / max rungs/sec | API v1.1 scope | [v1.1](#v11--platform-deferred--explicit-approval) |
+| Home “four band” visual unify | Cosmetic; same gutter already — only if device QA still feels broken | v1.9+ polish |
+| `pickObstacleType` RNG filter-first | Internal balance cleanup | v1.9+ optional |
+| API pytest local env | `tests.conftest` import on some Windows setups; CI may differ | Dev hygiene |
 
 ---
 
@@ -66,16 +109,18 @@ flowchart TB
 | **v1.5.0–v1.7.0** | Design, fairness, daily replays | **Tagged** · **Live** | [CHANGELOG](CHANGELOG.md#170---2026-05-31) |
 | **v1.8.0** | Narrative beats + arena identity | **Tagged** · **Live** | [CHANGELOG](CHANGELOG.md#180---2026-05-31) |
 | **v1.8.1** | Telegram mobile + playability polish | **Live** | [CHANGELOG](CHANGELOG.md#181---2026-05-31); device QA folded into v1.8.2 sign-off |
-| **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** — **QA + tag pending** | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) → tag `v1.8.2` |
+| **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** — **QA + tag pending** | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) → tag `v1.8.2` (optional if superseded by 1.8.4) |
+| **v1.8.3** | Shared content column + coffee pickup clear | **Code** · deploy folded into 1.8.4 | [CHANGELOG 1.8.3](CHANGELOG.md#183---2026-06-01) |
+| **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code done** · **Deploy + QA pending** | [Gate checklist](#v184-gate--open-items) → tag `v1.8.4` |
 | **v1.9.0** | Near-miss wince + Synergy Sprint (provisional) | **Planned** | F&F review ~2026-06-14 — [FF_TEST.md](docs/FF_TEST.md) |
 | **v1.9+** | Data-informed juice | **Backlog** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | **Deferred** | Explicit approval — [mvp-scope](docs/mvp-scope.md) |
 
 ---
 
-## Shipped baseline (v1.5 → v1.8.2)
+## Shipped baseline (v1.5 → v1.8.4)
 
-Inventory by pillar — do not regress without spec update. Per-release detail: [CHANGELOG](CHANGELOG.md) `1.5.0`–`1.8.2`.
+Inventory by pillar — do not regress without spec update. Per-release detail: [CHANGELOG](CHANGELOG.md) `1.5.0`–`1.8.4`.
 
 ### Mechanics
 
@@ -84,8 +129,10 @@ Inventory by pillar — do not regress without spec update. Per-release detail: 
 | Tap left/right, one rung per tap | Core loop unchanged |
 | Obstacles: Meeting, Reorg, Deadline (`burnout`) + Coffee | Rank-gated: Intern → meetings; Manager → +reorgs; CEO → +deadlines |
 | Energy drain + climb/coffee recovery | Pauses until first tap; 2s pause on promotion (v1.6) |
-| Intern tutorial ramp | 22% obstacle rate first 12 rungs; forced coffee if none by rung 8 |
-| Reorg fairness | Next rung (`rungs[1]`) does not swap during reorg ticks |
+| Intern tutorial ramp | 22% obstacle rate first 12 rungs; forced coffee inject on `rungs[2]` by rung 8 if none collected (v1.8.4) |
+| Reorg fairness | Next rung (`rungs[1]`) does not swap during reorg ticks; imminent reorg shows **Frozen** badge (v1.8.4) |
+| Tap rate limit (v1.8.4) | `MIN_TAP_INTERVAL_MS` 120ms — prevents energy exploit from tap spam |
+| Promotion spawn sync (v1.8.4) | `checkPromotions()` before `generateRung()` — rank-gated obstacles on promotion rung |
 | Milestone progression | Intern @ 0y → Manager @ 10y → CEO @ 35y |
 | Daily modifier resolver (v1.7) | UTC date → preset via [`daily-modifier.ts`](apps/mini-app/src/game/daily-modifier.ts) |
 | Spawn weight overrides (v1.7) | 4 presets; engine reads `dailyModifier` |
@@ -109,6 +156,10 @@ Inventory by pillar — do not regress without spec update. Per-release detail: 
 | Reorg HUD strip (v1.8) | `ORG CHART UNSTABLE` amber bar when reorgs active |
 | Game-over LB gap (v1.8) | `#leaderboardGapLine` — daily top vs current run |
 | Responsive ladder (v1.8.2) | `#ladderTrack` fills content column (no narrow `w-48` dead zones) |
+| Single game content column (v1.8.3+) | `#gameContentColumn` wraps HUD + play + tap deck — one gutter width |
+| Game-over stamp (v1.8.4) | REJECTED fully visible inside performance card |
+| HUD rank stack (v1.8.4) | Rank + milestone stacked; truncate on narrow viewports |
+| Play-area inset (v1.8.4) | Climber clamp + horizontal padding — no sprite/hint clip |
 | Bottom tap deck (v1.8.2) | Visible h-28 TAP LEFT / TAP RIGHT in `#tapControlsBar` (snippet-style; no play-area overlay) |
 | Dynamic rung scaling (v1.8.1+) | All 7 rungs fit inside play area |
 | Compact home (v1.8.2) | Amber news strip, shift description, Employee Badge, rule line, hero fade |
@@ -259,11 +310,12 @@ flowchart TD
 
 | F&F risk ([FF_TEST.md](docs/FF_TEST.md)) | Response |
 |------------------------------------------|----------|
-| Deaths felt unfair | v1.9 wince; audit reorg/next-rung warn sync |
+| Deaths felt unfair | v1.8.4 Frozen badge + retry tip; **v1.9** near-miss wince |
 | Same after run 2 | Daily shift ✓; Synergy Sprint; clean-climb streak |
 | Runs too long | Synergy Sprint 60s; soft drain cap @ 20y |
 | Wouldn't share | HR card ✓; LB gap ✓; streak in share text |
-| Taps sluggish | v1.8.2 deck + responsive ladder ✓; fixed timestep (v1.9+ engineering) |
+| Taps sluggish | v1.8.2 deck + responsive ladder ✓; v1.8.4 tap cooldown 120ms — tune at F&F if needed; fixed timestep (v1.9+ engineering) |
+| Layout “four widths” on mobile | v1.8.3 column + v1.8.4 clip fixes — **verify on device after deploy** |
 
 ### Adoption map (single source — do not duplicate elsewhere)
 
@@ -308,6 +360,8 @@ From [docs/mvp-scope.md](docs/mvp-scope.md). Not a substitute for v1.9 game juic
 | v1.8.0 | [1.8.0](CHANGELOG.md#180---2026-05-31) | Narrative copy pack, arena props, LB gap, ticker foreshadow |
 | v1.8.1 | [1.8.1](CHANGELOG.md#181---2026-05-31) | Telegram shell, overlay tap zones (superseded by 1.8.2 deck), dynamic rungs |
 | v1.8.2 | [1.8.2](CHANGELOG.md#182---2026-06-01) | F&F bundle: responsive ladder, HR memo rail, trust UX, OG meta |
+| v1.8.3 | [1.8.3](CHANGELOG.md#183---2026-06-01) | Single content column; coffee pickup clear |
+| v1.8.4 | [1.8.4](CHANGELOG.md#184---2026-06-01) | Layout clip + tutorial coffee + promotion spawn + tap cooldown + Frozen reorg UX |
 
 v1.8 MoSCoW deferred to v1.9: near-miss wince, Synergy Sprint, sticky-note decals. v1.8 **Out:** decaf trap.
 

@@ -11,6 +11,7 @@ import {
   INTERN_FAKE_PROMO,
   INTERN_TUTORIAL_RUNGS,
   MAX_VISIBLE_RUNGS,
+  MIN_TAP_INTERVAL_MS,
   PROMOTION_DIALOGUES,
   PROMO_DRAIN_PAUSE_MS,
   TICK_MS,
@@ -43,12 +44,12 @@ export class GameEngine {
   private onFirstTap: () => void;
   private firstTapDone = false;
   private coffeeCollected = false;
-  private tutorialCoffeeDone = false;
   private drainPausedUntil = 0;
   private dailyModifier: DailyModifier;
   private readonly fixedDailyModifier?: DailyModifier;
   private activeTicker: TickerHeadline | null = null;
   private internFakePromoShown = new Set<number>();
+  private lastTapAt = 0;
 
   constructor(
     callbacks: GameCallbacks,
@@ -103,10 +104,32 @@ export class GameEngine {
   private shouldForceTutorialCoffee(): boolean {
     return (
       !this.coffeeCollected &&
-      !this.tutorialCoffeeDone &&
       this.score >= TUTORIAL_COFFEE_MIN_RUNG &&
       this.score <= INTERN_TUTORIAL_RUNGS
     );
+  }
+
+  private hasImminentTutorialCoffee(): boolean {
+    return Boolean(this.rungs[1]?.coffee || this.rungs[2]?.coffee);
+  }
+
+  private injectTutorialCoffee(): void {
+    if (!this.shouldForceTutorialCoffee() || this.hasImminentTutorialCoffee()) return;
+
+    const side: PlayerSide = Math.random() < 0.5 ? "left" : "right";
+    const coffeeRung: Rung = { id: this.nextRungId++, obstacle: null, type: null, coffee: side };
+    const targetIndex = this.score >= INTERN_TUTORIAL_RUNGS ? 1 : 2;
+    const existing = this.rungs[targetIndex];
+
+    if (existing && !existing.obstacle && !existing.coffee) {
+      this.rungs[targetIndex] = coffeeRung;
+      return;
+    }
+
+    this.rungs.splice(targetIndex, 0, coffeeRung);
+    if (this.rungs.length > MAX_VISIBLE_RUNGS) {
+      this.rungs.pop();
+    }
   }
 
   private generateRung(forceEmpty = false): Rung {
@@ -115,20 +138,15 @@ export class GameEngine {
     let coffee: PlayerSide | null = null;
 
     if (!forceEmpty) {
-      if (this.shouldForceTutorialCoffee()) {
+      const rand = Math.random();
+      if (rand < this.obstacleSpawnRate()) {
+        obstacle = Math.random() < 0.5 ? "left" : "right";
+        type = pickObstacleType(this.currentRank, {
+          allowEarlyReorg: this.dailyModifier.allowEarlyReorg,
+          meetingPickThreshold: this.dailyModifier.meetingPickThreshold,
+        });
+      } else if (rand > this.dailyModifier.coffeeSpawnThreshold) {
         coffee = Math.random() < 0.5 ? "left" : "right";
-        this.tutorialCoffeeDone = true;
-      } else {
-        const rand = Math.random();
-        if (rand < this.obstacleSpawnRate()) {
-          obstacle = Math.random() < 0.5 ? "left" : "right";
-          type = pickObstacleType(this.currentRank, {
-            allowEarlyReorg: this.dailyModifier.allowEarlyReorg,
-            meetingPickThreshold: this.dailyModifier.meetingPickThreshold,
-          });
-        } else if (rand > this.dailyModifier.coffeeSpawnThreshold) {
-          coffee = Math.random() < 0.5 ? "left" : "right";
-        }
       }
     }
 
@@ -166,9 +184,9 @@ export class GameEngine {
     this.currentRank = "Intern";
     this.firstTapDone = false;
     this.coffeeCollected = false;
-    this.tutorialCoffeeDone = false;
     this.drainPausedUntil = 0;
     this.internFakePromoShown.clear();
+    this.lastTapAt = 0;
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
 
     this.rungs = [];
@@ -223,8 +241,7 @@ export class GameEngine {
     this.playerSide = playerSide;
     this.currentRank = rank;
     this.nextRungId = rungs.length;
-    this.coffeeCollected = false;
-    this.tutorialCoffeeDone = true;
+    this.coffeeCollected = true;
     this.drainPausedUntil = 0;
     this.internFakePromoShown.clear();
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
@@ -244,8 +261,9 @@ export class GameEngine {
 
   private checkInternFakePromos(years: number): void {
     if (this.currentRank !== "Intern") return;
+    const yearsTenths = Math.floor(years * 10) / 10;
     for (const promo of INTERN_FAKE_PROMO) {
-      if (years >= promo.years && !this.internFakePromoShown.has(promo.years)) {
+      if (yearsTenths >= promo.years && !this.internFakePromoShown.has(promo.years)) {
         this.internFakePromoShown.add(promo.years);
         this.callbacks.onToast(promo.message);
       }
@@ -254,6 +272,10 @@ export class GameEngine {
 
   handleTap(side: PlayerSide): void {
     if (!this.isPlaying || this.isGameOverState) return;
+
+    const now = Date.now();
+    if (now - this.lastTapAt < MIN_TAP_INTERVAL_MS) return;
+    this.lastTapAt = now;
 
     if (!this.firstTapDone) {
       this.firstTapDone = true;
@@ -284,40 +306,31 @@ export class GameEngine {
     this.score++;
     audio.tap(this.score);
 
+    let collectedCoffee = false;
     if (nextRung?.coffee === this.playerSide) {
       this.timeLeft = Math.min(100, this.timeLeft + COFFEE_RECOVERY);
       this.coffeeCollected = true;
       nextRung.coffee = null;
       audio.coffee();
-      this.callbacks.onCoffee();
-      // #region agent log
-      if (typeof fetch !== "undefined") {
-        fetch("http://127.0.0.1:7808/ingest/23292cd7-62fc-4135-a998-c5f22f7ea8ca", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a50bb8" },
-          body: JSON.stringify({
-            sessionId: "a50bb8",
-            hypothesisId: "H-coffee",
-            location: "engine.ts:handleTap",
-            message: "coffee collected",
-            data: { side, rung0Coffee: this.rungs[0]?.coffee ?? null, rung1Coffee: this.rungs[1]?.coffee ?? null },
-            timestamp: Date.now(),
-          }),
-        }).catch(() => {});
-      }
-      // #endregion
+      collectedCoffee = true;
     } else {
       this.timeLeft = Math.min(100, this.timeLeft + CLIMB_RECOVERY);
     }
 
     this.rungs.shift();
+    this.checkPromotions();
+    if (this.shouldForceTutorialCoffee()) {
+      this.injectTutorialCoffee();
+    }
     this.rungs.push(this.generateRung());
 
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
     this.checkInternFakePromos(years);
-    this.checkPromotions();
     this.renderRungs();
+    if (collectedCoffee) {
+      this.callbacks.onCoffee();
+    }
   }
 
   private checkPromotions(): void {

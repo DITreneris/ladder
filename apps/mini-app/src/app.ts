@@ -3,6 +3,7 @@ import {
   DEATH_EMOJI,
   DEATH_LABELS,
   MAX_VISIBLE_RUNGS,
+  MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
   floorLabel,
@@ -38,7 +39,6 @@ import {
   triggerDeathEmoji,
   triggerDeathFlash,
   triggerDeathCauseHold,
-  triggerCoffeePickup,
   triggerMeterFlash,
   triggerRankPop,
   triggerReorgTelegraph,
@@ -140,7 +140,9 @@ function incrementReapplyCount(): number {
 }
 
 function updateMilestoneChip(years: number): void {
-  $("milestoneChip").textContent = milestoneLabel(years);
+  const chip = $("milestoneChip");
+  chip.textContent = milestoneLabel(years);
+  chip.title = milestoneLabel(years);
 }
 
 function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
@@ -194,61 +196,6 @@ function syncTelegramBackButton(tab: Screen): void {
   });
 }
 
-function shouldDebugLayout(): boolean {
-  return import.meta.env.DEV || new URLSearchParams(window.location.search).has("debugLayout");
-}
-
-// #region agent log
-function debugLayoutColumnMetrics(screen: string): void {
-  if (!shouldDebugLayout()) return;
-  const box = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    const r = el.getBoundingClientRect();
-    return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
-  };
-  const card = document.querySelector("#gameOverScreen .card-performance");
-  const cardBox = card
-    ? (() => {
-        const r = card.getBoundingClientRect();
-        return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
-      })()
-    : null;
-  const retryBtn = document.querySelector("#gameOverScreen .btn-cl-primary");
-  const btnBox = retryBtn
-    ? (() => {
-        const r = retryBtn.getBoundingClientRect();
-        return { w: Math.round(r.width), l: Math.round(r.left), r: Math.round(r.right) };
-      })()
-    : null;
-  const playArea = $("gamePlayArea");
-  const slotWidth = playArea.style.getPropertyValue("--slot-width");
-  const payload = {
-    sessionId: "a50bb8",
-    hypothesisId: "H1-H4",
-    location: "app.ts:debugLayoutColumnMetrics",
-    message: "layout column widths",
-    data: {
-      screen,
-      hud: box("gameHud"),
-      memo: box("hrMemoRail"),
-      play: box("gamePlayArea"),
-      track: box("ladderTrack"),
-      tap: box("tapControlsBar"),
-      card: cardBox,
-      retryBtn: btnBox,
-      slotWidth,
-    },
-    timestamp: Date.now(),
-  };
-  fetch("http://127.0.0.1:7808/ingest/23292cd7-62fc-4135-a998-c5f22f7ea8ca", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a50bb8" },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-}
-// #endregion
-
 function switchTab(tab: Screen): void {
   ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
     $(id).classList.add("hidden");
@@ -267,11 +214,8 @@ function switchTab(tab: Screen): void {
   el.classList.add("flex");
   syncTelegramBackButton(tab);
   audio.nav();
-  if (tab === "game" || tab === "gameover") {
-    requestAnimationFrame(() => {
-      if (tab === "game") layoutRungs();
-      debugLayoutColumnMetrics(tab);
-    });
+  if (tab === "game") {
+    requestAnimationFrame(() => layoutRungs());
   }
 }
 
@@ -332,7 +276,7 @@ function refreshDailyShiftUI(): void {
   mountTickerHeadline();
 }
 
-function createObstacleBadge(type: ObstacleType, rungId: number): HTMLElement {
+function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = false): HTMLElement {
   const badge = document.createElement("div");
   badge.className =
     "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-sm text-center transform scale-95 select-none obstacle-pulse";
@@ -347,7 +291,11 @@ function createObstacleBadge(type: ObstacleType, rungId: number): HTMLElement {
     }
   } else if (type === "reorg") {
     badge.className += " bg-amber-100 border-amber-300 text-amber-800";
-    badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
+    if (isImminent) {
+      badge.innerHTML = `<span class="text-lg leading-none">🧊</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Frozen</span>`;
+    } else {
+      badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
+    }
   } else {
     badge.className += " bg-red-100 border-red-400 text-red-900";
     badge.innerHTML = `<span class="text-lg leading-none">⏰</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Deadline</span>`;
@@ -374,16 +322,17 @@ function slotContentKey(rung: Rung, side: "left" | "right"): string {
   return "empty";
 }
 
-function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right"): void {
+function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right", isImminent = false): void {
   const key = slotContentKey(rung, side);
-  if (slotEl.dataset.contentKey === key) return;
+  if (slotEl.dataset.contentKey === key && slotEl.dataset.imminent === String(isImminent)) return;
   slotEl.dataset.contentKey = key;
+  slotEl.dataset.imminent = String(isImminent);
   slotEl.innerHTML = "";
   if (side === "left") {
-    if (rung.obstacle === "left") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id));
+    if (rung.obstacle === "left") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id, isImminent));
     else if (rung.coffee === "left") slotEl.appendChild(createCoffeeBadge());
   } else {
-    if (rung.obstacle === "right") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id));
+    if (rung.obstacle === "right") slotEl.appendChild(createObstacleBadge(rung.type!, rung.id, isImminent));
     else if (rung.coffee === "right") slotEl.appendChild(createCoffeeBadge());
   }
 }
@@ -411,7 +360,9 @@ function layoutPlayerPosition(side: PlayerSide): void {
   const slotRect = slot.getBoundingClientRect();
   const playRect = playArea.getBoundingClientRect();
   const climberW = climber.offsetWidth;
-  const left = slotRect.left + slotRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
+  const rawLeft = slotRect.left + slotRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
+  const maxLeft = Math.max(0, playArea.clientWidth - climberW);
+  const left = Math.max(0, Math.min(maxLeft, rawLeft));
   climber.style.left = `${Math.round(left)}px`;
 }
 
@@ -494,8 +445,9 @@ function renderRungsInner(): void {
 
     const leftSlot = rungEl.querySelector(".left-slot") as HTMLElement;
     const rightSlot = rungEl.querySelector(".right-slot") as HTMLElement;
-    fillSlot(leftSlot, rung, "left");
-    fillSlot(rightSlot, rung, "right");
+    const isImminent = i === 1;
+    fillSlot(leftSlot, rung, "left", isImminent);
+    fillSlot(rightSlot, rung, "right", isImminent);
 
     leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
     rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
@@ -517,7 +469,7 @@ function renderRungsInner(): void {
     }
 
     const swap = reorgSwaps.find((s) => s.rungId === rung.id);
-    if (swap) {
+    if (swap && i !== 1) {
       const slotSelector = swap.toSide === "left" ? ".left-slot" : ".right-slot";
       const badge = rungEl.querySelector(`${slotSelector} .obstacle-badge`) as HTMLElement | null;
       if (badge) {
@@ -868,7 +820,7 @@ function bindTapButton(el: HTMLElement, side: PlayerSide): void {
   el.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     const now = Date.now();
-    if (now - lastPointerTapAt < 50) return;
+    if (now - lastPointerTapAt < MIN_TAP_INTERVAL_MS) return;
     lastPointerTapAt = now;
     engine.handleTap(side);
     if (earlyTapsRemaining > 0) {
@@ -993,13 +945,10 @@ export function mountApp(): void {
       },
       onGameOver,
       onCoffee: () => {
-        const nextRungEl = $("rungsContainer").querySelector(".next-rung");
-        const coffeeBadge = nextRungEl?.querySelector(".coffee-badge") as HTMLElement | null;
-        if (coffeeBadge) triggerCoffeePickup(coffeeBadge);
         flashPlayerEmoji("🤤", 200);
         showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
         triggerMeterFlash($("burnoutMeter"));
-        spawnFloatingParticles(coffeeBadge ?? $("playerClimber"), "☕", 5);
+        spawnFloatingParticles($("playerClimber"), "☕", 5);
         hapticImpact("medium");
       },
       onToast: (msg) => showHrMemo(msg, { variant: "info" }),
@@ -1035,6 +984,7 @@ export function mountApp(): void {
 
   window.addEventListener("keydown", (e) => {
     if (!engine.isActive()) return;
+    if (e.repeat) return;
     if (e.key === "ArrowLeft") engine.handleTap("left");
     if (e.key === "ArrowRight") engine.handleTap("right");
   });

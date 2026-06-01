@@ -18,6 +18,7 @@ export const INTERN_TUTORIAL_RUNGS = 12;
 export const TUTORIAL_COFFEE_MIN_RUNG = 8;
 export const COFFEE_SPAWN_THRESHOLD = 0.85;
 export const PROMO_DRAIN_PAUSE_MS = 2000;
+export const MIN_TAP_INTERVAL_MS = 120;
 
 export const REAPPLY_STORAGE_KEY = "corp_ladder_reapply_count";
 
@@ -87,7 +88,7 @@ export const DEATH_LABELS: Record<DeathType, string> = {
 
 export const RETRY_TIPS: Record<DeathType, string> = {
   meeting: "Pick the side without the calendar. Revolutionary, we know.",
-  reorg: "Wait for the shuffle, then climb. Org charts lie.",
+  reorg: "Next rung holds still — further rungs shuffle. Org charts lie.",
   burnout: "Deadlines look like meetings but mean business. Side-step.",
   energy: "Grab coffee when you can. Decaf is not a strategy.",
 };
