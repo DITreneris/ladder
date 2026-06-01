@@ -12,6 +12,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 - Bot `/start` (and `/go`) welcome: hook-first copy, coffee/Manager line, daily shift block, minimal emoji at CTA
 
+### Fixed
+- CI `qa:coffee` flake: wait for preview + `clQa` harness, tap-deck-only flow, longer timeouts, curl healthcheck before Playwright QA
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

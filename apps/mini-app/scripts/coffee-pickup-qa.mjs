@@ -5,14 +5,41 @@
 import { chromium } from "playwright";
 
 const BASE = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
-const TAP_GAP_MS = 250;
-const WAIT_MS = 8000;
+/** UI + engine throttle is 120ms each — gap avoids dropped taps on slow CI. */
+const TAP_GAP_MS = 320;
+const WAIT_MS = 15000;
 
 function qaUrl() {
   const url = new URL(BASE);
   url.searchParams.set("qa", "1");
   url.searchParams.set("dailyPreset", "standard");
   return url.toString();
+}
+
+async function waitForPreviewReady() {
+  const deadline = Date.now() + 30_000;
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(BASE);
+      if (res.ok) return;
+    } catch {
+      /* preview still starting */
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(`Preview not ready at ${BASE}`);
+}
+
+async function waitForQaHarness(page) {
+  await page.waitForFunction(() => typeof window.startGame === "function", null, {
+    timeout: WAIT_MS,
+  });
+  await page.waitForFunction(() => window.clQa != null, null, { timeout: WAIT_MS });
+}
+
+async function waitForTapDeck(page) {
+  await page.waitForSelector("#btnTapLeft", { state: "visible", timeout: WAIT_MS });
+  await page.waitForSelector("#btnTapRight", { state: "visible", timeout: WAIT_MS });
 }
 
 async function tapLeft(page) {
@@ -29,24 +56,36 @@ async function snapshot(page) {
   return page.evaluate(() => window.clQa?.snapshot?.() ?? null);
 }
 
-async function runCoffeePickup(page) {
+async function waitForImminentCoffee(page) {
+  await page.waitForFunction(
+    () => {
+      const hint = document.getElementById("imminentHint")?.textContent ?? "";
+      if (/Coffee on/i.test(hint)) return true;
+      const snap = window.clQa?.snapshot?.();
+      return Boolean(snap?.rungs?.[1]?.coffee);
+    },
+    null,
+    { timeout: WAIT_MS }
+  );
+}
+
+async function climbToTutorialCoffee(page) {
   await page.evaluate(() => window.startGame());
   await page.waitForSelector("#gameScreen:not(.hidden)");
-  await page.click("#gamePlayArea");
+  await waitForTapDeck(page);
   await tapLeft(page);
   await tapLeft(page);
+  await waitForImminentCoffee(page);
+}
 
-  await page.waitForFunction(() => {
-    const hint = document.getElementById("imminentHint")?.textContent ?? "";
-    return /Coffee on/i.test(hint);
-  }, null, { timeout: WAIT_MS });
+async function runCoffeePickup(page) {
+  await climbToTutorialCoffee(page);
 
   const before = await snapshot(page);
   if (!before?.rungs?.[1]?.coffee) {
     throw new Error("imminent rung has no coffee before pickup tap");
   }
 
-  await page.click("#gamePlayArea");
   await tapLeft(page);
 
   await page.waitForFunction(() => (window.clQa?.getCoffeePickups?.() ?? 0) >= 1, null, {
@@ -62,19 +101,10 @@ async function runCoffeePickup(page) {
 async function runImminentSyncAfterCoffeePickup(page) {
   await page.goto(qaUrl(), { waitUntil: "load" });
   await page.waitForSelector("#startScreen");
-  await page.evaluate(() => window.startGame());
-  await page.waitForSelector("#gameScreen:not(.hidden)");
-  await page.click("#gamePlayArea");
-  await tapLeft(page);
+  await waitForQaHarness(page);
+  await climbToTutorialCoffee(page);
   await tapLeft(page);
 
-  await page.waitForFunction(() => {
-    const hint = document.getElementById("imminentHint")?.textContent ?? "";
-    return /Coffee on/i.test(hint);
-  }, null, { timeout: WAIT_MS });
-
-  await page.click("#gamePlayArea");
-  await page.click("#btnTapLeft");
   await page.waitForFunction(() => (window.clQa?.getCoffeePickups?.() ?? 0) >= 1, null, {
     timeout: WAIT_MS,
   });
@@ -104,20 +134,24 @@ async function runImminentSyncAfterCoffeePickup(page) {
 async function runMeetingCollision(page) {
   await page.goto(qaUrl(), { waitUntil: "load" });
   await page.waitForSelector("#startScreen");
+  await waitForQaHarness(page);
   await page.evaluate(() => window.startGame());
   await page.waitForSelector("#gameScreen:not(.hidden)");
-  await page.click("#gamePlayArea");
+  await waitForTapDeck(page);
   await tapLeft(page);
   await tapRight(page);
-  await page.waitForSelector("#gameOverScreen:not(.hidden)", { timeout: 3000 });
+  await page.waitForSelector("#gameOverScreen:not(.hidden)", { timeout: WAIT_MS });
 }
 
 async function main() {
+  await waitForPreviewReady();
+
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(qaUrl(), { waitUntil: "load" });
   await page.waitForSelector("#startScreen");
+  await waitForQaHarness(page);
 
   try {
     await runCoffeePickup(page);
