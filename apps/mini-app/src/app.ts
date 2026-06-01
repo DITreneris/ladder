@@ -28,7 +28,7 @@ import {
   OG_CAPTURE_YEARS,
 } from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry } from "./lib/api";
+import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
@@ -56,7 +56,6 @@ import {
   hideTelegramBack,
   initTelegram,
   isTelegram,
-  shareText,
   showTelegramBack,
 } from "./lib/telegram";
 import { audio } from "./game/audio";
@@ -536,8 +535,16 @@ async function renderLeaderboard(): Promise<void> {
   const list = $("leaderboardList");
   renderLeaderboardSkeleton(list);
 
-  const entries = await fetchLeaderboard(leaderboardPeriod, getInitData());
+  const result = await fetchLeaderboard(leaderboardPeriod, getInitData());
   list.innerHTML = "";
+
+  if (!result.ok) {
+    list.innerHTML =
+      '<p class="text-xs text-red-600 text-center py-4 font-semibold">Leaderboard offline. HR will refresh when connection returns.</p>';
+    return;
+  }
+
+  const entries = result.entries;
 
   if (entries.length === 0) {
     list.innerHTML =
@@ -655,6 +662,103 @@ function goHome(): void {
   switchTab("home");
 }
 
+function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult): void {
+  const gapEl = $("leaderboardGapLine");
+  if (!lbResult.ok) {
+    gapEl.textContent = "";
+    gapEl.classList.add("hidden");
+    return;
+  }
+  const top = lbResult.entries[0];
+  if (top && top.years_survived > result.yearsSurvived) {
+    const gap = top.years_survived - result.yearsSurvived;
+    gapEl.textContent = `#1 is ${gap.toFixed(1)}y ahead`;
+    gapEl.classList.remove("hidden");
+  } else if (top?.is_current_user) {
+    gapEl.textContent = "You're #1 on today's board.";
+    gapEl.classList.remove("hidden");
+  } else {
+    gapEl.textContent = "";
+    gapEl.classList.add("hidden");
+  }
+}
+
+function refreshCareerHighOnGameOver(): void {
+  if (highScore > 0 && bestRank) {
+    $("careerHighLine").textContent = `Career high: ${bestRank} (${highScore.toFixed(1)}y)`;
+  }
+}
+
+function showSubmitResultToast(submitResult: SubmitRunResult | null): void {
+  if (!submitResult) return;
+  if (!$("gameOverScreen").classList.contains("hidden")) {
+    if (submitResult.ok) {
+      showToast("Score submitted to the boardroom!", { surface: "shell" });
+    } else {
+      showToast(submitFailureMessage(submitResult.reason), { surface: "shell" });
+    }
+  }
+}
+
+async function runPostGameOverIo(
+  result: GameOverResult,
+  initData: string
+): Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }> {
+  const lbPromise = fetchLeaderboard("daily", initData || undefined);
+  let submitResult: SubmitRunResult | null = null;
+
+  if (initData) {
+    submitResult = await submitRun(initData, {
+      yearsSurvived: result.yearsSurvived,
+      finalRank: result.finalRank,
+      terminationCause: result.terminationCause,
+      rungsClimbed: result.rungsClimbed,
+    });
+    if (submitResult.ok) {
+      if (result.yearsSurvived > highScore) {
+        highScore = result.yearsSurvived;
+        bestRank = result.finalRank;
+        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+      }
+      const profileResult = await fetchProfile(initData);
+      if (profileResult.ok) {
+        highScore = profileResult.profile.best_score;
+        bestRank = profileResult.profile.best_rank || result.finalRank;
+        $("highScoreBadge").textContent = `${highScore.toFixed(1)} Years`;
+        refreshCareerHighOnGameOver();
+      }
+    }
+  }
+
+  const lbResult = await lbPromise;
+  return { submitResult, lbResult };
+}
+
+function seedGameOverForQa(): void {
+  lastGameResult = {
+    yearsSurvived: 4.5,
+    finalRank: "Intern",
+    deathType: "meeting",
+    terminationCause: "Meeting collision",
+    terminationDetail: "Attended one meeting too many.",
+    terminationFlavor: "Your calendar owned you.",
+    rungsClimbed: 18,
+  };
+  $("statYears").textContent = "4.5 Years";
+  $("statRank").innerHTML = `<span>${rankEmoji("Intern")}</span> Intern`;
+  $("terminationCauseIcon").textContent = DEATH_EMOJI.meeting;
+  $("terminationCauseLabel").textContent = DEATH_LABELS.meeting;
+  $("terminationReason").textContent = `"${lastGameResult.terminationDetail}"`;
+  $("retryTip").textContent = RETRY_TIPS.meeting;
+  $("terminationFlavor").textContent = `"${lastGameResult.terminationFlavor}"`;
+  $("reviewId").textContent = "REF-89412";
+  $("statBestDelta").textContent = "";
+  $("careerHighLine").textContent = "";
+  $("leaderboardGapLine").textContent = "";
+  $("leaderboardGapLine").classList.add("hidden");
+  $("reapplyFlavorLine").textContent = reappliesFlavor(1);
+}
+
 async function onGameOver(result: GameOverResult): Promise<void> {
   hideHrMemo();
   hideHudTapHint();
@@ -703,40 +807,10 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   }
 
   const initData = getInitData();
-  const lbFetch = fetchLeaderboard("daily", initData || undefined);
-  if (initData) {
-    const submitResult = await submitRun(initData, {
-      yearsSurvived: result.yearsSurvived,
-      finalRank: result.finalRank,
-      terminationCause: result.terminationCause,
-      rungsClimbed: result.rungsClimbed,
-    });
-    if (submitResult.ok) {
-      showToast("Score submitted to the boardroom!", { surface: "shell" });
-    } else {
-      showToast(submitFailureMessage(submitResult.reason), { surface: "shell" });
-    }
-  }
+  $("leaderboardGapLine").textContent = "";
+  $("leaderboardGapLine").classList.add("hidden");
 
-  const gapEl = $("leaderboardGapLine");
-  try {
-    const entries = await lbFetch;
-    const top = entries[0];
-    if (top && top.years_survived > result.yearsSurvived) {
-      const gap = top.years_survived - result.yearsSurvived;
-      gapEl.textContent = `#1 is ${gap.toFixed(1)}y ahead`;
-      gapEl.classList.remove("hidden");
-    } else if (top?.is_current_user) {
-      gapEl.textContent = "You're #1 on today's board.";
-      gapEl.classList.remove("hidden");
-    } else {
-      gapEl.textContent = "";
-      gapEl.classList.add("hidden");
-    }
-  } catch {
-    gapEl.textContent = "";
-    gapEl.classList.add("hidden");
-  }
+  const postGameIo = runPostGameOverIo(result, initData);
 
   flashBurnoutStress(false);
   setPlayerPanic(false);
@@ -748,6 +822,10 @@ async function onGameOver(result: GameOverResult): Promise<void> {
       enableVerticalSwipe();
       switchTab("gameover");
       triggerDeathCauseHold($("terminationCauseRow"));
+      void postGameIo.then(({ submitResult, lbResult }) => {
+        applyLeaderboardGap(result, lbResult);
+        showSubmitResultToast(submitResult);
+      });
     });
   });
 }
@@ -777,13 +855,9 @@ function buildShareText(): string {
 
 function copyShareText(): void {
   const text = buildShareText();
-  if (shareText(text)) {
-    showToast("Share sheet opened");
-    return;
-  }
   if (navigator.clipboard?.writeText) {
     navigator.clipboard.writeText(text).then(
-      () => showToast("Review copied! Share on Telegram."),
+      () => showToast("Review copied! Paste into Telegram to share."),
       () => showToast("Could not copy — try again.")
     );
   } else {
@@ -1001,6 +1075,9 @@ export function mountApp(): void {
       renderLeaderboard();
     } else if (tab === "howtoplay") {
       switchTab("howtoplay");
+    } else if (tab === "gameover") {
+      seedGameOverForQa();
+      switchTab("gameover");
     }
   };
   (window as unknown as Record<string, unknown>).copyShareText = copyShareText;

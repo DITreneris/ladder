@@ -9,6 +9,15 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- **Game-over screen blocked on slow network** — death animation runs immediately; score submit and leaderboard fetch happen in background with 8s timeout; toasts show on game-over screen
+- **Share button no-op on modern Telegram** — removed invalid `shareMessage({ text })`; clipboard copy with paste-into-Telegram toast
+- **Score submit rate limit after validation failure** — `/runs` cooldown applies only after successful insert; validation 400 no longer triggers 10s lockout
+- **Leaderboard silent failure** — API returns 503 when database unavailable; client shows offline message instead of empty satirical state
+- **Profile stale after first run** — refresh profile after successful score submit; career-high line updates on game over
+- **Viewport QA game-over checks** — QA `switchTab('gameover')` seeds game-over state for REJECTED stamp layout checks
+- **REJECTED stamp viewport clip** — slightly smaller stamp inset (`right-3 bottom-3`) so rotated badge stays inside performance card bounds
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

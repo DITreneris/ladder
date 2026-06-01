@@ -209,12 +209,8 @@ export function getDisplayName(fallback = "CorporateSlave"): string {
   return user.username ?? user.first_name ?? fallback;
 }
 
-export function shareText(text: string): boolean {
-  const tg = window.Telegram?.WebApp;
-  if (tg?.shareMessage) {
-    tg.shareMessage({ text });
-    return true;
-  }
+/** Clipboard fallback only — shareMessage(msg_id) needs bot savePreparedInlineMessage (v1.1). */
+export function shareText(_text: string): boolean {
   return false;
 }
 

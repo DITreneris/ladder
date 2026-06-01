@@ -49,9 +49,11 @@ Use results to pick **1–2 v1.9 items** — see [ROADMAP.md](../ROADMAP.md) § 
 
 |----------|--------|--------|
 
-| **iOS** | Core team | Pending — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
+| **iOS** | Core team | Pending — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) + [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) |
 
 | **Android** | Recruit before external invite | Pending — same checklists |
+
+**Automated gates (2026-06-01):** pytest 16 passed · vitest 42 passed · lint/build green · smoke-local passed · viewport QA passed · API health ok.
 
 
 

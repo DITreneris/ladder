@@ -32,7 +32,7 @@ From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** 
 | 1 | **Push `main`** (if local commits not on origin) | GitHub |
 | 2 | **Vercel redeploy** mini-app | Prod must not serve `main-BO_qJQT_.js` (v1.8.2); verify new bundle hash on https://www.promptanatomy.lol |
 | 3 | **Telegram cache bust** | Hard refresh / reopen from bot after deploy |
-| 4 | **Device QA** iOS + Android | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) regression + v1.8.4 delta: one content column, REJECTED not clipped, HUD readable, tutorial coffee by ~rung 10, Frozen on imminent reorg |
+| 4 | **Device QA** iOS + Android | [DEVICE_QA_v1.8.1](docs/DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) + [DEVICE_QA_v1.8.4](docs/DEVICE_QA_v1.8.4.md) |
 | 5 | **Verifier** pass | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) before tag |
 | 6 | **`git tag v1.8.4`** + push tags | After device QA sign-off |
 | 7 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D — invite testers |

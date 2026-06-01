@@ -22,13 +22,13 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 2 | Railway API | **Done** | https://ladder-production-642d.up.railway.app — `GET /health` → `{"status":"ok"}` |
 
-| 3 | Vercel Mini App | **Redeploy pending** | https://www.promptanatomy.lol — v1.8.4 hotfix (layout + mechanics); prod still on v1.8.2 bundle until redeploy |
+| 3 | Vercel Mini App | **Redeploy pending** | https://www.promptanatomy.lol — v1.8.4 + trust hotfix; prod still on v1.8.2 bundle until redeploy |
 
 | 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL |
 
 | 5 | BotFather | **Done** | Menu button + `/setdomain` |
 
-| 6 | Post-deploy smoke | **Pending v1.8.4** | After Vercel redeploy: health, `/start`, score → Daily LB, layout spot-check on device |
+| 6 | Post-deploy smoke | **Local Done** / **Prod manual pending** | Local: smoke-local + viewport QA + API health `{"status":"ok"}` (2026-06-01). After Vercel redeploy: `/start`, score → Daily LB, share clipboard on device |
 
 | 7 | v1.6 + v1.7 device QA | **Done** | Milestone chip; death cause + retry tip; Meeting Monday + Reorg Week presets |
 
@@ -38,9 +38,11 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 10 | v1.8.2 + F&F trust fixes | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
 
-| 11 | v1.8.4 hotfix | **Code Done** / **Deploy Pending** | Layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX; `npm test` + `npm run build` green |
+| 11 | v1.8.4 hotfix | **Code Done** / **Deploy Pending** | Layout + mechanics + trust UX (game-over I/O, share clipboard, rate limit, LB errors); run smoke before redeploy |
 
-**Code readiness:** v1.8.4 hotfix — mini-app lint/test/build 42 passed (2026-06-01). Run `npm run qa:viewport` after preview before device QA.
+**Code readiness:** v1.8.4 + trust hotfix — run `scripts/smoke-local.ps1`, `pytest`, `npm run lint && npm test && npm run build`, `npm run qa:viewport` before Vercel redeploy.
+
+**Vercel redeploy (manual):** Push commits to `main`, trigger production deploy in Vercel (root `apps/mini-app`), confirm new bundle hash on https://www.promptanatomy.lol (not `main-BO_qJQT_.js`), then hard-reopen Mini App from bot.
 
 
 

@@ -29,8 +29,8 @@ def get_leaderboard(
 
     try:
         db = get_supabase()
-    except RuntimeError:
-        return LeaderboardResponse(period=period, entries=[])
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail="Database unavailable") from e
 
     runs = (
         db.table("game_runs")

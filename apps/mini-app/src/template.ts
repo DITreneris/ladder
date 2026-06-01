@@ -177,7 +177,7 @@ export const APP_SHELL = `
         <p class="text-micro text-slate-500 font-bold uppercase mt-1 tracking-wide">HR Exit Interview in Progress</p>
       </div>
       <div class="card-performance">
-        <div class="absolute right-1 bottom-1 w-20 h-20 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-sm transform -rotate-12 pointer-events-none select-none">REJECTED</div>
+        <div class="absolute right-3 bottom-3 w-14 h-14 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-[10px] leading-none -rotate-12 pointer-events-none select-none">REJECTED</div>
         <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
           <span class="text-caption font-extrabold uppercase text-slate-500">Corporate Performance Card</span>
           <span class="text-micro font-mono text-slate-400" id="reviewId">REF-89412</span>

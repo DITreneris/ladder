@@ -4,7 +4,7 @@
 
 **F&F gate:** [FF_EXECUTION.md](FF_EXECUTION.md) · **Android owner:** recruit before external invite
 
-**Prod bundle:** `d862c3c` (v1.8.2) · Run [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) regression first, then delta below on Telegram Android.
+**Prod bundle:** redeploy from `main` (v1.8.4+) — run [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) regression first, then delta below on Telegram iOS + Android. v1.8.4 trust delta: [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md).
 
 Sign off on real Telegram **iOS** and **Android** after redeploy from `main` (includes trust UX + responsive ladder).
 
@@ -54,5 +54,6 @@ Sign off on real Telegram **iOS** and **Android** after redeploy from `main` (in
 ## On full pass
 
 1. Mark [DEPLOY_STATUS.md](DEPLOY_STATUS.md) v1.8.2 redeploy **Done**
-2. Tag `v1.8.2` and push
-3. Start or continue [FF_TEST.md](FF_TEST.md)
+2. Continue [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) delta
+3. Tag `v1.8.4` after v1.8.4 delta pass (not v1.8.2 — superseded)
+4. Start or continue [FF_TEST.md](FF_TEST.md)

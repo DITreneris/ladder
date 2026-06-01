@@ -35,7 +35,7 @@
 | **Gameplay / engine** | [ROADMAP.md](ROADMAP.md) § Shipped baseline | [docs/mvp-scope.md](docs/mvp-scope.md) (boundaries only), `apps/mini-app/src/game/` |
 | **Auth / API / DB** | [docs/architecture.md](docs/architecture.md) | Matching skill in task router |
 | **Deploy / release** | [DEPLOY.md](DEPLOY.md) | [ROADMAP.md](ROADMAP.md) Status → [FF_EXECUTION](docs/FF_EXECUTION.md) |
-| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) |
+| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.4](docs/DEVICE_QA_v1.8.4.md) |
 
 ---
 
@@ -87,7 +87,7 @@ Use this table to pick the right skill, rules, and documents.
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |
-| `device-qa-v182` | [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) | Release | v1.8.2 delta + F&F trust UX — blocks tag `v1.8.2` |
+| `device-qa-v184` | [docs/DEVICE_QA_v1.8.4.md](docs/DEVICE_QA_v1.8.4.md) | Release | v1.8.4 trust + layout delta — blocks tag `v1.8.4` |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |

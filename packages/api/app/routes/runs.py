@@ -43,7 +43,6 @@ def submit_run(body: RunSubmitRequest):
     now = time.time()
     if now - _submit_timestamps[telegram_id] < SUBMIT_COOLDOWN_SECONDS:
         raise HTTPException(status_code=429, detail="Too many submissions")
-    _submit_timestamps[telegram_id] = now
 
     expected_rungs = body.years_survived * 4
     if abs(body.rungs_climbed - expected_rungs) > 1:
@@ -69,5 +68,7 @@ def submit_run(body: RunSubmitRequest):
         db.table("users").update(
             {"best_score": body.years_survived, "best_rank": body.final_rank}
         ).eq("id", user_id).execute()
+
+    _submit_timestamps[telegram_id] = now
 
     return {"ok": True, "years_survived": body.years_survived}

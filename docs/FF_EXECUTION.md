@@ -20,18 +20,15 @@
 
 ## Phase B — Deploy and smoke
 
-### Pre-deploy (local)
+### Pre-deploy (local) — 2026-06-01
 
-```powershell
-cd c:\Users\tomas\Desktop\069_ladder
-.\scripts\smoke-local.ps1
-cd apps\mini-app
-npm run preview
-# second terminal:
-npm run qa:viewport
-```
+| Step | Result |
+|------|--------|
+| `scripts/smoke-local.ps1` | [x] pytest 16, vitest 42, lint/build |
+| `npm run qa:viewport` | [x] REJECTED stamp + game-over navigation |
+| API health | [x] `{"status":"ok"}` |
 
-### Post-deploy smoke (production) — 2026-06-01
+### Post-deploy smoke (production)
 
 | Step | Result |
 |------|--------|
@@ -125,19 +122,21 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 
 | Criterion | Status |
 |-----------|--------|
-| Prod = main with trust fixes | [x] `d862c3c` live; API health ok; OG meta on prod |
-| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + delta |
+| Prod = main with trust fixes | [ ] Vercel redeploy pending — push trust hotfix then redeploy mini-app |
+| Automated CI gates | [x] pytest 16, vitest 42, lint, build, smoke-local, viewport QA (2026-06-01) |
+| API health | [x] `{"status":"ok"}` |
+| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + v1.8.2 + [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) |
 | Android DEVICE_QA signed | [ ] — recruit signer; same checklists |
-| Submit/auth errors visible | [x] code shipped |
-| No badge flicker | [x] code shipped |
+| Submit/auth errors visible | [x] code shipped; toasts on game-over screen |
+| Share clipboard fallback | [x] code shipped (no bogus shareMessage) |
 | 5–10 testers invited | [ ] after Phase C pass |
 | ≥3 runs from majority | [ ] Phase E |
 | Hotfix protocol active | [x] see FF_TEST hotfix policy |
 | Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
 
-### After device QA pass — tag v1.8.2
+### After device QA pass — tag v1.8.4
 
 ```powershell
-git tag -a v1.8.2 -m "v1.8.2 — F&F-ready bundle (mobile UX + trust + discoverability)"
+git tag -a v1.8.4 -m "v1.8.4 — pre-F&F hotfix (layout + mechanics + trust UX)"
 git push origin --tags
 ```
