@@ -64,8 +64,11 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 |----------|-------|
 | `TELEGRAM_BOT_TOKEN` | From BotFather |
 | `MINI_APP_URL` | Vercel production URL from step 3 |
+| `MINI_APP_SHORT_NAME` | Optional — BotFather direct-link short name for group `t.me/bot/app` buttons |
 
-3. Deploy.
+3. Deploy. **Run exactly one bot replica** — two polling processes on the same token cause `TelegramConflictError` in logs.
+
+**Groups:** Telegram allows `web_app` inline buttons **only in private chat**. In groups the bot sends a `t.me/...?startapp` URL button instead (see `apps/bot/main.py`).
 
 ## 5. BotFather
 

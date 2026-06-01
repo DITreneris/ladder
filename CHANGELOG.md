@@ -18,6 +18,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
 ### Fixed
+- **Bot silent in groups (`BUTTON_TYPE_INVALID`)** — `web_app` inline buttons are private-chat only per Telegram API; groups now get `t.me/bot?startapp` URL button; command logging + send fallback
 - **X card validator robots.txt** — switch from `Allow: /` to empty `Disallow:` (legacy-compatible); list `Twitterbot` first for order-sensitive parsers
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
 - **Home scroll layout** — single scroll on `#startScreen` (no nested gutter scroll); `#homeGameplayPreview` full column width; clearer two-line auth banner when profile sync fails; compact shift description; Telegram Punch In hint when inline CTA hidden
