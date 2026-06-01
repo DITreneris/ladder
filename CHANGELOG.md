@@ -15,10 +15,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
+- **Home scroll layout** — single scroll on `#startScreen` (no nested gutter scroll); `#homeGameplayPreview` full column width; clearer two-line auth banner when profile sync fails; compact shift description; Telegram Punch In hint when inline CTA hidden
 
 ### Changed
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 - **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)
+- **Tutorial visual clarity** — `.rung-future` dims rungs 2–6; `.next-rung` row emphasis; `safe-side-hint` through 12 rungs; `#imminentHint` on SE Telegram; HR memo scroll line on first tap
 
 ### Planned (v1.1)
 - All-time / Legends tab

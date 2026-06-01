@@ -127,7 +127,7 @@
 }
 
 @utility card-light-sm {
-  @apply flex items-start gap-2.5 rounded-xl border border-slate-200 bg-white p-3;
+  @apply w-full min-w-0 flex items-start gap-2.5 rounded-xl border border-slate-200 bg-white p-3;
 }
 
 @utility card-performance {
@@ -271,6 +271,12 @@
   min-width: 0;
 }
 
+#startScreen {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 html.cl-in-telegram,
 html.cl-in-telegram body {
   height: 100dvh;
@@ -335,8 +341,12 @@ html.cl-in-telegram .text-micro {
   display: none;
 }
 
-.start-cta-bar {
-  background-color: color-mix(in srgb, var(--cl-secondary-bg) 92%, white);
+.cl-telegram-cta-hint {
+  display: none;
+}
+
+html.cl-in-telegram .cl-telegram-cta-hint {
+  display: block;
 }
 
 .game-hud {
@@ -488,7 +498,13 @@ html.cl-in-telegram .text-micro {
   }
 
   html.cl-in-telegram .imminent-hint {
-    display: none;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    padding-top: 0;
+    font-size: 10px;
+    line-height: 1.25;
   }
 
   html.cl-in-telegram .hud-tap-hint {
@@ -916,6 +932,21 @@ html.cl-in-telegram .text-micro {
 .next-rung .rung-center:not(.rung-center--corridor) {
   border-color: var(--color-cl-primary);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-cl-primary) 30%, transparent);
+}
+
+[data-rung-slot].next-rung {
+  opacity: 1;
+  border-radius: 0.5rem;
+  outline: 1px solid color-mix(in srgb, var(--color-cl-primary) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.rung-future {
+  opacity: 0.45;
+}
+
+.rung-future .obstacle-badge {
+  opacity: 0.85;
 }
 
 @keyframes reorg-warning-pulse {

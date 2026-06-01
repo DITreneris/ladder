@@ -147,10 +147,11 @@ async function homeColumnAlignment(page) {
   return page.evaluate(() => {
     const badge = document.querySelector("#startScreen .card-light");
     const ticker = document.getElementById("homeNewsTicker");
+    const preview = document.getElementById("homeGameplayPreview");
     const ctaBar = document.querySelector("#startScreen .start-cta-bar");
-    if (!badge || !ticker || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
+    if (!badge || !ticker || !preview || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
 
-    const boxes = [badge, ticker, ctaBar].map((el) => {
+    const boxes = [badge, ticker, preview, ctaBar].map((el) => {
       const r = el.getBoundingClientRect();
       return { w: r.width, l: r.left };
     });
@@ -163,7 +164,8 @@ async function homeColumnAlignment(page) {
       ok: widthDelta <= 2 && leftDelta <= 2,
       badgeWidth: widths[0],
       tickerWidth: widths[1],
-      ctaBarWidth: widths[2],
+      previewWidth: widths[2],
+      ctaBarWidth: widths[3],
       widthDelta,
       leftDelta,
     };

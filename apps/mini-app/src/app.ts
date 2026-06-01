@@ -206,12 +206,17 @@ function submitFailureMessage(reason: ApiFailureReason): string {
 
 function showAuthDegradedBanner(reason?: ApiFailureReason): void {
   const bot = getBotUsername();
+  const lead = $("authDegradedLead");
+  const sub = $("authDegradedSub");
   if (reason === "auth") {
-    $("authDegradedText").textContent = `Session expired. Reopen from @${bot} to sync scores.`;
+    lead.textContent = "Session expired.";
+    sub.textContent = `Reopen via @${bot} to sync scores.`;
   } else if (reason === "network" || reason === "server") {
-    $("authDegradedText").textContent = `Connection issue — scores may not sync. Check network and reopen from @${bot}.`;
+    lead.textContent = "Play works — scores sync when you're back on the grid.";
+    sub.textContent = `Reopen via @${bot} if this sticks.`;
   } else {
-    $("authDegradedText").textContent = `Session expired or offline. Reopen from @${bot} to sync scores.`;
+    lead.textContent = "Session expired or offline.";
+    sub.textContent = `Reopen via @${bot} to sync scores.`;
   }
   $("authDegradedBanner").classList.remove("hidden");
 }
@@ -525,12 +530,13 @@ function renderRungsInner(): void {
     const rung = rungs[i];
     if (!rung) {
       rungEl.style.visibility = "hidden";
-      rungEl.classList.remove("next-rung");
+      rungEl.classList.remove("next-rung", "rung-future");
       continue;
     }
     rungEl.style.visibility = "visible";
     rungEl.dataset.rungId = String(rung.id);
     rungEl.classList.toggle("next-rung", i === 1);
+    rungEl.classList.toggle("rung-future", i >= 2);
 
     const leftSlot = rungEl.querySelector(".left-slot") as HTMLElement;
     const rightSlot = rungEl.querySelector(".right-slot") as HTMLElement;
@@ -541,7 +547,7 @@ function renderRungsInner(): void {
     leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
     rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
 
-    if (earlyTapsRemaining > 0 && i === 1) {
+    if (shouldShowImminentHint(engine.getRungsClimbed()) && i === 1) {
       leftSlot.classList.toggle("safe-side-hint", rung.obstacle !== "left");
       rightSlot.classList.toggle("safe-side-hint", rung.obstacle !== "right");
     }
@@ -1176,8 +1182,9 @@ export function mountApp(): void {
         [
           "You are in the corridor. Each tap picks LEFT or RIGHT on the next rung.",
           "Avoid hazards on the occupied side. Coffee on your side restores energy.",
+          "Only the next rung counts — everything else scrolls down.",
         ],
-        { variant: "info", durationMs: 4000 }
+        { variant: "info", durationMs: 4500 }
       );
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
         shiftToastShown = true;

@@ -34,9 +34,12 @@ export const APP_SHELL = `
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
     <div id="startScreen" class="flex flex-col flex-grow min-h-0 min-w-0 select-none z-10 pt-4 pb-2 overflow-x-hidden">
-      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-y-auto overflow-x-hidden space-y-2.5">
+      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-x-hidden space-y-2.5">
       <div id="authDegradedBanner" class="hidden shrink-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
-        <p id="authDegradedText" class="text-caption font-semibold text-amber-900 flex-1 min-w-0"></p>
+        <p id="authDegradedText" class="text-caption font-extrabold text-amber-900 flex-1 min-w-0">
+          <span id="authDegradedLead"></span>
+          <span id="authDegradedSub" class="block text-micro font-semibold mt-0.5"></span>
+        </p>
         <button type="button" onclick="dismissAuthBanner()" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
         <div class="text-center">
@@ -77,7 +80,7 @@ export const APP_SHELL = `
             <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
             <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
           </div>
-          <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1"></p>
+          <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1 line-clamp-2"></p>
         </div>
         <div id="homeGameplayPreview" class="card-light-sm shrink-0">
           <span class="text-xl shrink-0" aria-hidden="true">🏃</span>
@@ -92,6 +95,7 @@ export const APP_SHELL = `
           <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
             <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
           </button>
+          <p class="cl-telegram-cta-hint text-micro font-semibold text-slate-500 text-center">Punch In lives in Telegram&apos;s bar below.</p>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2 px-3 text-xs">
               <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard

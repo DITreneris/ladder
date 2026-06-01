@@ -148,7 +148,7 @@ Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented
 - Hide in-app `.cl-header` — use Telegram native title + `BackButton` API
 - Floating `.sound-fab` for mute toggle (not duplicated in header)
 - Safe-area padding on `.cl-phone-shell` via `--tg-content-safe-area-inset-*` + `env(safe-area-inset-*)`
-- Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + static news strip (`news-ticker-text--static`) + daily shift pill + `#homeGameplayPreview` + sticky `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden); `#startScreen` scrolls on short viewports with MainButton bottom padding
+- Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + static news strip (`news-ticker-text--static`) + daily shift pill (`#dailyShiftDescription` line-clamp-2; full copy on pill `title`) + `#homeGameplayPreview` (`card-light-sm` full width) + `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden) + `.cl-telegram-cta-hint`; `#startScreen` is the sole home scroll container with MainButton bottom padding; `#authDegradedBanner` two-line offline copy when profile sync fails
 - Game: compact `.game-hud` with optional `#hudTapHint` chip (deck-first copy: TAP LEFT / TAP RIGHT); first-run `.tap-deck-hint` pulse on `#tapControlsBar`; `#hrMemoRail` below HUD for in-run People Ops memos (queued, consolidated on promotion); `#gamePlayArea` for responsive full-column ladder (`cl-shell-gutter`, `#ladderTrack` width 100%); fixed `.tap-controls-bar` full-bleed with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; player position from DOM slot centers; keyboard hints hidden in Telegram; shell toast on home/game-over only — mute feedback uses HR memo in-run
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
 
@@ -233,7 +233,9 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 | Pattern | Usage | Notes |
 |---------|--------|-------|
 | **Center corridor** | `.rung-center--corridor`, `.player-at-corridor` | Player starts center aisle; L/R tap only |
-| **Imminent hint** | `#imminentHint` | Next-rung panel first ~12 rungs |
+| **Imminent hint** | `#imminentHint` | Next-rung panel first ~12 rungs; compact 2-line on SE Telegram |
+| **Future rung de-emphasis** | `.rung-future` | Rungs index 2–6 at reduced opacity; `.next-rung` row outline |
+| **Safe-side hint** | `.safe-side-hint` on imminent rung | Tutorial window aligned to 12 rungs (tap-deck pulse still 5 taps) |
 | **Gate badge** | Manager+ obstacles | Slate badge; same dodge as meetings |
 | **Plant badge** | CEO+ obstacles | Emerald badge; same dodge as deadlines |
 
