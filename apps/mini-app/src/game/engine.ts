@@ -334,13 +334,13 @@ export class GameEngine {
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
     this.checkInternFakePromos(years);
-    this.renderRungs();
     if (coffeePickup) {
       this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
       debugTapResult(side, nextRung, "coffee");
     } else {
       debugTapResult(side, nextRung, "climb");
     }
+    this.renderRungs();
     debugTapContext(this.rungs[1]);
   }
 

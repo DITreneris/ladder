@@ -58,7 +58,7 @@ Use this table to pick the right skill, rules, and documents.
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + § Shipped baseline, [CHANGELOG.md](CHANGELOG.md) |
-| F&F gate / device QA / pre-tag | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
+| F&F gate / device QA / pre-tag | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md), [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Debug triage / incident history | `debug-steward` | [project-context.mdc](.cursor/rules/project-context.mdc) | [debug-triage](.cursor/skills/debug-triage/SKILL.md), [DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md) |
@@ -77,7 +77,7 @@ Use this table to pick the right skill, rules, and documents.
 | `scope` | [docs/mvp-scope.md](docs/mvp-scope.md) | v1 boundary, v1.1 deferrals, out-of-scope, terminology — **not** feature inventory | Scope / approval decisions |
 | `architecture` | [docs/architecture.md](docs/architecture.md) | Stack, data flow, env matrix, security | Infra or API contract changes |
 | `tokens` | [apps/mini-app/src/style.css](apps/mini-app/src/style.css) | Design tokens (`@theme`) and utilities (`@utility`) | New colors, spacing, shell component utilities |
-| `design-system` | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app visual canon (v1.8.2), a11y matrix, agent guardrails | UI pattern or token changes |
+| `design-system` | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app visual canon (v1.8.5), a11y matrix, agent guardrails | UI pattern or token changes |
 | `env` | [.env.example](.env.example) | Required environment variable names | New env vars |
 
 ### Tier 2 — Human and agent guides
@@ -85,7 +85,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.8.2 live (QA/tag pending); v1.9 after F&F |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.8.5 code done (deploy/QA/tag pending); v1.9 after F&F |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |

@@ -10,7 +10,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
-- **Coffee pickup animation** — `onCoffee` fires after `renderRungs()` again (v1.8.4 order restored)
+- **Coffee pickup (C-03)** — `onCoffee` fires **before** `renderRungs()` so `findImminentCoffeeBadge()` still sees `.next-rung`; `fillSlot` skips animating `.coffee-pickup`; resync after animation via `triggerCoffeePickup` callback
+- **Player vs rung layering** — foot-rung anchor (dynamic `bottom` from slot 0); z-index stack so `#playerClimber` sits above rung connectors but hazard/coffee badges stay visible on `.next-rung`
 - **Career high trust** — home badge and career-high line update only after successful score submit, not on game-over screen open
 - **Game-over gap copy** — leaderboard gap line respects Daily vs Weekly tab (`leaderboardPeriod`)
 - **Energy death HUD tick** — no extra score update after energy-depletion game over
@@ -20,6 +21,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 - **package.json version** — aligned to `1.8.5`
+- **CI** — `npm run qa:coffee` (Playwright tutorial coffee + meeting collision) on preview
+- **Cursor agent layer** — rules, verifier, deploy/debug/score skills, `AGENTS.md`, `DOCS_INDEX`, `DESIGN_SYSTEM`, `FF_EXECUTION` synced to v1.8.5 gate and shipped baseline
 
 ### Planned (v1.1)
 - All-time / Legends tab

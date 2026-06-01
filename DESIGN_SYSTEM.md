@@ -1,9 +1,9 @@
 # Corporate Ladder — Design System
 
-**Status:** v1.8.2 (F&F-ready bundle — deck-first, responsive ladder, HR memo rail)  
+**Status:** v1.8.5 (corridor UX, scripted tutorial, gate/plant hazards, single content column)  
 **Audience:** Frontend developers, coding agents  
 **Scope:** Telegram Mini App shell + game chrome (`apps/mini-app`) — not a visual redesign  
-**Release context:** [ROADMAP.md](ROADMAP.md) Status · [CHANGELOG 1.8.2](CHANGELOG.md#182---2026-06-01)
+**Release context:** [ROADMAP.md](ROADMAP.md) Status · [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01)
 
 **Family sibling:** [DITreneris/site](https://github.com/DITreneris/site) shares token/utility *process*; do **not** import Prompt Anatomy navy/gold brand or marketing layout.
 
@@ -228,7 +228,16 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 | **Auth banner** | Home | Dismissible when profile sync fails |
 | **Home scroll** | `#startScreen` | `overflow-y: auto` on short Telegram viewports |
 
-Game-over: `card-performance` + REJECTED stamp. Obstacle badges: red meeting, amber reorg, bright red deadline, slate gate (Manager+), emerald plant (CEO+). Corridor: `.rung-center--corridor`, `.player-at-corridor` (v1.8.5). Weekly tab label: **Last 7 Days**.
+### v1.8.5 corridor + hazards
+
+| Pattern | Usage | Notes |
+|---------|--------|-------|
+| **Center corridor** | `.rung-center--corridor`, `.player-at-corridor` | Player starts center aisle; L/R tap only |
+| **Imminent hint** | `#imminentHint` | Next-rung panel first ~12 rungs |
+| **Gate badge** | Manager+ obstacles | Slate badge; same dodge as meetings |
+| **Plant badge** | CEO+ obstacles | Emerald badge; same dodge as deadlines |
+
+Game-over: `card-performance` + REJECTED stamp. Obstacle badges: red meeting, amber reorg, bright red deadline, slate gate (Manager+), emerald plant (CEO+). Weekly tab label: **Last 7 Days**.
 
 ---
 
@@ -267,14 +276,15 @@ Attribution for the [Prompt Anatomy](https://www.promptanatomy.app/) ecosystem �
 ## 12. QA checklist
 
 - [ ] `cd apps/mini-app && npm run lint && npm test && npm run build`
-- [ ] `npm run preview` → `npm run qa:viewport` (no horizontal overflow; home CTA @ 320×568; play-area ≥ 50%; memo ≥ 45%; seven rungs fit)
+- [ ] `npm run preview` → `npm run qa:viewport` + `npm run qa:layout` (no horizontal overflow; play width stable after first tap)
 - [ ] `#ladderTrack` fills column at 320px / 390px — no grey dead zones beside ladder
+- [ ] `#gameContentColumn` wraps HUD + play + tap at one width
 - [ ] `#hudTapHint` references TAP LEFT / TAP RIGHT (viewport QA asserts copy)
 - [ ] Telegram light + dark theme: shell adapts, next-rung visible
 - [ ] `prefers-reduced-motion`: animations off, game playable
 - [ ] Grep: no `text-[` pixel sizes in `apps/mini-app/src/`
-- [ ] Device QA: [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) before tag `v1.8.2`
+- [ ] Device QA: [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) before tag `v1.8.5`
 
 ---
 
-**Declared:** Design System **v1.8.2** — 2026-06-01 (aligned with [CHANGELOG](CHANGELOG.md#182---2026-06-01)).
+**Declared:** Design System **v1.8.5** — 2026-06-01 (aligned with [CHANGELOG](CHANGELOG.md#185---2026-06-01)).

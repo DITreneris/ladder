@@ -16,7 +16,7 @@ Follow [.cursor/skills/changelog-maintainer/SKILL.md](../skills/changelog-mainta
 
 - Any agent ships user-visible changes → ensure `[Unreleased]` entry exists
 - Weekly cyclic review via `/loop 7d` prompt (see [AGENTS.md](../../AGENTS.md))
-- Release tag cut (e.g. v1.8.2 after device QA)
+- Release tag cut (e.g. v1.8.5 after device QA)
 
 ## Release cut checklist
 

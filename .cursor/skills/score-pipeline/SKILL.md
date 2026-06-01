@@ -47,6 +47,18 @@ Example: `GET /leaderboard?period=daily&limit=50&initData=...`
 
 **Note:** `termination_cause` strings come from UI constants (human-readable labels), not engine type IDs.
 
+## Client trust (v1.8.4+)
+
+Career high on home must not bump until submit succeeds:
+
+| File | Role |
+|------|------|
+| `apps/mini-app/src/lib/score-trust.ts` | `nextHighScoreAfterSubmit()` — pure helper |
+| `apps/mini-app/src/lib/score-trust.test.ts` | Unit tests for submit-fail / profile-best paths |
+| `apps/mini-app/src/app.ts` | Calls helper after `submitRun` resolves |
+
+**Rule:** If `submitOk === false`, return `currentHigh` unchanged. If API returns profile best, prefer that over local bump.
+
 ## Files
 
 | Layer | File |

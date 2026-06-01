@@ -119,17 +119,38 @@ Fix before public launch or competitive leaderboard marketing. Can ship F&F with
 | Field | Detail |
 |-------|--------|
 | **ID** | C-03 |
-| **Files** | `apps/mini-app/src/game/engine.ts` — `handleTap()` |
-| **Bug** | `onCoffee` callback fires **before** `renderRungs()`; CHANGELOG 1.8.4 fixed this by firing **after** |
-| **Impact** | Tutorial coffee (+25% energy) — pickup animation cut short; badge vanishes instantly |
+| **Files** | `engine.ts`, `app.ts`, `effects.ts`, `scripts/coffee-pickup-qa.mjs` |
+| **Bug** | Wave 1 moved `onCoffee` **after** `renderRungs()` — `findImminentCoffeeBadge()` queries `.next-rung` after shift, badge gone; animation never runs |
+| **Impact** | Tutorial coffee (+25% energy) — no pickup animation; badge ghosting; Telegram screenshots showed broken coffee UX |
 
 **Tasks:**
 
-- [x] Move `callbacks.onCoffee(...)` to after `this.renderRungs()` (restore v1.8.4 order)
-- [x] Re-run tutorial test: tap 3 picks up coffee; animation visible
-- [x] Add regression test in `engine.test.ts`: `onCoffee` invoked after render mock order
+- [x] Move `callbacks.onCoffee(...)` to **before** `this.renderRungs()` (correct order for DOM badge lookup)
+- [x] `fillSlot` guard: skip slot while `.coffee-pickup` animates; resync via `triggerCoffeePickup` `onComplete`
+- [x] Regression tests: `onCoffee` before render mock order; `COFFEE_RECOVERY` on tutorial tap 3
+- [x] Playwright `npm run qa:coffee` — coffee pickup callback + meeting tap-2-RIGHT game over
+- [ ] **Device verified** — Telegram iOS/Android rows 3–5 ([DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md)) after redeploy
 
-**Acceptance:** Coffee badge animates on tap 3; no ghost coffee on imminent rung after climb.
+**Acceptance:** Coffee badge animates on tap 3; +25% energy in engine; no ghost coffee on imminent rung after climb; device QA rows 3–5 pass.
+
+---
+
+### P1-2b · Player foot-rung anchor + z-index (Reply-All visual / rung overlap)
+
+| Field | Detail |
+|-------|--------|
+| **ID** | (layout) |
+| **Files** | `app.ts` `layoutPlayerPosition`, `style.css`, `template.ts` |
+| **Bug** | Fixed `bottom-20` + `.rung-center` z-index 10 > player z-index 5 — character overlapped by rung connector; stood under hazard column |
+| **Impact** | Reply-All looked “broken”; third rung bar drew over player head |
+
+**Tasks:**
+
+- [x] Anchor `#playerClimber` to foot rung slot 0 (horizontal + vertical from `getBoundingClientRect`)
+- [x] Z-index stack: player above connectors; `.next-rung` badges above player
+- [ ] **Device verified** — overlap check on 320×568 Telegram (row 5)
+
+**Acceptance:** Player sits on foot rung; meeting badge on occupied side above player, not under feet; no connector over player head @320px.
 
 ---
 
@@ -285,7 +306,8 @@ Prioritized. Link to test file when implemented.
 | Priority | Test name | File (target) | Purpose | Status |
 |----------|-----------|---------------|---------|--------|
 | P0 | `layout-stable-after-first-tap` | `scripts/layout-audit.mjs` | C-01 regression guard | [x] |
-| P1 | `onCoffee-after-renderRungs` | `engine.test.ts` | C-03 regression | [x] |
+| P1 | `onCoffee-before-renderRungs` | `engine.test.ts` | C-03 regression | [x] |
+| P1 | `qa:coffee` Playwright | `scripts/coffee-pickup-qa.mjs` | tutorial coffee + meeting death | [x] |
 | P1 | `energy-depletion-game-over` | `engine.test.ts` | Timer death path | [x] |
 | P1 | `high-score-not-updated-on-submit-fail` | `score-trust.test.ts` | C-02 | [x] |
 | P1 | `rank-boundary-40-rungs-manager` | `engine.test.ts` + API | Submit at 10.0y | [ ] |
@@ -377,7 +399,7 @@ Update this table when closing items.
 | Runtime verification (V-01–V-19) | 19 | 0 |
 | Automated tests to add | 5 | 4 |
 
-**Last updated:** 2026-06-01 (Wave 1 sprint — C-02/C-03/P1-4/P3; verifier green; pending redeploy + device QA)
+**Last updated:** 2026-06-01 (Gameplay visual fix sprint — C-03 true fix, player anchor, qa:coffee; pending redeploy + device QA)
 
 ---
 
@@ -387,7 +409,7 @@ Update this table when closing items.
 |----|----------|------------------|
 | C-01 | P0* | Ladder width shrink after first tap |
 | C-02 | P1 | High score UI before API success |
-| C-03 | P1 | Coffee animation before render (regression) |
+| C-03 | P1 | Coffee before render + fillSlot guard (Wave 1 regression reopened) |
 | C-04 | P2 | Share clipboard-only |
 | C-05 | P2 | Auth banner on network errors |
 | C-06 | P1 | Client-trusted scores |

@@ -28,7 +28,7 @@ Telegram Mini App game: tap left/right to climb a corporate ladder, avoid obstac
 | File | Purpose |
 |------|---------|
 | [DOCS_INDEX.md](DOCS_INDEX.md) | Navigation map for humans and agents |
-| [ROADMAP.md](ROADMAP.md) | **Status** block, release train, shipped baseline (v1.5 → v1.8.2), v1.9 plan |
+| [ROADMAP.md](ROADMAP.md) | **Status** block, release train, shipped baseline (v1.5 → v1.8.5), v1.9 plan |
 | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | F&F operational gate (device QA → tag → testers) |
 | [CHANGELOG.md](CHANGELOG.md) | Per-release shipped detail (Keep a Changelog) |
 | [docs/mvp-scope.md](docs/mvp-scope.md) | Scope boundaries, v1.1 deferrals, out-of-scope (not feature inventory) |
@@ -36,7 +36,7 @@ Telegram Mini App game: tap left/right to climb a corporate ladder, avoid obstac
 | [.cursor/rules/satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | Satirical tone (active copy rules) |
 | [docs/mvp-scope.md](docs/mvp-scope.md) | v1 / v1.1 / out-of-scope |
 | [docs/architecture.md](docs/architecture.md) | Stack, data flow, env matrix, security |
-| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails (through v1.8.2) |
+| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails (through v1.8.5) |
 | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Manual production deploy progress |
 
 ## DITreneris family
@@ -86,9 +86,9 @@ Copy `.env.example` to `.env` and fill in credentials.
 
 ## MVP boundaries
 
-**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. v1.5–v1.8.2 live on prod.
+**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. v1.5–v1.8.5 code in repo.
 
-**Next:** v1.8.2 device QA + tag → friends-and-family → v1.9 — see [ROADMAP.md](ROADMAP.md) **Status**.
+**Next:** v1.8.5 deploy + device QA + tag → friends-and-family → v1.9 — see [ROADMAP.md](ROADMAP.md) **Status**.
 
 **v1.1 (do NOT implement without approval):** Friends leaderboard, All-time tab, analytics, anti-cheat replay.
 
@@ -129,13 +129,13 @@ cd packages/api && pytest
 cd apps/mini-app && npm run lint && npm test && npm run build
 ```
 
-After layout changes: `cd apps/mini-app && npm run preview` then `npm run qa:viewport`.
+After layout changes: `cd apps/mini-app && npm run preview` then `npm run qa:viewport` and `npm run qa:layout`.
 
 ## Deploy
 
 [DEPLOY.md](DEPLOY.md) · [.cursor/rules/deployment.mdc](.cursor/rules/deployment.mdc) · [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md)
 
-Current gate: tag `v1.8.2` after [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) — [ROADMAP.md](ROADMAP.md).
+Current gate: tag `v1.8.5` after [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) — [ROADMAP.md](ROADMAP.md).
 
 ## Agent roles
 

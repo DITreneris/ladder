@@ -139,10 +139,13 @@ export function triggerPromoConfetti(el: HTMLElement): void {
   );
 }
 
-export function triggerCoffeePickup(badge: HTMLElement): void {
-  const removeBadge = () => badge.remove();
+export function triggerCoffeePickup(badge: HTMLElement, onComplete?: () => void): void {
+  const finish = () => {
+    badge.remove();
+    onComplete?.();
+  };
   if (respectsReducedMotion()) {
-    removeBadge();
+    finish();
     return;
   }
   badge.classList.remove("coffee-pickup");
@@ -152,7 +155,7 @@ export function triggerCoffeePickup(badge: HTMLElement): void {
     "animationend",
     () => {
       badge.classList.remove("coffee-pickup");
-      removeBadge();
+      finish();
     },
     { once: true }
   );

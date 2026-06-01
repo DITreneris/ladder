@@ -21,7 +21,8 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 - [ ] `cd apps/mini-app && npm test` passes
 - [ ] `cd apps/mini-app && npm run build` passes
 - [ ] After layout changes: `npm run preview` then `npm run qa:viewport` passes
-- [ ] CI runs viewport QA on PRs; optional local: `npm run capture:hero` for README asset
+- [ ] `npm run qa:layout` passes (post-tap `#gamePlayArea` width delta ≤ 2px)
+- [ ] CI runs viewport + layout QA on PRs; optional local: `npm run capture:hero` for README asset
 - [ ] Optional: `scripts/smoke-local.ps1` or `scripts/smoke-local.sh` from repo root
 
 ### Gameplay
@@ -66,6 +67,41 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 - [ ] Share toast says sheet opened (not implying success); Meeting Monday badges stable (rung id)
 - [ ] Sound FAB + safe-area padding on notched devices
 - [ ] Bot starts on Railway without Docker `.env` IndexError (`main.py` from `/app`)
+
+### v1.8.3 layout column
+
+- [ ] `#gameContentColumn` wraps HUD + play + tap — single gutter width at 320px / 390px
+- [ ] Coffee clears from rung on pickup (badge removed; engine clears `coffee` flag)
+
+### v1.8.4 mechanics + layout
+
+- [ ] REJECTED stamp fully visible inside performance card (no clip)
+- [ ] HUD rank + milestone stacked; truncate on narrow viewports
+- [ ] Player sprite and hint glow not clipped at play-area edges
+- [ ] Tutorial coffee injects on `rungs[2]` (or `rungs[1]` at rung 12 retry)
+- [ ] Rank-gated obstacles appear on promotion rung (`checkPromotions()` before `generateRung()`)
+- [ ] Tap spam throttled: `MIN_TAP_INTERVAL_MS` 120ms; keyboard repeat ignored
+- [ ] Imminent reorg next rung shows **Frozen** badge (no shuffle telegraph on `rungs[1]`)
+
+### v1.8.5 corridor + tutorial
+
+- [ ] Player starts in **center corridor** before first tap (`.player-at-corridor`, `.rung-center--corridor`)
+- [ ] Control scheme unchanged: TAP LEFT / TAP RIGHT only — no center tap
+- [ ] Scripted tutorial: tap 1 clear → tap 2 meeting on RIGHT (dodge LEFT) → tap 3 coffee on LEFT
+- [ ] HR memo on first tap explains corridor + next-rung safe side
+- [ ] `#imminentHint` readable for first ~12 rungs (and in debug mode)
+- [ ] Double-tap throttle toast: “Too fast — one tap per beat”
+- [ ] Manager+: occasional **Gate** badge (same L/R dodge as meetings)
+- [ ] CEO+: occasional **Plant** badge (same rules as deadlines)
+- [ ] Obstacle picker uses rank-allowed pool only (no intern fallback noise)
+- [ ] Play-area width stable taps 0–8 (no ladder shrink after first tap)
+
+### Score trust + game-over UX
+
+- [ ] Career high / home badge updates only after **successful** score submit — not on game-over open
+- [ ] Game-over leaderboard gap line respects Daily vs Weekly tab (`leaderboardPeriod`)
+- [ ] No extra HUD score tick after energy-depletion game over
+- [ ] `score-trust.test.ts` passes (`nextHighScoreAfterSubmit` behavior)
 
 ### v1.6 Gameplay
 

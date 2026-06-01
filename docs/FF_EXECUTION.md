@@ -1,7 +1,7 @@
 # F&F execution runbook — Corporate Ladder
 
 **Goal:** 9/10 friends-and-family readiness · **Window:** 2026-05-31 → 2026-06-14  
-**Tracker:** [FF_TEST.md](FF_TEST.md) · **Device QA:** [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md)
+**Tracker:** [FF_TEST.md](FF_TEST.md) · **Device QA:** [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) (+ [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) / [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) regressions as needed)
 
 ---
 
@@ -125,7 +125,7 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 | Prod = main with trust fixes | [ ] Vercel redeploy pending — push trust hotfix then redeploy mini-app |
 | Automated CI gates | [x] pytest 16, vitest 42, lint, build, smoke-local, viewport QA (2026-06-01) |
 | API health | [x] `{"status":"ok"}` |
-| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + v1.8.2 + [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) |
+| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) (+ v1.8.4 regressions) |
 | Android DEVICE_QA signed | [ ] — recruit signer; same checklists |
 | Submit/auth errors visible | [x] code shipped; toasts on game-over screen |
 | Share clipboard fallback | [x] code shipped (no bogus shareMessage) |
@@ -134,9 +134,9 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 | Hotfix protocol active | [x] see FF_TEST hotfix policy |
 | Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
 
-### After device QA pass — tag v1.8.4
+### After device QA pass — tag v1.8.5
 
 ```powershell
-git tag -a v1.8.4 -m "v1.8.4 — pre-F&F hotfix (layout + mechanics + trust UX)"
+git tag -a v1.8.5 -m "v1.8.5 — corridor UX, scripted tutorial, office hazards"
 git push origin --tags
 ```

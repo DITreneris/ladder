@@ -22,7 +22,7 @@ Load this skill **before** deep-diving game logic or UX copy. Target: **15 minut
 | **Layout width** | “Ladder narrow”, “4 bands”, “misaligned tap deck” | Width at tap 0 vs tap 1 (Step 2) |
 | **Layout height** | “Rungs squashed”, “can’t see ladder” | Play area height + rung height; HR memo visible |
 | **Reactions** | “No emoji”, “coffee invisible”, “tap dead” | [DEBUG_REPRO.md](../../docs/DEBUG_REPRO.md) R1–R5 |
-| **API / trust** | “Score not saved”, “leaderboard empty” | Network tab, `/runs`, `/leaderboard`, CHANGELOG trust fixes |
+| **API / trust** | “Score not saved”, “leaderboard empty”, “career high wrong” | Network tab, `/runs`, `/leaderboard`, [`score-trust.ts`](../../apps/mini-app/src/lib/score-trust.ts), CHANGELOG trust fixes |
 
 Work **one bucket at a time**.
 
@@ -58,7 +58,7 @@ console.log({ before: w(), afterTap: "tap once then re-run w()" });
 **Pass:** delta ≤ 2px.  
 **Fail:** investigate `#app` / `body` layout (`index.html`, `#app` rules in `style.css`). See [DEBUG_FIX_2026-06-01.md](../../docs/DEBUG_FIX_2026-06-01.md).
 
-Automated: `npm run qa:layout` (column alignment at start). Future: layout audit after simulated tap.
+Automated: `npm run qa:layout` — column alignment + **post-tap** play width (delta ≤ 2px; C-01 regression guard).
 
 ---
 

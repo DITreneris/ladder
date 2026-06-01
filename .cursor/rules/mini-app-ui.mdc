@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Design system doc
 
-Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.2). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
+Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
 
 ## v1.6 UI patterns
 
@@ -27,6 +27,26 @@ Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.2). Token 
 - **Home** — scroll on short Telegram viewports; amber news strip + shift description
 - **Viewport QA** — `npm run qa:viewport` after layout changes (50% play-area ratio; tap deck outside `#gamePlayArea`)
 
+## v1.8.3+ layout column
+
+- **`#gameContentColumn`** — single `cl-shell-gutter` wraps HUD + play + tap (not per-section gutters)
+- **Coffee pickup** — badge clears on collect; engine clears rung `coffee` flag
+
+## v1.8.4 clip + reorg UX
+
+- **REJECTED stamp** — fully visible inside `card-performance` (overflow visible)
+- **HUD rank stack** — rank + milestone stacked; truncate + title tooltip on narrow phones
+- **Play-area inset** — climber clamp; horizontal padding prevents sprite/hint clip
+- **Frozen badge** — imminent reorg next rung labeled Frozen (no shuffle telegraph)
+
+## v1.8.5 corridor + hazards
+
+- **Center corridor** — `.player-at-corridor`, `.rung-center--corridor` before first tap; L/R control unchanged
+- **`#imminentHint`** — next-rung panel readable first ~12 rungs
+- **Obstacle badges** — slate **Gate** (Manager+), emerald **Plant** (CEO+); same dodge rules as meetings/deadlines
+- **Layout QA** — `npm run qa:layout` after layout changes (post-tap width stable)
+- **320×568** — compact HUD + tap deck; rung rows scale to 32px min so seven rungs fit
+
 Canonical: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Do not regress without [ROADMAP.md](../../ROADMAP.md) baseline update.
 
 ## Structure (unchanged)
@@ -42,7 +62,7 @@ See [mini-app-frontend.mdc](mini-app-frontend.mdc) for folder layout and game/AP
 - Preserve Telegram `--cl-*` theme integration via existing `.cl-*` shell classes
 - Use `brand-attribution-*` utilities for Prompt Anatomy footer on shell screens only
 - Update DESIGN_SYSTEM.md when adding utilities
-- Run `npm run build`; after layout changes run `npm run qa:viewport`
+- Run `npm run build`; after layout changes run `npm run qa:viewport` and `npm run qa:layout`
 
 ## Agent must not do
 

@@ -148,7 +148,7 @@ export const APP_SHELL = `
             <p id="floorLabel" class="absolute top-1 left-0 right-0 text-center text-nano font-bold uppercase tracking-wider text-slate-400/80">Floor 1 — Intern Pit</p>
             <div id="rungsContainer" class="relative w-full h-full flex flex-col-reverse justify-start"></div>
           </div>
-          <div id="playerClimber" class="absolute bottom-20 w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none">
+          <div id="playerClimber" class="absolute w-16 h-16 flex flex-col items-center justify-center transition-all duration-100 ease-out select-none pointer-events-none">
             <span id="playerRankProp" class="absolute -top-1 -right-1 text-lg leading-none rank-prop" aria-hidden="true">🪪</span>
             <div id="playerActionEmoji" class="text-4xl filter drop-shadow idle-bob">🧑‍💻</div>
             <div class="mt-1 bg-slate-900/80 text-nano text-white px-1 py-0.5 rounded uppercase font-bold tracking-tight">YOU</div>

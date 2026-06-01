@@ -83,6 +83,7 @@ let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
 let emojiFlashLock = false;
 let playerAtCorridor = true;
+let qaCoffeePickups = 0;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -360,6 +361,7 @@ function slotContentKey(rung: Rung, side: "left" | "right"): string {
 }
 
 function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right", isImminent = false): void {
+  if (slotEl.querySelector(".coffee-pickup")) return;
   const key = slotContentKey(rung, side);
   if (slotEl.dataset.contentKey === key && slotEl.dataset.imminent === String(isImminent)) return;
   slotEl.dataset.contentKey = key;
@@ -392,15 +394,18 @@ function layoutPlayerPosition(side: PlayerLayout): void {
   const climber = $("playerClimber");
   const playRect = playArea.getBoundingClientRect();
   const climberW = climber.offsetWidth;
+  const climberH = climber.offsetHeight;
+  const footRung = playArea.querySelector("[data-rung-slot='0']") as HTMLElement | null;
   let anchor: HTMLElement | null = null;
 
   if (side === "center") {
     anchor =
       (playArea.querySelector(".next-rung .rung-center") as HTMLElement | null) ??
       (playArea.querySelector("[data-rung-slot='1'] .rung-center") as HTMLElement | null) ??
+      (footRung?.querySelector(".rung-center") as HTMLElement | null) ??
       ($("ladderTrack") as HTMLElement);
   } else {
-    anchor = playArea.querySelector(
+    anchor = footRung?.querySelector(
       side === "left" ? ".left-slot" : ".right-slot"
     ) as HTMLElement | null;
   }
@@ -408,11 +413,16 @@ function layoutPlayerPosition(side: PlayerLayout): void {
   if (!anchor) return;
 
   const anchorRect = anchor.getBoundingClientRect();
+  const anchorTopRel = anchorRect.top - playRect.top;
   const rawLeft =
     anchorRect.left + anchorRect.width / 2 - playRect.left - playArea.clientLeft - climberW / 2;
   const maxLeft = Math.max(0, playArea.clientWidth - climberW);
   const left = Math.max(0, Math.min(maxLeft, rawLeft));
   climber.style.left = `${Math.round(left)}px`;
+
+  const anchorCenterY = anchorTopRel + anchorRect.height / 2;
+  const bottomPx = playArea.clientHeight - anchorCenterY - climberH / 2;
+  climber.style.bottom = `${Math.max(0, Math.round(bottomPx))}px`;
 }
 
 function layoutRungs(): void {
@@ -447,7 +457,7 @@ function ensureRungSlot(container: HTMLElement, index: number): HTMLElement {
 
   const center = document.createElement("div");
   center.className =
-    "rung-center shrink-0 w-8 h-8 rounded-full bg-white border border-slate-300 shadow-sm flex items-center justify-center z-10";
+    "rung-center shrink-0 w-8 h-8 rounded-full bg-white border border-slate-300 shadow-sm flex items-center justify-center";
   rungEl.appendChild(center);
 
   const rightSlot = document.createElement("div");
@@ -703,6 +713,7 @@ function startGame(): void {
   earlyTapsRemaining = 5;
   shiftToastShown = false;
   ceoTrapShown = false;
+  qaCoffeePickups = 0;
   activeDailyModifier = engine.getDailyModifier();
   engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
@@ -1091,9 +1102,12 @@ export function mountApp(): void {
       },
       onGameOver,
       onCoffee: (side, rungId) => {
+        qaCoffeePickups++;
         debugLog("coffee", "callback", { side, rungId });
         const badge = findImminentCoffeeBadge(side);
-        if (badge) triggerCoffeePickup(badge);
+        if (badge) {
+          triggerCoffeePickup(badge, () => renderRungsWithReorgFeedback());
+        }
         flashPlayerEmoji("🤤", 550);
         showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
         triggerMeterFlash($("burnoutMeter"));
@@ -1168,6 +1182,24 @@ export function mountApp(): void {
   (window as unknown as Record<string, unknown>).openPromptAnatomy = openPromptAnatomy;
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
   (window as unknown as Record<string, unknown>).dismissAuthBanner = dismissAuthBanner;
+
+  if (new URLSearchParams(window.location.search).get("qa") === "1") {
+    (window as unknown as Record<string, unknown>).clQa = {
+      snapshot: () => ({
+        rungs: engine.getRungs().slice(0, 5).map((r) => ({
+          id: r.id,
+          obstacle: r.obstacle,
+          coffee: r.coffee,
+          type: r.type,
+        })),
+        timeLeft: engine.getTimeLeft(),
+        climbed: engine.getRungsClimbed(),
+        playerSide: engine.getPlayerSide(),
+        coffeePickups: qaCoffeePickups,
+      }),
+      getCoffeePickups: () => qaCoffeePickups,
+    };
+  }
 
   updateRankUI("Intern");
   if (isOgCaptureMode()) {

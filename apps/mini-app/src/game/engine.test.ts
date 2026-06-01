@@ -14,7 +14,7 @@ vi.mock("./audio", () => ({
 
 import { getDailyModifierById } from "./daily-modifier";
 import { GameEngine } from "./engine";
-import { MIN_TAP_INTERVAL_MS, TICK_MS } from "./constants";
+import { COFFEE_RECOVERY, MIN_TAP_INTERVAL_MS, TICK_MS } from "./constants";
 import type { DailyModifier } from "./daily-modifier";
 import type { GameCallbacks, GameOverResult } from "./types";
 
@@ -84,7 +84,7 @@ describe("GameEngine", () => {
     expect(onCoffee).toHaveBeenCalledWith("left", expect.any(Number));
   });
 
-  it("invokes onCoffee after renderRungs on coffee pickup", () => {
+  it("invokes onCoffee before renderRungs on coffee pickup", () => {
     const callOrder: string[] = [];
     const renderRungs = vi.fn(() => callOrder.push("renderRungs"));
     const onCoffee = vi.fn(() => callOrder.push("onCoffee"));
@@ -95,16 +95,25 @@ describe("GameEngine", () => {
       onCoffee,
       onToast: vi.fn(),
     };
-    const engine = new GameEngine(callbacks, vi.fn(), vi.fn(), renderRungs);
+    const engine = new GameEngine(callbacks, renderRungs, vi.fn(), vi.fn());
     engine.start();
     tapWithCooldown(engine, "left");
     tapWithCooldown(engine, "left");
+    callOrder.length = 0;
     tapWithCooldown(engine, "left");
 
-    const lastRenderIdx = callOrder.lastIndexOf("renderRungs");
-    const lastCoffeeIdx = callOrder.lastIndexOf("onCoffee");
-    expect(lastCoffeeIdx).toBeGreaterThanOrEqual(0);
-    expect(lastRenderIdx).toBeLessThan(lastCoffeeIdx);
+    expect(onCoffee).toHaveBeenCalledTimes(1);
+    expect(callOrder).toEqual(["onCoffee", "renderRungs"]);
+  });
+
+  it("adds COFFEE_RECOVERY to timeLeft on tutorial coffee tap", () => {
+    const { engine } = createEngine();
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    const beforeCoffee = engine.getTimeLeft();
+    engine.handleTap("left");
+    expect(engine.getTimeLeft()).toBe(Math.min(100, beforeCoffee + COFFEE_RECOVERY));
   });
 
   it("does not call onScoreUpdate after energy depletion game over", () => {

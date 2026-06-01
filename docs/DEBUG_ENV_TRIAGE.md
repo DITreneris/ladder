@@ -6,9 +6,9 @@ Pass/fail after trust hotfix push (`c253d26`+). Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |
 |---------|-------------|------------|----------------|-----------------|-------|
-| Telegram prod | `main-mUiaglh1.js` (2026-06-01 curl) | Retest on device | Retest | Retest | Pre–Wave-1 sprint deploy; redeploy after C-02/C-03 fixes |
-| Local build (post-sprint) | `main-BWQOXY_x.js` (2026-06-01) | `qa:layout` pass — play 316px stable tap 0→1 @390px | R2 in DEBUG_REPRO | R3 in DEBUG_REPRO | `npm run preview` + `qa:layout` |
-| Browser preview | local `npm run build` | Run `npm run qa:layout` | R2 in DEBUG_REPRO | R3 in DEBUG_REPRO | |
+| Telegram prod | `main-BWQOXY_x.js` (2026-06-01 curl) | Retest on device | Retest rows 3–4 | Retest row 3 | **Redeploy required** — visual fix sprint (`main-C4C8kB58.js`) not on prod yet |
+| Local build (visual fix sprint) | `main-C4C8kB58.js` (2026-06-01) | `qa:layout` pass | `qa:coffee` pass — onCoffee before render | `qa:coffee` pass — tap 2 RIGHT → game over | `npm run preview` + `qa:coffee` |
+| Browser preview | local `npm run build` | Run `npm run qa:layout` | `?qa=1` + `npm run qa:coffee` | same | |
 | npm run dev | n/a (HMR) | Visual | `?debug=1` | `?debug=1` | |
 
 **Layout measurements (local preview, post-sprint):**
