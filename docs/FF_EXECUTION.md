@@ -103,8 +103,8 @@ Run Supabase SQL from FF_TEST.md; update metrics table.
 
 | Check-in | Date | Runs (avg) | Shares | Pain items |
 |----------|------|------------|--------|------------|
-| Day 1 | 2026-06-01 | | | Tag v1.8.5 + F&F kickoff |
-| Day 4 | 2026-06-04 | | | Supabase metrics — [FF_TEST.md](FF_TEST.md) SQL |
+| Day 1 | 2026-06-01 | **0** | — | Supabase empty; prod `/auth/me` + `/runs` → 500 (upsert bug) |
+| Day 4 | 2026-06-04 | | | Re-run `scripts/ff-metrics.py` post API redeploy |
 | Day 7 | 2026-06-07 | | | External F&F mid-window; Tier A verification due |
 | Day 10 | 2026-06-10 | | | DEVICE_QA rows 6–10 spot-check; pre-review snapshot |
 
@@ -132,7 +132,7 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 | Submit/auth errors visible | [x] code shipped; toasts on game-over screen |
 | Share clipboard fallback | [x] code shipped (no bogus shareMessage) |
 | 5–10 testers invited | [~] Phase E — after Phase D dogfood |
-| ≥3 runs from majority | [ ] Phase E / F monitor |
+| ≥3 runs from majority | [ ] blocked — API upsert 500 until redeploy |
 | Hotfix protocol active | [x] see FF_TEST hotfix policy |
 | Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
 | v1.8.5 tagged | [x] `git tag v1.8.5` on `46abf19` |

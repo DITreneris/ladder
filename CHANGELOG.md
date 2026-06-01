@@ -18,6 +18,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
 - **Home scroll layout** — single scroll on `#startScreen` (no nested gutter scroll); `#homeGameplayPreview` full column width; clearer two-line auth banner when profile sync fails; compact shift description; Telegram Punch In hint when inline CTA hidden
 - **Obstacle badge readability** — future rung dim no longer fades hazard badges; meeting/reorg stronger borders and text; imminent hazard red glow (mirrors coffee hint); softer obstacle pulse on distant rungs
+- **Score submit 500 for new Telegram users** — `upsert_user()` handles Supabase `maybe_single()` returning `None` when no row exists; unblocks `/auth/me` and `/runs` (F&F data audit 2026-06-01)
 
 ### Changed
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)

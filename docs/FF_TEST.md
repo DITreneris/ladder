@@ -45,7 +45,23 @@ Use results to pick **1–2 v1.9 items** — see [ROADMAP.md](../ROADMAP.md) § 
 
 Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation order, C-01 layout CI guard (`qa:layout` post-tap), C-09/C-10/C-11/C-12 hygiene.
 
+### Data audit — Supabase (2026-06-01)
 
+**Tool:** `python scripts/ff-metrics.py` (reads root `.env`; no secrets printed)
+
+| Check | Result |
+|-------|--------|
+| Supabase `users` | **0** (no tester rows persisted) |
+| Supabase `game_runs` | **0** |
+| Prod `GET /leaderboard` daily + weekly | **200**, `entries: []` (consistent with empty DB) |
+| Prod `VITE_API_URL` in bundle | `ladder-production-642d.up.railway.app` — matches local `.env` |
+| Prod `POST /auth/me` + `/runs` (signed probe) | **500** — not 401 (secret OK); server crash on **new user** upsert |
+
+**Root cause (fixed in repo, pending Railway redeploy):** [`packages/api/app/routes/_users.py`](../packages/api/app/routes/_users.py) — Supabase Python client returns `None` from `maybe_single().execute()` when no row exists; code accessed `existing.data` → **500** for every first-time Telegram user. Explains why ~3–4 bot plays with game over left **no** `users` / `game_runs` rows.
+
+**After API redeploy:** re-run `scripts/ff-metrics.py` (`submit_pipeline_ok: true` expected) → ask testers to replay 1 run → refresh metrics SQL below.
+
+**Blocker:** Railway API must redeploy from `main` with upsert fix before F&F scores count.
 
 
 ## Device QA assignment
@@ -89,11 +105,9 @@ Mix **iOS + Android**; not all on the core team.
 
 
 | Tester | Platform | Invited | Runs (wk1) | Notes |
-
 |--------|----------|---------|------------|-------|
-
-| _(Android QA signer)_ | Android | [ ] | | DEVICE_QA sign-off |
-
+| _(reported ~3–4 via bot)_ | iOS / Android | [x] | **0 in DB** | Game over reported; submit failed (API 500) — re-test after API redeploy |
+| _(Android QA signer)_ | Android | [x] | | DEVICE_QA sign-off only |
 | | iOS / Android | [ ] | | |
 
 | | | | | |
@@ -138,10 +152,13 @@ Mix **iOS + Android**; not all on the core team.
 | Metric | Target | Jun 4 | Jun 7 | Jun 10 | How measured |
 |--------|--------|-------|-------|--------|--------------|
 | Session length | 30–90s | | | | Ask / observe |
-| Games per user (wk1) | ≥3 | | | | Supabase query below |
-| Share rate | Any shares | | | | Ask testers |
-| Daily return (engaged) | ≥2 days/wk | | | | `game_runs` timestamps |
-| Tier A verification | V-08–V-14 | | | | [todo.md](todo.md) §6 |
+| Games per user (wk1) | ≥3 | **0**¹ | | | `scripts/ff-metrics.py` or SQL below |
+| Distinct players (wk1) | ≥3 | **0**¹ | | | Supabase `users` with ≥1 run |
+| Share rate | Any shares | unknown | | | Ask testers |
+| Daily return (engaged) | ≥2 days/wk | n/a | | | `game_runs` timestamps |
+| Tier A verification | V-08–V-14 | blocked¹ | | | [todo.md](todo.md) §6 |
+
+¹ Audit **2026-06-01** — submit pipeline broken on prod (API 500 new-user upsert). Re-measure after Railway redeploy.
 
 
 
@@ -176,12 +193,9 @@ ORDER BY runs DESC;
 
 
 | Day | Date | Notes |
-
 |-----|------|-------|
-
-| 1 | 2026-06-01 | Deploy `d862c3c`; device QA kickoff |
-
-| 4 | 2026-06-04 | |
+| 1 | 2026-06-01 | Tag v1.8.5 + F&F kickoff; **data audit:** 0 users/runs; prod submit 500 (upsert bug) |
+| 4 | 2026-06-04 | Re-run `scripts/ff-metrics.py` after API redeploy |
 
 | 7 | 2026-06-07 | |
 
@@ -216,10 +230,8 @@ Log in GitHub Issues or a scratch column:
 
 
 | Date | Tester | Bucket | Detail | Action |
-
 |------|--------|--------|--------|--------|
-
-| | | | | |
+| 2026-06-01 | ~3–4 external | **pain** | Played via bot + game over; no scores in Supabase / empty leaderboard | **Hotfix:** `upsert_user` `maybe_single()` None guard — redeploy Railway API |
 
 
 

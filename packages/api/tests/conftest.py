@@ -61,8 +61,10 @@ def mock_supabase(monkeypatch):
                         def execute():
                             if field == "telegram_id":
                                 user = users_store.get(value)
+                                if user is None:
+                                    return None
                                 return MagicMock(data=user)
-                            return MagicMock(data=None)
+                            return None
 
                         ms.execute = execute
                         return ms

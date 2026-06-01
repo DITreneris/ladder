@@ -12,7 +12,7 @@ def upsert_user(tg_user: dict) -> dict:
         "first_name": tg_user.get("first_name"),
     }
 
-    if existing.data:
+    if existing and existing.data:
         db.table("users").update(payload).eq("telegram_id", telegram_id).execute()
         return {**existing.data, **payload}
 

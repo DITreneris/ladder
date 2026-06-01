@@ -295,6 +295,8 @@ Items that **cannot** be confirmed from code alone. Check off during device QA /
 
 **F&F sprint schedule:** Tier A (V-08–V-14) during dogfood + first external runs · Tier B/C (V-04–V-07, V-15–V-19, DEVICE_QA rows 6–10) by **2026-06-10**
 
+**2026-06-01 data audit:** Supabase `users`/`game_runs` = 0 despite ~3–4 bot plays. Prod `POST /auth/me` + `/runs` → **500** (new-user `maybe_single()` None bug — fixed in `_users.py`, **Railway redeploy required**). V-08–V-10, V-14 blocked until redeploy + tester replay.
+
 ---
 
 ## 7. Automated tests to add
