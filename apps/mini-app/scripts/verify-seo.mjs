@@ -40,8 +40,11 @@ for (const relativePath of [
 }
 
 const robots = readRequired("public/robots.txt");
-if (!robots.includes("Allow: /")) {
-  fail("robots.txt must contain Allow: /");
+if (!robots.includes("User-agent: Twitterbot")) {
+  fail("robots.txt must allow Twitterbot (X card previews)");
+}
+if (!/User-agent:\s*\*\s*\nDisallow:\s*\n/m.test(robots)) {
+  fail("robots.txt must use empty Disallow for User-agent: * (crawler-compatible allow-all)");
 }
 if (!robots.includes("Sitemap: https://www.promptanatomy.lol/sitemap.xml")) {
   fail("robots.txt must reference sitemap.xml");
