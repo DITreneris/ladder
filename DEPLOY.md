@@ -93,16 +93,17 @@ Climb the ladder in Telegram. Dodge meetings. https://www.promptanatomy.lol
 
 ```
 start - Open Corporate Ladder and punch in
+go - Open the app (use in groups with other bots)
 play - Same as start
 help - How to play in 30 seconds
 ```
 
-After Railway bot redeploy, smoke `/start`, `/play`, and `/help` — each should show **Punch In & Climb** (WebApp) and today's shift label should match the in-app pill.
+After Railway bot redeploy, smoke `/start`, `/go`, `/play`, and `/help` — each should show **Punch In & Climb** (WebApp) and today's shift label should match the in-app pill.
 
 ## 6. Post-deploy verification
 
 - [ ] `GET {API_URL}/health` returns ok over HTTPS
-- [ ] `/start`, `/play`, and `/help` in Telegram show **Punch In & Climb** and open the Mini App
+- [ ] `/start`, `/go`, `/play`, and `/help` in Telegram show **Punch In & Climb** and open the Mini App
 - [ ] Mini App loads inside Telegram (not broken blank screen)
 - [ ] Complete one run; score appears on **Daily** leaderboard
 - [ ] **Weekly** tab loads entries

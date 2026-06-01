@@ -46,7 +46,8 @@ def build_help_text() -> str:
         "• Coffee restores +25% Energy when you pick it up.\n"
         "• Climb Intern → Manager (10y) → CEO (35y).\n"
         "• Scores land on Daily and Weekly leaderboards.\n\n"
-        "Tap Punch In & Climb to open the app."
+        "Tap Punch In & Climb to open the app.\n\n"
+        "In a group with other bots, use /go (or /go@this_bot) instead of /start."
     )
 
 
@@ -84,6 +85,10 @@ async def cmd_play(message: Message):
     await send_welcome(message)
 
 
+async def cmd_go(message: Message):
+    await send_welcome(message)
+
+
 async def cmd_help(message: Message):
     await message.answer(
         build_help_text(),
@@ -100,6 +105,7 @@ async def main():
     dp = Dispatcher()
     dp.message.register(cmd_start, CommandStart())
     dp.message.register(cmd_play, Command("play"))
+    dp.message.register(cmd_go, Command("go"))
     dp.message.register(cmd_help, Command("help"))
 
     logger.info("Bot starting... Mini App URL: %s", MINI_APP_URL)

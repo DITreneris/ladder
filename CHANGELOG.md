@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Bot `/go` command** — opens Mini App like `/start`; use in groups where another bot also handles `/start`
 - **SEO / GEO hardening** — canonical URL, unified meta copy, JSON-LD (`WebApplication` + `VideoGame`), `sitemap.xml`, `llms.txt`, expanded `robots.txt`, `<noscript>` crawler fallback; CI `verify:seo`
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
