@@ -83,10 +83,10 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 Satirical office climb game in Telegram. Tap left or right on each rung — dodge meetings, reorgs, and deadlines. Compete on Daily and Weekly leaderboards. Open the app and punch in.
 ```
 
-**About** (`/setabout`):
+**About** (`/setabout`, ≤120 chars — plain text only; no OG image in profile; link preview when URL is shared in chat):
 
 ```
-Climb the corporate ladder. Avoid meetings. Survive the org chart. New shift every UTC day.
+Climb the ladder in Telegram. Dodge meetings. https://www.promptanatomy.lol
 ```
 
 **Commands** (`/setcommands`):

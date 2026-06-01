@@ -35,6 +35,7 @@ def test_build_welcome_text_includes_controls_and_shift():
     assert preset["description"] in text
     assert "Punch In & Climb" in text
     assert "promptanatomy.app" not in text
+    assert "http" in text
 
 
 def test_build_help_text_covers_basics():

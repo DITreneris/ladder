@@ -23,7 +23,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Bot `/start` silent after deploy** — Dockerfile now copies `shifts.py` (was `main.py` only; import crash on Railway)
 
 ### Changed
-- **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, PA link button-only (no URL in message)
+- **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, mini-app URL in message (OG preview in chat); PA link button-only (no `.app` URL in body)
 - **Bot commands** — `/help` (30-second rules) and `/play` (alias of `/start`); shift presets in `apps/bot/shifts.py` mirror mini-app copy
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 - **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)

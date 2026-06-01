@@ -26,13 +26,15 @@ MINI_APP_URL = os.getenv("MINI_APP_URL", "http://localhost:5173")
 
 def build_welcome_text(preset: ShiftPreset | None = None) -> str:
     shift = preset or today_preset()
+    play_url = MINI_APP_URL.rstrip("/")
     return (
         "Welcome to Corporate Ladder.\n\n"
         "Tap LEFT or RIGHT on each rung — pick the safe side. "
         "Dodge meetings, reorgs, and deadlines. Watch your Energy.\n\n"
         f"Today's shift: {shift['label']}\n"
         f"{shift['description']}\n\n"
-        "Tap Punch In & Climb below to start."
+        "Tap Punch In & Climb below to start.\n\n"
+        f"{play_url}"
     )
 
 
