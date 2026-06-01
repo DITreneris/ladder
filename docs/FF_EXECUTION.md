@@ -35,23 +35,24 @@ npm run qa:viewport
 
 | Step | Result |
 |------|--------|
-| API health | `{"status":"ok"}` |
+| API health | `{"status":"ok"}` — verified after push `d862c3c` |
 | Local smoke | Passed (pytest 15, vitest 38, build) |
-| Viewport QA | Passed (preview :4175) |
-| Vercel redeploy | **Manual** — push `main` to trigger |
-| Telegram full run | **Manual** — after redeploy |
+| Viewport QA | Passed (preview; `PREVIEW_URL` if port ≠ 4173) |
+| Vercel redeploy | **Done** — `main` → `d862c3c`; prod bundle `main-BO_qJQT_.js` |
+| Railway API | Auto-deploy from `main` (rank validation on `/runs`) |
+| Telegram full run | **Manual** — steps 2–7 below |
 
 | # | Check | Pass |
 |---|-------|------|
-| 1 | `GET https://ladder-production-642d.up.railway.app/health` → ok | [ ] |
-| 2 | `/start` → today's shift + WebApp button | [ ] |
-| 3 | Ladder fills column (no narrow 192px frame) | [ ] |
-| 4 | Full run → game over → submit toast (success or explicit failure) | [ ] |
-| 5 | Score on Daily leaderboard | [ ] |
-| 6 | Share includes `Shift:` line | [ ] |
-| 7 | Home auth banner hidden after fresh bot open | [ ] |
+| 1 | `GET https://ladder-production-642d.up.railway.app/health` → ok | [x] |
+| 2 | `/start` → today's shift + WebApp button | [ ] manual |
+| 3 | Ladder fills column (no narrow 192px frame) | [ ] manual — **P0** |
+| 4 | Full run → game over → submit toast (success or explicit failure) | [ ] manual |
+| 5 | Score on Daily leaderboard | [ ] manual — **P0** |
+| 6 | Share includes `Shift:` line | [ ] manual — **P0** |
+| 7 | Home auth banner hidden after fresh bot open | [ ] manual |
 
-Update [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 10 when redeploy done.
+Update [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 10 when device QA signed.
 
 ---
 
@@ -103,10 +104,10 @@ Run Supabase SQL from FF_TEST.md; update metrics table.
 
 | Check-in | Date | Runs (avg) | Shares | Pain items |
 |----------|------|------------|--------|------------|
-| Day 1 | | | | |
-| Day 4 | | | | |
-| Day 7 | | | | |
-| Day 10 | | | | |
+| Day 1 | 2026-06-01 | | | Deploy + device QA kickoff |
+| Day 4 | 2026-06-04 | | | |
+| Day 7 | 2026-06-07 | | | External F&F mid-window |
+| Day 10 | 2026-06-10 | | | |
 
 ---
 
@@ -124,12 +125,19 @@ Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag r
 
 | Criterion | Status |
 |-----------|--------|
-| Prod = main with trust fixes | [ ] post-deploy smoke |
-| iOS DEVICE_QA signed | [ ] |
-| Android DEVICE_QA signed | [ ] |
+| Prod = main with trust fixes | [x] `d862c3c` live; API health ok; OG meta on prod |
+| iOS DEVICE_QA signed | [ ] — [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + delta |
+| Android DEVICE_QA signed | [ ] — recruit signer; same checklists |
 | Submit/auth errors visible | [x] code shipped |
 | No badge flicker | [x] code shipped |
-| 5–10 testers invited | [ ] |
-| ≥3 runs from majority | [ ] |
-| Hotfix protocol active | [ ] |
-| Jun 14 review scheduled | [x] 2026-06-14 |
+| 5–10 testers invited | [ ] after Phase C pass |
+| ≥3 runs from majority | [ ] Phase E |
+| Hotfix protocol active | [x] see FF_TEST hotfix policy |
+| Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
+
+### After device QA pass — tag v1.8.2
+
+```powershell
+git tag -a v1.8.2 -m "v1.8.2 — F&F-ready bundle (mobile UX + trust + discoverability)"
+git push origin --tags
+```

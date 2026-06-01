@@ -289,7 +289,7 @@ cd apps/mini-app && npm run lint && npm test && npm run build
 **Ship gate checklist:**
 
 - [x] `npm run lint && npm test && npm run build`; `npm run qa:viewport` green (2026-06-01)
-- [ ] Production redeploy from `main` (Vercel + Railway API)
+- [x] Production redeploy from `main` (Vercel + Railway API) — `d862c3c` 2026-06-01
 - [ ] Device QA: v1.8.1 regression + [docs/DEVICE_QA_v1.8.2.md](docs/DEVICE_QA_v1.8.2.md) delta on iOS + Android
 - [x] Cut `## [1.8.2]` in CHANGELOG (2026-06-01 bundle)
 - [ ] Tag `v1.8.2` after device QA

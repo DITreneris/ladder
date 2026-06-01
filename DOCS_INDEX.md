@@ -88,6 +88,7 @@ Use this table to pick the right skill, rules, and documents.
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 Telegram device sign-off |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
+| `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |

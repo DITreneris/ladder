@@ -35,7 +35,7 @@ Track manual deploy progress for **v1.5.0 → v1.8.1** (deploy gate per [ROADMAP
 | 8 | v1.8 device QA | **Done** | Ticker foreshadow; RE-APPLY counter; LB gap; floor labels; rank props |
 
 | 9 | v1.8.1 redeploy + device QA | **Redeploy Done** / **Device QA Pending** | Prod bundle verified; manual checklist [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) |
-| 10 | v1.8.2 + F&F trust fixes redeploy | **Redeploy in progress** / **Device QA Pending** | Push `main` → Vercel + Railway API; then [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) + [FF_EXECUTION.md](FF_EXECUTION.md) post-deploy smoke |
+| 10 | v1.8.2 + F&F trust fixes redeploy | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); prod `main-BO_qJQT_.js`; [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) + [FF_EXECUTION.md](FF_EXECUTION.md) Phase C |
 
 **Code readiness:** deploy configs verified; local CI parity (pytest 15 passed, lint/test/build 38 passed) green 2026-06-01. F&F trust UX shipped in `[Unreleased]`.
 

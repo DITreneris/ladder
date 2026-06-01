@@ -4,6 +4,8 @@
 
 **F&F gate:** Sign off before external invites · **Runbook:** [FF_EXECUTION.md](FF_EXECUTION.md) · **iOS owner:** core team
 
+**Prod bundle:** `d862c3c` (v1.8.2) · **Sign-off now:** run full checklist below on Telegram iOS, then fill tester/date at bottom.
+
 Sign off on real Telegram **iOS** and **Android** before marking [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 9 complete.
 
 ---

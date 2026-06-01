@@ -4,6 +4,8 @@
 
 **F&F gate:** [FF_EXECUTION.md](FF_EXECUTION.md) · **Android owner:** recruit before external invite
 
+**Prod bundle:** `d862c3c` (v1.8.2) · Run [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) regression first, then delta below on Telegram Android.
+
 Sign off on real Telegram **iOS** and **Android** after redeploy from `main` (includes trust UX + responsive ladder).
 
 ---
