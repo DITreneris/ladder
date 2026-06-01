@@ -59,6 +59,48 @@ async function runCoffeePickup(page) {
   );
 }
 
+async function runImminentSyncAfterCoffeePickup(page) {
+  await page.goto(qaUrl(), { waitUntil: "load" });
+  await page.waitForSelector("#startScreen");
+  await page.evaluate(() => window.startGame());
+  await page.waitForSelector("#gameScreen:not(.hidden)");
+  await page.click("#gamePlayArea");
+  await tapLeft(page);
+  await tapLeft(page);
+
+  await page.waitForFunction(() => {
+    const hint = document.getElementById("imminentHint")?.textContent ?? "";
+    return /Coffee on/i.test(hint);
+  }, null, { timeout: WAIT_MS });
+
+  await page.click("#gamePlayArea");
+  await page.click("#btnTapLeft");
+  await page.waitForFunction(() => (window.clQa?.getCoffeePickups?.() ?? 0) >= 1, null, {
+    timeout: WAIT_MS,
+  });
+
+  const syncOk = await page.evaluate(() => {
+    window.clQa?.forceImminentRung?.({ obstacle: "left", type: "meeting" });
+    window.clQa?.refreshRungs?.();
+    const snap = window.clQa?.snapshot?.();
+    const imminent = document.querySelector(".next-rung");
+    const coffeeOnNext = imminent?.querySelector(".coffee-badge");
+    const meetingOnNext = imminent?.querySelector(".left-slot .obstacle-badge:not(.coffee-badge)");
+    const hint = document.getElementById("imminentHint")?.textContent ?? "";
+    return (
+      snap?.rungs?.[1]?.obstacle === "left" &&
+      snap?.rungs?.[1]?.type === "meeting" &&
+      !coffeeOnNext &&
+      Boolean(meetingOnNext) &&
+      /Meeting/i.test(hint)
+    );
+  });
+
+  if (!syncOk) {
+    throw new Error("imminent slot DOM out of sync with engine after coffee pickup (stale coffee badge)");
+  }
+}
+
 async function runMeetingCollision(page) {
   await page.goto(qaUrl(), { waitUntil: "load" });
   await page.waitForSelector("#startScreen");
@@ -87,6 +129,15 @@ async function main() {
   }
 
   try {
+    await runImminentSyncAfterCoffeePickup(page);
+  } catch (err) {
+    console.error("IMMINENT SYNC QA FAILED:", err.message ?? err);
+    console.error(`Preview URL: ${BASE} (set PREVIEW_URL if vite picked another port)`);
+    await browser.close();
+    process.exit(1);
+  }
+
+  try {
     await runMeetingCollision(page);
   } catch (err) {
     console.error("MEETING QA FAILED:", err.message ?? err);
@@ -96,7 +147,7 @@ async function main() {
 
   await browser.close();
   console.log(
-    "COFFEE + MEETING QA PASSED: +25 energy on tap 3; meeting collision ends run on tap 2 RIGHT."
+    "COFFEE + MEETING QA PASSED: +25 energy on tap 3; imminent slot sync after pickup; meeting collision on tap 2 RIGHT."
   );
 }
 

@@ -182,4 +182,5 @@ Use ngrok or Telegram’s test environment for real `initData` against a local A
 | `TelegramConflictError` in logs | Two processes polling same bot token — one Railway replica; stop local `python main.py`; `deleteWebhook` if set |
 | Auth fails / invalid hash | [telegram-initdata-auth](.cursor/skills/telegram-initdata-auth/SKILL.md) |
 | Score not on leaderboard | [score-pipeline](.cursor/skills/score-pipeline/SKILL.md); run `python scripts/ff-metrics.py` |
+| Slow profile badge on first open | Railway API cold start — optional keep-warm: cron `GET /health` every 5 min, or Railway min instances = 1 |
 | Env matrix | [docs/architecture.md](docs/architecture.md) |

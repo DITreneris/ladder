@@ -17,36 +17,15 @@ import {
   reappliesFlavor,
   type TickerHeadline,
 } from "./game/constants";
-import { type DailyModifier, resolveDailyModifier } from "./game/daily-modifier";
+import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
-import {
-  buildMarketingGameRungs,
-  getMarketingCaptureMode,
-  MARKETING_GAME_ENERGY,
-  MARKETING_GAME_MODIFIER,
-  MARKETING_GAME_PLAYER_SIDE,
-  MARKETING_GAME_RANK,
-  MARKETING_GAME_SCORE,
-  MARKETING_GAME_YEARS,
-  MARKETING_GAMEOVER,
-  MARKETING_HOME_HIGH_SCORE,
-  MARKETING_HOME_MODIFIER,
-  MARKETING_HOME_USERNAME,
-} from "./game/marketing-capture";
-import {
-  buildOgCaptureRungs,
-  OG_CAPTURE_DAILY_MODIFIER,
-  OG_CAPTURE_ENERGY,
-  OG_CAPTURE_PLAYER_SIDE,
-  OG_CAPTURE_RANK,
-  OG_CAPTURE_SCORE,
-  OG_CAPTURE_YEARS,
-} from "./game/og-capture";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchProfile, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
+import { getCaptureFlags } from "./lib/capture-mode";
 import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
+import { icon } from "./lib/icons";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
   applyReorgSlide,
@@ -107,11 +86,9 @@ type PlayerLayout = PlayerSide | "center";
 
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 
-const $ = (id: string) => document.getElementById(id)!;
+let marketingGameCapture = false;
 
-function isOgCaptureMode(): boolean {
-  return new URLSearchParams(window.location.search).get("og") === "1";
-}
+const $ = (id: string) => document.getElementById(id)!;
 
 function flashPlayerEmoji(emoji: string, ms: number): void {
   if (playerEmojiFlashTimer) clearTimeout(playerEmojiFlashTimer);
@@ -292,9 +269,7 @@ function switchTab(tab: Screen): void {
   syncTelegramBackButton(tab);
   syncTelegramMainButton(tab);
   audio.nav();
-  if (tab === "home") {
-    audio.startHomeBgm();
-  } else if (tab !== "game") {
+  if (tab !== "game") {
     audio.stopBgm();
   }
   if (tab === "game") {
@@ -419,7 +394,6 @@ function slotContentKey(rung: Rung, side: "left" | "right"): string {
 }
 
 function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right", isImminent = false): void {
-  if (slotEl.querySelector(".coffee-pickup")) return;
   const key = slotContentKey(rung, side);
   if (slotEl.dataset.contentKey === key && slotEl.dataset.imminent === String(isImminent)) return;
   slotEl.dataset.contentKey = key;
@@ -570,14 +544,14 @@ function renderRungsInner(): void {
     leftSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
     rightSlot.classList.remove("safe-side-hint", "next-obstacle-warn", "next-coffee-hint");
 
-    if ((shouldShowImminentHint(engine.getRungsClimbed()) || getMarketingCaptureMode() === "game") && i === 1) {
+    if ((shouldShowImminentHint(engine.getRungsClimbed()) || marketingGameCapture) && i === 1) {
       leftSlot.classList.toggle("safe-side-hint", rung.obstacle !== "left");
       rightSlot.classList.toggle("safe-side-hint", rung.obstacle !== "right");
     }
 
     if (i === 1 && rung.obstacle) {
       const blockedSlot = rung.obstacle === "left" ? leftSlot : rightSlot;
-      const badge = blockedSlot.querySelector(".obstacle-badge") as HTMLElement | null;
+      const badge = blockedSlot.querySelector(".obstacle-badge:not(.coffee-badge)") as HTMLElement | null;
       badge?.classList.add("next-obstacle-warn");
     }
 
@@ -786,7 +760,7 @@ function startGame(): void {
   activeDailyModifier = engine.getDailyModifier();
   engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
-  audio.fadeOutForRun();
+  audio.prepareBgmForRun();
   engine.start();
   updateSprintTimerChip();
   updateRankUI("Intern");
@@ -887,7 +861,7 @@ async function runPostGameOverIo(
 }
 
 function seedGameOverForQa(): void {
-  applyMarketingGameOverUi();
+  void import("./game/marketing-capture").then((m) => applyMarketingGameOverUi(m.MARKETING_GAMEOVER));
 }
 
 async function onGameOver(result: GameOverResult): Promise<void> {
@@ -995,17 +969,17 @@ function copyShareText(): void {
 
 function toggleMute(): void {
   audio.setMuted(!audio.isMuted());
-  const icon = $("soundIcon");
+  const soundIcon = $("soundIcon");
   const inGame = engine?.isActive();
   if (audio.isMuted()) {
-    icon.className = "fa-solid fa-volume-xmark text-red-400";
+    soundIcon.innerHTML = icon("volume-xmark", "text-red-400");
     if (inGame) {
       showHrMemo("Synthesizer muted.", { variant: "info", durationMs: 1500 });
     } else {
       showToast("Synthesizer Muted");
     }
   } else {
-    icon.className = "fa-solid fa-volume-high";
+    soundIcon.innerHTML = icon("volume-high", "text-sm");
     if (inGame) {
       showHrMemo("Synthesizer live.", { variant: "info", durationMs: 1500 });
     } else {
@@ -1071,63 +1045,66 @@ function applyDailyModifierUi(modifier: DailyModifier): void {
 }
 
 function mountMarketingHomeCapture(): void {
-  hideAuthDegradedBanner();
-  username = MARKETING_HOME_USERNAME;
-  ($("usernameInput") as HTMLInputElement).value = username;
-  highScore = MARKETING_HOME_HIGH_SCORE;
-  bestRank = rankFromYears(Math.floor(highScore));
-  applyDailyModifierUi(MARKETING_HOME_MODIFIER);
-  mountTickerHeadline();
-  refreshHomeBadgeUI();
-  switchTab("home");
-  $("startScreen").scrollTop = 0;
-  signalCaptureReady(500);
-}
-
-function mountMarketingGameCapture(): void {
-  document.documentElement.dataset.ogCapture = "1";
-  document.documentElement.dataset.captureVariant = "marketing";
-  applyDailyModifierUi(MARKETING_GAME_MODIFIER);
-
-  $("soundToggleBtn").classList.add("hidden");
-  hideHudTapHint();
-  hideTapDeckHint();
-  hideHrMemo();
-
-  prevRungsSnapshot = [];
-  earlyTapsRemaining = 0;
-  playerInPanic = false;
-  playerAtCorridor = false;
-  $("playerActionEmoji").classList.remove("idle-bob");
-
-  engine.applyOgCaptureSnapshot(
-    buildMarketingGameRungs(),
-    MARKETING_GAME_SCORE,
-    MARKETING_GAME_ENERGY,
-    MARKETING_GAME_PLAYER_SIDE,
-    MARKETING_GAME_RANK
-  );
-
-  updateRankUI(MARKETING_GAME_RANK);
-  updateMilestoneChip(MARKETING_GAME_YEARS);
-  updateFloorLabel(MARKETING_GAME_YEARS);
-  updateReorgHudStrip(MARKETING_GAME_RANK);
-  $("burnoutMeter").style.width = `${MARKETING_GAME_ENERGY}%`;
-  $("burnoutPercentLabel").textContent = `${MARKETING_GAME_ENERGY}%`;
-  $("gameYearsLabel").textContent = MARKETING_GAME_YEARS.toFixed(1);
-  updateImminentRungHint();
-
-  switchTab("game");
-
-  requestAnimationFrame(() => {
-    layoutRungs();
-    layoutPlayerPosition("center");
-    signalCaptureReady();
+  void import("./game/marketing-capture").then((m) => {
+    hideAuthDegradedBanner();
+    username = m.MARKETING_HOME_USERNAME;
+    ($("usernameInput") as HTMLInputElement).value = username;
+    highScore = m.MARKETING_HOME_HIGH_SCORE;
+    bestRank = rankFromYears(Math.floor(highScore));
+    applyDailyModifierUi(m.MARKETING_HOME_MODIFIER);
+    mountTickerHeadline();
+    refreshHomeBadgeUI();
+    switchTab("home");
+    $("startScreen").scrollTop = 0;
+    signalCaptureReady(500);
   });
 }
 
-function applyMarketingGameOverUi(): void {
-  const result = MARKETING_GAMEOVER;
+function mountMarketingGameCapture(): void {
+  void import("./game/marketing-capture").then((m) => {
+    document.documentElement.dataset.ogCapture = "1";
+    document.documentElement.dataset.captureVariant = "marketing";
+    applyDailyModifierUi(m.MARKETING_GAME_MODIFIER);
+
+    $("soundToggleBtn").classList.add("hidden");
+    hideHudTapHint();
+    hideTapDeckHint();
+    hideHrMemo();
+
+    prevRungsSnapshot = [];
+    earlyTapsRemaining = 0;
+    playerInPanic = false;
+    playerAtCorridor = false;
+    $("playerActionEmoji").classList.remove("idle-bob");
+
+    engine.applyOgCaptureSnapshot(
+      m.buildMarketingGameRungs(),
+      m.MARKETING_GAME_SCORE,
+      m.MARKETING_GAME_ENERGY,
+      m.MARKETING_GAME_PLAYER_SIDE,
+      m.MARKETING_GAME_RANK
+    );
+
+    updateRankUI(m.MARKETING_GAME_RANK);
+    updateMilestoneChip(m.MARKETING_GAME_YEARS);
+    updateFloorLabel(m.MARKETING_GAME_YEARS);
+    updateReorgHudStrip(m.MARKETING_GAME_RANK);
+    $("burnoutMeter").style.width = `${m.MARKETING_GAME_ENERGY}%`;
+    $("burnoutPercentLabel").textContent = `${m.MARKETING_GAME_ENERGY}%`;
+    $("gameYearsLabel").textContent = m.MARKETING_GAME_YEARS.toFixed(1);
+    updateImminentRungHint();
+
+    switchTab("game");
+
+    requestAnimationFrame(() => {
+      layoutRungs();
+      layoutPlayerPosition("center");
+      signalCaptureReady();
+    });
+  });
+}
+
+function applyMarketingGameOverUi(result: GameOverResult): void {
   lastGameResult = result;
   $("statYears").textContent = `${result.yearsSurvived.toFixed(1)} Years`;
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
@@ -1145,61 +1122,65 @@ function applyMarketingGameOverUi(): void {
 }
 
 function mountMarketingGameOverCapture(): void {
-  hideAuthDegradedBanner();
-  applyMarketingGameOverUi();
-  switchTab("gameover");
-  signalCaptureReady(300);
+  void import("./game/marketing-capture").then((m) => {
+    hideAuthDegradedBanner();
+    applyMarketingGameOverUi(m.MARKETING_GAMEOVER);
+    switchTab("gameover");
+    signalCaptureReady(300);
+  });
 }
 
 function mountOgCaptureMode(): void {
-  document.documentElement.dataset.ogCapture = "1";
-  activeDailyModifier = OG_CAPTURE_DAILY_MODIFIER;
+  void import("./game/og-capture").then((og) => {
+    document.documentElement.dataset.ogCapture = "1";
+    activeDailyModifier = og.OG_CAPTURE_DAILY_MODIFIER;
 
-  const viewport = document.querySelector(".cl-viewport");
-  if (viewport) {
-    for (const cls of GRID_TINT_CLASSES) {
-      viewport.classList.remove(cls);
+    const viewport = document.querySelector(".cl-viewport");
+    if (viewport) {
+      for (const cls of GRID_TINT_CLASSES) {
+        viewport.classList.remove(cls);
+      }
+      if (activeDailyModifier.gridTintClass) {
+        viewport.classList.add(activeDailyModifier.gridTintClass);
+      }
     }
-    if (activeDailyModifier.gridTintClass) {
-      viewport.classList.add(activeDailyModifier.gridTintClass);
-    }
-  }
 
-  $("soundToggleBtn").classList.add("hidden");
-  $("tapControlsBar").classList.add("hidden");
-  hideHudTapHint();
-  hideTapDeckHint();
-  hideHrMemo();
+    $("soundToggleBtn").classList.add("hidden");
+    $("tapControlsBar").classList.add("hidden");
+    hideHudTapHint();
+    hideTapDeckHint();
+    hideHrMemo();
 
-  prevRungsSnapshot = [];
-  earlyTapsRemaining = 0;
-  playerInPanic = false;
-  playerAtCorridor = false;
-  $("playerActionEmoji").classList.remove("idle-bob");
+    prevRungsSnapshot = [];
+    earlyTapsRemaining = 0;
+    playerInPanic = false;
+    playerAtCorridor = false;
+    $("playerActionEmoji").classList.remove("idle-bob");
 
-  engine.applyOgCaptureSnapshot(
-    buildOgCaptureRungs(),
-    OG_CAPTURE_SCORE,
-    OG_CAPTURE_ENERGY,
-    OG_CAPTURE_PLAYER_SIDE,
-    OG_CAPTURE_RANK
-  );
+    engine.applyOgCaptureSnapshot(
+      og.buildOgCaptureRungs(),
+      og.OG_CAPTURE_SCORE,
+      og.OG_CAPTURE_ENERGY,
+      og.OG_CAPTURE_PLAYER_SIDE,
+      og.OG_CAPTURE_RANK
+    );
 
-  updateRankUI(OG_CAPTURE_RANK);
-  updateMilestoneChip(OG_CAPTURE_YEARS);
-  updateFloorLabel(OG_CAPTURE_YEARS);
-  updateReorgHudStrip(OG_CAPTURE_RANK);
-  $("burnoutMeter").style.width = `${OG_CAPTURE_ENERGY}%`;
-  $("burnoutPercentLabel").textContent = `${OG_CAPTURE_ENERGY}%`;
-  $("gameYearsLabel").textContent = OG_CAPTURE_YEARS.toFixed(1);
+    updateRankUI(og.OG_CAPTURE_RANK);
+    updateMilestoneChip(og.OG_CAPTURE_YEARS);
+    updateFloorLabel(og.OG_CAPTURE_YEARS);
+    updateReorgHudStrip(og.OG_CAPTURE_RANK);
+    $("burnoutMeter").style.width = `${og.OG_CAPTURE_ENERGY}%`;
+    $("burnoutPercentLabel").textContent = `${og.OG_CAPTURE_ENERGY}%`;
+    $("gameYearsLabel").textContent = og.OG_CAPTURE_YEARS.toFixed(1);
 
-  switchTab("game");
+    switchTab("game");
 
-  requestAnimationFrame(() => {
-    layoutRungs();
-    layoutPlayerPosition("center");
     requestAnimationFrame(() => {
-      (window as unknown as Record<string, unknown>).__CL_OG_READY__ = true;
+      layoutRungs();
+      layoutPlayerPosition("center");
+      requestAnimationFrame(() => {
+        (window as unknown as Record<string, unknown>).__CL_OG_READY__ = true;
+      });
     });
   });
 }
@@ -1276,7 +1257,7 @@ export function mountApp(): void {
         debugLog("coffee", "callback", { side, rungId });
         const badge = findImminentCoffeeBadge(side);
         if (badge) {
-          triggerCoffeePickup(badge, () => renderRungsWithReorgFeedback());
+          triggerCoffeePickup(badge, $("gamePlayArea"));
         }
         flashPlayerEmoji("🤤", 550);
         showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
@@ -1307,7 +1288,7 @@ export function mountApp(): void {
         showHrMemo("Shift rules active", { variant: "alert" });
       }
     },
-    isOgCaptureMode() ? OG_CAPTURE_DAILY_MODIFIER : undefined
+    getCaptureFlags().og ? getDailyModifierById("reorg_week") : undefined
   );
 
   ($("usernameInput") as HTMLInputElement).value = username;
@@ -1373,26 +1354,37 @@ export function mountApp(): void {
         coffeePickups: qaCoffeePickups,
       }),
       getCoffeePickups: () => qaCoffeePickups,
+      forceImminentRung: (spec: { obstacle: PlayerSide; type: ObstacleType }) => {
+        const rungs = engine.getRungs();
+        if (rungs[1]) {
+          rungs[1].obstacle = spec.obstacle;
+          rungs[1].type = spec.type;
+          rungs[1].coffee = null;
+        }
+      },
+      refreshRungs: () => renderRungsWithReorgFeedback(),
     };
   }
 
   updateRankUI("Intern");
   refreshHomeBadgeUI();
-  if (isOgCaptureMode()) {
+
+  const captureFlags = getCaptureFlags();
+  marketingGameCapture = captureFlags.capture === "game";
+
+  if (captureFlags.og) {
     mountOgCaptureMode();
     return;
   }
-
-  const marketingCaptureMode = getMarketingCaptureMode();
-  if (marketingCaptureMode === "home") {
+  if (captureFlags.capture === "home") {
     mountMarketingHomeCapture();
     return;
   }
-  if (marketingCaptureMode === "game") {
+  if (captureFlags.capture === "game") {
     mountMarketingGameCapture();
     return;
   }
-  if (marketingCaptureMode === "gameover") {
+  if (captureFlags.capture === "gameover") {
     mountMarketingGameOverCapture();
     return;
   }
@@ -1426,6 +1418,4 @@ export function mountApp(): void {
       refreshHomeBadgeUI();
     }
   }
-
-  audio.startHomeBgm();
 }

@@ -46,6 +46,9 @@ supabase/.temp/
 *.log
 npm-debug.log*
 
+# Source audio masters (trimmed copy lives in apps/mini-app/public/audio/)
+MR_Bullet_Be_Streso.mp3*
+
 # Vercel
 .vercel
 

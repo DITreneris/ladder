@@ -2,7 +2,7 @@ let audioCtx: AudioContext | null = null;
 let isMuted = false;
 let bgm: HTMLAudioElement | null = null;
 
-type BgmMode = "off" | "home" | "run";
+type BgmMode = "off" | "run";
 
 let bgmMode: BgmMode = "off";
 let animFrameId: number | null = null;
@@ -12,10 +12,8 @@ let rampFromVol = 0;
 let rampToVol = 0;
 
 const BGM_URL = "/audio/bgm-streso-chorus.mp3";
-const BGM_VOLUME_HOME = 0.14;
 const BGM_VOLUME_RUN_QUIET = 0.04;
 const BGM_VOLUME_RUN_FULL = 0.14;
-const BGM_FADE_MS = 500;
 const BGM_RAMP_MS = 12_000;
 
 function initAudio(): void {
@@ -28,8 +26,8 @@ function initBgm(): HTMLAudioElement {
   if (!bgm) {
     bgm = new Audio(BGM_URL);
     bgm.loop = true;
-    bgm.volume = BGM_VOLUME_HOME;
-    bgm.preload = "auto";
+    bgm.volume = BGM_VOLUME_RUN_QUIET;
+    bgm.preload = "none";
   }
   return bgm;
 }
@@ -39,24 +37,6 @@ function cancelBgmAnim(): void {
     cancelAnimationFrame(animFrameId);
     animFrameId = null;
   }
-}
-
-function animateVolume(from: number, to: number, durationMs: number, onDone?: () => void): void {
-  cancelBgmAnim();
-  const el = initBgm();
-  const start = performance.now();
-  const step = (now: number) => {
-    const t = Math.min(1, (now - start) / durationMs);
-    el.volume = from + (to - from) * t;
-    if (t < 1) {
-      animFrameId = requestAnimationFrame(step);
-    } else {
-      animFrameId = null;
-      el.volume = to;
-      onDone?.();
-    }
-  };
-  animFrameId = requestAnimationFrame(step);
 }
 
 function startRamp(from: number, to: number, durationMs: number): void {
@@ -91,13 +71,6 @@ function resumeRampIfNeeded(): void {
   startRamp(bgm.volume, rampToVol, rampDurationMs - elapsed);
 }
 
-function playBgmIfAllowed(): void {
-  if (isMuted || bgmMode === "off") return;
-  void initBgm().play().catch(() => {
-    /* iOS/Telegram gesture policy */
-  });
-}
-
 function playTone(freq: number, type: OscillatorType, duration: number): void {
   if (isMuted || !audioCtx) return;
   try {
@@ -127,13 +100,7 @@ export const audio = {
       bgm?.pause();
       return;
     }
-    if (bgmMode === "home") {
-      const el = initBgm();
-      el.volume = BGM_VOLUME_HOME;
-      void el.play().catch(() => {
-        /* iOS/Telegram gesture policy */
-      });
-    } else if (bgmMode === "run") {
+    if (bgmMode === "run") {
       const el = initBgm();
       void el.play().catch(() => {
         /* iOS/Telegram gesture policy */
@@ -144,28 +111,10 @@ export const audio = {
   isMuted(): boolean {
     return isMuted;
   },
-  startHomeBgm(): void {
-    cancelBgmAnim();
-    rampDurationMs = 0;
-    bgmMode = "home";
+  prepareBgmForRun(): void {
     const el = initBgm();
-    el.volume = BGM_VOLUME_HOME;
-    playBgmIfAllowed();
-  },
-  fadeOutForRun(): void {
-    cancelBgmAnim();
-    rampDurationMs = 0;
-    const el = initBgm();
-    if (bgmMode === "off" || el.paused) {
-      bgmMode = "off";
-      el.pause();
-      return;
-    }
-    const from = el.volume;
-    animateVolume(from, 0, BGM_FADE_MS, () => {
-      el.pause();
-      bgmMode = "off";
-    });
+    el.preload = "auto";
+    el.load();
   },
   startManagerBgmRamp(): void {
     cancelBgmAnim();
@@ -192,7 +141,7 @@ export const audio = {
     if (!bgm) return;
     bgm.pause();
     bgm.currentTime = 0;
-    bgm.volume = BGM_VOLUME_HOME;
+    bgm.volume = BGM_VOLUME_RUN_QUIET;
   },
   tap(score: number): void {
     playTone(440 + score * 4, "sine", 0.15);
@@ -228,3 +177,14 @@ export const audio = {
     playTone(440, "sine", 0.1);
   },
 };
+
+/** @internal test hook */
+export function __getBgmElementForTest(): HTMLAudioElement | null {
+  return bgm;
+}
+
+/** @internal test hook */
+export function __resetBgmForTest(): void {
+  bgm = null;
+  bgmMode = "off";
+}

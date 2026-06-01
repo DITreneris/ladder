@@ -19,6 +19,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
 ### Fixed
+- **Coffee pickup imminent-slot desync** — pickup badge detaches to `#gamePlayArea` overlay before animation so `.next-rung` repaints immediately; fixes stale ☕ on next hazard (testers: “coffee turned into meeting”)
 - **Game over toast overlap** — submit/share shell toast lifted above RE-APPLY and action buttons (`.toast-above-game-over-actions`); home/leaderboard toasts unchanged
 - **Bot silent in groups (`BUTTON_TYPE_INVALID`)** — Telegram allows `web_app` inline buttons only in private chat; groups now get `t.me/bot?startapp` URL button; command logging + send fallback; verified `/go@CorporateLadder_bot` + score → Supabase (2026-06-01)
 - **X card validator robots.txt** — switch from `Allow: /` to empty `Disallow:` (legacy-compatible); list `Twitterbot` first for order-sensitive parsers
@@ -29,8 +30,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Bot `/start` silent after deploy** — Dockerfile now copies `shifts.py` (was `main.py` only; import crash on Railway)
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
+### Removed
+- **Home lounge BGM loop** — BGM no longer plays or preloads on Home; Manager promo ramp unchanged
+
 ### Changed
-- **Layered BGM** — lounge chorus on home (~14%); silent run until Manager promo (10y / Floor 11); then quiet ramp to full background level (~14%) over ~12s; CEO unchanged; leaderboard/game over stop BGM
+- **Load-speed optimization** — co-brand logo as lightweight SVG; inline SVG icons replace FontAwesome (~300 KB saved); Google Fonts subset; BGM deferred until PUNCH IN; Vercel cache headers + API preconnect; analytics deferred via `requestIdleCallback`; marketing/OG capture modules lazy-loaded
+- **Home audio** — corporate lounge silent on Home; in-run BGM still ramps at Manager promo (unchanged from promo onward)
 - **Production smoke signed (2026-06-01)** — prod API auth + `/runs` → Supabase (`scripts/ff-metrics.py` `submit_pipeline_ok: true`); Daily/Weekly leaderboard populated; private `/start` + group `/go`/`/play` with `@bot` handle; deploy docs for multi-bot groups ([DEPLOY.md](DEPLOY.md))
 - **Deploy post-deploy gate** — `DEPLOY.md` requires `scripts/ff-metrics.py` `submit_pipeline_ok: true` (not `/health` alone)
 - **Crawler access** — `robots.txt` now allows search, social preview (Twitter/Facebook/LinkedIn), and AI bots; shell `index.html` uses `index, follow` so card validators can fetch OG image

@@ -152,7 +152,25 @@ export function triggerPromoConfetti(el: HTMLElement): void {
   );
 }
 
-export function triggerCoffeePickup(badge: HTMLElement, onComplete?: () => void): void {
+/** Reparent badge into play area so imminent slot can repaint while animation runs. */
+export function detachBadgeForOverlay(badge: HTMLElement, playArea: HTMLElement): HTMLElement {
+  const badgeRect = badge.getBoundingClientRect();
+  const playRect = playArea.getBoundingClientRect();
+  badge.style.position = "absolute";
+  badge.style.left = `${badgeRect.left - playRect.left}px`;
+  badge.style.top = `${badgeRect.top - playRect.top}px`;
+  badge.style.zIndex = "20";
+  badge.style.pointerEvents = "none";
+  playArea.appendChild(badge);
+  return badge;
+}
+
+export function triggerCoffeePickup(
+  badge: HTMLElement,
+  playArea: HTMLElement,
+  onComplete?: () => void
+): void {
+  detachBadgeForOverlay(badge, playArea);
   const finish = () => {
     badge.remove();
     onComplete?.();

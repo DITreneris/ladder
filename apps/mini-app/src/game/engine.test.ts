@@ -3,8 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("./audio", () => ({
   audio: {
     init: vi.fn(),
-    startHomeBgm: vi.fn(),
-    fadeOutForRun: vi.fn(),
+    prepareBgmForRun: vi.fn(),
     startManagerBgmRamp: vi.fn(),
     stopBgm: vi.fn(),
     tap: vi.fn(),

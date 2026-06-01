@@ -1,9 +1,14 @@
+/// <reference types="vite/client" />
+
+import { icon } from "./lib/icons";
+import { PROMPT_ANATOMY_LOGO } from "./lib/branding";
+
 export const BRAND_FOOTER = `
       <div class="brand-attribution">
         <button type="button" onclick="openPromptAnatomy()" class="brand-attribution-link" aria-label="Visit Prompt Anatomy">
-          <img src="/branding/prompt-anatomy-logo.png" alt="" class="brand-attribution-logo" width="18" height="18" />
+          <img src="${PROMPT_ANATOMY_LOGO}" alt="" class="brand-attribution-logo" width="18" height="18" loading="lazy" />
           <span>Prompt Anatomy</span>
-          <i class="fa-solid fa-arrow-up-right-from-square text-nano opacity-60" aria-hidden="true"></i>
+          ${icon("arrow-up-right-from-square", "text-nano opacity-60")}
         </button>
       </div>`;
 
@@ -13,12 +18,12 @@ export const APP_SHELL = `
     <div class="w-12 h-1 rounded-full mb-1" style="background: var(--cl-border);"></div>
   </div>
   <button id="soundToggleBtn" type="button" onclick="toggleMute()" class="sound-fab focus-ring" title="Toggle Sound" aria-label="Toggle sound">
-    <i id="soundIcon" class="fa-solid fa-volume-high text-sm"></i>
+    <span id="soundIcon" class="inline-flex">${icon("volume-high", "text-sm")}</span>
   </button>
   <div class="cl-header flex items-center justify-between pt-5 pb-3 px-3 rounded-t-2xl border-b select-none z-40">
     <div class="flex items-center space-x-2">
       <button onclick="goHome()" class="cl-header-muted min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors duration-150 focus-ring rounded-lg" aria-label="Back to home">
-        <i class="fa-solid fa-chevron-left text-lg"></i>
+        ${icon("chevron-left", "text-lg")}
       </button>
       <div>
         <h1 class="font-bold text-sm tracking-wide">Corporate Ladder</h1>
@@ -29,7 +34,7 @@ export const APP_SHELL = `
       </div>
     </div>
     <div class="flex items-center space-x-3 cl-header-muted" aria-hidden="true">
-      <i class="fa-solid fa-ellipsis-vertical text-sm cl-header-muted"></i>
+      ${icon("ellipsis-vertical", "text-sm cl-header-muted")}
     </div>
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
@@ -44,7 +49,7 @@ export const APP_SHELL = `
       </div>
         <div class="text-center">
           <div class="home-hero-enter home-hero-enter-icon inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
-            <i class="fa-solid fa-briefcase text-xl"></i>
+            ${icon("briefcase", "text-xl")}
           </div>
           <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
           <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Simulating modern work chaos</p>
@@ -93,15 +98,15 @@ export const APP_SHELL = `
         </div>
         <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
           <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
-            <i class="fa-solid fa-play"></i><span>PUNCH IN &amp; CLIMB</span>
+            ${icon("play")}<span>PUNCH IN &amp; CLIMB</span>
           </button>
           <p class="cl-telegram-cta-hint text-micro font-semibold text-slate-500 text-center">Punch In lives in Telegram&apos;s bar below.</p>
           <div class="grid grid-cols-2 gap-2">
             <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2 px-3 text-xs">
-              <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard
+              ${icon("trophy", "text-amber-500")} Leaderboard
             </button>
             <button onclick="switchTab('howtoplay')" class="btn-cl-secondary py-2 px-3 text-xs">
-              <i class="fa-solid fa-circle-question text-cl-primary"></i> How to Survive
+              ${icon("circle-question", "text-cl-primary")} How to Survive
             </button>
           </div>
           ${BRAND_FOOTER}
@@ -127,7 +132,7 @@ export const APP_SHELL = `
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="flex shrink-0 items-center gap-1 text-caption font-bold text-slate-500"><i class="fa-solid fa-bolt text-amber-500"></i></span>
+          <span class="flex shrink-0 items-center gap-1 text-caption font-bold text-slate-500">${icon("bolt", "text-amber-500")}</span>
           <div class="h-2 flex-1 overflow-hidden rounded-full border border-slate-200 bg-slate-100 p-px">
             <div id="burnoutMeter" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75" style="width: 100%;"></div>
           </div>
@@ -173,12 +178,12 @@ export const APP_SHELL = `
       </div>
       <div id="tapControlsBar" class="tap-controls-bar select-none">
         <button id="btnTapLeft" type="button" aria-label="Climb left" class="btn-tap-zone btn-tap-zone-left touch-none focus-ring">
-          <i class="fa-solid fa-arrow-left icon-md text-slate-700" aria-hidden="true"></i>
+          ${icon("arrow-left", "icon-md text-slate-700")}
           <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
           <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: ←</span>
         </button>
         <button id="btnTapRight" type="button" aria-label="Climb right" class="btn-tap-zone btn-tap-zone-right touch-none focus-ring">
-          <i class="fa-solid fa-arrow-right icon-md text-slate-700" aria-hidden="true"></i>
+          ${icon("arrow-right", "icon-md text-slate-700")}
           <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP RIGHT</span>
           <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: →</span>
         </button>
@@ -188,7 +193,7 @@ export const APP_SHELL = `
     <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto min-w-0">
       <div class="text-center mt-2 w-full min-w-0">
         <span class="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full mb-2">
-          <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+          ${icon("triangle-exclamation", "text-2xl")}
         </span>
         <h2 class="text-2xl font-black text-red-600 tracking-tight leading-none uppercase">Employment Terminated</h2>
         <p class="text-micro text-slate-500 font-bold uppercase mt-1 tracking-wide">HR Exit Interview in Progress</p>
@@ -219,14 +224,14 @@ export const APP_SHELL = `
       </div>
       <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
         <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md">
-          <i class="fa-solid fa-rotate-right"></i><span>RE-APPLY FOR ROLE (TRY AGAIN)</span>
+          ${icon("rotate-right")}<span>RE-APPLY FOR ROLE (TRY AGAIN)</span>
         </button>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">
-            <i class="fa-solid fa-share"></i> Share Results
+            ${icon("share")} Share Results
           </button>
           <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2.5 px-3 text-xs">
-            <i class="fa-solid fa-trophy text-amber-500"></i> Leaderboard
+            ${icon("trophy", "text-amber-500")} Leaderboard
           </button>
         </div>
         <button onclick="goHome()" class="btn-cl-muted text-xs">Back to Corporate Lounge</button>
@@ -315,7 +320,7 @@ export const APP_SHELL = `
     </div>
     <div id="debugStrip" class="debug-strip hidden" aria-live="polite"></div>
     <div id="toastNotification" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg z-50 flex items-center space-x-2 opacity-0 pointer-events-none transition-opacity duration-300">
-      <i class="fa-solid fa-circle-check text-emerald-400"></i>
+      ${icon("circle-check", "text-emerald-400")}
       <span id="toastText">Done!</span>
     </div>
   </div>

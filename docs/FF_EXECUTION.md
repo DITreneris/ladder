@@ -49,6 +49,8 @@
 | 6 | Share includes `Shift:` line | [ ] manual — **P0** |
 | 7 | Home auth banner hidden after fresh bot open | [ ] manual |
 
+**Optional — API keep-warm (profile badge latency):** If Home `best career` loads slowly on first open after idle, ping `GET https://ladder-production-642d.up.railway.app/health` on a 5-minute cron (GitHub Actions / UptimeRobot), or set Railway min instances = 1.
+
 Update [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 10 when device QA signed.
 
 ---

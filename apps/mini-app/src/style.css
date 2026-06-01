@@ -68,6 +68,12 @@
   --cl-accent: #2563eb;
 }
 
+@utility cl-icon {
+  @apply inline-block shrink-0 align-middle;
+  width: 1em;
+  height: 1em;
+}
+
 @utility focus-ring {
   @apply focus:outline-hidden focus-visible:ring-2 focus-visible:ring-cl-primary focus-visible:ring-offset-2;
 }
