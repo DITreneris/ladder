@@ -73,10 +73,36 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 2. Set Mini App URL to the Vercel production URL.
 3. `/setdomain` — add your Vercel domain if required for WebApp.
 
+### Profile copy (paste in BotFather)
+
+**Botpic:** briefcase on brand gradient (matches [`apps/mini-app/public/favicon.svg`](apps/mini-app/public/favicon.svg)). Upload 512×512 PNG manually in Bot Settings → Edit Botpic.
+
+**Description** (`/setdescription`):
+
+```
+Satirical office climb game in Telegram. Tap left or right on each rung — dodge meetings, reorgs, and deadlines. Compete on Daily and Weekly leaderboards. Open the app and punch in.
+```
+
+**About** (`/setabout`):
+
+```
+Climb the corporate ladder. Avoid meetings. Survive the org chart. New shift every UTC day.
+```
+
+**Commands** (`/setcommands`):
+
+```
+start - Open Corporate Ladder and punch in
+play - Same as start
+help - How to play in 30 seconds
+```
+
+After Railway bot redeploy, smoke `/start`, `/play`, and `/help` — each should show **Punch In & Climb** (WebApp) and today's shift label should match the in-app pill.
+
 ## 6. Post-deploy verification
 
 - [ ] `GET {API_URL}/health` returns ok over HTTPS
-- [ ] `/start` in Telegram shows **Punch In & Climb** (or configured label)
+- [ ] `/start`, `/play`, and `/help` in Telegram show **Punch In & Climb** and open the Mini App
 - [ ] Mini App loads inside Telegram (not broken blank screen)
 - [ ] Complete one run; score appears on **Daily** leaderboard
 - [ ] **Weekly** tab loads entries

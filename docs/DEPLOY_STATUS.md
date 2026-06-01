@@ -26,7 +26,7 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 
 | 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL |
 
-| 5 | BotFather | **Done** | Menu button + `/setdomain` |
+| 5 | BotFather | **Done** | Menu button + `/setdomain`; botpic uploaded manually (briefcase mark); Description/About/Commands — paste from [DEPLOY.md](../DEPLOY.md) |
 
 | 6 | Post-deploy smoke | **Local Done** / **Prod manual pending** | Local: smoke-local + viewport QA + API health `{"status":"ok"}` (2026-06-01). After Vercel redeploy: `/start`, score → Daily LB, share clipboard on device |
 

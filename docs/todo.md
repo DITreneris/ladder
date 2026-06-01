@@ -258,7 +258,7 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | C-09 | `return` after `triggerGameOver` in energy timer tick | `engine.ts` L211–229 | [x] |
 | C-10 | Bump `package.json` version to match release (1.8.5) | `apps/mini-app/package.json` | [x] |
 | C-11 | Guard `seedGameOverForQa` / `switchTab('gameover')` behind `import.meta.env.DEV` | `app.ts` L1168–1170 | [x] |
-| S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/main.py`, `daily-modifier.ts` | [~] Bot updated for synergy_sprint; automated parity test pending |
+| S-06 | Bot vs mini-app daily shift hash parity test | `apps/bot/shifts.py`, `daily-modifier.ts` | [x] `test_shifts.py` preset hash + labels |
 | S-08 | Fixed `840px` shell on very short viewports | `template.ts` L11 | [ ] Verify |
 | S-11 | Tighten CORS origins (currently `*`) | `packages/api/app/main.py` | [ ] |
 | S-12 | Fail CI build if `VITE_API_URL` unset in prod | Vercel / CI | [ ] |

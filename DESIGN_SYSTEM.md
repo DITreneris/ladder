@@ -151,6 +151,7 @@ Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented
 - Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + static news strip (`news-ticker-text--static`) + daily shift pill (`#dailyShiftDescription` line-clamp-2; full copy on pill `title`) + `#homeGameplayPreview` (`card-light-sm` full width) + `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden) + `.cl-telegram-cta-hint`; `#startScreen` is the sole home scroll container with MainButton bottom padding; `#authDegradedBanner` two-line offline copy when profile sync fails
 - Game: compact `.game-hud` with optional `#hudTapHint` chip (deck-first copy: TAP LEFT / TAP RIGHT); first-run `.tap-deck-hint` pulse on `#tapControlsBar`; `#hrMemoRail` below HUD for in-run People Ops memos (queued, consolidated on promotion); `#gamePlayArea` for responsive full-column ladder (`cl-shell-gutter`, `#ladderTrack` width 100%); fixed `.tap-controls-bar` full-bleed with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; player position from DOM slot centers; keyboard hints hidden in Telegram; shell toast on home/game-over only — mute feedback uses HR memo in-run
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
+- **Favicon:** briefcase on `cl-primary` → `cl-accent-indigo` gradient — `public/favicon.svg`, `public/apple-touch-icon.png` (matches home hero icon)
 
 ### 8.2 Focus
 

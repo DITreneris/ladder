@@ -13,6 +13,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
 - **Marketing screenshot pipeline** — `?capture=home|game|gameover` seeds, `npm run capture:marketing` → `docs/assets/marketing/` (01-home, 02-gameplay-dodge, 03-game-over); OG crop uses marketing gameplay frame
+- **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
 
 ### Fixed
 - **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
@@ -21,6 +22,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Score submit 500 for new Telegram users** — `upsert_user()` handles Supabase `maybe_single()` returning `None` when no row exists; unblocks `/auth/me` and `/runs` (F&F data audit 2026-06-01)
 
 ### Changed
+- **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, PA link button-only (no URL in message)
+- **Bot commands** — `/help` (30-second rules) and `/play` (alias of `/start`); shift presets in `apps/bot/shifts.py` mirror mini-app copy
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 - **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)
 - **Tutorial visual clarity** — `.rung-future` dims rung rows 2–6 (hazard badges stay full contrast); `.next-rung` row emphasis; `safe-side-hint` through 12 rungs; `#imminentHint` on SE Telegram; HR memo scroll line on first tap

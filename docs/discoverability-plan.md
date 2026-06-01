@@ -32,7 +32,7 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 | `sitemap.xml` | Missing | N/A for single-page app shell |
 | `llms.txt` | Missing | Defer |
 | Schema.org | Missing | Defer |
-| Bot welcome copy | OK | `apps/bot/main.py` — `/start` + shift line |
+| Bot welcome copy | OK | `apps/bot/main.py` — `/start`, `/play`, `/help` + shift label + description |
 | Share loop | OK | `shareMessage` + clipboard fallback |
 | Co-branding link | OK | Footer → Prompt Anatomy |
 | Marketing site entity | Missing | No CL page on promptanatomy.app yet |
@@ -57,7 +57,7 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 |---|------|-------|--------|-----------------|--------|
 | 0.1 | Add meta description + Open Graph + Twitter card tags | Dev | S | `apps/mini-app/index.html` | **Done** |
 | 0.2 | Add `robots.txt` with `Disallow: /` (or `noindex` meta) | Dev | S | `apps/mini-app/public/robots.txt` | **Done** |
-| 0.3 | Audit BotFather: description, about, commands | Ops | S | [@BotFather](https://t.me/BotFather) | Manual |
+| 0.3 | Audit BotFather: description, about, commands | Ops | S | [@BotFather](https://t.me/BotFather) | **Template in [DEPLOY.md](../DEPLOY.md)** — paste manually; botpic set separately |
 | 0.4 | Confirm F&F share message uses bot link, not raw mini-app URL | Ops | S | [docs/FF_TEST.md](FF_TEST.md) | **Done** |
 | 0.5 | OG image (1200×630) Playwright composite + GitHub social preview | Dev | S | `scripts/capture-og.mjs` → `public/og.png`, `.github/social-preview.png` | **Done** |
 
