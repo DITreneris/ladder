@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **SEO / GEO hardening** — canonical URL, unified meta copy, JSON-LD (`WebApplication` + `VideoGame`), `sitemap.xml`, `llms.txt`, expanded `robots.txt`, `<noscript>` crawler fallback; CI `verify:seo`
 - **Near-miss wince (v1.9.0)** — safe-side tap past imminent hazard triggers brief player wince + haptic; `prefers-reduced-motion` safe
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
 - **Marketing screenshot pipeline** — `?capture=home|game|gameover` seeds, `npm run capture:marketing` → `docs/assets/marketing/` (01-home, 02-gameplay-dodge, 03-game-over); OG crop uses marketing gameplay frame
@@ -24,6 +25,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
 
 ### Changed
+- **Crawler access** — `robots.txt` now allows search, social preview (Twitter/Facebook/LinkedIn), and AI bots; shell `index.html` uses `index, follow` so card validators can fetch OG image
 - **Bot `/start` welcome** — how-to-play line (tap L/R, Energy), today's shift description, mini-app URL in message (OG preview in chat); PA link button-only (no `.app` URL in body)
 - **Bot commands** — `/help` (30-second rules) and `/play` (alias of `/start`); shift presets in `apps/bot/shifts.py` mirror mini-app copy
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)

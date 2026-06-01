@@ -62,3 +62,5 @@ jobs:
           kill "$PREVIEW_PID" 2>/dev/null || true
       - name: OG asset check
         run: npm run verify:og
+      - name: SEO asset check
+        run: npm run verify:seo

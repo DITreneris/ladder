@@ -1,8 +1,8 @@
 # Discoverability Plan — Corporate Ladder
 
-**Status:** Approved approach · **Not traditional SEO** · **Doc map:** [DOCS_INDEX.md](../DOCS_INDEX.md)
+**Status:** Approved approach · **Shell SEO/GEO enabled (2026-06-01)** · **Doc map:** [DOCS_INDEX.md](../DOCS_INDEX.md)
 
-Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-chat shares, and word of mouth — not Google search. This plan covers the minimum web/Telegram discoverability work worth doing, and explicitly defers full SEO/GEO until (unless) distribution strategy changes.
+Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-chat shares, and word of mouth — not Google search as primary channel. This plan covers minimum web/Telegram discoverability plus **shell-level SEO/GEO** (meta, sitemap, llms.txt) without turning the mini-app into a marketing site.
 
 ---
 
@@ -10,10 +10,10 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 
 | Question | Answer |
 |----------|--------|
-| Do we need full SEO (sitemap, schema, blog, llms.txt)? | **No** — not on the mini-app URL at current stage |
+| Do we need full SEO (sitemap, schema, blog, llms.txt)? | **Partial — shell only** — canonical, JSON-LD, `sitemap.xml`, `llms.txt` on mini-app URL; no blog/FAQ in game repo |
 | Do we need Telegram-native discoverability? | **Yes** — bot profile, share loop, F&F recruitment |
 | Do we need link-preview metadata? | **Yes** — low effort, helps when URL is pasted outside Telegram |
-| Where does “what is Corporate Ladder?” live for web/AI? | **Prompt Anatomy site** (`DITreneris/site`) — not the game shell |
+| Where does “what is Corporate Ladder?” live for web/AI? | **Mini-app shell** (`llms.txt`, JSON-LD) + **Prompt Anatomy site** (`DITreneris/site`) for long-form entity copy |
 
 **Primary growth loop:**
 
@@ -27,11 +27,11 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 
 | Area | Status | Notes |
 |------|--------|-------|
-| `index.html` metadata | Minimal | Title only; no description, OG, or canonical |
-| `robots.txt` | Missing | No crawl policy |
-| `sitemap.xml` | Missing | N/A for single-page app shell |
-| `llms.txt` | Missing | Defer |
-| Schema.org | Missing | Defer |
+| `index.html` metadata | **Done** | Title, description, canonical, OG, Twitter, JSON-LD, noscript |
+| `robots.txt` | **Done** | Allow all + social/AI bots + sitemap directive |
+| `sitemap.xml` | **Done** | Single URL for SPA shell |
+| `llms.txt` | **Done** | AI/GEO entity index at site root |
+| Schema.org | **Done** | `WebApplication` + `VideoGame` in `index.html` |
 | Bot welcome copy | OK | `apps/bot/main.py` — `/start`, `/play`, `/help` + shift label + description |
 | Share loop | OK | `shareMessage` + clipboard fallback |
 | Co-branding link | OK | Footer → Prompt Anatomy |
@@ -56,7 +56,7 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 | # | Task | Owner | Effort | Files / surface | Status |
 |---|------|-------|--------|-----------------|--------|
 | 0.1 | Add meta description + Open Graph + Twitter card tags | Dev | S | `apps/mini-app/index.html` | **Done** |
-| 0.2 | Add `robots.txt` with `Disallow: /` (or `noindex` meta) | Dev | S | `apps/mini-app/public/robots.txt` | **Done** |
+| 0.2 | Add `robots.txt` with `Disallow: /` (or `noindex` meta) | Dev | S | `apps/mini-app/public/robots.txt` | **Superseded** — now `Allow: /` + AI/social bots (2026-06-01) |
 | 0.3 | Audit BotFather: description, about, commands | Ops | S | [@BotFather](https://t.me/BotFather) | **Template in [DEPLOY.md](../DEPLOY.md)** — paste manually; botpic set separately |
 | 0.4 | Confirm F&F share message uses bot link, not raw mini-app URL | Ops | S | [docs/FF_TEST.md](FF_TEST.md) | **Done** |
 | 0.5 | OG image (1200×630) Playwright composite + GitHub social preview | Dev | S | `scripts/capture-og.mjs` → `public/og.png`, `.github/social-preview.png` | **Done** |
@@ -131,7 +131,7 @@ Add `og:image` once `public/og.png` exists.
 ### KISS — do these
 
 - `<head>` metadata on mini-app (Phase 0)
-- `robots.txt` disallow or `noindex` on app URL
+- `robots.txt` allow crawlers + `sitemap.xml` + `llms.txt` on app URL
 - BotFather profile polish
 - F&F message → bot deep link
 - One CL paragraph on Prompt Anatomy site (Phase 1, if F&F positive)
@@ -147,8 +147,7 @@ Add `og:image` once `public/og.png` exists.
 
 - Full SEO audit playbook on `apps/mini-app`
 - FAQ pages, comparison pages, glossary, blog inside game repo
-- `llms.txt` on the game URL
-- Indexing the SPA as a marketing site
+- Indexing the SPA as a marketing site (hero, footer grid)
 - Google Search Console for `promptanatomy.lol` before Phase 2 decision
 - Marketing-site layout in mini-app (hero, footer grid) — per [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md)
 - v1.1 analytics platform as substitute for F&F qualitative signal
@@ -159,8 +158,10 @@ Add `og:image` once `public/og.png` exists.
 
 | File | Action |
 |------|--------|
-| `apps/mini-app/index.html` | Add description, OG, Twitter meta |
-| `apps/mini-app/public/robots.txt` | Create — `User-agent: *` / `Disallow: /` |
+| `apps/mini-app/index.html` | Description, OG, Twitter, canonical, JSON-LD, noscript |
+| `apps/mini-app/public/robots.txt` | Allow crawlers + sitemap + AI/social bots |
+| `apps/mini-app/public/sitemap.xml` | Single-URL sitemap |
+| `apps/mini-app/public/llms.txt` | AI/GEO entity index |
 | `apps/mini-app/public/og.png` | 1200×630 link preview (Playwright composite) |
 | `.github/social-preview.png` | 1280×640 GitHub repo share image |
 | `apps/mini-app/public/favicon.ico` | Optional — if missing in browser tab |
@@ -187,10 +188,10 @@ Add `og:image` once `public/og.png` exists.
 
 | Area | Target | Fix if fail |
 |------|--------|-------------|
-| Link previews | OK | Complete OG tags + optional og.png |
-| Accidental SEO | OK (noindex/disallow) | Add robots.txt |
+| Link previews | OK | Complete OG tags + og.png; redeploy Vercel |
+| Crawler access | OK (index + allow) | robots.txt + canonical + sitemap |
 | Telegram entry | OK | BotFather + F&F message |
-| AI entity clarity | Fail until Phase 1 | PA site paragraph |
+| AI entity clarity | Partial (shell) | llms.txt + JSON-LD; Phase 1 PA site paragraph |
 | Web organic growth | N/A (deferred) | Phase 2 landing if needed |
 
 ---
