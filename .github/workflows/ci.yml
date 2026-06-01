@@ -50,20 +50,15 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install chromium --with-deps
-      - name: Viewport QA
+      - name: Playwright QA (viewport, layout, coffee)
         run: |
-          npx vite preview --host 127.0.0.1 --port 4173 &
+          npx vite preview --host 127.0.0.1 --port 4173 --strictPort &
+          PREVIEW_PID=$!
           sleep 5
+          export PREVIEW_URL=http://127.0.0.1:4173
           npm run qa:viewport
-      - name: Layout QA
-        run: |
-          npx vite preview --host 127.0.0.1 --port 4173 &
-          sleep 5
           npm run qa:layout
-      - name: Coffee and meeting QA
-        run: |
-          npx vite preview --host 127.0.0.1 --port 4173 &
-          sleep 5
           npm run qa:coffee
+          kill "$PREVIEW_PID" 2>/dev/null || true
       - name: OG asset check
         run: npm run verify:og

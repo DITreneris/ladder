@@ -77,6 +77,7 @@ async function main() {
     await runCoffeePickup(page);
   } catch (err) {
     console.error("COFFEE QA FAILED:", err.message ?? err);
+    console.error(`Preview URL: ${BASE} (set PREVIEW_URL if vite picked another port)`);
     await browser.close();
     process.exit(1);
   }

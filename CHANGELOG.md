@@ -14,7 +14,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Synergy Sprint preset (v1.9.0)** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
 
 ### Fixed
-- **Auth degraded banner (P2-1 / C-05)** — home banner branches on `ApiFailureReason`: session expired vs connection issue
+- **CI coffee QA** — single `vite preview` on port 4173 for viewport, layout, and coffee Playwright steps (fixes port drift when prior preview processes stayed alive)
 
 ### Changed
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
