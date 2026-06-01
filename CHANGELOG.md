@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- **Coffee pickup left a ghost ☕ on the current rung** — engine now clears `coffee` on the rung when collected; pickup animation removes the badge (including reduced-motion)
 - **Three mismatched column widths on game and game-over screens** — align tap deck with `cl-shell-gutter` (remove double horizontal padding); full-width performance card; ladder rails span play area edges (no grey side dead zones); drop play-area side borders that framed a narrow lane
 
 ### Changed

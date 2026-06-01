@@ -287,8 +287,25 @@ export class GameEngine {
     if (nextRung?.coffee === this.playerSide) {
       this.timeLeft = Math.min(100, this.timeLeft + COFFEE_RECOVERY);
       this.coffeeCollected = true;
+      nextRung.coffee = null;
       audio.coffee();
       this.callbacks.onCoffee();
+      // #region agent log
+      if (typeof fetch !== "undefined") {
+        fetch("http://127.0.0.1:7808/ingest/23292cd7-62fc-4135-a998-c5f22f7ea8ca", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a50bb8" },
+          body: JSON.stringify({
+            sessionId: "a50bb8",
+            hypothesisId: "H-coffee",
+            location: "engine.ts:handleTap",
+            message: "coffee collected",
+            data: { side, rung0Coffee: this.rungs[0]?.coffee ?? null, rung1Coffee: this.rungs[1]?.coffee ?? null },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
     } else {
       this.timeLeft = Math.min(100, this.timeLeft + CLIMB_RECOVERY);
     }

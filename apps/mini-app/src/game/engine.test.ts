@@ -73,6 +73,25 @@ describe("GameEngine", () => {
     expect(onCoffee).toHaveBeenCalledTimes(1);
   });
 
+  it("clears coffee from the rung after pickup (no ghost badge on current slot)", () => {
+    const onCoffee = vi.fn();
+    let randomCall = 0;
+    vi.spyOn(Math, "random").mockImplementation(() => {
+      const sequence = [0.9, 0.3, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99];
+      return sequence[randomCall++] ?? 0.99;
+    });
+
+    const { engine } = createEngine({ onCoffee });
+    engine.start();
+    engine.handleTap("left");
+    engine.handleTap("left");
+    engine.handleTap("left");
+
+    const rungs = engine.getRungs();
+    expect(onCoffee).toHaveBeenCalledTimes(1);
+    expect(rungs.some((r) => r.coffee === "left")).toBe(false);
+  });
+
   it("does not drain energy before the first tap", () => {
     vi.useFakeTimers();
     const onGameOver = vi.fn();
