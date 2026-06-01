@@ -78,6 +78,8 @@ Each member before external invite:
 
 Log pain items in [FF_TEST.md](FF_TEST.md) feedback buckets. Fix P0/P1 before Phase E.
 
+**Tier A trust checks (during dogfood + first external runs):** V-08 profile load · V-10 submit toast · V-11 offline failure copy · V-12 429 toast · V-13 share clipboard · V-14 leaderboard — track in [todo.md](todo.md) §6.
+
 ---
 
 ## Phase E — External F&F launch

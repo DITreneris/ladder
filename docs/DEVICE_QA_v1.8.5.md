@@ -84,4 +84,4 @@ cd apps/mini-app && npm run qa:viewport && npm run qa:layout && npm run qa:coffe
 | Android | [x] | Rows 1–5 pass — corridor, tutorial, width (2026-06-01) |
 | Viewport QA script | [x] | CI + local |
 
-**Gate:** Ready for `git tag v1.8.5` → F&F ([FF_EXECUTION.md](FF_EXECUTION.md)).
+**Gate:** `v1.8.5` tagged → F&F active ([FF_EXECUTION.md](FF_EXECUTION.md)). Rows 6–10 spot-check by **2026-06-10**.
