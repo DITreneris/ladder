@@ -10,7 +10,7 @@ A fast-paced Telegram Mini App where players climb the corporate ladder while av
 
 
 
-![Corporate Ladder gameplay](docs/assets/gameplay.png)
+![Corporate Ladder gameplay](docs/assets/marketing/02-gameplay-dodge.png)
 
 
 
@@ -46,11 +46,7 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 4. Survive as many **Career Years** as possible before HR terminates you.
 
-
-
-**Controls:** large tap zones on mobile; arrow keys (← →) in desktop browser. Full rules in the in-app **How to Play** screen.
-
-
+**Controls:** large tap zones on mobile; arrow keys (← →) in desktop browser. Full rules in the in-app **How to Survive** screen (career ladder: building floors vs rank gates).
 
 **Goal:** maximize Career Years and final rank (Intern → Manager at 10y → CEO at 35y). Compete on Daily and Weekly leaderboards.
 
@@ -58,11 +54,8 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 ## Known issues
 
-
-
 - API rate limiting is in-memory per Railway replica — see [docs/architecture.md](docs/architecture.md) for multi-replica caveat.
-
-- Production URLs are placeholders until [DEPLOY.md](DEPLOY.md) checklist is complete.
+- Supabase migration `002` — verify apply before relying on v2.0 cooldown/triage tables ([docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)).
 
 
 
@@ -80,7 +73,7 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 | [DOCS_INDEX.md](DOCS_INDEX.md) | Document map and task router for humans and agents |
 
-| [ROADMAP.md](ROADMAP.md) | Status + release train; shipped baseline through v1.8.2; v1.9 after F&F |
+| [ROADMAP.md](ROADMAP.md) | Status + release train; shipped through v1.9.0 / v2.0.0; soft launch active |
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Mini-app tokens, utilities, UI guardrails |
 
 | [docs/mvp-scope.md](docs/mvp-scope.md) | v1 in/out, v1.1 deferrals, terminology (inventory → ROADMAP) |

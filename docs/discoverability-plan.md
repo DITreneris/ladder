@@ -175,8 +175,8 @@ Add `og:image` once `public/og.png` exists.
 
 | Milestone | Discoverability action |
 |-----------|------------------------|
-| **Phase 0** (shipped in v1.8.2) | OG/meta/`og.png`/`robots.txt` — done |
-| **v1.8.2 device QA + tag** (now) | No new discoverability work — finish [DEVICE_QA_v1.8.2](DEVICE_QA_v1.8.2.md) |
+| **Phase 0** | OG/meta/`og.png`/`robots.txt` — canonical OG via `npm run adopt:og` from [docs/assets/Corporate_Ladder_og.png](assets/Corporate_Ladder_og.png) |
+| **Soft launch** (2026-06-14) | Redeploy Vercel after OG adopt; F&F bot-link recruitment — [DEVICE_QA_v2.0](DEVICE_QA_v2.0.md) |
 | **F&F test** (2026-05-31 → 2026-06-14) | Bot-link recruitment; optional share copy tweaks from feedback |
 | **F&F review** (~2026-06-14) | Go/no-go on Phase 1 |
 | **v1.9** | Game juice if F&F weak; Phase 1 if widening audience |
@@ -199,7 +199,8 @@ Add `og:image` once `public/og.png` exists.
 ## Related documents
 
 - [docs/FF_TEST.md](FF_TEST.md) — F&F metrics and recruitment
-- [docs/DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) — current release gate (after Phase 0 shipped)
+- [docs/assets/README.md](assets/README.md) — OG vs marketing asset map
+- [docs/DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) — soft-launch device gate
 - [docs/FF_EXECUTION.md](FF_EXECUTION.md) — F&F runbook
 - [ROADMAP.md](../ROADMAP.md) — release train
 - [docs/mvp-scope.md](mvp-scope.md) — scope boundaries

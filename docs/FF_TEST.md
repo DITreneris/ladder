@@ -140,7 +140,7 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 | Tier A verification | V-08–V-14 | pending deploy | | | |
 | Soft-launch GO gates | all §B green | | | pre-read | **vote** |
 
-**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample; F&F UX pack shipped in repo pending deploy.
+**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample. **Jun 14:** `v1.9.0` + `v2.0.0` tagged — prod bundle per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md).
 
 
 

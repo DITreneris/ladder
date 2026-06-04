@@ -2,7 +2,7 @@
 
 **Purpose:** Actionable backlog from the v1.8.5 deep bug audit (2026-06-01). Tracks confirmed bugs, verification items, tests, and release gates toward v1.8.5 tag → F&F → v2.0 hardening.
 
-**Status snapshot:** Soft-launch GO review **2026-06-14** · v1.9 + v2.0 code in repo · prod `main-7DTXR6XJ.js` (v1.8.5) · v1.9/v2.0 **deploy pending** · [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)
+**Status snapshot:** Soft launch **2026-06-14** · `v1.9.0` + `v2.0.0` tagged · prod bundle per [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) · Vercel OG redeploy pending · [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)
 
 **Related docs:**
 

@@ -2,9 +2,9 @@
 
 **Release:** v1.8.5 corridor + tutorial + office hazards · **Base:** [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) full delta + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md)
 
-**F&F gate:** [FF_EXECUTION.md](FF_EXECUTION.md) · **Tag after pass:** `v1.8.5`
+**F&F gate:** [FF_EXECUTION.md](FF_EXECUTION.md) · **Tag:** `v1.8.5` on `46abf19` (done)
 
-**Prod bundle:** `main-7DTXR6XJ.js` (2026-06-01 curl) — https://www.promptanatomy.lol
+**Prod bundle:** see [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) — https://www.promptanatomy.lol
 
 Sign off on real Telegram **iOS** and **Android** after Vercel redeploy.
 
@@ -21,7 +21,7 @@ Repo gates green before device sign-off:
 | `npm run qa:viewport` | pass |
 | `npm run qa:layout` (post-tap width) | pass |
 | `npm run qa:coffee` (tutorial coffee + meeting collision) | pass |
-| Prod bundle | `main-7DTXR6XJ.js` (post-`46abf19`) |
+| Prod bundle | per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md) |
 
 **Human sign-off:** Telegram rows 1–5 confirmed 2026-06-01. Rows 6–10 due **2026-06-10** — tracked in [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B gate 5.
 

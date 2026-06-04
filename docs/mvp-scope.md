@@ -2,7 +2,7 @@
 
 **Doc map:** [DOCS_INDEX.md](../DOCS_INDEX.md) · **Shipped inventory:** [ROADMAP.md](../ROADMAP.md) § Shipped baseline · **History:** [CHANGELOG.md](../CHANGELOG.md) · **v0.1 archive:** [archive/README.md](archive/README.md)
 
-**Role of this file:** Scope **boundaries** only (what v1 is, what is deferred, what is forbidden). Do **not** duplicate the mechanics/UI inventory here — that lives in [ROADMAP.md](../ROADMAP.md) § Shipped baseline (updated through v1.8.2).
+**Role of this file:** Scope **boundaries** only (what v1 is, what is deferred, what is forbidden). Do **not** duplicate the mechanics/UI inventory here — that lives in [ROADMAP.md](../ROADMAP.md) § Shipped baseline (through v1.8.5; v1.9 F&F + v2.0 triage in [CHANGELOG](../CHANGELOG.md)).
 
 ---
 
@@ -12,7 +12,7 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 
 **Pitch:** Fast-paced office climb where your energy meter drains like a Friday afternoon.
 
-**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (v1.8.5 code; F&F gate).
+**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (v1.9.0 + v2.0.0 tagged; soft launch / F&F active).
 
 ---
 

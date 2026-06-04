@@ -9,34 +9,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-**Jun 14 cut:** Merge this block into `[1.9.0]` on soft-launch GO — procedure in [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §H. Do not cut before deploy + device sign-off.
-
-### Added
-- **F&F UX pack** — Intern-phase imminent hints through 40 rungs; pinned leaderboard self-row with gap-to-#1; emoji avatar picker (localStorage); metrics snapshot [FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md)
-
-### Changed
-- **OG link preview** — canonical image from manual `docs/assets/Corporate_Ladder_og.png` via `npm run adopt:og` (replaces June 1 Playwright composite); redeploy Vercel for `/og.png` cache
-- **How-to-Play career ladder** — merged Ranks + Career Phases into one card: building floors (flavor) vs rank gates (mechanics), first-climb ramp, Reorg Week footnote
-- **Reorg Week onboarding** — early reorgs for Intern only after tutorial ramp (~3y / 12 rungs); preset copy updated; reorg HUD strip matches
-- **Soft-launch GO plan** — [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) expanded with gate checklist, GO matrix, CHANGELOG cut procedure; synced [FF_EXECUTION](docs/FF_EXECUTION.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md), [FF_TEST](docs/FF_TEST.md), [todo](docs/todo.md)
-- Bot `/start` (and `/go`) welcome: hook-first copy, coffee/Manager line, daily shift block, minimal emoji at CTA
-- **CEO progression copy** — Manager as milestone; CEO (35y) framed as boardroom myth (home, milestone chip, bot `/help`, game-over hint)
-- **Leaderboard subtitle** — "Most career years survived" (was "Fastest corporate climbers")
-- **First-tap HR memo** — single actionable line (details remain in How to Survive)
-
-### Fixed
-- **Home news ticker** — scroll animation restored (was forced static in v1.8.5 clarity pass); stays static for `prefers-reduced-motion` and marketing/OG capture modes
-- CI `qa:coffee` flake: wait for preview + `clQa` harness, tap-deck-only flow, longer timeouts, curl healthcheck before Playwright QA
-- **Engine test** — intern obstacle pool test pins `standard` daily preset (avoids Reorg Week flake)
-
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events
 - Server-side replay validation (full anti-cheat)
 
-## [2.0.0] - 2026-06-01
+## [2.0.0] - 2026-06-14
 
-Public launch: platform hardening + Corporate triage rung. Requires Supabase migration `002_v2_hardening.sql`.
+Platform hardening + Corporate triage rung (soft-launch GO). Requires Supabase migration `002_v2_hardening.sql` — verify apply in [DEPLOY_STATUS](docs/DEPLOY_STATUS.md).
 
 ### Added
 - **Corporate triage rung** — Manager+ HR prompt every 16 rungs; next tap overloads a lane with P1 backlog (75% hazard bias × 3 rungs); [V2_TRIAGE_SPIKE.md](docs/V2_TRIAGE_SPIKE.md)
@@ -56,9 +36,9 @@ Public launch: platform hardening + Corporate triage rung. Requires Supabase mig
 ### Fixed
 - **P1-3 / C-06** — client-trusted scores mitigated with server plausibility (full replay deferred v1.1)
 
-## [1.9.0] - 2026-06-01
+## [1.9.0] - 2026-06-14
 
-F&F juice release: near-miss wince, Synergy Sprint, discoverability, and trust fixes from `[Unreleased]` sprint.
+Soft-launch release: F&F juice, UX pack, manual OG adopt, career onboarding clarity, and trust fixes (includes 2026-06-01 sprint).
 
 ### Added
 - **In-run background music** — chorus loop from *Mr. Bullet — Be Streso* (trimmed from 0:55); respects mute FAB; stops on game over / exit
@@ -68,6 +48,10 @@ F&F juice release: near-miss wince, Synergy Sprint, discoverability, and trust f
 - **Synergy Sprint preset** — 5th daily shift with 60s wall-clock cap; score = years at buzzer; sprint HUD chip + satirical game-over/share copy
 - **Marketing screenshot pipeline** — `?capture=home|game|gameover` seeds, `npm run capture:marketing` → `docs/assets/marketing/` (01-home, 02-gameplay-dodge, 03-game-over); OG crop uses marketing gameplay frame
 - **Mini-app favicon** — briefcase mark on brand gradient (`public/favicon.svg`, `apple-touch-icon.png`) wired in shell HTML
+- **F&F UX pack** — Intern-phase imminent hints through 40 rungs; pinned leaderboard self-row with gap-to-#1; emoji avatar picker (localStorage); baseline metrics [FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md)
+- **`npm run adopt:og`** — copies `docs/assets/Corporate_Ladder_og.png` (1200×630) to `public/og.png` and letterboxes GitHub `social-preview.png` (1280×640); `capture:og` remains optional legacy composite
+- **`docs/assets/README.md`** — documents OG source vs marketing screenshot pipeline
+- **[FF_METRICS_2026-06-10.md](docs/FF_METRICS_2026-06-10.md)** — mid-window F&F metrics template for Jun 14 soft-launch review
 
 ### Fixed
 - **Coffee pickup imminent-slot desync** — pickup badge detaches to `#gamePlayArea` overlay before animation so `.next-rung` repaints immediately; fixes stale ☕ on next hazard (testers: “coffee turned into meeting”)
@@ -80,6 +64,9 @@ F&F juice release: near-miss wince, Synergy Sprint, discoverability, and trust f
 - **Score submit 500 for new Telegram users** — `upsert_user()` handles Supabase `maybe_single()` returning `None` when no row exists; unblocks `/auth/me` and `/runs` (F&F data audit 2026-06-01)
 - **Bot `/start` silent after deploy** — Dockerfile now copies `shifts.py` (was `main.py` only; import crash on Railway)
 - **CI coffee QA flake** — use tap buttons (not keyboard) after focus wait; `dailyPreset=standard`; longer Playwright timeouts
+- **Home news ticker** — scroll animation restored (was forced static in v1.8.5 clarity pass); stays static for `prefers-reduced-motion` and marketing/OG capture modes
+- CI `qa:coffee` flake: wait for preview + `clQa` harness, tap-deck-only flow, longer timeouts, curl healthcheck before Playwright QA
+- **Engine test** — intern obstacle pool test pins `standard` daily preset (avoids Reorg Week flake)
 
 ### Removed
 - **Home lounge BGM loop** — BGM no longer plays or preloads on Home; Manager promo ramp unchanged
@@ -95,6 +82,16 @@ F&F juice release: near-miss wince, Synergy Sprint, discoverability, and trust f
 - **Bot daily shift** — `synergy_sprint` label in `/start` rotation (matches mini-app preset hash)
 - **Home screen clarity** — hero mechanic pitch; `#homeGameplayPreview` (avoid/climb); badge labels (`Best career`, milestone chip); static news ticker; sharper daily shift copy; **How to Survive** button; Telegram `MainButton` for Punch In on home (inline CTA hidden in Telegram)
 - **Tutorial visual clarity** — `.rung-future` dims rung rows 2–6 (hazard badges stay full contrast); `.next-rung` row emphasis; `safe-side-hint` through 12 rungs; `#imminentHint` on SE Telegram; HR memo scroll line on first tap
+- **OG link preview** — production `og.png` and GitHub social preview use manual Corporate Ladder artwork (replaces 2026-06-01 Playwright composite); redeploy Vercel after adopt so Telegram/link caches refresh
+- **How-to-Play career ladder** — merged Ranks + Career Phases into one card: building floors (flavor) vs rank gates (mechanics), first-climb ramp, Reorg Week footnote
+- **Reorg Week onboarding** — Intern early reorgs only after tutorial ramp (~3y / 12 rungs); preset + reorg HUD strip aligned with engine gate
+- **ROADMAP v1.9+ backlog** — deferred adaptive difficulty from `best_score` and expanded rank tree (explicit out of scope until product decision)
+- **Soft-launch GO plan** — [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) expanded with gate checklist, GO matrix, CHANGELOG cut procedure; synced [FF_EXECUTION](docs/FF_EXECUTION.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md), [FF_TEST](docs/FF_TEST.md), [todo](docs/todo.md)
+- Bot `/start` (and `/go`) welcome: hook-first copy, coffee/Manager line, daily shift block, minimal emoji at CTA
+- **CEO progression copy** — Manager as milestone; CEO (35y) framed as boardroom myth (home, milestone chip, bot `/help`, game-over hint)
+- **Leaderboard subtitle** — "Most career years survived" (was "Fastest corporate climbers")
+- **First-tap HR memo** — single actionable line (details remain in How to Survive)
+- **Documentation sync** — DOCS_INDEX, DEBUG_ENV_TRIAGE canonical bundle, release train aligned with v1.9.0 / v2.0.0 tags
 
 ## [1.8.5] - 2026-06-01
 
@@ -388,7 +385,9 @@ Initial monorepo scaffold — MVP v1 foundation.
 ### Security
 - Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
 
-[Unreleased]: compare/v1.8.4...HEAD
+[Unreleased]: https://github.com/DITreneris/ladder/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/DITreneris/ladder/compare/v1.9.0...v2.0.0
+[1.9.0]: https://github.com/DITreneris/ladder/compare/v1.8.5...v1.9.0
 [1.8.4]: compare/v1.8.3...v1.8.4
 [1.8.3]: compare/v1.8.2...v1.8.3
 [1.8.2]: compare/v1.8.1...v1.8.2

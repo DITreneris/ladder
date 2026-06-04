@@ -287,8 +287,8 @@ Attribution for the [Prompt Anatomy](https://www.promptanatomy.app/) ecosystem �
 - [ ] Telegram light + dark theme: shell adapts, next-rung visible
 - [ ] `prefers-reduced-motion`: animations off, game playable
 - [ ] Grep: no `text-[` pixel sizes in `apps/mini-app/src/`
-- [ ] Device QA: [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) before tag `v1.8.5`
+- [ ] Device QA: [docs/DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) for soft launch
 
 ---
 
-**Declared:** Design System **v1.8.5** — 2026-06-01 (aligned with [CHANGELOG](CHANGELOG.md#185---2026-06-01)).
+**Declared:** Design System **v1.8.5** shell (2026-06-01) — v1.9 F&F hints unchanged tokens; see [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14).

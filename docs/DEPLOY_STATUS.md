@@ -15,10 +15,11 @@ Track manual deploy progress through **soft-launch GO (2026-06-14)**. Full steps
 | 5 | BotFather | **Done** | Menu button + `/setdomain`; paste from [DEPLOY.md](../DEPLOY.md) |
 | 6 | Post-deploy smoke | **v1.8.5 Done** | `ff-metrics.py` green 2026-06-04 — re-run after v2.0 deploy |
 | 7–11 | v1.6 → v1.8.5 | **Done** | See prior steps; tag `v1.8.5` on `46abf19` |
-| 12 | v1.9.0 + F&F UX pack | **Code Done** / **Deploy Pending** | Near-miss, hints 40 rungs, LB self-row, avatar, CEO copy |
-| 13 | v2.0.0 hardening + triage | **Code Done** / **Deploy Pending** | Migration `002` · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) |
-| 14 | Soft launch GO signed | **Pending** | [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) · tag `v1.9.0` + `v2.0.0` on GO |
+| 12 | v1.9.0 + F&F UX pack | **Tagged** | [CHANGELOG 1.9.0](../CHANGELOG.md#190---2026-06-14) — redeploy Vercel for prod bundle + OG |
+| 13 | v2.0.0 hardening + triage | **Tagged** | Migration `002` verify · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) |
+| 14 | Soft launch GO + tags | **CHANGELOG cut Done** | `v1.9.0` + `v2.0.0` tags on release-cut commit — [FF_REVIEW](FF_REVIEW_2026-06-14.md) §H |
+| 15 | Vercel OG redeploy | **Pending** | New `public/og.png` after `npm run adopt:og` — link preview cache |
 
-**Tag sequence:** `v1.8.5` (done) → deploy v1.9 + v2.0 → F&F + device QA → **soft-launch GO Jun 14** → tags → public launch review ~Jun 28.
+**Tag sequence:** `v1.8.5` · `v1.9.0` · `v2.0.0` on `origin` — public launch review ~Jun 28.
 
 After each step, update [DOCS_INDEX.md](../DOCS_INDEX.md) and [README.md](../README.md) live demo table.

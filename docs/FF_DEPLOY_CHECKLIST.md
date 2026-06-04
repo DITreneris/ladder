@@ -1,6 +1,6 @@
 # Combined deploy — v1.9.0 + v2.0.0 + F&F UX pack
 
-**When:** Jun 4–5 (pre soft-launch F&F). **Tags:** Jun 14 after [FF_REVIEW GO vote](FF_REVIEW_2026-06-14.md).  
+**When:** Jun 4–14 soft-launch F&F. **Tags:** `v1.9.0` + `v2.0.0` applied 2026-06-14 — [CHANGELOG](../CHANGELOG.md#190---2026-06-14).  
 **Refs:** [DEPLOY.md](../DEPLOY.md) · [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md)
 
 ## Pre-deploy (local)
@@ -22,9 +22,9 @@
 
 ## 3. Vercel mini-app
 
-- [x] Prod bundle `main-CJgmaRAS.js` matches local build (2026-06-04 curl)
+- [x] Prod bundle per [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) (2026-06-04 curl)
+- [ ] **OG redeploy** after `npm run adopt:og` — verify `https://www.promptanatomy.lol/og.png`
 - [ ] Telegram cache bust — reopen from @bot; confirm v1.9 features (avatar picker, LB self-row)
-- [ ] Record hash in [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) after device verify
 
 ## 4. Post-deploy smoke
 
@@ -40,12 +40,12 @@
 - [ ] [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 6–10 spot-check
 - [ ] Close [todo.md](todo.md) Tier A V-08–V-14
 
-## 6. Tag (Jun 14 GO only)
+## 6. Tag (done 2026-06-14)
 
-See [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §H — cut CHANGELOG then:
+CHANGELOG cut per [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §H. Tags on release-cut commit:
 
 ```powershell
-git tag -a v1.9.0 -m "v1.9.0 — F&F juice + UX pack (soft launch)"
+git tag -a v1.9.0 -m "v1.9.0 — F&F juice, UX pack, OG adopt, onboarding clarity"
 git tag -a v2.0.0 -m "v2.0.0 — platform hardening + triage rung"
 git push origin v1.9.0 v2.0.0
 ```

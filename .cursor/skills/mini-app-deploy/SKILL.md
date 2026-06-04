@@ -5,7 +5,7 @@ description: Deploy Corporate Ladder to Vercel, Railway, Supabase, and BotFather
 
 # Mini App Deploy Checklist
 
-**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — tag `v1.8.5` after [DEVICE_QA_v1.8.5](../../docs/DEVICE_QA_v1.8.5.md); then [FF_EXECUTION](../../docs/FF_EXECUTION.md).
+**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — soft launch; `v1.9.0` + `v2.0.0` tagged; **Vercel OG redeploy** after `npm run adopt:og`; [FF_EXECUTION](../../docs/FF_EXECUTION.md).
 
 ## Prerequisites
 

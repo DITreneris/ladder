@@ -35,7 +35,7 @@
 | **Gameplay / engine** | [ROADMAP.md](ROADMAP.md) § Shipped baseline | [docs/mvp-scope.md](docs/mvp-scope.md) (boundaries only), `apps/mini-app/src/game/` |
 | **Auth / API / DB** | [docs/architecture.md](docs/architecture.md) | Matching skill in task router |
 | **Deploy / release** | [DEPLOY.md](DEPLOY.md) | [ROADMAP.md](ROADMAP.md) Status → [FF_EXECUTION](docs/FF_EXECUTION.md) |
-| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md), [todo](docs/todo.md) |
+| **F&F / device QA / tag** | [ROADMAP.md](ROADMAP.md) Status | [FF_EXECUTION](docs/FF_EXECUTION.md), [FF_REVIEW_2026-06-14](docs/FF_REVIEW_2026-06-14.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md) |
 | **Bug fix backlog / release TODO** | [docs/todo.md](docs/todo.md) | P0–P3 queue, verification matrix, test gaps |
 
 ---
@@ -58,8 +58,8 @@ Use this table to pick the right skill, rules, and documents.
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + § Shipped baseline, [CHANGELOG.md](CHANGELOG.md) |
-| F&F gate / device QA / pre-tag | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
-| Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/FF_TEST.md](docs/FF_TEST.md), [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) |
+| F&F gate / device QA | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
+| Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og` |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Debug triage / incident history | `debug-steward` | [project-context.mdc](.cursor/rules/project-context.mdc) | [debug-triage](.cursor/skills/debug-triage/SKILL.md), [DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md) |
 | Co-branding / PA footer | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | `apps/mini-app/src/lib/branding.ts`, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §9 |
@@ -85,12 +85,14 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.8.5 code done (deploy/QA/tag pending); v1.9 after F&F |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.9.0 + v2.0.0 tagged; soft launch active |
+| `assets` | [docs/assets/README.md](docs/assets/README.md) | Marketing / OG | OG source (`Corporate_Ladder_og.png`) vs Playwright marketing shots |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
 | `device-qa` | [docs/DEVICE_QA_v1.8.1.md](docs/DEVICE_QA_v1.8.1.md) | Release | v1.8.1 regression (run before v1.8.2 delta) |
 | `device-qa-v184` | [docs/DEVICE_QA_v1.8.4.md](docs/DEVICE_QA_v1.8.4.md) | Release | v1.8.4 trust + layout delta |
-| `device-qa-v185` | [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) | Release | v1.8.5 corridor + tutorial — blocks tag `v1.8.5` |
+| `device-qa-v2` | [docs/DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) | Release | v2.0 triage + hardening — soft-launch gate |
+| `device-qa-v185` | [docs/DEVICE_QA_v1.8.5.md](docs/DEVICE_QA_v1.8.5.md) | Release | v1.8.5 corridor + tutorial regression |
 | `todo` | [docs/todo.md](docs/todo.md) | Release / QA | v1.8.5 bug audit backlog — P0–P3 fixes, verification, tests, deploy gates |
 | `debug-repro` | [docs/DEBUG_REPRO.md](docs/DEBUG_REPRO.md) | QA | Manual R1–R5 reaction + L1–L5 layout checklist |
 | `debug-env` | [docs/DEBUG_ENV_TRIAGE.md](docs/DEBUG_ENV_TRIAGE.md) | QA | Prod bundle hash triage table |

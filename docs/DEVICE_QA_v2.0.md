@@ -1,6 +1,8 @@
 # Device QA — v2.0.0 (Corporate Triage + Platform Hardening)
 
-**Gate:** Soft-launch GO on **2026-06-14** ([FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)) · tag `v2.0.0` after sign-off · **Baseline:** [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–10 must still pass
+**Gate:** Soft-launch GO **2026-06-14** ([FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)) · `v2.0.0` tagged · **Baseline:** [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–10 must still pass
+
+**Prod bundle:** [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md)
 
 ---
 
@@ -31,7 +33,7 @@ Re-run [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–5 (corridor, width, c
 
 | Platform | Tester | Date | Bundle hash |
 |----------|--------|------|-------------|
-| iOS | | | `main-CJgmaRAS.js` |
-| Android | | | `main-CJgmaRAS.js` |
+| iOS | | | per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md) |
+| Android | | | per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md) |
 
 **Due:** 2026-06-10 · **Gate:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B row 4 (rows 1–8 required for soft-launch GO)

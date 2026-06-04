@@ -8,40 +8,33 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 ---
 
-## Status (2026-06-04)
+## Status (2026-06-14)
 
 | | |
 |---|---|
-| **Production** | `main` live — prod `main-CJgmaRAS.js` (2026-06-04); Supabase `002` migration **pending verify** |
-| **Tagged** | `v1.8.5` on `46abf19` · **v1.9.0 + v2.0.0** in CHANGELOG (tags pending [Jun 14 soft-launch GO](docs/FF_REVIEW_2026-06-14.md)) |
+| **Production** | `main` live — prod bundle per [DEBUG_ENV_TRIAGE](docs/DEBUG_ENV_TRIAGE.md); **Vercel redeploy** for new `og.png` after adopt |
+| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** on `main` (2026-06-14 soft-launch GO; `git describe --tags`) |
 | **Active** | Soft launch / F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) — **no public marketing** |
-| **Next actions** | Deploy v1.9 + v2.0 · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · 8 external testers · [FF_REVIEW](docs/FF_REVIEW_2026-06-14.md) GO vote Jun 14 |
-| **Shipped in repo** | v1.9 juice + F&F UX pack + v2.0 hardening — see [CHANGELOG](CHANGELOG.md) `[Unreleased]` + [2.0.0](CHANGELOG.md#200---2026-06-01) |
+| **Next actions** | Vercel OG redeploy · Supabase `002` verify · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) sign-off · public launch review ~2026-06-28 |
+| **Shipped in repo** | v1.9 F&F UX + OG adopt + career onboarding + v2.0 triage/hardening — [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14) · [2.0.0](CHANGELOG.md#200---2026-06-14) |
 | **Public launch** | Gated — review ~2026-06-28 after soft launch metrics |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
 ---
 
-## v1.8.5 gate — open items
+## v1.8.5 gate — complete
 
-**Code shipped in repo** — [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01). **Remaining:**
-
-### Operations (blocking F&F)
-
-| # | Item | Owner / notes |
-|---|------|----------------|
-| 1 | ~~Push / redeploy / cache bust~~ | Done — `main-7DTXR6XJ.js` |
-| 2 | ~~Device QA rows 1–5~~ | Signed 2026-06-01 (Telegram) |
-| 3 | **`git tag v1.8.5`** + push tags | Done — `46abf19` |
-| 4 | **F&F window** | [FF_EXECUTION](docs/FF_EXECUTION.md) Phase D → E — active |
-| 5 | Optional: DEVICE_QA rows 6–10 | Gate / Plant / regressions spot-check by Jun 10 |
+**Code shipped** — [CHANGELOG 1.8.5](CHANGELOG.md#185---2026-06-01). **Operations:** tag `v1.8.5` on `46abf19`; device QA rows 1–5 signed 2026-06-01; F&F window active per [FF_EXECUTION](docs/FF_EXECUTION.md). Optional rows 6–10: spot-check via [DEVICE_QA_v1.8.5](docs/DEVICE_QA_v1.8.5.md) / [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md).
 
 ---
 
-## v1.8.4 gate — open items (superseded by 1.8.5 deploy)
+## v1.8.4 gate — historical (superseded by 1.8.5)
 
-From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** — [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01). **Fold into 1.8.5 deploy if 1.8.4 never tagged:**
+**Audit trail only** — do not treat as active gate. Code folded into 1.8.5 deploy — [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01).
+
+<details>
+<summary>Original v1.8.4 operations checklist (2026-06-01)</summary>
 
 ### Operations (blocking F&F)
 
@@ -79,6 +72,8 @@ From integrated bug/layout analysis (2026-06-01 chat). **Code shipped in repo** 
 | Home “four band” visual unify | Cosmetic; same gutter already — only if device QA still feels broken | v1.9+ polish |
 | `pickObstacleType` RNG filter-first | Internal balance cleanup | v1.9+ optional |
 | API pytest local env | `tests.conftest` import on some Windows setups; CI may differ | Dev hygiene |
+
+</details>
 
 ---
 
@@ -127,12 +122,12 @@ flowchart TB
 | **v1.5.0–v1.7.0** | Design, fairness, daily replays | **Tagged** · **Live** | [CHANGELOG](CHANGELOG.md#170---2026-05-31) |
 | **v1.8.0** | Narrative beats + arena identity | **Tagged** · **Live** | [CHANGELOG](CHANGELOG.md#180---2026-05-31) |
 | **v1.8.1** | Telegram mobile + playability polish | **Live** | [CHANGELOG](CHANGELOG.md#181---2026-05-31); device QA folded into v1.8.2 sign-off |
-| **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** — **QA + tag pending** | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) → tag `v1.8.2` (optional if superseded by 1.8.4) |
+| **v1.8.2** | F&F-ready bundle (mobile UX + trust + discoverability) | **Live** (superseded by 1.8.5) | [DEVICE_QA_v1.8.2](docs/DEVICE_QA_v1.8.2.md) |
 | **v1.8.3** | Shared content column + coffee pickup clear | **Code** · deploy folded into 1.8.4 | [CHANGELOG 1.8.3](CHANGELOG.md#183---2026-06-01) |
 | **v1.8.4** | Pre-F&F hotfix: layout clip + tutorial coffee + promotion spawn + tap cooldown + imminent reorg UX | **Code** · folded into 1.8.5 deploy | [CHANGELOG 1.8.4](CHANGELOG.md#184---2026-06-01) |
 | **v1.8.5** | Corridor UX + scripted tutorial + badge gate / desk plant hazards | **Tagged** · **Live** | [Gate checklist](#v185-gate--open-items) · tag `v1.8.5` |
-| **v1.9.0** | Near-miss wince + Synergy Sprint | **Code in CHANGELOG** | F&F review — [FF_TEST.md](docs/FF_TEST.md) |
-| **v2.0.0** | Platform hardening + Corporate triage rung | **Code in CHANGELOG** | [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · migration `002` |
+| **v1.9.0** | F&F juice + UX pack + OG adopt + onboarding clarity | **Tagged** · **Live** (post-deploy) | [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14) · [FF_TEST.md](docs/FF_TEST.md) |
+| **v2.0.0** | Platform hardening + Corporate triage rung | **Tagged** · **Live** (post-deploy) | [CHANGELOG 2.0.0](CHANGELOG.md#200---2026-06-14) · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) |
 | **v1.9+** | Data-informed juice | **Backlog** | After F&F metrics |
 | **v1.1** | Platform (Legends, analytics, anti-cheat) | **Deferred** | Explicit approval — [mvp-scope](docs/mvp-scope.md) |
 

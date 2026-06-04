@@ -141,4 +141,4 @@ Run `python scripts/ff-metrics.py` + Supabase SQL from FF_TEST.md.
 | Zero open pain items | [ ] |
 | Jun 14 GO plan ready | [x] [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) |
 | v1.8.5 tagged | [x] `46abf19` |
-| v1.9.0 + v2.0.0 tagged | [ ] after GO vote |
+| v1.9.0 + v2.0.0 tagged | [x] 2026-06-14 release cut |
