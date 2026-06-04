@@ -266,7 +266,7 @@ export function milestoneLabel(years: number): string {
   if (years >= CEO_YEARS) return "Corner office secured";
   if (years >= MANAGER_YEARS) {
     const remaining = Math.max(0, CEO_YEARS - years);
-    return `CEO in ${remaining.toFixed(1)}y`;
+    return `CEO myth in ${remaining.toFixed(1)}y`;
   }
   const remaining = Math.max(0, MANAGER_YEARS - years);
   return `Manager in ${remaining.toFixed(1)}y`;

@@ -140,6 +140,8 @@ async function fetchLeaderboardMe(
   return result.data;
 }
 
+export { fetchLeaderboardMe };
+
 export async function fetchLeaderboard(
   period: "daily" | "weekly",
   sessionToken?: string | null

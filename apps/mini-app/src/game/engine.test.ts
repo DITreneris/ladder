@@ -212,7 +212,7 @@ describe("GameEngine", () => {
       return sequence[randomCall++] ?? 0.99;
     });
 
-    const { engine } = createEngine();
+    const { engine } = createEngine({}, getDailyModifierById("standard"));
     engine.start();
 
     for (let i = 0; i < 8; i++) {

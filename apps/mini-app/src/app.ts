@@ -21,7 +21,8 @@ import {
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchProfile, getSessionToken, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { fetchLeaderboard, fetchLeaderboardMe, fetchProfile, getSessionToken, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/avatar";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
 import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
@@ -31,6 +32,7 @@ import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
   applyReorgSlide,
   flashBurnoutStress,
+  respectsReducedMotion,
   spawnFloatingParticles,
   triggerClimbPop,
   triggerCoffeePickup,
@@ -126,12 +128,24 @@ function updateReorgHudStrip(rank: Rank): void {
   $("reorgHudStrip").classList.toggle("hidden", !show);
 }
 
+function shouldTickerScroll(): boolean {
+  if (respectsReducedMotion()) return false;
+  if (document.documentElement.dataset.ogCapture === "1") return false;
+  if (getCaptureFlags().capture !== null) return false;
+  return true;
+}
+
 function mountTickerHeadline(): void {
   activeTickerHeadline = pickTickerHeadline();
   const formatted = formatTickerText(activeTickerHeadline);
   const tickerEl = $("newsTickerText");
+  tickerEl.classList.remove("news-ticker-text--static");
   tickerEl.textContent = formatted;
-  tickerEl.classList.add("news-ticker-text--static");
+  if (shouldTickerScroll()) {
+    void tickerEl.offsetWidth;
+  } else {
+    tickerEl.classList.add("news-ticker-text--static");
+  }
   engine?.setActiveTicker(activeTickerHeadline);
 }
 
@@ -284,8 +298,13 @@ const RANK_BADGE: Record<Rank, string> = {
   CEO: "badge-rank-ceo mt-0.5",
 };
 
+function playerDisplayEmoji(rank: Rank): string {
+  if (rank === "Intern") return getStoredAvatarEmoji();
+  return rankEmoji(rank);
+}
+
 function refreshHomeBadgeUI(): void {
-  $("avatarIcon").textContent = rankEmoji(bestRank);
+  $("avatarIcon").textContent = getStoredAvatarEmoji();
   $("userTitleLabel").textContent =
     highScore > 0 ? `Current rank: ${bestRank}` : `Starting rank: Intern`;
   $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
@@ -293,11 +312,10 @@ function refreshHomeBadgeUI(): void {
 }
 
 function updateRankUI(rank: Rank, updatePlayer = true): void {
-  const emoji = rankEmoji(rank);
-  $("rankBadgeIcon").textContent = emoji;
+  $("rankBadgeIcon").textContent = rankEmoji(rank);
   $("rankBadgeText").textContent = rank;
   if (updatePlayer && !playerInPanic && !emojiFlashLock) {
-    $("playerActionEmoji").textContent = emoji;
+    $("playerActionEmoji").textContent = playerDisplayEmoji(rank);
   }
   $("gameRankBadge").className = RANK_BADGE[rank];
   updateRankProp(rank);
@@ -311,7 +329,7 @@ function setPlayerPanic(on: boolean): void {
   if (on) {
     $("playerActionEmoji").textContent = "😰";
   } else {
-    $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
+    $("playerActionEmoji").textContent = playerDisplayEmoji(engine.getCurrentRank());
   }
 }
 
@@ -637,9 +655,19 @@ function renderLeaderboardSkeleton(list: HTMLElement): void {
 
 async function renderLeaderboard(): Promise<void> {
   const list = $("leaderboardList");
+  const selfRow = $("leaderboardSelfRow");
+  const gapHint = $("leaderboardGapHint");
   renderLeaderboardSkeleton(list);
+  selfRow.classList.add("hidden");
+  gapHint.classList.add("hidden");
+  gapHint.textContent = "";
 
-  const result = await fetchLeaderboard(leaderboardPeriod, getSessionToken());
+  const token = getSessionToken();
+  const boardLabel = leaderboardPeriod === "weekly" ? "the weekly board" : "today's board";
+  const mePromise = token ? fetchLeaderboardMe(leaderboardPeriod, token) : Promise.resolve(null);
+
+  const result = await fetchLeaderboard(leaderboardPeriod, token);
+  const me = await mePromise;
   list.innerHTML = "";
 
   if (!result.ok) {
@@ -653,18 +681,16 @@ async function renderLeaderboard(): Promise<void> {
   if (entries.length === 0) {
     list.innerHTML =
       '<p class="text-xs text-slate-500 text-center py-4 italic">No terminations recorded yet. HR is optimistic.</p>';
-    return;
-  }
-
-  entries.forEach((player: LeaderboardEntry, index: number) => {
-    const item = document.createElement("div");
-    item.className = `lb-row flex items-center justify-between p-3 rounded-xl border transition duration-150 ${
-      player.is_current_user ? "lb-row-self" : "bg-white border-slate-200"
-    }`;
-    item.style.setProperty("--i", String(index));
-    const medal = player.rank === 1 ? "🥇" : player.rank === 2 ? "🥈" : player.rank === 3 ? "🥉" : `#${player.rank}`;
-    const emoji = rankEmoji(player.final_rank as Rank);
-    item.innerHTML = `
+  } else {
+    entries.forEach((player: LeaderboardEntry, index: number) => {
+      const item = document.createElement("div");
+      item.className = `lb-row flex items-center justify-between p-3 rounded-xl border transition duration-150 ${
+        player.is_current_user ? "lb-row-self" : "bg-white border-slate-200"
+      }`;
+      item.style.setProperty("--i", String(index));
+      const medal = player.rank === 1 ? "🥇" : player.rank === 2 ? "🥈" : player.rank === 3 ? "🥉" : `#${player.rank}`;
+      const emoji = rankEmoji(player.final_rank as Rank);
+      item.innerHTML = `
       <div class="flex items-center space-x-3">
         <span class="w-6 text-xs font-bold text-slate-400 text-center">${medal}</span>
         <span class="text-base">${emoji}</span>
@@ -677,8 +703,50 @@ async function renderLeaderboard(): Promise<void> {
         <span class="text-xs font-black text-slate-900">${player.years_survived.toFixed(1)}</span>
         <span class="text-nano font-bold text-slate-400 block">Years</span>
       </div>`;
-    list.appendChild(item);
-  });
+      list.appendChild(item);
+    });
+  }
+
+  updateLeaderboardSelfRow(me, entries, boardLabel, token);
+}
+
+function updateLeaderboardSelfRow(
+  me: LeaderboardMeResponse | null,
+  entries: LeaderboardEntry[],
+  boardLabel: string,
+  token: string | null
+): void {
+  const selfRow = $("leaderboardSelfRow");
+  const selfText = $("leaderboardSelfText");
+  const gapHint = $("leaderboardGapHint");
+
+  if (!token) {
+    selfText.textContent = "Open from Telegram to see your rank on the board.";
+    selfRow.classList.remove("hidden");
+    return;
+  }
+
+  if (!me) {
+    selfRow.classList.add("hidden");
+    return;
+  }
+
+  if (me.on_board && me.rank != null && me.years_survived != null) {
+    const rankLabel = me.final_rank ?? "Intern";
+    selfText.textContent = `Your rank: #${me.rank} · ${me.years_survived.toFixed(1)}y · ${rankLabel}`;
+    const top = entries[0];
+    if (top && top.years_survived > me.years_survived) {
+      const gap = top.years_survived - me.years_survived;
+      gapHint.textContent = `#1 on ${boardLabel} is ${gap.toFixed(1)}y ahead`;
+      gapHint.classList.remove("hidden");
+    }
+  } else {
+    const bestLine =
+      highScore > 0 ? `Career high: ${highScore.toFixed(1)}y (${bestRank}).` : "Play a run to land on the board.";
+    selfText.textContent = `Not on ${boardLabel} yet. ${bestLine}`;
+  }
+
+  selfRow.classList.remove("hidden");
 }
 
 function setLeaderboardPeriod(period: LeaderboardPeriod): void {
@@ -893,6 +961,16 @@ async function onGameOver(result: GameOverResult): Promise<void> {
 
   const reapplyCount = incrementReapplyCount();
   $("reapplyFlavorLine").textContent = reappliesFlavor(reapplyCount);
+
+  const progressionHint = $("progressionHintLine");
+  if (result.finalRank !== "CEO") {
+    progressionHint.textContent =
+      "Most employees peak at Manager. CEO at 35y is the boardroom myth HR keeps on the org chart.";
+    progressionHint.classList.remove("hidden");
+  } else {
+    progressionHint.textContent = "";
+    progressionHint.classList.add("hidden");
+  }
 
   if (previousBest > 0 && previousBestRank) {
     $("careerHighLine").textContent = `Career high: ${previousBestRank} (${previousBest.toFixed(1)}y)`;
@@ -1310,12 +1388,8 @@ export function mountApp(): void {
     updatePlayerPosition,
     () => {
       hideHudTapHint();
-      showHrMemoCombined(
-        [
-          "You are in the corridor. Each tap picks LEFT or RIGHT on the next rung.",
-          "Avoid hazards on the occupied side. Coffee on your side restores energy.",
-          "Only the next rung counts — everything else scrolls down.",
-        ],
+      showHrMemo(
+        "Tap LEFT or RIGHT for the next rung's safe side — avoid hazards on the occupied side.",
         { variant: "info", durationMs: 4500 }
       );
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
@@ -1352,6 +1426,14 @@ export function mountApp(): void {
 
   (window as unknown as Record<string, unknown>).goHome = goHome;
   (window as unknown as Record<string, unknown>).startGame = startGame;
+  (window as unknown as Record<string, unknown>).cycleAvatarEmoji = () => {
+    const next = cycleAvatarEmoji(getStoredAvatarEmoji() as AvatarEmoji);
+    $("avatarIcon").textContent = next;
+    if (engine?.getCurrentRank() === "Intern" && !playerInPanic) {
+      $("playerActionEmoji").textContent = next;
+    }
+    showToast("Avatar updated for your employee badge.");
+  };
   (window as unknown as Record<string, unknown>).switchTab = (tab: string) => {
     if (tab === "leaderboard") {
       switchTab("leaderboard");

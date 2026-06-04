@@ -725,7 +725,7 @@ html.cl-in-telegram .cl-telegram-cta-hint {
 .news-ticker-text {
   display: inline-block;
   white-space: nowrap;
-  animation: ticker-scroll 20s linear infinite;
+  animation: ticker-scroll var(--ticker-duration, 20s) linear infinite;
 }
 
 .news-ticker-text--static {

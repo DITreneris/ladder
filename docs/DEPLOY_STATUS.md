@@ -39,8 +39,8 @@ Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMA
 | 10 | v1.8.2 + F&F trust fixes | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
 
 | 11 | v1.8.5 corridor + tutorial | **Tagged** / **Live** | Tag `v1.8.5` on `46abf19`; prod `main-7DTXR6XJ.js`; DEVICE_QA rows 1–5 signed |
-| 12 | v1.9.0 near-miss + Synergy Sprint | **Code Done** / **Deploy Pending** | `[Unreleased]` — bundle `main-Bfn2Swgz.js`; redeploy + F&F review 2026-06-14 |
-| 13 | Group bot + `/go` | **Done** (2026-06-01) | `17c51c4` `/go`; `39d8249` group keyboard; prod smoke + Supabase ingest verified |
+| 12 | v1.9.0 near-miss + Synergy Sprint + F&F UX pack | **Code Done** / **Deploy Pending** | Intern hints, LB self-row, avatar picker, CEO copy — deploy with v2.0.0 |
+| 13 | v2.0.0 hardening + triage | **Code Done** / **Deploy Pending** | Run migration `002_v2_hardening.sql` · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) · `ff-metrics.py` |
 
 **Tag sequence:** … → `v1.8.5` (done) → F&F → **`v1.9.0`** after Jun 14 review.
 

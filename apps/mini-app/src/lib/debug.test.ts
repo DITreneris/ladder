@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeNextRung, describeTapResult } from "./debug";
+import { describeNextRung, describeTapResult, INTERN_HINT_RUNGS, shouldShowImminentHint } from "./debug";
 import type { Rung } from "../game/types";
 
 describe("debug helpers", () => {
@@ -21,5 +21,16 @@ describe("debug helpers", () => {
   it("describes death on obstacle side", () => {
     const rung: Rung = { id: 4, obstacle: "left", type: "meeting", coffee: null };
     expect(describeTapResult("left", rung, "death")).toContain("GAME OVER");
+  });
+});
+
+describe("shouldShowImminentHint", () => {
+  it("shows hints through Intern phase (40 rungs)", () => {
+    expect(INTERN_HINT_RUNGS).toBe(40);
+    expect(shouldShowImminentHint(0)).toBe(true);
+    expect(shouldShowImminentHint(20)).toBe(true);
+    expect(shouldShowImminentHint(39)).toBe(true);
+    expect(shouldShowImminentHint(40)).toBe(false);
+    expect(shouldShowImminentHint(50)).toBe(false);
   });
 });

@@ -1,4 +1,8 @@
+import { MANAGER_YEARS } from "../game/constants";
 import type { ObstacleType, PlayerSide, Rung } from "../game/types";
+
+/** Imminent hint + safe-side glow through full Intern phase (Manager promotion at 10y). */
+export const INTERN_HINT_RUNGS = MANAGER_YEARS * 4;
 
 const DEBUG_KEY = "cl_debug";
 const MAX_LOG_LINES = 5;
@@ -125,5 +129,5 @@ export function mountDebugStrip(): void {
 }
 
 export function shouldShowImminentHint(rungsClimbed: number): boolean {
-  return isDebugMode() || rungsClimbed < 12;
+  return isDebugMode() || rungsClimbed < INTERN_HINT_RUNGS;
 }

@@ -9,11 +9,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **F&F UX pack** — Intern-phase imminent hints through 40 rungs; pinned leaderboard self-row with gap-to-#1; emoji avatar picker (localStorage); metrics snapshot [FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md)
+
 ### Changed
 - Bot `/start` (and `/go`) welcome: hook-first copy, coffee/Manager line, daily shift block, minimal emoji at CTA
+- **CEO progression copy** — Manager as milestone; CEO (35y) framed as boardroom myth (home, milestone chip, bot `/help`, game-over hint)
+- **Leaderboard subtitle** — "Most career years survived" (was "Fastest corporate climbers")
+- **First-tap HR memo** — single actionable line (details remain in How to Survive)
 
 ### Fixed
+- **Home news ticker** — scroll animation restored (was forced static in v1.8.5 clarity pass); stays static for `prefers-reduced-motion` and marketing/OG capture modes
 - CI `qa:coffee` flake: wait for preview + `clQa` harness, tap-deck-only flow, longer timeouts, curl healthcheck before Playwright QA
+- **Engine test** — intern obstacle pool test pins `standard` daily preset (avoids Reorg Week flake)
 
 ### Planned (v1.1)
 - All-time / Legends tab

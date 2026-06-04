@@ -61,7 +61,9 @@ export const APP_SHELL = `
             <span class="text-nano bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">ACTIVE EMPLOYMENT</span>
           </div>
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0" id="avatarIcon">🧑‍💻</div>
+            <button type="button" id="avatarIconBtn" onclick="cycleAvatarEmoji()" class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0 focus-ring min-h-[44px] min-w-[44px]" aria-label="Change employee avatar emoji">
+              <span id="avatarIcon">🧑‍💻</span>
+            </button>
             <div class="flex-grow min-w-0">
               <input type="text" id="usernameInput" value="CorporateSlave" class="font-bold text-slate-800 border-b border-dashed border-slate-300 focus:border-cl-primary focus:outline-none focus-ring bg-transparent w-full min-h-[44px]" placeholder="Enter Nickname...">
               <p class="text-xs text-slate-500 mt-0.5 truncate" id="userTitleLabel">Starting rank: Intern</p>
@@ -93,7 +95,7 @@ export const APP_SHELL = `
             <p class="text-caption font-extrabold text-slate-800">Avoid</p>
             <p class="text-caption text-slate-600">Meetings · Reorgs · Deadlines</p>
             <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
-            <p class="text-caption text-slate-600">Intern → Manager (10y) → CEO (35y)</p>
+            <p class="text-caption text-slate-600">Intern → Manager (10y). CEO (35y) is the boardroom myth.</p>
           </div>
         </div>
         <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
@@ -209,6 +211,7 @@ export const APP_SHELL = `
           <div><p class="text-slate-400 text-label-upper">Highest Level</p><p class="font-extrabold text-cl-primary text-lg flex items-center gap-1" id="statRank"><span>🧑‍💻</span> Intern</p></div>
         </div>
         <p id="careerHighLine" class="text-nano font-bold text-slate-500 -mt-1 mb-1"></p>
+        <p id="progressionHintLine" class="text-nano font-semibold text-slate-500 text-center px-2 mb-1 hidden"></p>
         <p id="leaderboardGapLine" class="text-nano font-bold text-indigo-700 text-center hidden"></p>
         <p id="reapplyFlavorLine" class="text-caption text-slate-600 italic text-center px-2"></p>
         <div class="bg-red-50/50 border border-red-100 p-3 rounded-lg text-xs">
@@ -244,7 +247,7 @@ export const APP_SHELL = `
           <span class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">🏆</span>
           <div>
             <h3 class="font-black text-slate-900 text-lg leading-none">Global Boardroom</h3>
-            <p class="text-xs text-slate-500">Fastest corporate climbers in the organization</p>
+            <p class="text-xs text-slate-500">Most career years survived</p>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-lg mb-4">
@@ -252,6 +255,10 @@ export const APP_SHELL = `
           <button data-lb-tab="weekly" class="lb-tab-inactive">Last 7 Days</button>
         </div>
         <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1" id="leaderboardList"></div>
+        <div id="leaderboardSelfRow" class="hidden lb-self-row mt-3 p-3 rounded-xl border border-indigo-200 bg-indigo-50/80">
+          <p id="leaderboardSelfText" class="text-caption font-extrabold text-indigo-900 text-center"></p>
+          <p id="leaderboardGapHint" class="text-nano font-bold text-indigo-700 text-center mt-1 hidden"></p>
+        </div>
       </div>
       <div class="pt-4 border-t border-slate-200 mt-4 space-y-2">
         <button onclick="goHome()" class="btn-cl-primary-sm">BACK TO THE OFFICE</button>
@@ -298,7 +305,7 @@ export const APP_SHELL = `
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🏆</span>
-            <div><h4 class="font-extrabold text-slate-800">Ranks</h4><p class="mt-0.5 text-caption">Intern → Manager (10y) → CEO (35y).</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Ranks</h4><p class="mt-0.5 text-caption">Intern → Manager (10y). CEO (35y) is the boardroom myth.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">📈</span>

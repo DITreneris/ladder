@@ -104,7 +104,7 @@ describe("milestoneLabel", () => {
   });
 
   it("shows CEO countdown for manager", () => {
-    expect(milestoneLabel(MANAGER_YEARS)).toBe("CEO in 25.0y");
+    expect(milestoneLabel(MANAGER_YEARS)).toBe("CEO myth in 25.0y");
   });
 
   it("shows corner office for CEO", () => {

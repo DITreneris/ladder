@@ -147,14 +147,14 @@ Mix **iOS + Android**; not all on the core team.
 
 | Metric | Target | Jun 4 | Jun 7 | Jun 10 | How measured |
 |--------|--------|-------|-------|--------|--------------|
-| Session length | 30–90s | | | | Ask / observe |
-| Games per user (wk1) | ≥3 | **0**¹ | | | `scripts/ff-metrics.py` or SQL below |
-| Distinct players (wk1) | ≥3 | **0**¹ | | | Supabase `users` with ≥1 run |
+| Session length | 30–90s | on track | | | Ask / observe |
+| Games per user (wk1) | ≥3 | **153 / 96 / 85** | | | `scripts/ff-metrics.py` or SQL below |
+| Distinct players (wk1) | ≥3 | **5** | | | Supabase `users` with ≥1 run |
 | Share rate | Any shares | unknown | | | Ask testers |
-| Daily return (engaged) | ≥2 days/wk | n/a | | | `game_runs` timestamps |
-| Tier A verification | V-08–V-14 | blocked¹ | | | [todo.md](todo.md) §6 |
+| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | | `game_runs` timestamps |
+| Tier A verification | V-08–V-14 | pending deploy | | | [todo.md](todo.md) §6 |
 
-¹ Audit **2026-06-01** — submit pipeline broken on prod (API 500 new-user upsert). Re-measure after Railway redeploy.
+**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample; F&F UX pack shipped in repo pending deploy.
 
 
 
@@ -191,7 +191,7 @@ ORDER BY runs DESC;
 | Day | Date | Notes |
 |-----|------|-------|
 | 1 | 2026-06-01 | Tag v1.8.5 + F&F kickoff; **data audit:** 0 users/runs; prod submit 500 (upsert bug) |
-| 4 | 2026-06-04 | Re-run `scripts/ff-metrics.py` after API redeploy |
+| 4 | 2026-06-04 | F&F UX pack in repo; [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md): 346 runs, 5 players, Manager yes / CEO no |
 
 | 7 | 2026-06-07 | |
 

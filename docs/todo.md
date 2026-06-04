@@ -407,7 +407,7 @@ Update this table when closing items.
 | Runtime verification (V-01–V-19) | 16 | 6 |
 | Automated tests to add | 1 | 12 |
 
-**Last updated:** 2026-06-01 — v2.0.0 code complete; pytest 20 · vitest 72 · `ff-metrics` green; deploy + DEVICE_QA_v2.0 pending
+**Last updated:** 2026-06-04 — F&F UX pack in repo; 76 vitest pass; combined deploy checklist [FF_DEPLOY_CHECKLIST.md](FF_DEPLOY_CHECKLIST.md); prod deploy pending
 
 ---
 

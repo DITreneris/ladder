@@ -96,6 +96,9 @@ Use this table to pick the right skill, rules, and documents.
 | `debug-env` | [docs/DEBUG_ENV_TRIAGE.md](docs/DEBUG_ENV_TRIAGE.md) | QA | Prod bundle hash triage table |
 | `debug-incident-2026-06-01` | [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) | QA / agents | F&F debug postmortem — ladder width, lessons learned, CHANGELOG cross-links |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
+| `ff-metrics-2026-06-04` | [docs/FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md) | Product | F&F data snapshot (Phase 0 gate) |
+| `ff-deploy-checklist` | [docs/FF_DEPLOY_CHECKLIST.md](docs/FF_DEPLOY_CHECKLIST.md) | Deploy | Combined v1.9 + v2.0 + UX pack ship steps |
+| `ff-review-2026-06-14` | [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | Product | Jun 14 decision template (drain cap, CEO threshold) |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
