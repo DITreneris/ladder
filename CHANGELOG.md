@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Telegram Mini Apps Analytics (TON Builders)** — `@telegram-apps/analytics` init before app mount; `appName` `corporate_ladder` (TON Builders Analytics Keys identifier); optional `VITE_TELEGRAM_ANALYTICS_TOKEN` on Vercel (no-op when unset)
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Analytics events

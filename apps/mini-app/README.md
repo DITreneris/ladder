@@ -75,6 +75,8 @@ Loaded from **repo root** `.env` (see `vite.config.ts` `envDir`).
 |----------|---------|
 | `VITE_API_URL` | FastAPI base URL (e.g. `http://localhost:8000`) |
 | `VITE_BOT_USERNAME` | Bot username without `@` (share deep links) |
+| `VITE_TELEGRAM_ANALYTICS_TOKEN` | Optional — TON Builders Analytics Keys SDK token (production) |
+| `VITE_TELEGRAM_ANALYTICS_APP_NAME` | Optional — defaults to `corporate_ladder` (case-sensitive) |
 
 Never put `TELEGRAM_BOT_TOKEN` or Supabase keys in this app.
 

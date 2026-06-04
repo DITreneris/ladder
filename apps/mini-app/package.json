@@ -20,6 +20,7 @@
     "verify:seo": "node scripts/verify-seo.mjs"
   },
   "dependencies": {
+    "@telegram-apps/analytics": "^1.6.4",
     "@vercel/analytics": "^2.0.1"
   },
   "devDependencies": {

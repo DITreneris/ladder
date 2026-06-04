@@ -53,9 +53,12 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 | `VITE_API_URL` | Railway API URL from step 2 |
 | `VITE_BOT_USERNAME` | Bot username without `@` |
 | `VITE_PROMPT_ANATOMY_URL` | Optional — Prompt Anatomy co-branding (defaults in code) |
+| `VITE_TELEGRAM_ANALYTICS_TOKEN` | TON Builders → Analytics Keys → SDK token (eye icon) — activates Telegram catalog analytics |
+| `VITE_TELEGRAM_ANALYTICS_APP_NAME` | Optional — must be exactly `corporate_ladder` if set (defaults in code) |
 
 4. Deploy and note production URL (e.g. `https://your-app.vercel.app`).
 5. **Web Analytics:** Project → **Analytics** tab → **Enable** (required for `@vercel/analytics` page views on production).
+6. **TON Analytics:** After deploy, open the mini-app from the bot once; TON Builders → Analytics Keys should leave “Waiting for SDK”.
 
 ## 4. Railway — Bot
 
