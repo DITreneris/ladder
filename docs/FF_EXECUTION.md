@@ -1,7 +1,8 @@
 # F&F execution runbook — Corporate Ladder
 
-**Goal:** 9/10 friends-and-family readiness · **Window:** 2026-05-31 → 2026-06-14  
-**Tracker:** [FF_TEST.md](FF_TEST.md) · **Device QA:** [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) (+ [DEVICE_QA_v1.8.4.md](DEVICE_QA_v1.8.4.md) / [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) regressions as needed)
+**Goal:** Soft-launch GO on **2026-06-14** (F&F expansion only — no public marketing)  
+**Window:** 2026-05-31 → 2026-06-14  
+**Tracker:** [FF_TEST.md](FF_TEST.md) · **GO plan:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) · **Device QA:** [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) + [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md)
 
 ---
 
@@ -10,140 +11,134 @@
 - [x] Score submit failure toasts (auth / rate limit / network)
 - [x] Auth degradation banner on home when profile sync fails
 - [x] Deterministic Meeting Monday badges (rung id)
-- [x] Share toast: "Share sheet opened"
+- [x] Share toast: "Review copied! Paste into Telegram to share."
 - [x] Leaderboard tab: Last 7 Days; satirical empty state
 - [x] API rank vs years validation on `/runs`
+- [x] v1.9 juice + F&F UX pack + v2.0 hardening in repo
 
-**Before inviting testers:** redeploy Vercel + Railway API (if not auto-deployed from `main`).
+**Before external F&F:** redeploy Vercel + Railway API + Supabase `002` (see Phase B).
 
 ---
 
-## Phase B — Deploy and smoke
+## Phase B — Deploy and smoke (v1.9 + v2.0 train)
 
-### Pre-deploy (local) — 2026-06-01
+### Pre-deploy (local)
 
 | Step | Result |
 |------|--------|
-| `scripts/smoke-local.ps1` | [x] pytest 16, vitest 42, lint/build |
-| `npm run qa:viewport` | [x] REJECTED stamp + game-over navigation |
-| API health | [x] `{"status":"ok"}` |
+| `scripts/smoke-local.ps1` | [ ] pytest + vitest + lint/build + qa:viewport/layout/coffee |
+| Supabase `002_v2_hardening.sql` | [ ] applied |
+| Push `main` → Vercel + Railway | [ ] |
 
 ### Post-deploy smoke (production)
 
 | Step | Result |
 |------|--------|
-| API health | `{"status":"ok"}` — verified after push `d862c3c` |
-| Local smoke | Passed (pytest 15, vitest 38, build) |
-| Viewport QA | Passed (preview; `PREVIEW_URL` if port ≠ 4173) |
-| Vercel redeploy | **Done** — `main` → `d862c3c`; prod bundle `main-BO_qJQT_.js` |
-| Railway API | Auto-deploy from `main` (rank validation on `/runs`) |
-| Telegram full run | **Done** (2026-06-01) — private + Prompt_Anatomy group; Supabase ingest via `ff-metrics.py` |
+| API health | [ ] `{"status":"ok"}` |
+| Prod bundle hash | [ ] recorded in [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) |
+| `python scripts/ff-metrics.py` | [ ] `submit_pipeline_ok: true` |
+| Telegram cache bust | [ ] reopen from @CorporateLadderBot |
 
 | # | Check | Pass |
 |---|-------|------|
-| 1 | `GET https://ladder-production-642d.up.railway.app/health` → ok | [x] |
-| 2 | `/start` (private) → shift + WebApp button; `/go@bot` (group) → `t.me?startapp` button | [x] |
+| 1 | `GET https://ladder-production-642d.up.railway.app/health` → ok | [ ] |
+| 2 | `/start` (private) → shift + WebApp button; `/go@bot` (group) → `t.me?startapp` | [ ] |
 | 3 | Ladder fills column (no narrow 192px frame) | [ ] manual — **P0** |
-| 4 | Full run → game over → submit toast (success or explicit failure) | [x] |
-| 5 | Score on Daily leaderboard | [x] |
-| 6 | Share includes `Shift:` line | [ ] manual — **P0** |
+| 4 | Full run → game over → submit toast (success or explicit failure) | [ ] |
+| 5 | Score on Daily leaderboard; self-row highlight (v1.9) | [ ] |
+| 6 | Share includes `Shift:` line (clipboard paste in Telegram) | [ ] manual — **P0** |
 | 7 | Home auth banner hidden after fresh bot open | [ ] manual |
+| 8 | Triage prompt at Manager+ (v2.0) | [ ] manual |
 
-**Optional — API keep-warm (profile badge latency):** If Home `best career` loads slowly on first open after idle, ping `GET https://ladder-production-642d.up.railway.app/health` on a 5-minute cron (GitHub Actions / UptimeRobot), or set Railway min instances = 1.
+**Optional — API keep-warm:** Ping health every 5 min if cold-start reported.
 
-Update [DEPLOY_STATUS.md](DEPLOY_STATUS.md) step 10 when device QA signed.
+Update [DEPLOY_STATUS.md](DEPLOY_STATUS.md) steps 12–13 when deploy complete.
 
 ---
 
 ## Phase C — Device QA sign-off
 
-| Platform | Owner | v1.8.1 | v1.8.2 delta | Date |
-|----------|-------|--------|--------------|------|
-| **iOS** | Core team | [ ] | [ ] | |
-| **Android** | Recruited signer | [ ] | [ ] | |
+| Platform | v1.8.5 rows 1–5 | v1.8.5 rows 6–10 | v2.0 rows 1–8 | Date |
+|----------|-------------------|------------------|---------------|------|
+| **iOS** | [x] 2026-06-01 | [ ] | [ ] | |
+| **Android** | [x] 2026-06-01 | [ ] | [ ] | |
 
-**P0 rows (block F&F if fail):** one tap = one climb; BackButton → home; responsive ladder; score on Daily LB; readable share.
-
-On full pass → mark DEPLOY_STATUS steps 9–10 **Done**.
+**P0 rows:** one tap = one climb; BackButton → home; responsive ladder; score on Daily LB; readable share.
 
 ---
 
 ## Phase D — Internal dogfood (core team, Telegram)
 
-Each member before external invite:
+Complete before external invite:
 
 | # | Run | Pass |
 |---|-----|------|
 | 1 | Intern-phase death; tap deck + HUD hint | [ ] |
 | 2 | Reach Manager or die to reorg; HR memo sane | [ ] |
-| 3 | Share once; verify performance review text | [ ] |
+| 3 | Share once; verify performance review text + `Shift:` line | [ ] |
 
-Log pain items in [FF_TEST.md](FF_TEST.md) feedback buckets. Fix P0/P1 before Phase E.
+Log pain items in [FF_TEST.md](FF_TEST.md). Fix P0/P1 before Phase E.
 
-**Tier A trust checks (during dogfood + first external runs):** V-08 profile load · V-10 submit toast · V-11 offline failure copy · V-12 429 toast · V-13 share clipboard · V-14 leaderboard — track in [todo.md](todo.md) §6.
-
-**Automated proxy (2026-06-01):** `python scripts/ff-metrics.py` → `submit_pipeline_ok: true` · pytest session-token + plausibility · vitest 72 (triage, throttle, rank boundary). Device sign-off still required for Tier A rows.
+**Tier A trust:** V-08–V-14 in [todo.md](todo.md) §6 — sign during dogfood.
 
 ---
 
-## Phase E — External F&F launch
+## Phase E — External F&F (soft launch cohort)
+
+**Target:** **8 testers** · ≥2 iOS · ≥2 Android · not core team · **≥6 must complete 3-run script**
 
 **Invite message:**
 
-> Corporate Ladder — satirical office climb game in Telegram. Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
 
-**Recruit:** 5–10 testers · ≥2 iOS · ≥2 Android · not all core team.
-
-Fill tester table in [FF_TEST.md](FF_TEST.md).
+Track in [FF_TEST.md](FF_TEST.md) tester table.
 
 ---
 
-## Phase F — Monitor (days 1, 4, 7, 10)
+## Phase F — Monitor (Jun 4, 7, 10, 14)
 
-Run Supabase SQL from FF_TEST.md; update metrics table.
+Run `python scripts/ff-metrics.py` + Supabase SQL from FF_TEST.md.
 
 **Hotfix within 24h:** tap bugs, layout, score submit, BackButton, crash.  
-**Defer to Jun 14:** samey, too hard, v1.9 juice.
+**Defer to Jun 14:** samey, too hard, backlog items in [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §E.
 
-| Check-in | Date | Runs (avg) | Shares | Pain items |
-|----------|------|------------|--------|------------|
-| Day 1 | 2026-06-01 | **0** | — | Supabase empty; prod `/auth/me` + `/runs` → 500 (upsert bug) |
-| Day 4 | 2026-06-04 | | | Re-run `scripts/ff-metrics.py` post API redeploy |
-| Day 7 | 2026-06-07 | | | External F&F mid-window; Tier A verification due |
-| Day 10 | 2026-06-10 | | | DEVICE_QA rows 6–10 spot-check; pre-review snapshot |
+| Check-in | Date | Notes |
+|----------|------|-------|
+| Day 4 | 2026-06-04 | [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md): 346 runs, 5 players |
+| Day 7 | 2026-06-07 | Mid-window; Tier A due; update FF_TEST metrics |
+| Day 10 | 2026-06-10 | [FF_METRICS_2026-06-10.md](FF_METRICS_2026-06-10.md); DEVICE_QA rows 6–10; verify §B gates |
+| Day 14 | 2026-06-14 | Soft-launch GO review |
 
 ---
 
 ## Phase G — Review (2026-06-14)
 
-1. Taps solid? → hotfix train if no  
-2. Sessions samey? → decals / NPC  
-3. Shorter runs wanted? → Synergy Sprint  
+**Full agenda:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §G.
 
-Record v1.9 picks in FF_TEST + [ROADMAP.md](../ROADMAP.md). Cut CHANGELOG, tag release, run verifier.
+1. Walk pre-review gate checklist (§B)
+2. Vote soft-launch GO matrix (§C)
+3. Fill backlog decisions (§E — default defer)
+4. If GO: cut CHANGELOG (§H) · tag `v1.9.0` + `v2.0.0` · run verifier
+5. If GO: invite 5 more testers; schedule public-launch review ~2026-06-28
 
 ---
 
-## 9/10 scorecard
+## 9/10 scorecard (soft launch)
 
 | Criterion | Status |
 |-----------|--------|
-| Prod = main with trust fixes | [x] `main-7DTXR6XJ.js` (2026-06-01) |
-| Automated CI gates | [x] vitest 61, lint, build (2026-06-01) |
-| API health | [x] `{"status":"ok"}` |
-| iOS DEVICE_QA signed | [x] rows 1–5 — [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) |
-| Android DEVICE_QA signed | [x] rows 1–5 — same checklist |
-| Submit/auth errors visible | [x] code shipped; toasts on game-over screen |
-| Share clipboard fallback | [x] code shipped (no bogus shareMessage) |
-| 5–10 testers invited | [~] Phase E — after Phase D dogfood |
-| ≥3 runs from majority | [ ] blocked — API upsert 500 until redeploy |
-| Hotfix protocol active | [x] see FF_TEST hotfix policy |
-| Jun 14 review scheduled | [x] 2026-06-14 · [V19_SPIKE.md](V19_SPIKE.md) ready |
-| v1.8.5 tagged | [x] `git tag v1.8.5` on `46abf19` |
-
-### After device QA pass — tag v1.8.5
-
-```powershell
-git tag -a v1.8.5 -m "v1.8.5 — corridor UX, scripted tutorial, office hazards"
-git push origin --tags
-```
+| v1.9 + v2.0 deployed to prod | [ ] |
+| Supabase `002` applied | [ ] |
+| Automated CI gates | [x] vitest + lint + build (repo) |
+| API health + `ff-metrics.py` | [x] 2026-06-04 · re-verify post-deploy |
+| iOS DEVICE_QA v2.0 rows 1–8 | [ ] |
+| Android DEVICE_QA v2.0 rows 1–8 | [ ] |
+| Submit/auth errors visible | [x] code shipped |
+| Share clipboard + `Shift:` line | [ ] device verify |
+| 8 external testers invited | [ ] |
+| ≥6 externals completed 3-run script | [ ] |
+| Tier A V-08–V-14 signed | [ ] |
+| Zero open pain items | [ ] |
+| Jun 14 GO plan ready | [x] [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) |
+| v1.8.5 tagged | [x] `46abf19` |
+| v1.9.0 + v2.0.0 tagged | [ ] after GO vote |

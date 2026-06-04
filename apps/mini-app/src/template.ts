@@ -304,18 +304,23 @@ export const APP_SHELL = `
             <div><h4 class="font-extrabold text-slate-800">Energy &amp; Coffee</h4><p class="mt-0.5 text-caption">Energy depletes over time. Climbing adds a little; coffee gives +25%.</p></div>
           </div>
           <div class="card-light-sm">
-            <span class="text-xl shrink-0">🏆</span>
-            <div><h4 class="font-extrabold text-slate-800">Ranks</h4><p class="mt-0.5 text-caption">Intern → Manager (10y). CEO (35y) is the boardroom myth.</p></div>
-          </div>
-          <div class="card-light-sm">
             <span class="text-xl shrink-0">📈</span>
             <div>
-              <h4 class="font-extrabold text-slate-800">Career Phases</h4>
-              <ul class="mt-1 text-caption space-y-1 list-disc list-inside">
-                <li><strong>Intern (0–9y):</strong> Meetings only — learn safe-side tapping.</li>
-                <li><strong>Manager (10–34y):</strong> Reorgs swap sides — time your climbs.</li>
-                <li><strong>CEO (35y+):</strong> Deadlines join the chaos — coffee is strategic.</li>
+              <h4 class="font-extrabold text-slate-800">Career ladder</h4>
+              <p class="mt-0.5 text-caption font-semibold text-slate-700">Building floors (flavor)</p>
+              <ul class="mt-1 text-caption space-y-0.5 list-disc list-inside">
+                <li><strong>Intern Pit (0–&lt;5y):</strong> Onboarding theater. Meetings only.</li>
+                <li><strong>Open Office (5–&lt;10y):</strong> Hot desks. Still Intern rank — meetings only.</li>
+                <li><strong>Middle Management (10–&lt;35y):</strong> Manager rank — reorgs and badge gates.</li>
+                <li><strong>Executive Suite (35y+):</strong> CEO rank — deadlines and desk plants join the stack.</li>
               </ul>
+              <p class="mt-2 text-caption font-semibold text-slate-700">Rank gates (mechanics)</p>
+              <ul class="mt-1 text-caption space-y-0.5 list-disc list-inside">
+                <li><strong>Intern:</strong> Meetings only — learn safe-side tapping.</li>
+                <li><strong>Manager @ 10y:</strong> Reorgs swap sides; badge gates appear.</li>
+                <li><strong>CEO @ 35y:</strong> Deadlines and rare desk plants — coffee is strategic. The boardroom myth HR keeps on the org chart.</li>
+              </ul>
+              <p class="mt-2 text-caption"><strong>First climb:</strong> Scripted first 3 rungs, gentler hazard rate through ~3y, hints through 10y. <strong>Reorg Week</strong> shift may add reorgs after that ramp — not on rung one.</p>
             </div>
           </div>
         </div>

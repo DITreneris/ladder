@@ -69,7 +69,8 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   reorg_week: {
     id: "reorg_week",
     label: "Reorg Week",
-    description: "Org chart unstable. Reporting lines are suggestions. Reorg probability rising. Titles fluid.",
+    description:
+      "Org chart unstable. Reporting lines are suggestions. Reorgs ramp after onboarding (~3y). Titles fluid.",
     obstacleSpawnRate: 0.38,
     internObstacleSpawnRate: INTERN_OBSTACLE_SPAWN_RATE,
     coffeeSpawnThreshold: COFFEE_SPAWN_THRESHOLD,

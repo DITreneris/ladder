@@ -9,10 +9,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jun 14 cut:** Merge this block into `[1.9.0]` on soft-launch GO — procedure in [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §H. Do not cut before deploy + device sign-off.
+
 ### Added
 - **F&F UX pack** — Intern-phase imminent hints through 40 rungs; pinned leaderboard self-row with gap-to-#1; emoji avatar picker (localStorage); metrics snapshot [FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md)
 
 ### Changed
+- **OG link preview** — canonical image from manual `docs/assets/Corporate_Ladder_og.png` via `npm run adopt:og` (replaces June 1 Playwright composite); redeploy Vercel for `/og.png` cache
+- **How-to-Play career ladder** — merged Ranks + Career Phases into one card: building floors (flavor) vs rank gates (mechanics), first-climb ramp, Reorg Week footnote
+- **Reorg Week onboarding** — early reorgs for Intern only after tutorial ramp (~3y / 12 rungs); preset copy updated; reorg HUD strip matches
+- **Soft-launch GO plan** — [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) expanded with gate checklist, GO matrix, CHANGELOG cut procedure; synced [FF_EXECUTION](docs/FF_EXECUTION.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md), [FF_TEST](docs/FF_TEST.md), [todo](docs/todo.md)
 - Bot `/start` (and `/go`) welcome: hook-first copy, coffee/Manager line, daily shift block, minimal emoji at CTA
 - **CEO progression copy** — Manager as milestone; CEO (35y) framed as boardroom myth (home, milestone chip, bot `/help`, game-over hint)
 - **Leaderboard subtitle** — "Most career years survived" (was "Fastest corporate climbers")

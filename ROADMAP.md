@@ -8,15 +8,16 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 
 ---
 
-## Status (2026-06-01)
+## Status (2026-06-04)
 
 | | |
 |---|---|
-| **Production** | `main` live — prod `main-BlcaGFVL.js` (pre-v2.0); local v2.0 build `main-C_cYxjEK.js` pending redeploy + Supabase `002` migration |
-| **Tagged** | `v1.8.5` on `46abf19` · **v1.9.0 + v2.0.0** in CHANGELOG (tags pending deploy) |
-| **Active** | F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) |
-| **Next actions** | Deploy v2.0.0 · run [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · `git tag v1.9.0` + `v2.0.0` after device sign-off |
-| **Shipped in repo** | v1.9 juice + v2.0 hardening + Corporate triage rung — see [CHANGELOG 2.0.0](CHANGELOG.md#200---2026-06-01) |
+| **Production** | `main` live — prod `main-CJgmaRAS.js` (2026-06-04); Supabase `002` migration **pending verify** |
+| **Tagged** | `v1.8.5` on `46abf19` · **v1.9.0 + v2.0.0** in CHANGELOG (tags pending [Jun 14 soft-launch GO](docs/FF_REVIEW_2026-06-14.md)) |
+| **Active** | Soft launch / F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) — **no public marketing** |
+| **Next actions** | Deploy v1.9 + v2.0 · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) · 8 external testers · [FF_REVIEW](docs/FF_REVIEW_2026-06-14.md) GO vote Jun 14 |
+| **Shipped in repo** | v1.9 juice + F&F UX pack + v2.0 hardening — see [CHANGELOG](CHANGELOG.md) `[Unreleased]` + [2.0.0](CHANGELOG.md#200---2026-06-01) |
+| **Public launch** | Gated — review ~2026-06-28 after soft launch metrics |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
 
@@ -303,6 +304,8 @@ Build only if F&F or v1.1 analytics show retention plateau. Synergy Sprint and n
 | 2–3 mode presets (Endless / Sprint / Today) | Mechanics + UI | Not a 5-level campaign |
 | Vector mascot | Graphics + animation | Emoji ceiling hit |
 | Corporate triage rung (v2 thesis) | Mechanics + satire | F&F plateau + approval — [research § v2](#one-page-game-research-2026-06-01) |
+| Adaptive difficulty from career high | Mechanics + retention | Spawn/ramp from `best_score` if F&F shows beginners churn before 10y |
+| Expanded rank tree (Junior, VP, C-suite steps) | Satire + mechanics | Product decision — currently explicit out (§ Explicitly out of scope) |
 | Full level select / campaign map | All | **Avoid** unless product pivot |
 
 ---

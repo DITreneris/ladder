@@ -8,9 +8,9 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 
 1. Tap **Punch In & Climb** — you start in the center corridor; first tap starts energy drain.
 2. Tap **LEFT** or **RIGHT** for the **next** rung's safe side (three lanes visually, two buttons).
-3. First runs teach: clear rung → dodge meeting → grab coffee (+25% energy).
-4. Manager+ may see **badge gates**; CEO+ may see **desk plants** — dodge like meetings/deadlines.
-5. Survive as many **Career Years** as possible before HR terminates you.
+3. First runs teach: clear rung → dodge meeting → grab coffee (+25% energy); gentler hazard rate through ~3y; hints through 10y.
+4. **Building floors** (Intern Pit → Open Office → Middle Management → Executive Suite) are flavor on the HUD; **rank gates** drive mechanics: Intern = meetings only; Manager @ 10y = +reorgs and badge gates; CEO @ 35y = +deadlines and desk plants.
+5. Survive as many **Career Years** as possible before HR terminates you. Reorg Week daily shift may add reorgs after the onboarding ramp (~3y), not from rung one.
 
 ## Pre-release QA
 
@@ -90,7 +90,8 @@ npm run preview  # Preview production build
 npm run qa:viewport  # Playwright overflow check (preview must be running)
 npm run capture:marketing  # Marketing set → docs/assets/marketing/
 npm run capture:hero  # Legacy alias → copies 01-home to docs/assets/gameplay.png
-npm run capture:og    # Link previews → public/og.png + .github/social-preview.png
+npm run adopt:og      # Link previews from docs/assets/Corporate_Ladder_og.png (canonical)
+npm run capture:og    # Legacy Playwright composite (optional)
 npm run verify:og     # Assert OG PNG dimensions (CI)
 ```
 
@@ -102,17 +103,18 @@ After layout changes: `npm run build && npm run preview` (terminal 1), then `npm
 
 ### OG link-preview images
 
-Regenerate after shell/game UI changes:
+**Canonical:** edit [../../docs/assets/Corporate_Ladder_og.png](../../docs/assets/Corporate_Ladder_og.png) (1200×630), then:
 
 ```bash
-npm run build && npm run preview -- --host 127.0.0.1 --port 4173
-# terminal 2
-npm run capture:marketing   # docs/assets/marketing/ (home, gameplay, game over)
-npm run capture:og          # public/og.png + .github/social-preview.png
+npm run adopt:og    # → public/og.png + .github/social-preview.png
 npm run verify:og
 ```
 
-Outputs: `docs/assets/marketing/01-home.png`, `02-gameplay-dodge.png`, `03-game-over.png`; `public/og.png` (1200×630); `.github/social-preview.png` (1280×640). Rubric and captions: [../../docs/assets/marketing/README.md](../../docs/assets/marketing/README.md). Intermediate crop in `public/og-cache/` (gitignored).
+Redeploy Vercel after changing `public/og.png` (link-preview caches).
+
+**Legacy composite** (live gameplay crop + `og-preview.html`): `npm run build && npm run preview` then `npm run capture:og`.
+
+Marketing phone shots: `npm run capture:marketing` — [../../docs/assets/marketing/README.md](../../docs/assets/marketing/README.md).
 
 ## Local Development
 

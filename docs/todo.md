@@ -2,7 +2,7 @@
 
 **Purpose:** Actionable backlog from the v1.8.5 deep bug audit (2026-06-01). Tracks confirmed bugs, verification items, tests, and release gates toward v1.8.5 tag → F&F → v2.0 hardening.
 
-**Status snapshot:** `v2.0.0` code in repo · prod `main-BlcaGFVL.js` (pre-v2 redeploy pending) · local build `main-C_cYxjEK.js` · F&F active · `ff-metrics.py` `submit_pipeline_ok: true` (2026-06-01)
+**Status snapshot:** Soft-launch GO review **2026-06-14** · v1.9 + v2.0 code in repo · prod `main-7DTXR6XJ.js` (v1.8.5) · v1.9/v2.0 **deploy pending** · [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)
 
 **Related docs:**
 
@@ -292,9 +292,27 @@ Items that **cannot** be confirmed from code alone. Check off during device QA /
 | V-18 | Hazards | CEO **Plant** badge appears | [ ] | [ ] | [ ] | [ ] |
 | V-19 | Bot | `/start` shift label matches in-app pill | [ ] | [ ] | [ ] | n/a |
 
-**F&F sprint schedule:** Tier A (V-08–V-14) during dogfood + first external runs · Tier B/C (V-04–V-07, V-15–V-19, DEVICE_QA rows 6–10) by **2026-06-10**
+**F&F sprint schedule:** Tier A (V-08–V-14) during dogfood + first external runs · Tier B/C (V-04–V-07, V-15–V-19, DEVICE_QA rows 6–10) by **2026-06-10** · sign-off tracked in [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B gate 6
 
-**2026-06-01 data audit:** Supabase `users`/`game_runs` = 0 despite ~3–4 bot plays. Prod `POST /auth/me` + `/runs` → **500** (new-user `maybe_single()` None bug — fixed in `_users.py`, **Railway redeploy required**). V-08–V-10, V-14 blocked until redeploy + tester replay.
+**2026-06-04:** Upsert 500 fixed; `ff-metrics.py` green (346 runs). Re-verify V-08–V-14 on **post v2.0 deploy** bundle.
+
+---
+
+## 6b. Soft launch gates (Jun 14)
+
+Cross-ref [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B. Complete before GO vote.
+
+| # | Gate | Status |
+|---|------|--------|
+| 1 | Prod bundle = repo `main` | [x] `main-CJgmaRAS.js` prod = local (2026-06-04) |
+| 2 | Supabase `002` applied | [ ] manual — Supabase SQL editor |
+| 3 | `ff-metrics.py` green post-deploy | [x] 2026-06-04 · re-run after deploy |
+| 4 | DEVICE_QA v2.0 rows 1–8 (iOS + Android) | [ ] |
+| 5 | DEVICE_QA v1.8.5 rows 6–10 spot-check | [ ] |
+| 6 | Tier A V-08–V-14 (§6 above) | [ ] |
+| 7 | ≥8 externals invited; ≥6 completed 3 runs | [ ] |
+| 8 | Share validated (`Shift:` line) | [ ] |
+| 9 | Zero open pain items | [ ] |
 
 ---
 

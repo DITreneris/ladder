@@ -7,10 +7,19 @@ cd apps/mini-app
 npm run build && npm run preview -- --host 127.0.0.1 --port 4173
 # terminal 2
 npm run capture:marketing
-npm run capture:og   # refreshes public/og.png composite crop
 ```
 
 Capture modes: `/?capture=home|game|gameover` (see `src/game/marketing-capture.ts`).
+
+**Link preview OG** (separate from marketing shots):
+
+```bash
+# After editing docs/assets/Corporate_Ladder_og.png (source artwork, 1200×630)
+npm run adopt:og
+npm run verify:og
+```
+
+Legacy Playwright composite (phone crop + `og-preview.html`): `npm run capture:og` — optional, not canonical.
 
 ## Files
 
@@ -20,7 +29,7 @@ Capture modes: `/?capture=home|game|gameover` (see `src/game/marketing-capture.t
 | `02-gameplay-dodge.png` | Carousel slide 2, README gameplay | *One tap, one rung. Don't attend the meeting.* |
 | `03-game-over.png` | Carousel slide 3, humor hook | *Employment terminated. HR will not be taking questions.* |
 
-Link previews: `apps/mini-app/public/og.png` (1200×630 composite with phone inset from `?capture=game` crop).
+Link previews: `apps/mini-app/public/og.png` (1200×630) from `docs/assets/Corporate_Ladder_og.png` via `npm run adopt:og`.
 
 ## Rubric evaluation (v1 — post pipeline)
 

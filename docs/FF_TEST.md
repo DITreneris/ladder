@@ -1,12 +1,8 @@
 # Friends-and-family test — Corporate Ladder
 
+**Window:** 2026-05-31 → 2026-06-14 · **Scope:** **Soft launch only** — no public marketing until ~2026-06-28 review
 
-
-**Window:** 2026-05-31 → 2026-06-14 (2 weeks) · **Gate:** Complete [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) + [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) first
-
-
-
-**Execution runbook:** [FF_EXECUTION.md](FF_EXECUTION.md) (deploy smoke, dogfood, monitor, review)
+**Execution runbook:** [FF_EXECUTION.md](FF_EXECUTION.md) · **GO plan:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)
 
 
 
@@ -80,39 +76,28 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 
 
-## Recruit (5–10 testers)
+## Recruit (8 external testers — soft launch)
 
-
-
-Mix **iOS + Android**; not all on the core team.
-
-
+**Target:** 8 invited · **≥6 must complete 3-run script** · ≥2 iOS · ≥2 Android · not core team
 
 **Share message:**
 
+> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
 
+**Bot (primary entry):** https://t.me/CorporateLadderBot · `@CorporateLadderBot`
 
-> Corporate Ladder — satirical office climb game in Telegram. Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+| # | Tester | Platform | Invited | Runs (≥3?) | Shared? | Notes |
+|---|--------|----------|---------|------------|---------|-------|
+| 1 | _(prior — re-test post v2 deploy)_ | iOS / Android | [x] | [ ] | [ ] | Submit 500 fixed — re-test after deploy |
+| 2 | _(Android QA signer)_ | Android | [x] | [ ] | [ ] | DEVICE_QA only |
+| 3 | | iOS / Android | [ ] | [ ] | [ ] | |
+| 4 | | iOS / Android | [ ] | [ ] | [ ] | |
+| 5 | | iOS / Android | [ ] | [ ] | [ ] | |
+| 6 | | iOS / Android | [ ] | [ ] | [ ] | |
+| 7 | | iOS | [ ] | [ ] | [ ] | |
+| 8 | | Android | [ ] | [ ] | [ ] | |
 
-
-
-**Bot (primary entry):** https://t.me/CorporateLadderBot · `@CorporateLadderBot` · **Mini App URL (WebApp shell only):** https://www.promptanatomy.lol
-
-
-
-| Tester | Platform | Invited | Runs (wk1) | Notes |
-|--------|----------|---------|------------|-------|
-| _(reported ~3–4 via bot)_ | iOS / Android | [x] | **0 in DB** | Game over reported; submit failed (API 500) — re-test after API redeploy |
-| _(Android QA signer)_ | Android | [x] | | DEVICE_QA sign-off only |
-| | iOS / Android | [ ] | | |
-
-| | | | | |
-
-| | | | | |
-
-| | | | | |
-
-| | | | | |
+**Completion count (externals with ≥3 runs):** ___ / 8 (GO requires ≥6)
 
 
 
@@ -145,14 +130,15 @@ Mix **iOS + Android**; not all on the core team.
 
 **Check-in dates:** Jun 4 · Jun 7 · Jun 10 · Jun 14 review — see [FF_EXECUTION.md](FF_EXECUTION.md) Phase F.
 
-| Metric | Target | Jun 4 | Jun 7 | Jun 10 | How measured |
-|--------|--------|-------|-------|--------|--------------|
-| Session length | 30–90s | on track | | | Ask / observe |
-| Games per user (wk1) | ≥3 | **153 / 96 / 85** | | | `scripts/ff-metrics.py` or SQL below |
-| Distinct players (wk1) | ≥3 | **5** | | | Supabase `users` with ≥1 run |
-| Share rate | Any shares | unknown | | | Ask testers |
-| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | | `game_runs` timestamps |
-| Tier A verification | V-08–V-14 | pending deploy | | | [todo.md](todo.md) §6 |
+| Metric | Target | Jun 4 | Jun 7 | Jun 10 | Jun 14 |
+|--------|--------|-------|-------|--------|--------|
+| Session length | 30–90s | on track | | | |
+| External testers (≥3 runs) | **≥6 / 8** | 0 ext | | | |
+| Distinct players (14d) | ≥8 | **5** | | | |
+| Share rate | ≥1 pasted in Telegram | unknown | | | |
+| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | | |
+| Tier A verification | V-08–V-14 | pending deploy | | | |
+| Soft-launch GO gates | all §B green | | | pre-read | **vote** |
 
 **Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample; F&F UX pack shipped in repo pending deploy.
 
@@ -247,9 +233,9 @@ Log in GitHub Issues or a scratch column:
 
 ## End-of-F&F review (2026-06-14)
 
+**Soft-launch GO plan:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) — full checklist, GO matrix, tag ceremony.
 
-
-Answer:
+Answer (qualitative):
 
 
 

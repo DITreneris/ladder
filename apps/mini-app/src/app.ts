@@ -7,6 +7,7 @@ import {
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
   SPRINT_SHARE_LINE,
+  INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
   floorLabel,
   formatTickerText,
@@ -123,8 +124,11 @@ function updateFloorLabel(years: number): void {
   $("floorLabel").textContent = floorLabel(years);
 }
 
-function updateReorgHudStrip(rank: Rank): void {
-  const show = rank !== "Intern" || activeDailyModifier.allowEarlyReorg;
+function updateReorgHudStrip(rank: Rank, rungScore?: number): void {
+  const score = rungScore ?? engine?.getRungsClimbed() ?? 0;
+  const show =
+    rank !== "Intern" ||
+    (activeDailyModifier.allowEarlyReorg && score >= INTERN_TUTORIAL_RUNGS);
   $("reorgHudStrip").classList.toggle("hidden", !show);
 }
 
@@ -319,7 +323,7 @@ function updateRankUI(rank: Rank, updatePlayer = true): void {
   }
   $("gameRankBadge").className = RANK_BADGE[rank];
   updateRankProp(rank);
-  updateReorgHudStrip(rank);
+  updateReorgHudStrip(rank, engine?.getRungsClimbed());
 }
 
 function setPlayerPanic(on: boolean): void {
@@ -1194,7 +1198,7 @@ function mountMarketingGameCapture(): void {
     updateRankUI(m.MARKETING_GAME_RANK);
     updateMilestoneChip(m.MARKETING_GAME_YEARS);
     updateFloorLabel(m.MARKETING_GAME_YEARS);
-    updateReorgHudStrip(m.MARKETING_GAME_RANK);
+    updateReorgHudStrip(m.MARKETING_GAME_RANK, INTERN_TUTORIAL_RUNGS);
     $("burnoutMeter").style.width = `${m.MARKETING_GAME_ENERGY}%`;
     $("burnoutPercentLabel").textContent = `${m.MARKETING_GAME_ENERGY}%`;
     $("gameYearsLabel").textContent = m.MARKETING_GAME_YEARS.toFixed(1);
@@ -1274,7 +1278,7 @@ function mountOgCaptureMode(): void {
     updateRankUI(og.OG_CAPTURE_RANK);
     updateMilestoneChip(og.OG_CAPTURE_YEARS);
     updateFloorLabel(og.OG_CAPTURE_YEARS);
-    updateReorgHudStrip(og.OG_CAPTURE_RANK);
+    updateReorgHudStrip(og.OG_CAPTURE_RANK, INTERN_TUTORIAL_RUNGS);
     $("burnoutMeter").style.width = `${og.OG_CAPTURE_ENERGY}%`;
     $("burnoutPercentLabel").textContent = `${og.OG_CAPTURE_ENERGY}%`;
     $("gameYearsLabel").textContent = og.OG_CAPTURE_YEARS.toFixed(1);
@@ -1317,7 +1321,7 @@ export function mountApp(): void {
         }
         updateMilestoneChip(years);
         updateFloorLabel(years);
-        updateReorgHudStrip(engine.getCurrentRank());
+        updateReorgHudStrip(engine.getCurrentRank(), engine.getRungsClimbed());
         $("burnoutMeter").style.width = `${energy}%`;
         $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;
         if (energy < 25) {

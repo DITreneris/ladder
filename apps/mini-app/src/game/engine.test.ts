@@ -270,6 +270,26 @@ describe("GameEngine", () => {
     expect(engine.getDailyModifier().meetingPickThreshold).toBe(0.38);
   });
 
+  it("reorg week intern before tutorial ramp spawns meetings only", () => {
+    let randomCall = 0;
+    vi.spyOn(Math, "random").mockImplementation(() => {
+      const sequence = [
+        0.1, 0.5, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9,
+      ];
+      return sequence[randomCall++] ?? 0.99;
+    });
+
+    const { engine } = createEngine({}, getDailyModifierById("reorg_week"));
+    engine.start();
+
+    for (let i = 0; i < 8; i++) {
+      tapWithCooldown(engine, i % 2 === 0 ? "left" : "right");
+    }
+
+    const types = engine.getRungs().map((r) => r.type).filter(Boolean);
+    expect(types.every((t) => t === "meeting" || t === null)).toBe(true);
+  });
+
   it("forces tutorial coffee on rungs 1 or 2 by rung 8 when none collected", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.99);
     const { engine } = createEngine();

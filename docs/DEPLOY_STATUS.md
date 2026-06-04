@@ -1,50 +1,24 @@
 # Production deploy status
 
-
-
-Track manual deploy progress for **v1.5.0 → v1.8.4** (current gate per [ROADMAP.md](../ROADMAP.md)). Full steps: [DEPLOY.md](../DEPLOY.md).
-
-
+Track manual deploy progress through **soft-launch GO (2026-06-14)**. Full steps: [DEPLOY.md](../DEPLOY.md) · GO plan: [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md)
 
 **GitHub:** [github.com/DITreneris/ladder](https://github.com/DITreneris/ladder) — `main` pushed.
 
-
-
 | Step | Service | Status | URL / notes |
-
 |------|---------|--------|-------------|
-
 | 0 | GitHub | **Done** | [DITreneris/ladder](https://github.com/DITreneris/ladder) — branch `main`, CI on push |
+| 0b | Local smoke | **Done** | `scripts/smoke-local.ps1` passed 2026-06-04 (pytest 20, vitest 76) |
+| 1 | Supabase migration | **001 Done** / **002 Pending** | Apply `002_v2_hardening.sql` before v2.0 sign-off |
+| 2 | Railway API | **Done** | Health ok; `ff-metrics.py` green 2026-06-04 |
+| 3 | Vercel Mini App | **Redeploy Done** / **OG pending** | Prod `main-CJgmaRAS.js` (2026-06-04); **redeploy after `public/og.png` adopt** so Telegram/link caches pick up new artwork |
+| 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL; `@CorporateLadder_bot` |
+| 5 | BotFather | **Done** | Menu button + `/setdomain`; paste from [DEPLOY.md](../DEPLOY.md) |
+| 6 | Post-deploy smoke | **v1.8.5 Done** | `ff-metrics.py` green 2026-06-04 — re-run after v2.0 deploy |
+| 7–11 | v1.6 → v1.8.5 | **Done** | See prior steps; tag `v1.8.5` on `46abf19` |
+| 12 | v1.9.0 + F&F UX pack | **Code Done** / **Deploy Pending** | Near-miss, hints 40 rungs, LB self-row, avatar, CEO copy |
+| 13 | v2.0.0 hardening + triage | **Code Done** / **Deploy Pending** | Migration `002` · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) |
+| 14 | Soft launch GO signed | **Pending** | [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) · tag `v1.9.0` + `v2.0.0` on GO |
 
-| 0b | Local smoke | **Done** | `scripts/verify-deploy-config.ps1` + `scripts/smoke-local.ps1` passed (2026-05-31) |
-
-| 1 | Supabase migration | **Done** | `001_initial_schema.sql` — `users` + `game_runs` verified |
-
-| 2 | Railway API | **Done** | https://ladder-production-642d.up.railway.app — `GET /health` → `{"status":"ok"}` |
-
-| 3 | Vercel Mini App | **Redeploy Done** | https://www.promptanatomy.lol — bundle `main-BVz1aF34.js` (2026-06-01); reaction/layout hotfix pending next deploy |
-
-| 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL; group `t.me?startapp` keyboard (`39d8249`); `@CorporateLadder_bot` |
-
-| 5 | BotFather | **Done** | Menu button + `/setdomain`; botpic uploaded manually (briefcase mark); Description/About/Commands — paste from [DEPLOY.md](../DEPLOY.md) |
-
-| 6 | Post-deploy smoke | **Prod Done** (2026-06-01) | `ff-metrics.py`: `submit_pipeline_ok: true`; 2 users / 12+ runs in Supabase; private `/start` + group `/go@CorporateLadder_bot` → Punch In → Daily LB; Prompt_Anatomy supergroup signed |
-
-| 7 | v1.6 + v1.7 device QA | **Done** | Milestone chip; death cause + retry tip; Meeting Monday + Reorg Week presets |
-
-| 8 | v1.8 device QA | **Done** | Ticker foreshadow; RE-APPLY counter; LB gap; floor labels; rank props |
-
-| 9 | v1.8.1 redeploy + device QA | **Redeploy Done** / **Device QA Pending** | Prod bundle verified; manual checklist [DEVICE_QA_v1.8.1.md](DEVICE_QA_v1.8.1.md) |
-
-| 10 | v1.8.2 + F&F trust fixes | **Redeploy Done** / **Device QA Pending** | Push `d862c3c` on `main` (2026-06-01); [DEVICE_QA_v1.8.2.md](DEVICE_QA_v1.8.2.md) |
-
-| 11 | v1.8.5 corridor + tutorial | **Tagged** / **Live** | Tag `v1.8.5` on `46abf19`; prod `main-7DTXR6XJ.js`; DEVICE_QA rows 1–5 signed |
-| 12 | v1.9.0 near-miss + Synergy Sprint + F&F UX pack | **Code Done** / **Deploy Pending** | Intern hints, LB self-row, avatar picker, CEO copy — deploy with v2.0.0 |
-| 13 | v2.0.0 hardening + triage | **Code Done** / **Deploy Pending** | Run migration `002_v2_hardening.sql` · [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) · `ff-metrics.py` |
-
-**Tag sequence:** … → `v1.8.5` (done) → F&F → **`v1.9.0`** after Jun 14 review.
-
-
+**Tag sequence:** `v1.8.5` (done) → deploy v1.9 + v2.0 → F&F + device QA → **soft-launch GO Jun 14** → tags → public launch review ~Jun 28.
 
 After each step, update [DOCS_INDEX.md](../DOCS_INDEX.md) and [README.md](../README.md) live demo table.
-

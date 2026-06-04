@@ -6,9 +6,9 @@ Pass/fail after trust hotfix push (`c253d26`+). Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |
 |---------|-------------|------------|----------------|-----------------|-------|
-| Telegram prod | `main-7DTXR6XJ.js` (v1.8.5) | pass (rows 1–5) | pass (row 4) | pass (row 3) | Human sign-off 2026-06-01 |
-| Local build v2.0 | `main-C_cYxjEK.js` (2026-06-01) | `qa:layout` pass | `qa:coffee` pass | `qa:coffee` pass | **Redeploy pending** — ship v2.0.0 |
-| Browser preview | local `npm run build` | Run `npm run qa:layout` | `?qa=1` + `npm run qa:coffee` | same | |
+| Telegram prod | `main-CJgmaRAS.js` (2026-06-04 curl) | verify rows 1–5 | verify row 4 | verify row 3 | Matches local build; DEVICE_QA v2.0 pending |
+| Local build | `main-CJgmaRAS.js` (2026-06-04) | `qa:layout` pass | `qa:coffee` pass | smoke pass | smoke-local 2026-06-04 |
+| Browser preview | local `npm run build` | Run `npm run qa:layout` | `npm run qa:coffee` | same | |
 | npm run dev | n/a (HMR) | Visual | `?debug=1` | `?debug=1` | |
 
 **Layout measurements (local preview, post-sprint):**

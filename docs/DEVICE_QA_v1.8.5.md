@@ -23,7 +23,7 @@ Repo gates green before device sign-off:
 | `npm run qa:coffee` (tutorial coffee + meeting collision) | pass |
 | Prod bundle | `main-7DTXR6XJ.js` (post-`46abf19`) |
 
-**Human sign-off:** Telegram rows 1–5 confirmed 2026-06-01. Rows 6–10 optional / spot-check before public launch.
+**Human sign-off:** Telegram rows 1–5 confirmed 2026-06-01. Rows 6–10 due **2026-06-10** — tracked in [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B gate 5.
 
 ---
 

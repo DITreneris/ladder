@@ -187,7 +187,8 @@ export class GameEngine {
           obstacle = Math.random() < 0.5 ? "left" : "right";
         }
         type = pickObstacleType(this.currentRank, {
-          allowEarlyReorg: this.dailyModifier.allowEarlyReorg,
+          allowEarlyReorg:
+            this.dailyModifier.allowEarlyReorg && this.score >= INTERN_TUTORIAL_RUNGS,
           meetingPickThreshold: this.dailyModifier.meetingPickThreshold,
         });
       } else if (rand > this.dailyModifier.coffeeSpawnThreshold) {

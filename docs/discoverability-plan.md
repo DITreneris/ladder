@@ -162,7 +162,7 @@ Add `og:image` once `public/og.png` exists.
 | `apps/mini-app/public/robots.txt` | Allow crawlers + sitemap + AI/social bots |
 | `apps/mini-app/public/sitemap.xml` | Single-URL sitemap |
 | `apps/mini-app/public/llms.txt` | AI/GEO entity index |
-| `apps/mini-app/public/og.png` | 1200×630 link preview (Playwright composite) |
+| `apps/mini-app/public/og.png` | 1200×630 link preview (`adopt:og` from `docs/assets/Corporate_Ladder_og.png`; legacy `capture:og` composite optional) |
 | `.github/social-preview.png` | 1280×640 GitHub repo share image |
 | `apps/mini-app/public/favicon.ico` | Optional — if missing in browser tab |
 | `apps/mini-app/vercel.json` | No change expected (SPA rewrite stays) |

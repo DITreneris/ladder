@@ -14,6 +14,7 @@
     "qa:coffee": "node scripts/coffee-pickup-qa.mjs",
     "capture:hero": "node scripts/capture-hero.mjs",
     "capture:marketing": "node scripts/capture-marketing.mjs",
+    "adopt:og": "node scripts/adopt-og.mjs",
     "capture:og": "node scripts/capture-og.mjs",
     "verify:og": "node scripts/verify-og.mjs",
     "verify:seo": "node scripts/verify-seo.mjs"
