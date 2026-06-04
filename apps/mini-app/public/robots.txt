@@ -1,4 +1,5 @@
 # Open to all crawlers (SEO, social previews, AI).
+# Empty Disallow: lines mean "no paths blocked" (allow-all), including listed AI bots.
 # Twitterbot first — X card validator is order-sensitive; use empty Disallow (not Allow:).
 User-agent: Twitterbot
 Disallow:

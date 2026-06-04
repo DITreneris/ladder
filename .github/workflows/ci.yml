@@ -71,6 +71,7 @@ jobs:
           npm run qa:viewport
           npm run qa:layout
           npm run qa:coffee
+          npm run verify:seo:live
           kill "$PREVIEW_PID" 2>/dev/null || true
       - name: OG asset check
         run: npm run verify:og

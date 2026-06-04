@@ -59,6 +59,14 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 4. Deploy and note production URL (e.g. `https://your-app.vercel.app`).
 5. **Web Analytics:** Project → **Analytics** tab → **Enable** (required for `@vercel/analytics` page views on production).
 6. **TON Analytics:** After deploy, open the mini-app from the bot once; TON Builders → Analytics Keys should leave “Waiting for SDK”.
+7. **SEO / crawlers:** Confirm static assets (not SPA HTML):
+   ```bash
+   curl -sfI https://www.promptanatomy.lol/sitemap.xml | head -1   # HTTP/2 200
+   curl -sf https://www.promptanatomy.lol/sitemap.xml | head -3    # <?xml ...
+   curl -sf https://www.promptanatomy.lol/robots.txt | grep Sitemap
+   curl -sf https://www.promptanatomy.lol/llms.txt | head -1      # # Corporate Ladder
+   ```
+   Resubmit `https://www.promptanatomy.lol/sitemap.xml` in Google Search Console after a fix deploy.
 
 ## 4. Railway — Bot
 

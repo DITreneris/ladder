@@ -10,7 +10,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **Telegram Mini Apps Analytics (TON Builders)** — `@telegram-apps/analytics` init before app mount; `appName` `corporate_ladder` (TON Builders Analytics Keys identifier); optional `VITE_TELEGRAM_ANALYTICS_TOKEN` on Vercel (no-op when unset)
+- **TON Builders analytics (Telegram Mini Apps SDK)** — `@telegram-apps/analytics` initializes before first render; `appName` **`corporate_ladder`** (case-sensitive — must match TON Builders Analytics Keys identifier); activates when `VITE_TELEGRAM_ANALYTICS_TOKEN` is set (no-op when unset; complements `@vercel/analytics`, not a replacement)
+- **Live SEO smoke** — `npm run verify:seo:live` curls `sitemap.xml`, `robots.txt`, `llms.txt` on preview (CI)
+
+### Changed
+- **SEO / AI hardening** — Vercel rewrite excludes crawler static paths; `Content-Type` headers for sitemap/robots/llms; expanded `llms.txt`; JSON-LD `PlayAction` + canonical bot `t.me/corporateladder_bot`; sitemap lists shell + `llms.txt`
+- **[DEPLOY.md](DEPLOY.md)** — Vercel env vars for TON Analytics token; post-deploy curl checklist for crawler assets + GSC resubmit
+- **[.env.example](.env.example)** — documents `VITE_TELEGRAM_ANALYTICS_TOKEN` (TON Builders SDK token, not `TELEGRAM_BOT_TOKEN`)
+
+### Fixed
+- **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
 
 ### Planned (v1.1)
 - All-time / Legends tab

@@ -17,7 +17,8 @@
     "adopt:og": "node scripts/adopt-og.mjs",
     "capture:og": "node scripts/capture-og.mjs",
     "verify:og": "node scripts/verify-og.mjs",
-    "verify:seo": "node scripts/verify-seo.mjs"
+    "verify:seo": "node scripts/verify-seo.mjs",
+    "verify:seo:live": "node scripts/verify-seo-live.mjs"
   },
   "dependencies": {
     "@telegram-apps/analytics": "^1.6.4",

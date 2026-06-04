@@ -1,13 +1,30 @@
 # Corporate Ladder
 
-> Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @CorporateLadderBot.
+> Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @CorporateLadder_bot.
 
-## Play
-- [Telegram bot](https://t.me/CorporateLadderBot): Primary entry point
+Last updated: 2026-06-04
+
+## What it is
+
+Telegram Mini App game (web shell at promptanatomy.lol). Not a standalone browser game — open the bot in Telegram to play.
+
+## How to play
+
+1. Open the Telegram bot below.
+2. Tap **Punch In & Climb** (or `/start` / `/go` in groups).
+3. Tap left or right to climb; manage energy; dodge meetings, reorgs, and deadlines.
+
+## Mechanics (short)
+
+Satirical corporate ladder climb. Energy drains over time. Rank-gated obstacles. Daily shift flavor. Score = career years survived.
+
+## Canonical URLs
+
+- [Telegram bot](https://t.me/corporateladder_bot): Primary entry — @CorporateLadder_bot
 - [Mini App shell](https://www.promptanatomy.lol/): Web shell opened from Telegram
-
-## About
 - [Prompt Anatomy](https://www.promptanatomy.app): Parent brand
+- [Sitemap](https://www.promptanatomy.lol/sitemap.xml): Crawler URL list
 
 ## Assets
+
 - [Link preview image](https://www.promptanatomy.lol/og.png): 1200×630 OG image

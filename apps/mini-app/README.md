@@ -95,7 +95,11 @@ npm run capture:hero  # Legacy alias → copies 01-home to docs/assets/gameplay.
 npm run adopt:og      # Link previews from docs/assets/Corporate_Ladder_og.png (canonical)
 npm run capture:og    # Legacy Playwright composite (optional)
 npm run verify:og     # Assert OG PNG dimensions (CI)
+npm run verify:seo    # Static SEO/GEO shell files (CI)
+npm run verify:seo:live  # HTTP smoke — requires preview (PREVIEW_URL)
 ```
+
+After `npm run build`, confirm crawler assets copied: `test -f dist/sitemap.xml && test -f dist/robots.txt && test -f dist/llms.txt`.
 
 ## Design system
 

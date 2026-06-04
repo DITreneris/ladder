@@ -9,8 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const miniAppRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(miniAppRoot, "../..");
 
+const BOT_URL = "https://t.me/corporateladder_bot";
+const BOT_HANDLE = "CorporateLadder_bot";
 const CANON_DESCRIPTION =
-  "Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @CorporateLadderBot.";
+  `Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @${BOT_HANDLE}.`;
 const CANON_URL = "https://www.promptanatomy.lol/";
 
 function fail(message) {
@@ -58,6 +60,9 @@ if (!sitemap.includes(CANON_URL)) {
 if (!sitemap.includes("<urlset")) {
   fail("sitemap.xml must be valid urlset XML");
 }
+if (!sitemap.includes("llms.txt")) {
+  fail("sitemap.xml must list llms.txt for AI/GEO discovery");
+}
 ok("sitemap.xml");
 
 const llms = readRequired("public/llms.txt");
@@ -67,8 +72,11 @@ if (!llms.includes("# Corporate Ladder")) {
 if (!llms.includes("> Corporate Ladder is a satirical")) {
   fail("llms.txt must contain blockquote summary");
 }
-if (!llms.includes("https://t.me/CorporateLadderBot")) {
+if (!llms.includes(BOT_URL)) {
   fail("llms.txt must link to Telegram bot");
+}
+if (!llms.includes(`@${BOT_HANDLE}`)) {
+  fail("llms.txt must reference canonical bot handle");
 }
 ok("llms.txt");
 
@@ -81,6 +89,12 @@ if (!indexHtml.includes("application/ld+json")) {
 }
 if (!indexHtml.includes(CANON_DESCRIPTION)) {
   fail("index.html must include canon description");
+}
+if (!indexHtml.includes(BOT_URL)) {
+  fail("index.html JSON-LD/noscript must use canonical bot URL");
+}
+if (!indexHtml.includes("PlayAction")) {
+  fail("index.html JSON-LD must include PlayAction entry point");
 }
 if (!indexHtml.includes("<noscript>")) {
   fail("index.html must include noscript fallback");

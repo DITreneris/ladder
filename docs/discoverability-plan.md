@@ -29,8 +29,8 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 |------|--------|-------|
 | `index.html` metadata | **Done** | Title, description, canonical, OG, Twitter, JSON-LD, noscript |
 | `robots.txt` | **Done** | Allow all + social/AI bots + sitemap directive |
-| `sitemap.xml` | **Done** | Single URL for SPA shell |
-| `llms.txt` | **Done** | AI/GEO entity index at site root |
+| `sitemap.xml` | **Done** | Shell + `llms.txt` URLs; Vercel rewrite excludes crawler paths (fix prod 500) |
+| `llms.txt` | **Done** | Expanded AI/GEO entity index; canonical bot `@CorporateLadder_bot` |
 | Schema.org | **Done** | `WebApplication` + `VideoGame` in `index.html` |
 | Bot welcome copy | OK | `apps/bot/main.py` — `/start`, `/play`, `/help` + shift label + description |
 | Share loop | OK | `shareMessage` + clipboard fallback |
@@ -140,7 +140,7 @@ Add `og:image` once `public/og.png` exists.
 
 - Telegram share loop (`shareMessage`, shift line, co-branding)
 - Bot `/start` welcome + daily shift hook
-- `@CorporateLadderBot` as canonical entry (env: `VITE_BOT_USERNAME`)
+- `@CorporateLadder_bot` as canonical entry for crawlers; in-app handle from `VITE_BOT_USERNAME`
 - ROADMAP retention metrics over search metrics
 
 ### Kill — do not do (this repo, this stage)
@@ -165,7 +165,7 @@ Add `og:image` once `public/og.png` exists.
 | `apps/mini-app/public/og.png` | 1200×630 link preview (`adopt:og` from `docs/assets/Corporate_Ladder_og.png`; legacy `capture:og` composite optional) |
 | `.github/social-preview.png` | 1280×640 GitHub repo share image |
 | `apps/mini-app/public/favicon.ico` | Optional — if missing in browser tab |
-| `apps/mini-app/vercel.json` | No change expected (SPA rewrite stays) |
+| `apps/mini-app/vercel.json` | SPA rewrite excludes `sitemap.xml`, `robots.txt`, `llms.txt`, OG assets |
 | `CHANGELOG.md` | `[Unreleased]` entry when Phase 0 ships |
 | `DITreneris/site` | Phase 1 only — out of scope for ladder repo |
 
