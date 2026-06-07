@@ -121,7 +121,7 @@
 }
 
 @utility brand-attribution-logo {
-  @apply h-[18px] w-[18px] shrink-0 rounded object-cover;
+  @apply h-[18px] w-[18px] shrink-0 rounded object-contain;
 }
 
 @utility brand-attribution-link {
@@ -328,10 +328,15 @@ html.cl-in-telegram .text-micro {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--cl-border) 70%, transparent);
-  background-color: color-mix(in srgb, var(--cl-header-bg) 92%, transparent);
-  color: var(--cl-header-text);
+  border: 1px solid color-mix(in srgb, var(--cl-border) 40%, var(--cl-text));
+  background-color: var(--cl-secondary-bg);
+  color: var(--cl-text);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   transition: opacity 150ms;
+}
+
+.start-cta-bar {
+  background-color: var(--cl-secondary-bg);
 }
 
 .sound-fab:hover {

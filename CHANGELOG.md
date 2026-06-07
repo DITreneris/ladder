@@ -20,6 +20,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
+- **Home screen UI** — sound toggle visible in Telegram light theme; CTA bar no longer shows office-grid pattern above Punch In; Prompt Anatomy footer uses official logo asset
 
 ### Planned (v1.1)
 - All-time / Legends tab

@@ -105,7 +105,12 @@ export function applyTelegramTheme(): void {
   setThemeVar(root, "--cl-button", params.button_color, "#2563eb");
   setThemeVar(root, "--cl-button-text", params.button_text_color, "#ffffff");
   setThemeVar(root, "--cl-header-bg", params.header_bg_color, "#0f172a");
-  setThemeVar(root, "--cl-header-text", params.header_text_color, "#ffffff");
+  setThemeVar(
+    root,
+    "--cl-header-text",
+    params.header_text_color ?? params.text_color,
+    "#ffffff"
+  );
   setThemeVar(root, "--cl-border", params.section_separator_color, "#1e293b");
   setThemeVar(root, "--cl-accent", params.accent_text_color, "#2563eb");
 
