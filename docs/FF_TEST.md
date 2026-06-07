@@ -132,15 +132,15 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 | Metric | Target | Jun 4 | Jun 7 | Jun 10 | Jun 14 |
 |--------|--------|-------|-------|--------|--------|
-| Session length | 30–90s | on track | | | |
-| External testers (≥3 runs) | **≥6 / 8** | 0 ext | | | |
-| Distinct players (14d) | ≥8 | **5** | | | |
-| Share rate | ≥1 pasted in Telegram | unknown | | | |
-| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | | |
-| Tier A verification | V-08–V-14 | pending deploy | | | |
+| Session length | 30–90s | on track | | on track | |
+| External testers (≥3 runs) | **≥6 / 8** | 0 ext | | **3 / 6** | |
+| Distinct players (14d) | ≥8 | **5** | | **8** | |
+| Share rate | ≥1 pasted in Telegram | unknown | | unknown | |
+| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | **4** (core 3) | |
+| Tier A verification | V-08–V-14 | pending deploy | | pending | |
 | Soft-launch GO gates | all §B green | | | pre-read | **vote** |
 
-**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample. **Jun 14:** `v1.9.0` + `v2.0.0` tagged — prod bundle per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md).
+**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample. **Jun 10 pre-read (2026-06-05):** [FF_METRICS_2026-06-10.md](FF_METRICS_2026-06-10.md) — 461 runs, 9 users, 3 externals ≥3 runs, prod `main-T7XrL0BN.js`. **Jun 14:** `v1.9.0` + `v2.0.0` tagged — prod bundle per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md).
 
 
 

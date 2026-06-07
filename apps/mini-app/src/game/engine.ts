@@ -31,9 +31,22 @@ import {
 } from "./constants";
 
 import type { DailyModifier } from "./daily-modifier";
-import { resolveDailyModifier } from "./daily-modifier";
+import { getDailyModifierById, resolveDailyModifier } from "./daily-modifier";
 
-import type { DeathType, GameCallbacks, GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./types";
+import type {
+  DeathType,
+  GameCallbacks,
+  GameOverResult,
+  ObstacleType,
+  PlayerSide,
+  Rank,
+  ReviveSnapshot,
+  Rung,
+} from "./types";
+
+const OBSTACLE_DEATH_TYPES: DeathType[] = ["meeting", "reorg", "burnout", "badge_gate", "foliage"];
+const REVIVE_COLLISION_ENERGY_BONUS = 25;
+const REVIVE_ENERGY_REFILL = 50;
 
 export class GameEngine {
   private score = 0;
@@ -64,6 +77,8 @@ export class GameEngine {
   private triageBiasSide: PlayerSide | null = null;
   private triageBiasRemaining = 0;
   private lastTriageAtScore = 0;
+  private reviveUsed = false;
+  private pendingReviveSnapshot: ReviveSnapshot | null = null;
   private visibilityHandler = (): void => {
     this.documentHidden = document.hidden;
   };
@@ -128,6 +143,14 @@ export class GameEngine {
 
   isAwaitingTriageChoice(): boolean {
     return this.awaitingTriageChoice;
+  }
+
+  hasUsedRevive(): boolean {
+    return this.reviveUsed;
+  }
+
+  getPendingReviveSnapshot(): ReviveSnapshot | null {
+    return this.pendingReviveSnapshot;
   }
 
   private obstacleSpawnRate(): number {
@@ -252,6 +275,8 @@ export class GameEngine {
     this.triageBiasSide = null;
     this.triageBiasRemaining = 0;
     this.lastTriageAtScore = 0;
+    this.reviveUsed = false;
+    this.pendingReviveSnapshot = null;
     if (typeof document !== "undefined") {
       document.addEventListener("visibilitychange", this.visibilityHandler);
     }
@@ -268,6 +293,13 @@ export class GameEngine {
     this.renderRungs();
     this.callbacks.onScoreUpdate(0, 100);
     this.stopLoops();
+    this.startGameLoops();
+  }
+
+  private startGameLoops(): void {
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", this.visibilityHandler);
+    }
 
     this.timerInterval = setInterval(() => {
       if (!this.isPlaying) return;
@@ -313,6 +345,79 @@ export class GameEngine {
     this.isPlaying = false;
     this.stopLoops();
     audio.stopBgm();
+  }
+
+  private buildReviveSnapshot(deathType: DeathType): ReviveSnapshot {
+    return {
+      deathType,
+      rungs: this.rungs.map((r) => ({ ...r })),
+      score: this.score,
+      timeLeft: this.timeLeft,
+      playerSide: this.playerSide,
+      currentRank: this.currentRank,
+      nextRungId: this.nextRungId,
+      firstTapDone: this.firstTapDone,
+      coffeeCollected: this.coffeeCollected,
+      drainPausedUntil: this.drainPausedUntil,
+      dailyModifierId: this.dailyModifier.id,
+      runStartedAt: this.runStartedAt,
+      awaitingTriageChoice: this.awaitingTriageChoice,
+      triageBiasSide: this.triageBiasSide,
+      triageBiasRemaining: this.triageBiasRemaining,
+      lastTriageAtScore: this.lastTriageAtScore,
+      internFakePromoShown: [...this.internFakePromoShown],
+    };
+  }
+
+  restoreFromRevive(snapshot: ReviveSnapshot): void {
+    if (this.reviveUsed) return;
+
+    this.reviveUsed = true;
+    this.pendingReviveSnapshot = null;
+    this.stopLoops();
+
+    this.score = snapshot.score;
+    this.timeLeft = snapshot.timeLeft;
+    this.playerSide = snapshot.playerSide;
+    this.currentRank = snapshot.currentRank;
+    this.nextRungId = snapshot.nextRungId;
+    this.firstTapDone = snapshot.firstTapDone;
+    this.coffeeCollected = snapshot.coffeeCollected;
+    this.drainPausedUntil = snapshot.drainPausedUntil;
+    this.runStartedAt = snapshot.runStartedAt;
+    this.awaitingTriageChoice = snapshot.awaitingTriageChoice;
+    this.triageBiasSide = snapshot.triageBiasSide;
+    this.triageBiasRemaining = snapshot.triageBiasRemaining;
+    this.lastTriageAtScore = snapshot.lastTriageAtScore;
+    this.internFakePromoShown = new Set(snapshot.internFakePromoShown);
+    this.rungs = snapshot.rungs.map((r) => ({ ...r }));
+    this.dailyModifier =
+      this.fixedDailyModifier ?? getDailyModifierById(snapshot.dailyModifierId as DailyModifier["id"]);
+
+    if (OBSTACLE_DEATH_TYPES.includes(snapshot.deathType)) {
+      const imminent = this.rungs[1];
+      if (imminent?.obstacle === this.playerSide) {
+        this.rungs[1] = {
+          id: imminent.id,
+          obstacle: null,
+          type: null,
+          coffee: imminent.coffee,
+        };
+      }
+      this.timeLeft = Math.min(100, this.timeLeft + REVIVE_COLLISION_ENERGY_BONUS);
+    } else if (snapshot.deathType === "energy") {
+      this.timeLeft = REVIVE_ENERGY_REFILL;
+    }
+
+    this.isPlaying = true;
+    this.isGameOverState = false;
+    this.documentHidden = typeof document !== "undefined" ? document.hidden : false;
+
+    this.updatePlayerPosition(this.playerSide);
+    this.renderRungs();
+    this.callbacks.onScoreUpdate(this.score / 4, this.timeLeft);
+    audio.prepareBgmForRun();
+    this.startGameLoops();
   }
 
   /** Frozen mid-game state for OG screenshot capture (`?og=1`). */
@@ -476,6 +581,7 @@ export class GameEngine {
   }
 
   private triggerGameOver(cause: string, detail: string, deathType: DeathType): void {
+    this.pendingReviveSnapshot = this.buildReviveSnapshot(deathType);
     this.isPlaying = false;
     this.isGameOverState = true;
     this.stopLoops();

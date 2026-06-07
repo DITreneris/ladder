@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **AdsGram rewarded revive** — optional **Mandatory HR Training** on game over (gated: meaningful run, near career high, or near #1); one executive exception per run; score submits after final death; `VITE_ADSGRAM_REVIVE_ENABLED=true` tests revive without ads; `VITE_ADSGRAM_BLOCK_ID` for live Reward ads
 - **TON Builders analytics (Telegram Mini Apps SDK)** — `@telegram-apps/analytics` initializes before first render; `appName` **`corporate_ladder`** (case-sensitive — must match TON Builders Analytics Keys identifier); activates when `VITE_TELEGRAM_ANALYTICS_TOKEN` is set (no-op when unset; complements `@vercel/analytics`, not a replacement)
 - **Live SEO smoke** — `npm run verify:seo:live` curls `sitemap.xml`, `robots.txt`, `llms.txt` on preview (CI)
 
@@ -17,10 +18,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **SEO / AI hardening** — Vercel rewrite excludes crawler static paths; `Content-Type` headers for sitemap/robots/llms; expanded `llms.txt`; JSON-LD `PlayAction` + canonical bot `t.me/corporateladder_bot`; sitemap lists shell + `llms.txt`
 - **[DEPLOY.md](DEPLOY.md)** — Vercel env vars for TON Analytics token; post-deploy curl checklist for crawler assets + GSC resubmit
 - **[.env.example](.env.example)** — documents `VITE_TELEGRAM_ANALYTICS_TOKEN` (TON Builders SDK token, not `TELEGRAM_BOT_TOKEN`)
+- **[DEPLOY.md](DEPLOY.md)** — AdsGram revive env vars (`VITE_ADSGRAM_REVIVE_ENABLED`, `VITE_ADSGRAM_BLOCK_ID`) and partner dashboard steps
 
 ### Fixed
 - **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
 - **Home screen UI** — sound toggle visible in Telegram light theme; CTA bar no longer shows office-grid pattern above Punch In; Prompt Anatomy footer uses official logo asset
+- **Telegram home co-brand** — Prompt Anatomy footer visible without scroll (`#homeBrandFooter` above CTA); reduced MainButton dead zone padding
 
 ### Planned (v1.1)
 - All-time / Legends tab

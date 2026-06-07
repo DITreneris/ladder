@@ -98,6 +98,9 @@ export const APP_SHELL = `
             <p class="text-caption text-slate-600">Intern → Manager (10y). CEO (35y) is the boardroom myth.</p>
           </div>
         </div>
+        <div id="homeBrandFooter" class="home-brand-footer shrink-0">
+          ${BRAND_FOOTER}
+        </div>
         <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
           <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
             ${icon("play")}<span>PUNCH IN &amp; CLIMB</span>
@@ -111,7 +114,6 @@ export const APP_SHELL = `
               ${icon("circle-question", "text-cl-primary")} How to Survive
             </button>
           </div>
-          ${BRAND_FOOTER}
         </div>
       </div>
     </div>
@@ -226,8 +228,12 @@ export const APP_SHELL = `
         <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">"Your synergy did not scale optimally with our paradigms."</p>
       </div>
       <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
-        <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md">
+        <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
           ${icon("rotate-right")}<span>RE-APPLY FOR ROLE (TRY AGAIN)</span>
+        </button>
+        <button id="reviveAdBtn" type="button" onclick="onReviveAdClick()" class="hidden btn-cl-secondary w-full py-3 px-6 min-h-[44px] focus-ring flex flex-col items-center gap-0.5">
+          <span id="reviveAdTitle" class="text-sm font-extrabold">Mandatory HR Training</span>
+          <span id="reviveAdSubline" class="text-nano font-semibold text-slate-500">One executive exception this shift</span>
         </button>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">

@@ -83,6 +83,27 @@ async function tapBarVisible(page) {
   }, MIN_TAP_BUTTON_HEIGHT);
 }
 
+async function homeBrandVisibleWithoutScroll(page) {
+  return page.evaluate(() => {
+    const startScreen = document.getElementById("startScreen");
+    const brandLink = document.querySelector("#homeBrandFooter .brand-attribution-link");
+    if (!startScreen || !brandLink) return { ok: false, reason: "missing-brand" };
+
+    startScreen.scrollTop = 0;
+    const containerRect = startScreen.getBoundingClientRect();
+    const brandRect = brandLink.getBoundingClientRect();
+    const text = brandLink.textContent ?? "";
+    const inView =
+      brandRect.top >= containerRect.top - 1 &&
+      brandRect.bottom <= containerRect.bottom + 1 &&
+      brandRect.left >= containerRect.left - 1 &&
+      brandRect.right <= containerRect.right + 1;
+    const hasLabel = text.includes("Prompt Anatomy");
+
+    return { ok: inView && hasLabel, inView, hasLabel, text: text.slice(0, 80) };
+  });
+}
+
 async function homeCtaReachable(page) {
   return page.evaluate(() => {
     const startScreen = document.getElementById("startScreen");
@@ -337,6 +358,18 @@ async function main() {
           });
         }
 
+        if (vp.width === 320 && vp.height === 568) {
+          const homeBrand = await homeBrandVisibleWithoutScroll(page);
+          if (!homeBrand.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "home-brand-not-visible",
+              ...homeBrand,
+            });
+          }
+        }
+
         if (vp.width === 320 || vp.width === 390) {
           const homeAlign = await homeColumnAlignment(page);
           if (!homeAlign.ok) {
@@ -481,7 +514,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; home Prompt Anatomy brand visible without scroll at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
   );
 }
 

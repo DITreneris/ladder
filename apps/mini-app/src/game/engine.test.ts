@@ -486,4 +486,67 @@ describe("GameEngine", () => {
     expect(engine.getCurrentRank()).toBe("Manager");
     expect(engine.getRungsClimbed()).toBe(40);
   });
+
+  it("captures revive snapshot on collision death", () => {
+    const onGameOver = vi.fn();
+    const { engine } = createEngine({ onGameOver });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "right");
+
+    const snapshot = engine.getPendingReviveSnapshot();
+    expect(snapshot).not.toBeNull();
+    expect(snapshot?.deathType).toBe("meeting");
+    expect(snapshot?.score).toBe(engine.getRungsClimbed());
+  });
+
+  it("restores collision death with safe imminent rung and bonus energy", () => {
+    const onGameOver = vi.fn();
+    const { engine } = createEngine({ onGameOver });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "right");
+
+    const snapshot = engine.getPendingReviveSnapshot();
+    expect(snapshot).not.toBeNull();
+    const energyBefore = snapshot!.timeLeft;
+
+    engine.restoreFromRevive(snapshot!);
+
+    expect(engine.hasUsedRevive()).toBe(true);
+    expect(engine.isActive()).toBe(true);
+    expect(engine.getRungs()[1]?.obstacle).toBeNull();
+    expect(engine.getTimeLeft()).toBe(Math.min(100, energyBefore + 25));
+    expect(onGameOver).toHaveBeenCalledTimes(1);
+  });
+
+  it("restores energy death with refill", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    const onGameOver = vi.fn();
+    const { engine } = createEngine({ onGameOver });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    vi.advanceTimersByTime(TICK_MS * 5000);
+
+    const snapshot = engine.getPendingReviveSnapshot();
+    expect(snapshot?.deathType).toBe("energy");
+    engine.restoreFromRevive(snapshot!);
+    expect(engine.getTimeLeft()).toBe(50);
+    expect(engine.isActive()).toBe(true);
+  });
+
+  it("allows only one revive per run", () => {
+    const { engine } = createEngine();
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "right");
+
+    const snapshot = engine.getPendingReviveSnapshot();
+    engine.restoreFromRevive(snapshot!);
+    expect(engine.hasUsedRevive()).toBe(true);
+    const energyAfterFirst = engine.getTimeLeft();
+
+    engine.restoreFromRevive(snapshot!);
+    expect(engine.getTimeLeft()).toBe(energyAfterFirst);
+  });
 });

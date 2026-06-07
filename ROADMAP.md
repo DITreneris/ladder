@@ -17,6 +17,7 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 | **Active** | Soft launch / F&F window 2026-06-01 → 2026-06-14 ([FF_EXECUTION](docs/FF_EXECUTION.md)) — **no public marketing** |
 | **Next actions** | Vercel OG redeploy · Supabase `002` verify · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) sign-off · public launch review ~2026-06-28 |
 | **Shipped in repo** | v1.9 F&F UX + OG adopt + career onboarding + v2.0 triage/hardening — [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14) · [2.0.0](CHANGELOG.md#200---2026-06-14) |
+| **Monetization** | **AdsGram rewarded revive** in repo — enable `VITE_ADSGRAM_REVIVE_ENABLED=true` to test now; add `VITE_ADSGRAM_BLOCK_ID` after AdsGram moderation for live ads. No virtual currency / forced interstitials. |
 | **Public launch** | Gated — review ~2026-06-28 after soft launch metrics |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)

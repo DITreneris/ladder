@@ -20,6 +20,26 @@ export interface GameOverResult {
   deathType: DeathType;
 }
 
+export interface ReviveSnapshot {
+  deathType: DeathType;
+  rungs: Rung[];
+  score: number;
+  timeLeft: number;
+  playerSide: PlayerSide;
+  currentRank: Rank;
+  nextRungId: number;
+  firstTapDone: boolean;
+  coffeeCollected: boolean;
+  drainPausedUntil: number;
+  dailyModifierId: string;
+  runStartedAt: number;
+  awaitingTriageChoice: boolean;
+  triageBiasSide: PlayerSide | null;
+  triageBiasRemaining: number;
+  lastTriageAtScore: number;
+  internFakePromoShown: number[];
+}
+
 export interface GameCallbacks {
   onScoreUpdate: (years: number, energy: number) => void;
   onRankChange: (rank: Rank, message: string) => void;

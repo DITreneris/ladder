@@ -55,8 +55,14 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 | `VITE_PROMPT_ANATOMY_URL` | Optional — Prompt Anatomy co-branding (defaults in code) |
 | `VITE_TELEGRAM_ANALYTICS_TOKEN` | TON Builders → Analytics Keys → SDK token (eye icon) — activates Telegram catalog analytics |
 | `VITE_TELEGRAM_ANALYTICS_APP_NAME` | Optional — must be exactly `corporate_ladder` if set (defaults in code) |
+| `VITE_ADSGRAM_REVIVE_ENABLED` | Optional — `true` enables rewarded revive UI (test without ads when Block ID unset) |
+| `VITE_ADSGRAM_BLOCK_ID` | Optional — AdsGram Reward block ID from [partner.adsgram.ai](https://partner.adsgram.ai) (live ads) |
 
-4. Deploy and note production URL (e.g. `https://your-app.vercel.app`).
+**AdsGram setup (operator):** On platform → **+ Block** → type **Reward** → name `revive-game-over` → moderation via @adsgramsupport → copy Block ID into `VITE_ADSGRAM_BLOCK_ID`.
+
+**Test revive now:** set `VITE_ADSGRAM_REVIVE_ENABLED=true` in root `.env` (and Vercel). Without Block ID, the HR Training button restores the run instantly (no ad). Add Block ID when moderation passes for live rewarded ads.
+
+4. Deploy and note production URL (e.g. `https://www.promptanatomy.lol`).
 5. **Web Analytics:** Project → **Analytics** tab → **Enable** (required for `@vercel/analytics` page views on production).
 6. **TON Analytics:** After deploy, open the mini-app from the bot once; TON Builders → Analytics Keys should leave “Waiting for SDK”.
 7. **SEO / crawlers:** Confirm static assets (not SPA HTML):
