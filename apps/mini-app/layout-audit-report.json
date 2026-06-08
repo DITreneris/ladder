@@ -1,0 +1,83 @@
+{
+  "report": [
+    {
+      "viewport": "320px",
+      "screen": "home",
+      "hasGameColumn": true,
+      "game": {
+        "column": 0,
+        "hud": 0,
+        "play": 0,
+        "playClient": 0,
+        "tap": 0
+      },
+      "homeGutter": 278
+    },
+    {
+      "viewport": "320px",
+      "screen": "game-before-tap",
+      "hasGameColumn": true,
+      "game": {
+        "column": 278,
+        "hud": 246,
+        "play": 246,
+        "playClient": 246,
+        "tap": 246
+      },
+      "homeGutter": 0
+    },
+    {
+      "viewport": "320px",
+      "screen": "game-after-tap",
+      "hasGameColumn": true,
+      "game": {
+        "column": 278,
+        "hud": 246,
+        "play": 246,
+        "playClient": 246,
+        "tap": 246
+      },
+      "homeGutter": 0
+    },
+    {
+      "viewport": "390px",
+      "screen": "home",
+      "hasGameColumn": true,
+      "game": {
+        "column": 0,
+        "hud": 0,
+        "play": 0,
+        "playClient": 0,
+        "tap": 0
+      },
+      "homeGutter": 348
+    },
+    {
+      "viewport": "390px",
+      "screen": "game-before-tap",
+      "hasGameColumn": true,
+      "game": {
+        "column": 348,
+        "hud": 316,
+        "play": 316,
+        "playClient": 316,
+        "tap": 316
+      },
+      "homeGutter": 0
+    },
+    {
+      "viewport": "390px",
+      "screen": "game-after-tap",
+      "hasGameColumn": true,
+      "game": {
+        "column": 348,
+        "hud": 316,
+        "play": 316,
+        "playClient": 316,
+        "tap": 316
+      },
+      "homeGutter": 0
+    }
+  ],
+  "failures": []
+}
