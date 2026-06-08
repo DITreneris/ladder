@@ -18,6 +18,7 @@ This roadmap is organized around four product pillars — **mechanics**, **graph
 | **Next actions** | Vercel OG redeploy · Supabase `002` verify · [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) sign-off · public launch review ~2026-06-28 |
 | **Shipped in repo** | v1.9 F&F UX + OG adopt + career onboarding + v2.0 triage/hardening — [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14) · [2.0.0](CHANGELOG.md#200---2026-06-14) |
 | **Monetization** | **AdsGram rewarded revive** in repo — enable `VITE_ADSGRAM_REVIVE_ENABLED=true` to test now; add `VITE_ADSGRAM_BLOCK_ID` after AdsGram moderation for live ads. No virtual currency / forced interstitials. |
+| **Acquisition** | **Deferred** — no paid ads during F&F; first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
 | **Public launch** | Gated — review ~2026-06-28 after soft launch metrics |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy steps: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
@@ -424,4 +425,5 @@ If any answer is no, cut scope or defer.
 | [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Shell tokens and utilities |
 | [CHANGELOG.md](CHANGELOG.md) | Per-release shipped detail |
 | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | F&F runbook; v1.9 gate ~2026-06-14 |
+| [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) | Paid ads + channel posts; AdsGram acquisition vs in-app Reward |
 | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) | Pre-tag QA |

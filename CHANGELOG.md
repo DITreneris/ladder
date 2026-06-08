@@ -10,17 +10,26 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
-- **AdsGram rewarded revive** — optional **Mandatory HR Training** on game over (gated: meaningful run, near career high, or near #1); one executive exception per run; score submits after final death; `VITE_ADSGRAM_REVIVE_ENABLED=true` tests revive without ads; `VITE_ADSGRAM_BLOCK_ID` for live Reward ads
+- **[docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md)** — acquisition vs in-app monetization lanes; AdsGram campaign types (Network / Native / Telegram Ads β); organic channel post phases; go/no-go gates before paid spend; timeline aligned with F&F and public launch review (~2026-06-28)
+- **AdsGram rewarded revive** — optional **Mandatory HR Training** on game over (gated: meaningful run, near career high, or near #1); one executive exception per run; score submits after final death; live Reward ads via AdsGram block `revive-game-over` on production (`VITE_ADSGRAM_BLOCK_ID` on Vercel); `VITE_ADSGRAM_REVIVE_ENABLED=true` still allows ad-free revive testing when Block ID is unset locally
 - **TON Builders analytics (Telegram Mini Apps SDK)** — `@telegram-apps/analytics` initializes before first render; `appName` **`corporate_ladder`** (case-sensitive — must match TON Builders Analytics Keys identifier); activates when `VITE_TELEGRAM_ANALYTICS_TOKEN` is set (no-op when unset; complements `@vercel/analytics`, not a replacement)
 - **Live SEO smoke** — `npm run verify:seo:live` curls `sitemap.xml`, `robots.txt`, `llms.txt` on preview (CI)
+- **`ff-metrics.py` migration probe** — reports `migration_002_ok` for Supabase `submit_cooldowns` + `api_sessions` (run before v2.0 sign-off)
 
 ### Changed
+- **Monetization** — AdsGram Reward integration verified live in Telegram (rewarded video → run resume on qualifying deaths); no forced interstitials or virtual currency
+- **Leaderboard fetch window** — API loads up to 2000 recent runs before best-per-user aggregation (was 500)
+- **Bot `/start` copy** — `reorg_week` shift description matches mini-app daily modifier
 - **SEO / AI hardening** — Vercel rewrite excludes crawler static paths; `Content-Type` headers for sitemap/robots/llms; expanded `llms.txt`; JSON-LD `PlayAction` + canonical bot `t.me/corporateladder_bot`; sitemap lists shell + `llms.txt`
-- **[DEPLOY.md](DEPLOY.md)** — Vercel env vars for TON Analytics token; post-deploy curl checklist for crawler assets + GSC resubmit
+- **[DEPLOY.md](DEPLOY.md)** — TON Analytics token, AdsGram revive env vars (`VITE_ADSGRAM_REVIVE_ENABLED`, `VITE_ADSGRAM_BLOCK_ID`), post-deploy curl checklist for crawler assets + GSC resubmit
+- **[docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)** · **[docs/FF_EXECUTION.md](docs/FF_EXECUTION.md)** — Supabase `002` gate uses `migration_002_ok` from `ff-metrics.py`
 - **[.env.example](.env.example)** — documents `VITE_TELEGRAM_ANALYTICS_TOKEN` (TON Builders SDK token, not `TELEGRAM_BOT_TOKEN`)
-- **[DEPLOY.md](DEPLOY.md)** — AdsGram revive env vars (`VITE_ADSGRAM_REVIVE_ENABLED`, `VITE_ADSGRAM_BLOCK_ID`) and partner dashboard steps
 
 ### Fixed
+- **Revive defer score loss** — deferred game-over score submits on app background/close when revive is not taken (`pagehide` / `visibilitychange`)
+- **API validation UX** — 400/422 responses map to distinct HR audit toast (not generic connection error)
+- **Sprint mode trust (v2.0 follow-up)** — API validates `sprint_mode` against UTC daily preset (`synergy_sprint`); tighter sprint rung plausibility cap (90s session ceiling)
+- **Session token growth (v2.0 follow-up)** — expired rows and excess per-user tokens (max 3) pruned on `/auth/me`
 - **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
 - **Home screen UI** — sound toggle visible in Telegram light theme; CTA bar no longer shows office-grid pattern above Punch In; Prompt Anatomy footer uses official logo asset
 - **Telegram home co-brand** — Prompt Anatomy footer visible without scroll (`#homeBrandFooter` above CTA); reduced MainButton dead zone padding

@@ -60,6 +60,7 @@ Use this table to pick the right skill, rules, and documents.
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + § Shipped baseline, [CHANGELOG.md](CHANGELOG.md) |
 | F&F gate / device QA | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og` |
+| Paid ads / channel promotion / AdsGram acquisition | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md), [DEPLOY.md](DEPLOY.md) § AdsGram revive, [FF_REVIEW_2026-06-14](docs/FF_REVIEW_2026-06-14.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Debug triage / incident history | `debug-steward` | [project-context.mdc](.cursor/rules/project-context.mdc) | [debug-triage](.cursor/skills/debug-triage/SKILL.md), [DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md) |
 | Co-branding / PA footer | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | `apps/mini-app/src/lib/branding.ts`, [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) §9 |
@@ -105,6 +106,7 @@ Use this table to pick the right skill, rules, and documents.
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
+| `ads-acquisition` | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) | Product / ops | Paid acquisition gates; AdsGram campaign types; channel posts; separate from in-app Reward monetization |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |
 | `changelog` | [CHANGELOG.md](CHANGELOG.md) | Everyone | Keep a Changelog; `[Unreleased]` |

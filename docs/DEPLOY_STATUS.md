@@ -8,7 +8,7 @@ Track manual deploy progress through **soft-launch GO (2026-06-14)**. Full steps
 |------|---------|--------|-------------|
 | 0 | GitHub | **Done** | [DITreneris/ladder](https://github.com/DITreneris/ladder) — branch `main`, CI on push |
 | 0b | Local smoke | **Done** | `scripts/smoke-local.ps1` passed 2026-06-04 (pytest 20, vitest 76) |
-| 1 | Supabase migration | **001 Done** / **002 Pending** | Apply `002_v2_hardening.sql` before v2.0 sign-off |
+| 1 | Supabase migration | **001 Done** / **002 verify via `ff-metrics`** | Run [002_v2_hardening.sql](../supabase/migrations/002_v2_hardening.sql) if `migration_002_ok: false` |
 | 2 | Railway API | **Done** | Health ok; `ff-metrics.py` green 2026-06-04 |
 | 3 | Vercel Mini App | **Redeploy Done** / **OG pending** | Prod `main-CJgmaRAS.js` (2026-06-04); **redeploy after `public/og.png` adopt** so Telegram/link caches pick up new artwork |
 | 4 | Railway Bot | **Done** | `MINI_APP_URL` = Vercel production URL; `@CorporateLadder_bot` |

@@ -71,6 +71,7 @@ import {
   shouldOfferRevive,
   type ReviveContext,
 } from "./lib/revive";
+import { shouldFlushPendingSubmitOnLeave } from "./lib/pending-submit";
 
 type Screen = "home" | "game" | "gameover" | "leaderboard" | "howtoplay";
 type LeaderboardPeriod = "daily" | "weekly";
@@ -226,6 +227,9 @@ function submitFailureMessage(reason: ApiFailureReason): string {
   }
   if (reason === "rate_limit") {
     return "Score filing cooldown. Retry from game over in a few seconds.";
+  }
+  if (reason === "validation") {
+    return "HR rejected the filing — score didn't pass audit. Your local run still counts.";
   }
   return "Score not filed with HR. Check connection.";
 }
@@ -878,6 +882,25 @@ async function flushPendingSubmit(): Promise<SubmitRunResult | null> {
   return submitResult;
 }
 
+function installPendingSubmitLifecycleGuards(): void {
+  const flushOnLeave = (): void => {
+    if (
+      !shouldFlushPendingSubmitOnLeave(
+        pendingSubmitDeferred,
+        pendingSubmitResult !== null,
+        awaitingReviveRunSubmit
+      )
+    ) {
+      return;
+    }
+    void flushPendingSubmit();
+  };
+  window.addEventListener("pagehide", flushOnLeave);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushOnLeave();
+  });
+}
+
 async function onReviveAdClick(): Promise<void> {
   const snapshot = engine.getPendingReviveSnapshot();
   if (!snapshot || !lastGameResult) return;
@@ -1450,6 +1473,7 @@ function mountOgCaptureMode(): void {
 
 export function mountApp(): void {
   initTelegram();
+  installPendingSubmitLifecycleGuards();
   mountDebugStrip();
   username = getDisplayName();
   $("botHandleLabel").textContent = `@${getBotUsername()}`;
@@ -1679,12 +1703,5 @@ export function mountApp(): void {
         showAuthDegradedBanner(result.reason);
       }
     });
-  } else {
-    const saved = localStorage.getItem("corp_ladder_highscore");
-    if (saved) {
-      highScore = parseFloat(saved);
-      bestRank = rankFromYears(Math.floor(highScore));
-      refreshHomeBadgeUI();
-    }
   }
 }

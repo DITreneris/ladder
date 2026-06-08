@@ -232,12 +232,13 @@ def mock_supabase(monkeypatch):
                 ins = MagicMock()
 
                 def execute():
-                    expires = datetime.now(timezone.utc) + timedelta(hours=24)
-                    sessions[payload["token"]] = {
+                    row = {
                         **payload,
-                        "expires_at": expires.isoformat(),
+                        "expires_at": payload.get("expires_at")
+                        or (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
                     }
-                    return MagicMock(data=[payload])
+                    sessions[payload["token"]] = row
+                    return MagicMock(data=[row])
 
                 ins.execute = execute
                 return ins
@@ -259,18 +260,64 @@ def mock_supabase(monkeypatch):
                         ms.execute = execute
                         return ms
 
+                    def execute():
+                        if field == "telegram_id":
+                            rows = [v for v in sessions.values() if v.get("telegram_id") == value]
+                            return MagicMock(data=rows)
+                        if field == "token" and value in sessions:
+                            return MagicMock(data=[sessions[value]])
+                        return MagicMock(data=[])
+
                     eq_chain.maybe_single = maybe_single
+                    eq_chain.execute = execute
                     return eq_chain
 
                 sel.eq = eq
                 return sel
 
+            def delete():
+                del_chain = MagicMock()
+
+                def lt(field, value):
+                    lt_chain = MagicMock()
+
+                    def execute():
+                        if field == "expires_at":
+                            to_drop = [
+                                tok
+                                for tok, row in sessions.items()
+                                if row.get("expires_at", "") < value
+                            ]
+                            for tok in to_drop:
+                                sessions.pop(tok, None)
+                        return MagicMock(data=[])
+
+                    lt_chain.execute = execute
+                    return lt_chain
+
+                def eq(field, value):
+                    eq_chain = MagicMock()
+
+                    def execute():
+                        if field == "token" and value in sessions:
+                            sessions.pop(value, None)
+                        return MagicMock(data=[])
+
+                    eq_chain.execute = execute
+                    return eq_chain
+
+                del_chain.lt = lt
+                del_chain.eq = eq
+                return del_chain
+
             chain.insert = insert
             chain.select = select
+            chain.delete = delete
 
         return chain
 
     db.table = table
+    db.sessions_store = sessions
 
     def get_supabase():
         return db

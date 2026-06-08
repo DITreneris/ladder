@@ -62,6 +62,8 @@ Cold-deploy checklist for Supabase, Railway (API + bot), Vercel (mini-app), and 
 
 **Test revive now:** set `VITE_ADSGRAM_REVIVE_ENABLED=true` in root `.env` (and Vercel). Without Block ID, the HR Training button restores the run instantly (no ad). Add Block ID when moderation passes for live rewarded ads.
 
+**Paid acquisition (buying players):** separate from Reward blocks — deferred until public launch GO; see [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md).
+
 4. Deploy and note production URL (e.g. `https://www.promptanatomy.lol`).
 5. **Web Analytics:** Project → **Analytics** tab → **Enable** (required for `@vercel/analytics` page views on production).
 6. **TON Analytics:** After deploy, open the mini-app from the bot once; TON Builders → Analytics Keys should leave “Waiting for SDK”.

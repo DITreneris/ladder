@@ -39,7 +39,7 @@ PRESETS: dict[str, ShiftPreset] = {
     "reorg_week": {
         "id": "reorg_week",
         "label": "Reorg Week",
-        "description": "Org chart unstable. Reporting lines are suggestions. Reorg probability rising. Titles fluid.",
+        "description": "Org chart unstable. Reporting lines are suggestions. Reorgs ramp after onboarding (~3y). Titles fluid.",
     },
     "synergy_sprint": {
         "id": "synergy_sprint",

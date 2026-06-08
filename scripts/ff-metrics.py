@@ -63,6 +63,17 @@ def http_json(method: str, url: str, body: dict | None = None, timeout: int = 15
             return e.code, raw
 
 
+def probe_migration_002(db) -> bool:
+    """Return True when submit_cooldowns and api_sessions exist."""
+    ok = True
+    for table in ("submit_cooldowns", "api_sessions"):
+        try:
+            db.table(table).select("telegram_id").limit(1).execute()
+        except Exception:
+            ok = False
+    return ok
+
+
 def query_supabase(env: dict[str, str]) -> dict:
     from supabase import create_client
 
@@ -155,6 +166,7 @@ def query_supabase(env: dict[str, str]) -> dict:
 
     return {
         "supabase_url_host": url.replace("https://", "").split("/")[0],
+        "migration_002_ok": probe_migration_002(db),
         "users_total": users_count,
         "runs_total": runs_count,
         "runs_14d": runs_14d,

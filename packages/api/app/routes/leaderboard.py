@@ -31,7 +31,7 @@ def _fetch_best_by_user(since: datetime) -> dict[int, dict]:
         .select("years_survived, final_rank, created_at, users(username, first_name, telegram_id)")
         .gte("created_at", since.isoformat())
         .order("years_survived", desc=True)
-        .limit(500)
+        .limit(2000)  # v1.1: DB-side best-per-user aggregation
         .execute()
     )
 

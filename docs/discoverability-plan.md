@@ -151,6 +151,7 @@ Add `og:image` once `public/og.png` exists.
 - Google Search Console for `promptanatomy.lol` before Phase 2 decision
 - Marketing-site layout in mini-app (hero, footer grid) — per [DESIGN_SYSTEM.md](../DESIGN_SYSTEM.md)
 - v1.1 analytics platform as substitute for F&F qualitative signal
+- Paid acquisition (AdsGram campaigns, boosted channel posts) before public launch review — see [ads-acquisition-plan.md](ads-acquisition-plan.md)
 
 ---
 
@@ -181,6 +182,7 @@ Add `og:image` once `public/og.png` exists.
 | **F&F review** (~2026-06-14) | Go/no-go on Phase 1 |
 | **v1.9** | Game juice if F&F weak; Phase 1 if widening audience |
 | **v1.1 platform** | Analytics (explicit approval) — separate from SEO |
+| **Public launch (~2026-06-28)** | Paid acquisition pilot if GO — [ads-acquisition-plan.md](ads-acquisition-plan.md) |
 
 ---
 
@@ -205,3 +207,4 @@ Add `og:image` once `public/og.png` exists.
 - [ROADMAP.md](../ROADMAP.md) — release train
 - [docs/mvp-scope.md](mvp-scope.md) — scope boundaries
 - [DITreneris/site](https://github.com/DITreneris/site) — ecosystem marketing (Phase 1)
+- [docs/ads-acquisition-plan.md](ads-acquisition-plan.md) — paid ads + channel posts (deferred until public launch GO)

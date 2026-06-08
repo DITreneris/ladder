@@ -27,7 +27,7 @@
 | Step | Result |
 |------|--------|
 | `scripts/smoke-local.ps1` | [ ] pytest + vitest + lint/build + qa:viewport/layout/coffee |
-| Supabase `002_v2_hardening.sql` | [ ] applied |
+| Supabase `002_v2_hardening.sql` | [ ] applied — confirm `python scripts/ff-metrics.py` → `migration_002_ok: true` |
 | Push `main` → Vercel + Railway | [ ] |
 
 ### Post-deploy smoke (production)

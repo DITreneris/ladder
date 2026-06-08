@@ -32,7 +32,7 @@ export interface LeaderboardMeResponse {
   on_board: boolean;
 }
 
-export type ApiFailureReason = "auth" | "rate_limit" | "network" | "server";
+export type ApiFailureReason = "auth" | "rate_limit" | "validation" | "network" | "server";
 
 export type ProfileResult =
   | { ok: true; profile: UserProfile; sessionToken: string | null }
@@ -56,9 +56,10 @@ export function setSessionToken(token: string | null): void {
   cachedSessionToken = token;
 }
 
-function statusToReason(status: number): ApiFailureReason {
+export function statusToReason(status: number): ApiFailureReason {
   if (status === 401) return "auth";
   if (status === 429) return "rate_limit";
+  if (status === 400 || status === 422) return "validation";
   if (status >= 500) return "server";
   return "server";
 }

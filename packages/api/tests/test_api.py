@@ -218,3 +218,64 @@ def test_leaderboard_me_invalid_token(mock_supabase):
         json={"sessionToken": "bad-token", "period": "daily"},
     )
     assert response.status_code == 401
+
+
+def test_runs_sprint_mode_required_on_sprint_day(mock_supabase, valid_init_data, monkeypatch):
+    runs_module._submit_timestamps.clear()
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
+    response = client.post(
+        "/runs",
+        json={
+            "initData": valid_init_data,
+            "years_survived": 5,
+            "final_rank": "Intern",
+            "rungs_climbed": 20,
+            "sprint_mode": False,
+        },
+    )
+    assert response.status_code == 400
+    assert "sprint_mode required" in response.json()["detail"].lower()
+
+
+def test_runs_sprint_mode_rejected_on_non_sprint_day(mock_supabase, valid_init_data, monkeypatch):
+    runs_module._submit_timestamps.clear()
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "standard")
+    response = client.post(
+        "/runs",
+        json={
+            "initData": valid_init_data,
+            "years_survived": 5,
+            "final_rank": "Intern",
+            "rungs_climbed": 20,
+            "sprint_mode": True,
+        },
+    )
+    assert response.status_code == 400
+    assert "sprint_mode invalid" in response.json()["detail"].lower()
+
+
+def test_runs_accepts_sprint_mode_on_sprint_day(mock_supabase, valid_init_data, monkeypatch):
+    runs_module._submit_timestamps.clear()
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 5,
+            "final_rank": "Intern",
+            "termination_cause": "Sprint standdown",
+            "rungs_climbed": 20,
+            "sprint_mode": True,
+        },
+    )
+    assert response.status_code == 200
+
+
+def test_create_session_prunes_old_tokens(mock_supabase):
+    from app.auth.session import create_session
+
+    tg_id = TEST_USER["id"]
+    for _ in range(5):
+        create_session(tg_id)
+    assert len(mock_supabase.sessions_store) <= 3

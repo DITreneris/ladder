@@ -8,12 +8,37 @@ from fastapi import HTTPException
 from app.db.supabase import get_supabase
 
 SESSION_TTL_HOURS = 24
+MAX_ACTIVE_SESSIONS_PER_USER = 3
+
+
+def _cleanup_sessions(db, telegram_id: int) -> None:
+    now_iso = datetime.now(timezone.utc).isoformat()
+    db.table("api_sessions").delete().lt("expires_at", now_iso).execute()
+
+    existing = (
+        db.table("api_sessions")
+        .select("token, expires_at")
+        .eq("telegram_id", telegram_id)
+        .execute()
+    )
+    rows = existing.data if existing else []
+    if not rows:
+        return
+
+    def sort_key(row: dict) -> str:
+        return row.get("expires_at") or ""
+
+    rows.sort(key=sort_key, reverse=True)
+    if len(rows) >= MAX_ACTIVE_SESSIONS_PER_USER:
+        for row in rows[MAX_ACTIVE_SESSIONS_PER_USER - 1 :]:
+            db.table("api_sessions").delete().eq("token", row["token"]).execute()
 
 
 def create_session(telegram_id: int) -> str:
     token = secrets.token_urlsafe(32)
     expires_at = datetime.now(timezone.utc) + timedelta(hours=SESSION_TTL_HOURS)
     db = get_supabase()
+    _cleanup_sessions(db, telegram_id)
     db.table("api_sessions").insert(
         {
             "token": token,
