@@ -32,7 +32,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Session token growth (v2.0 follow-up)** — expired rows and excess per-user tokens (max 3) pruned on `/auth/me`
 - **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
 - **Home screen UI** — sound toggle visible in Telegram light theme; CTA bar no longer shows office-grid pattern above Punch In; Prompt Anatomy footer uses official logo asset
-- **Telegram home co-brand** — Prompt Anatomy footer visible without scroll (`#homeBrandFooter` above CTA); reduced MainButton dead zone padding
+- **Coffee QA flake (CI)** — longer tap gaps and timeouts in `qa:coffee`; one retry on GitHub Actions runners
 
 ### Planned (v1.1)
 - All-time / Legends tab

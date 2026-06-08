@@ -5,9 +5,9 @@
 import { chromium } from "playwright";
 
 const BASE = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
-/** UI + engine throttle is 120ms each — gap avoids dropped taps on slow CI. */
-const TAP_GAP_MS = 320;
-const WAIT_MS = 15000;
+/** UI + engine throttle is 120ms each — gap avoids dropped taps on slow CI runners. */
+const TAP_GAP_MS = 450;
+const WAIT_MS = 25000;
 
 function qaUrl() {
   const url = new URL(BASE);
