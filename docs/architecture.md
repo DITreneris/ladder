@@ -44,8 +44,10 @@ All services can read a **single repo root** `.env` (see [.env.example](../.env.
 
 | Variable | Where | Purpose |
 |----------|-------|---------|
-| `TELEGRAM_BOT_TOKEN` | Railway (API + Bot) | Bot authentication |
+| `TELEGRAM_BOT_TOKEN` | Railway (API + Bot) | Bot authentication; API also calls `savePreparedInlineMessage` |
 | `TELEGRAM_WEBAPP_SECRET` | Railway API | initData HMAC validation (same as bot token) |
+| `TELEGRAM_BOT_USERNAME` | Railway API | Optional; native share challenge links (default `CorporateLadder_bot`) |
+| `PROMPT_ANATOMY_URL` | Railway API | Optional; share co-brand line |
 | `SUPABASE_URL` | Railway API | Database URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Railway API | Server-side writes (bypasses RLS) |
 | `MINI_APP_URL` | Railway Bot | Vercel production URL for private-chat `web_app` button |
@@ -66,6 +68,7 @@ All services can read a **single repo root** `.env` (see [.env.example](../.env.
 | GET | `/health` | Health check |
 | POST | `/auth/me` | Validate initData, return user profile + `session_token` |
 | POST | `/runs` | Submit game result (`initData`, optional `sprint_mode`) |
+| POST | `/share/prepare` | Prepare native Telegram share (`initData` + run summary → `preparedMessageId`) |
 | GET | `/leaderboard?period=daily\|weekly&limit=50` | Leaderboard entries (no auth in URL) |
 | POST | `/leaderboard/me` | Current user rank highlight via `session_token` |
 

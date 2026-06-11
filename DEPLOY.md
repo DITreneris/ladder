@@ -124,6 +124,13 @@ help - How to play in 30 seconds
 
 After Railway bot redeploy, smoke `/start`, `/go`, `/play`, and `/help` — each should show **Punch In & Climb** and today's shift label should match the in-app pill.
 
+**Native share (Bot API 8.0+):**
+
+1. BotFather → `/setinline` → enable **inline mode** for the game bot (required for `savePreparedInlineMessage`)
+2. Railway API must have `TELEGRAM_BOT_TOKEN` (already set for initData)
+3. Optional: set `TELEGRAM_BOT_USERNAME` on API if bot handle differs from `CorporateLadder_bot`
+4. Device QA: game over → **Share** → pick DM or group → performance review message sends; if prepare fails, clipboard fallback toast appears
+
 ## Group chats (multi-bot)
 
 Telegram **does not allow** `web_app` inline buttons in groups/supergroups (`BUTTON_TYPE_INVALID`). Private chat uses a WebApp button; groups use a **`t.me/bot?startapp`** URL button (see `apps/bot/main.py`).
@@ -151,7 +158,7 @@ Telegram **does not allow** `web_app` inline buttons in groups/supergroups (`BUT
 - [ ] Mini App loads inside Telegram (not broken blank screen)
 - [ ] Complete one run; score appears on **Daily** leaderboard
 - [ ] **Weekly** tab loads entries
-- [ ] Share button works (native share or clipboard fallback with toast on failure)
+- [ ] Share button works: native picker (prepared message) in DM **and** group, or clipboard fallback with toast on failure
 - [ ] Header bot handle matches `VITE_BOT_USERNAME`
 - [ ] No `TELEGRAM_BOT_TOKEN` or Supabase keys in mini-app bundle (inspect env / build only uses `VITE_*`)
 

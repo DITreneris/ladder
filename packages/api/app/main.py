@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import auth, leaderboard, runs
+from app.routes import auth, leaderboard, runs, share
 
 _DEFAULT_CORS = [
     "https://www.promptanatomy.lol",
@@ -30,6 +30,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(runs.router, prefix="/runs", tags=["runs"])
 app.include_router(leaderboard.router, prefix="/leaderboard", tags=["leaderboard"])
+app.include_router(share.router, prefix="/share", tags=["share"])
 
 
 @app.get("/health")

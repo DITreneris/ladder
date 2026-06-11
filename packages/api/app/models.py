@@ -58,3 +58,21 @@ class LeaderboardMeResponse(BaseModel):
     years_survived: float | None = None
     final_rank: str | None = None
     on_board: bool = False
+
+
+class SharePrepareRequest(BaseModel):
+    init_data: str = Field(..., alias="initData")
+    years_survived: float = Field(..., ge=0, le=100)
+    final_rank: FinalRank
+    shift_label: str = Field(..., min_length=1, max_length=80)
+    termination_detail: str = Field(..., min_length=1, max_length=200)
+    termination_flavor: str = Field(..., min_length=1, max_length=300)
+    death_type: str | None = Field(default=None, max_length=32)
+
+    model_config = {"populate_by_name": True}
+
+
+class SharePrepareResponse(BaseModel):
+    prepared_message_id: str = Field(..., alias="preparedMessageId")
+
+    model_config = {"populate_by_name": True}

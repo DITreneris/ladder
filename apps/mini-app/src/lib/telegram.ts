@@ -39,7 +39,8 @@ declare global {
         expand: () => void;
         initData: string;
         initDataUnsafe: { user?: TelegramUser; start_param?: string };
-        shareMessage?: (params: { text: string }) => void;
+        isVersionAtLeast?: (version: string) => boolean;
+        shareMessage?: (msgId: string, callback?: (sent: boolean) => void) => void;
         openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink?: (url: string) => void;
         MainButton: TelegramMainButton;
@@ -263,16 +264,56 @@ export function getDisplayName(fallback = "CorporateSlave"): string {
   return user.username ?? user.first_name ?? fallback;
 }
 
-/** Native Telegram share when WebApp.shareMessage is available; else clipboard in app.ts. */
-export function shareText(text: string): boolean {
-  const share = window.Telegram?.WebApp?.shareMessage;
-  if (typeof share !== "function") return false;
-  try {
-    share({ text });
-    return true;
-  } catch {
-    return false;
+/** True when Bot API 8.0+ shareMessage with prepared id is available. */
+export function canNativeShare(): boolean {
+  const tg = window.Telegram?.WebApp;
+  if (!tg || typeof tg.shareMessage !== "function") return false;
+  if (typeof tg.isVersionAtLeast === "function") {
+    return tg.isVersionAtLeast("8.0");
   }
+  return true;
+}
+
+const SHARE_MESSAGE_TIMEOUT_MS = 120_000;
+
+/** Open native share picker for a bot-prepared message id; resolves when send completes or fails. */
+export function sharePreparedMessage(msgId: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const tg = window.Telegram?.WebApp;
+    const share = tg?.shareMessage;
+    if (!share) {
+      resolve(false);
+      return;
+    }
+
+    let settled = false;
+    const finish = (sent: boolean) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      clearTimeout(timeoutId);
+      resolve(sent);
+    };
+
+    const onSent = () => finish(true);
+    const onFailed = () => finish(false);
+
+    const cleanup = () => {
+      tg?.offEvent?.("shareMessageSent", onSent);
+      tg?.offEvent?.("shareMessageFailed", onFailed);
+    };
+
+    tg?.onEvent?.("shareMessageSent", onSent);
+    tg?.onEvent?.("shareMessageFailed", onFailed);
+
+    const timeoutId = setTimeout(() => finish(false), SHARE_MESSAGE_TIMEOUT_MS);
+
+    try {
+      share(msgId, (sent) => finish(Boolean(sent)));
+    } catch {
+      finish(false);
+    }
+  });
 }
 
 export function openExternalLink(url: string): void {

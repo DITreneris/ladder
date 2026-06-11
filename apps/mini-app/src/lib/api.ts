@@ -143,6 +143,35 @@ async function fetchLeaderboardMe(
 
 export { fetchLeaderboardMe };
 
+export type PrepareShareResult =
+  | { ok: true; preparedMessageId: string }
+  | { ok: false; reason: ApiFailureReason };
+
+export interface SharePreparePayload {
+  initData: string;
+  yearsSurvived: number;
+  finalRank: string;
+  shiftLabel: string;
+  terminationDetail: string;
+  terminationFlavor: string;
+  deathType?: string | null;
+}
+
+export async function prepareShare(payload: SharePreparePayload): Promise<PrepareShareResult> {
+  if (!payload.initData) return { ok: false, reason: "auth" };
+  const result = await apiPost<{ preparedMessageId: string }>("/share/prepare", {
+    initData: payload.initData,
+    years_survived: payload.yearsSurvived,
+    final_rank: payload.finalRank,
+    shift_label: payload.shiftLabel,
+    termination_detail: payload.terminationDetail,
+    termination_flavor: payload.terminationFlavor,
+    death_type: payload.deathType ?? null,
+  });
+  if (!result.ok) return result;
+  return { ok: true, preparedMessageId: result.data.preparedMessageId };
+}
+
 export async function fetchLeaderboard(
   period: "daily" | "weekly",
   sessionToken?: string | null

@@ -24,7 +24,7 @@ import {
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchLeaderboardMe, fetchProfile, getSessionToken, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { fetchLeaderboard, fetchLeaderboardMe, fetchProfile, getSessionToken, prepareShare, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/avatar";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
@@ -53,6 +53,7 @@ import {
 import {
   disableVerticalSwipe,
   enableVerticalSwipe,
+  canNativeShare,
   getBotUsername,
   getDisplayName,
   getInitData,
@@ -63,7 +64,7 @@ import {
   hideHomeMainButton,
   initTelegram,
   isTelegram,
-  shareText,
+  sharePreparedMessage,
   showHomeMainButton,
   showTelegramBack,
 } from "./lib/telegram";
@@ -85,6 +86,7 @@ let username = "CorporateSlave";
 let highScore = 0;
 let bestRank: Rank = "Intern";
 let lastGameResult: GameOverResult | null = null;
+let shareInProgress = false;
 let leaderboardPeriod: LeaderboardPeriod = "daily";
 let engine: GameEngine;
 let prevRungsSnapshot: Rung[] = [];
@@ -1478,24 +1480,57 @@ function buildShareText(): string {
   );
 }
 
-function copyShareText(): void {
-  const text = buildShareText();
-  trackEvent("share_tap");
-  if (shareText(text)) {
-    trackEvent("share_success", { method: "native" });
-    showToast("Share sheet opened in Telegram.", { surface: "shell" });
-    return;
-  }
+function fallbackClipboard(text: string): Promise<void> {
   if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text).then(
+    return navigator.clipboard.writeText(text).then(
       () => {
         trackEvent("share_success", { method: "clipboard" });
         showToast("Review copied! Paste into Telegram to share.");
       },
       () => showToast("Could not copy — try again.")
     );
-  } else {
-    showToast("Could not copy — try again.");
+  }
+  showToast("Could not copy — try again.");
+  return Promise.resolve();
+}
+
+async function copyShareText(): Promise<void> {
+  if (shareInProgress) return;
+  shareInProgress = true;
+  const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
+  if (shareBtn) shareBtn.disabled = true;
+
+  try {
+    const text = buildShareText();
+    trackEvent("share_tap");
+
+    if (canNativeShare() && lastGameResult) {
+      const initData = getInitData();
+      if (initData) {
+        const prepared = await prepareShare({
+          initData,
+          yearsSurvived: lastGameResult.yearsSurvived,
+          finalRank: lastGameResult.finalRank,
+          shiftLabel: engine.getDailyModifier().label,
+          terminationDetail: lastGameResult.terminationDetail,
+          terminationFlavor: lastGameResult.terminationFlavor,
+          deathType: lastGameResult.deathType,
+        });
+        if (prepared.ok) {
+          const sent = await sharePreparedMessage(prepared.preparedMessageId);
+          if (sent) {
+            trackEvent("share_success", { method: "native" });
+            showToast("Share sheet opened in Telegram.", { surface: "shell" });
+            return;
+          }
+        }
+      }
+    }
+
+    await fallbackClipboard(text);
+  } finally {
+    shareInProgress = false;
+    if (shareBtn) shareBtn.disabled = false;
   }
 }
 

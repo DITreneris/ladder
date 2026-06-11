@@ -249,7 +249,7 @@ export const APP_SHELL = `
           <span id="reviveAdSubline" class="text-nano font-semibold text-slate-500">One executive exception this shift</span>
         </button>
         <div class="grid grid-cols-2 gap-2">
-          <button onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">
+          <button id="shareBtn" type="button" onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">
             ${icon("share")} Share
           </button>
           <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2.5 px-3 text-xs">

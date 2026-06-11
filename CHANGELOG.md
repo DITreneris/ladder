@@ -10,6 +10,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **`POST /share/prepare`** — authenticated share prep for native Telegram `shareMessage` (Bot API 8.0+)
 - **[docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)** — pre-launch product audit #2 (CONDITIONAL GO 62/100); integrated with ROADMAP § UX audit and PUBLIC_LAUNCH_REVIEW gates
 - **Home context slot** — news ticker, daily shift, and challenge banner now share one rotating slot (`#homeContextSlot`, 6s crossfade); challenge pins until dismissed; daily shift shown statically under reduced motion and capture modes — trims home above-the-fold density per 2026 front-page audit
 - **Home badge skeleton** — Employee Badge fields pulse (`.home-skeleton`) while the HR file (`/auth/me`) loads in Telegram, instead of default values popping in
@@ -20,6 +21,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Short-viewport home trim** — gameplay preview collapses by default on viewports ≤620px (not just after first run) so the Punch In CTA bar fits 320×568 without scrolling; "How to Survive — show mechanics" toggle unchanged
 
 ### Fixed
+- **Native Telegram share** — `POST /share/prepare` calls Bot API `savePreparedInlineMessage`; mini-app opens `WebApp.shareMessage(preparedMessageId)` with `shareMessageSent`/`Failed` handling; clipboard fallback on prepare failure, unsupported client, or user decline (fixes v2.2.0 invalid `shareMessage({ text })` crash in groups)
 - **Phone landscape / orientation** — portrait gate on squashed landscape viewports; shell height uses `min-height: 100dvh` for Android rotation; resize/orientation handlers refresh home trim and in-run ladder layout
 - **Android Telegram black screen** — on `colorScheme: dark`, keep `.cl-viewport` and WebApp background light so fixed slate shell copy stays readable; guard TON analytics init so a SDK failure cannot block mount
 - **Daily leaderboard stale after game over** — fetch leaderboard after score submit (not in parallel), so gap line, self-row highlight, and Leaderboard tab reflect the run HR just filed

@@ -23,7 +23,7 @@ alwaysApply: false
 - Never embed `TELEGRAM_BOT_TOKEN` or Supabase keys in client code.
 - Use `getInitData()` for `/auth/me` and `/runs`; use cached `session_token` for `POST /leaderboard/me`.
 - Leaderboard tabs: Daily and Weekly only (v1).
-- Share: prefer `Telegram.WebApp.shareMessage()`, fallback to clipboard.
+- Share: `POST /share/prepare` then `WebApp.shareMessage(preparedMessageId)`; clipboard fallback on failure.
 - Styling: Tailwind utility classes via Vite plugin; no CDN Tailwind in production.
 - Game logic changes must match [ROADMAP.md](../../ROADMAP.md) § Shipped baseline; new features need [mvp-scope](../../docs/mvp-scope.md) boundary check.
 

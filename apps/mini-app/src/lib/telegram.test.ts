@@ -1,8 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
-import { afterEach, describe, expect, it } from "vitest";
-import { applyTelegramTheme, shareText } from "./telegram";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { applyTelegramTheme, canNativeShare, sharePreparedMessage } from "./telegram";
 
 function mockTelegramTheme(
   themeParams: Record<string, string>,
@@ -13,7 +13,7 @@ function mockTelegramTheme(
       themeParams,
       colorScheme,
     },
-  } as Window["Telegram"];
+  } as unknown as Window["Telegram"];
 }
 
 describe("applyTelegramTheme", () => {
@@ -61,25 +61,108 @@ describe("applyTelegramTheme", () => {
   });
 });
 
-describe("shareText", () => {
+describe("canNativeShare", () => {
   afterEach(() => {
     delete window.Telegram;
   });
 
   it("returns false when shareMessage unavailable", () => {
-    expect(shareText("hello")).toBe(false);
+    expect(canNativeShare()).toBe(false);
   });
 
-  it("calls WebApp.shareMessage when available", () => {
-    let shared = "";
+  it("returns true when shareMessage exists and version is 8.0+", () => {
     window.Telegram = {
       WebApp: {
-        shareMessage: ({ text }: { text: string }) => {
-          shared = text;
-        },
+        shareMessage: vi.fn(),
+        isVersionAtLeast: (version: string) => version === "8.0",
       },
-    } as Window["Telegram"];
-    expect(shareText("review")).toBe(true);
-    expect(shared).toBe("review");
+    } as unknown as Window["Telegram"];
+    expect(canNativeShare()).toBe(true);
+  });
+
+  it("returns false when Telegram client is below 8.0", () => {
+    window.Telegram = {
+      WebApp: {
+        shareMessage: vi.fn(),
+        isVersionAtLeast: () => false,
+      },
+    } as unknown as Window["Telegram"];
+    expect(canNativeShare()).toBe(false);
+  });
+});
+
+describe("sharePreparedMessage", () => {
+  afterEach(() => {
+    delete window.Telegram;
+    vi.useRealTimers();
+  });
+
+  it("returns false when shareMessage unavailable", async () => {
+    await expect(sharePreparedMessage("msg-id")).resolves.toBe(false);
+  });
+
+  it("passes prepared message id to WebApp.shareMessage", async () => {
+    let sharedId = "";
+    window.Telegram = {
+      WebApp: {
+        shareMessage: (msgId: string, callback?: (sent: boolean) => void) => {
+          sharedId = msgId;
+          callback?.(true);
+        },
+        onEvent: vi.fn(),
+        offEvent: vi.fn(),
+      },
+    } as unknown as Window["Telegram"];
+
+    await expect(sharePreparedMessage("prepared-123")).resolves.toBe(true);
+    expect(sharedId).toBe("prepared-123");
+  });
+
+  it("resolves false when callback reports decline", async () => {
+    window.Telegram = {
+      WebApp: {
+        shareMessage: (_msgId: string, callback?: (sent: boolean) => void) => {
+          callback?.(false);
+        },
+        onEvent: vi.fn(),
+        offEvent: vi.fn(),
+      },
+    } as unknown as Window["Telegram"];
+
+    await expect(sharePreparedMessage("prepared-456")).resolves.toBe(false);
+  });
+
+  it("resolves true on shareMessageSent event", async () => {
+    const handlers: Record<string, () => void> = {};
+    window.Telegram = {
+      WebApp: {
+        shareMessage: vi.fn(),
+        onEvent: (event: string, handler: () => void) => {
+          handlers[event] = handler;
+        },
+        offEvent: vi.fn(),
+      },
+    } as unknown as Window["Telegram"];
+
+    const promise = sharePreparedMessage("prepared-789");
+    handlers.shareMessageSent?.();
+    await expect(promise).resolves.toBe(true);
+  });
+
+  it("resolves false on shareMessageFailed event", async () => {
+    const handlers: Record<string, () => void> = {};
+    window.Telegram = {
+      WebApp: {
+        shareMessage: vi.fn(),
+        onEvent: (event: string, handler: () => void) => {
+          handlers[event] = handler;
+        },
+        offEvent: vi.fn(),
+      },
+    } as unknown as Window["Telegram"];
+
+    const promise = sharePreparedMessage("prepared-fail");
+    handlers.shareMessageFailed?.();
+    await expect(promise).resolves.toBe(false);
   });
 });

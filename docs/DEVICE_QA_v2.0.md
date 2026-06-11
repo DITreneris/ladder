@@ -20,6 +20,8 @@
 | 8 | **Score submit** | Offline game over | Failure toast; career high unchanged | [ ] | [ ] |
 | 9 | **429 cooldown** | Two quick deaths | "Score filing cooldown" toast | [ ] | [ ] |
 | 10 | **Synergy Sprint** | On sprint day, 60s cap | Sprint HUD + timeout game over | [ ] | [ ] |
+| 11 | **Native share (DM)** | Finish run → Share → send to saved messages or contact | Prepared performance review sends; `share_success` native or clipboard toast | [ ] | [ ] |
+| 12 | **Native share (group)** | Open via `/go@bot` in supergroup → finish run → Share to same group | Message appears in group; no WebView crash | [ ] | [ ] |
 
 ---
 
@@ -51,7 +53,7 @@ Local CI smoke before manual device sign-off:
 | 4 Tutorial rungs 1–3 | `engine.test.ts` — `TUTORIAL_RUNG_SPECS` + v2.1.1 overlay gating in app |
 | 7 LB highlight | `api.test.ts` + session token flow |
 | 8 Score submit | API pytest submit pipeline |
-| Share | `copyShareText` native + clipboard paths; manual paste still required for gate #8 |
+| Share | `telegram.test.ts` + `test_share.py`; manual DM + group rows 11–12 for gate #8 |
 
 **Manual only:** triage prompt (1–3), background drain (5), keyboard throttle (6), layout/tap feel, Telegram BackButton, native share on device.
 

@@ -152,7 +152,7 @@ Verify home badge, spawn feel, and share text includes `Shift:`.
 
 - **Auth:** `getInitData()` for `/auth/me` and `/runs`; cached `session_token` for `POST /leaderboard/me`
 - **Theme:** `themeParams` mapped to `--cl-*` CSS variables (light/dark)
-- **Share:** `Telegram.WebApp.shareMessage()` with clipboard fallback
+- **Share:** `POST /share/prepare` then `WebApp.shareMessage(preparedMessageId)`; clipboard fallback
 - **Leaderboards:** Daily + Weekly only (v1)
 
 ## Deploy

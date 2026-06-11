@@ -201,14 +201,14 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **Tasks** | [x] Branch on `ApiFailureReason`: `auth` vs `network` vs `server` |
 | **Acceptance** | Airplane mode shows connection message, not session expired |
 
-### P2-2 · Share flow clipboard-only
+### P2-2 · Share flow (native + clipboard)
 
 | **ID** | C-04 |
-| **Files** | `apps/mini-app/src/lib/telegram.ts` (`shareText` always `false`), `app.ts` `copyShareText()` |
-| **Tasks** | [ ] Verify clipboard on iOS/Android Telegram **Verify** |
-| **Tasks** | [x] Improve failure toast if clipboard denied |
-| **Defer** | Native `shareMessage` via bot `savePreparedInlineMessage` (v1.1) |
-| **Acceptance** | Share button always gives clear next step (copied / failed) |
+| **Files** | `packages/api/app/routes/share.py`, `apps/mini-app/src/lib/telegram.ts`, `app.ts` `copyShareText()` |
+| **Tasks** | [x] Native `shareMessage` via `savePreparedInlineMessage` + `POST /share/prepare` |
+| **Tasks** | [x] Clipboard fallback on prepare failure / user decline |
+| **Tasks** | [ ] Verify native share on iOS/Android Telegram in DM + group **Verify** |
+| **Acceptance** | Share button always gives clear next step (native send or copied / failed) |
 
 ### P2-3 · In-memory rate limit (10s submit cooldown)
 

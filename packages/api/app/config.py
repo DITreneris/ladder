@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=_ENV_FILES, extra="ignore")
     telegram_bot_token: str = ""
     telegram_webapp_secret: str = ""
+    telegram_bot_username: str = "CorporateLadder_bot"
+    prompt_anatomy_url: str = "https://www.promptanatomy.app"
     supabase_url: str = ""
     supabase_service_role_key: str = ""
 
