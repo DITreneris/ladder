@@ -9,7 +9,7 @@ A fast-paced Telegram Mini App: tap left/right to climb the corporate ladder, do
 1. Tap **Punch In & Climb** — you start in the center corridor; first tap starts energy drain.
 2. Tap **LEFT** or **RIGHT** for the **next** rung's safe side (three lanes visually, two buttons).
 3. First runs teach: clear rung → dodge meeting → grab coffee (+25% energy); gentler hazard rate through ~3y; hints through 10y.
-4. **Building floors** (Intern Pit → Open Office → Middle Management → Executive Suite) are flavor on the HUD; **rank gates** drive mechanics: Intern = meetings only; Manager @ 10y = +reorgs and badge gates; CEO @ 35y = +deadlines and desk plants.
+4. **Building floors** (Intern Pit → Open Office → Middle Management → Executive Suite) are flavor on the HUD; **rank gates** drive mechanics: Intern = meetings only; Manager @ 10y = +reorgs and badge gates; Director @ 20y = +deadlines; CEO @ 35y = +desk plants.
 5. Survive as many **Career Years** as possible before HR terminates you. Reorg Week daily shift may add reorgs after the onboarding ramp (~3y), not from rung one.
 
 ## Pre-release QA
@@ -74,9 +74,11 @@ Loaded from **repo root** `.env` (see `vite.config.ts` `envDir`).
 | Variable | Purpose |
 |----------|---------|
 | `VITE_API_URL` | FastAPI base URL (e.g. `http://localhost:8000`) |
-| `VITE_BOT_USERNAME` | Bot username without `@` (share deep links) |
+| `VITE_BOT_USERNAME` | Bot username without `@` (`CorporateLadder_bot`; share deep links) |
 | `VITE_TELEGRAM_ANALYTICS_TOKEN` | Optional — TON Builders Analytics Keys SDK token (production) |
 | `VITE_TELEGRAM_ANALYTICS_APP_NAME` | Optional — defaults to `corporate_ladder` (case-sensitive) |
+| `VITE_ADSGRAM_REVIVE_ENABLED` | Optional — enable rewarded revive flow (ad-free test when Block ID unset) |
+| `VITE_ADSGRAM_BLOCK_ID` | Optional — AdsGram Reward block ID for live ads |
 
 Never put `TELEGRAM_BOT_TOKEN` or Supabase keys in this app.
 
@@ -141,14 +143,14 @@ Outside Telegram, the app uses localStorage for nickname and high score. Inside 
 
 UTC date picks a spawn preset for all players. In dev:
 
-- URL: `?dailyPreset=meeting_monday` (also `coffee_break`, `reorg_week`, `standard`)
+- URL: `?dailyPreset=meeting_monday` (also `coffee_break`, `reorg_week`, `standard`, `synergy_sprint`)
 - Or `localStorage.setItem('cl-daily-preset', 'reorg_week')` then reload
 
 Verify home badge, spawn feel, and share text includes `Shift:`.
 
 ## Telegram Integration
 
-- **Auth:** `getInitData()` on every authenticated API call
+- **Auth:** `getInitData()` for `/auth/me` and `/runs`; cached `session_token` for `POST /leaderboard/me`
 - **Theme:** `themeParams` mapped to `--cl-*` CSS variables (light/dark)
 - **Share:** `Telegram.WebApp.shareMessage()` with clipboard fallback
 - **Leaderboards:** Daily + Weekly only (v1)

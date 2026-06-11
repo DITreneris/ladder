@@ -8,7 +8,7 @@
 |---------|-----|
 | Mini App (production) | https://www.promptanatomy.lol |
 | API (production) | https://ladder-production-642d.up.railway.app |
-| Bot | Telegram — `@CorporateLadderBot` (or your `VITE_BOT_USERNAME`) |
+| Bot | Telegram — `@CorporateLadder_bot` · https://t.me/corporateladder_bot |
 | Database | Supabase project dashboard |
 
 ---
@@ -52,14 +52,16 @@ Use this table to pick the right skill, rules, and documents.
 | Satirical copy, promotions, failures | — | [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | `constants.ts`, `template.ts`, [ROADMAP](ROADMAP.md) § Narrative thesis |
 | Telegram initData, `/auth/me` | `telegram-initdata-auth` | [python-api.mdc](.cursor/rules/python-api.mdc) | [docs/architecture.md](docs/architecture.md), `packages/api/`, `apps/mini-app/src/lib/telegram.ts` |
 | Score submit → leaderboard | `score-pipeline` | [python-api.mdc](.cursor/rules/python-api.mdc), [supabase-db.mdc](.cursor/rules/supabase-db.mdc) | `packages/api/`, [supabase/migrations/](supabase/migrations/) |
+| AdsGram revive / game-over monetization | `revive-monetization` | [project-context.mdc](.cursor/rules/project-context.mdc) | [revive-monetization](.cursor/skills/revive-monetization/SKILL.md), [ads-acquisition-plan](docs/ads-acquisition-plan.md), `lib/revive.ts` |
 | API routes, validation, rate limits | — | [python-api.mdc](.cursor/rules/python-api.mdc) | `packages/api/` |
 | Schema, RLS, migrations | — | [supabase-db.mdc](.cursor/rules/supabase-db.mdc) | `supabase/migrations/` |
 | Production deploy | `mini-app-deploy` | [deployment.mdc](.cursor/rules/deployment.mdc) | [DEPLOY.md](DEPLOY.md), [.env.example](.env.example) |
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
-| Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + § Shipped baseline, [CHANGELOG.md](CHANGELOG.md) |
+| Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + active gate + § Shipped baseline; historical gates → [archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md) |
+| UX audit / retention polish | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md), [ROADMAP](ROADMAP.md) § UX audit → release map |
 | F&F gate / device QA | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
-| Discoverability / link previews (not full SEO) | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og` |
+| Discoverability / shell SEO-GEO | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og`, `verify:seo` |
 | Paid ads / channel promotion / AdsGram acquisition | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md), [DEPLOY.md](DEPLOY.md) § AdsGram revive, [FF_REVIEW_2026-06-14](docs/FF_REVIEW_2026-06-14.md) |
 | Layout QA (overflow) | `verifier` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc) | [apps/mini-app/scripts/viewport-qa.mjs](apps/mini-app/scripts/viewport-qa.mjs), CI workflow |
 | Debug triage / incident history | `debug-steward` | [project-context.mdc](.cursor/rules/project-context.mdc) | [debug-triage](.cursor/skills/debug-triage/SKILL.md), [DEBUG_FIX_2026-06-01](docs/DEBUG_FIX_2026-06-01.md) |
@@ -86,7 +88,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status + release train; v1.9.0 + v2.0.0 tagged; soft launch active |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Forward-only working doc: Status, v2.1 gate, v2.2 leg, shipped baseline; historical gates → [ROADMAP_HISTORY](docs/archive/ROADMAP_HISTORY.md) |
 | `assets` | [docs/assets/README.md](docs/assets/README.md) | Marketing / OG | OG source (`Corporate_Ladder_og.png`) vs Playwright marketing shots |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
@@ -101,12 +103,14 @@ Use this table to pick the right skill, rules, and documents.
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-metrics-2026-06-04` | [docs/FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md) | Product | F&F data snapshot (Phase 0 gate) |
 | `ff-metrics-2026-06-10` | [docs/FF_METRICS_2026-06-10.md](docs/FF_METRICS_2026-06-10.md) | Product | Pre-review metrics template (fill Jun 10) |
+| `20260608-analize` | [docs/20260608_analize.md](docs/20260608_analize.md) | Product | Supabase deep analysis + insights (2026-06-08) |
 | `ff-deploy-checklist` | [docs/FF_DEPLOY_CHECKLIST.md](docs/FF_DEPLOY_CHECKLIST.md) | Deploy | Combined v1.9 + v2.0 deploy; tags deferred to Jun 14 GO |
 | `ff-review-2026-06-14` | [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | Product | Soft launch GO plan + Jun 14 decision (F&F only; no public marketing) |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
 | `v19-spike` | [docs/V19_SPIKE.md](docs/V19_SPIKE.md) | Product / agents | v1.9 parallel agent tracks; gate on Jun 14 F&F review |
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
 | `ads-acquisition` | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) | Product / ops | Paid acquisition gates; AdsGram campaign types; channel posts; separate from in-app Reward monetization |
+| `ux-retention-plan` | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md) | Product / frontend | UX audit integrated with ROADMAP release train (v2.1.0 cut → v2.1.1 hotfix → v2.2.0) |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |
 | `changelog` | [CHANGELOG.md](CHANGELOG.md) | Everyone | Keep a Changelog; `[Unreleased]` |
@@ -118,6 +122,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Notes |
 |----|------|-------|
 | `archive` | [docs/archive/README.md](docs/archive/README.md) | Policy + index; exclude from default agent context |
+| `roadmap-history` | [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md) | Historical ROADMAP gates v1.8.x, v1.9 planning, F&F research — not active ops |
 | `prototype-html` | [docs/archive/snippet.txt](docs/archive/snippet.txt) | v0 HTML prototype — parity archaeology only |
 | `concept-v01` | [docs/archive/primal.txt](docs/archive/primal.txt) | Concept v0.1 — tone archaeology only |
 
@@ -166,6 +171,7 @@ Main session handles game/API/copy work inline using skills and rules above.
 | `mini-app-deploy` | [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) | Production setup, env vars, first launch |
 | `changelog-maintainer` | [.cursor/skills/changelog-maintainer/SKILL.md](.cursor/skills/changelog-maintainer/SKILL.md) | Changelog updates, weekly cyclic review, release cut |
 | `debug-triage` | [.cursor/skills/debug-triage/SKILL.md](.cursor/skills/debug-triage/SKILL.md) | Gameplay “feels broken”, layout shift, prod vs repo, postmortems |
+| `revive-monetization` | [.cursor/skills/revive-monetization/SKILL.md](.cursor/skills/revive-monetization/SKILL.md) | AdsGram rewarded revive, score defer on game-over, revive env vars |
 
 ---
 

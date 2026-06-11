@@ -25,7 +25,7 @@ Legacy Playwright composite (phone crop + `og-preview.html`): `npm run capture:o
 
 | File | Use | Suggested caption |
 |------|-----|-------------------|
-| `01-home.png` | Telegram intro, landing hero | *Tap left or right. Dodge meetings. Survive the org chart.* |
+| `01-home.png` | Telegram intro, landing hero | *Dodge meetings. Survive the org chart.* |
 | `02-gameplay-dodge.png` | Carousel slide 2, README gameplay | *One tap, one rung. Don't attend the meeting.* |
 | `03-game-over.png` | Carousel slide 3, humor hook | *Employment terminated. HR will not be taking questions.* |
 

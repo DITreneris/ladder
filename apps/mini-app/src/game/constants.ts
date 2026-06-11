@@ -3,6 +3,7 @@ import type { DeathType, ObstacleType, Rank, Rung } from "./types";
 export const MAX_VISIBLE_RUNGS = 7;
 
 export const MANAGER_YEARS = 10;
+export const DIRECTOR_YEARS = 20;
 export const CEO_YEARS = 35;
 
 export const TICK_MS = 100;
@@ -15,6 +16,9 @@ export const REORG_INTERVAL_CEO_MS = 500;
 export const OBSTACLE_SPAWN_RATE = 0.35;
 export const INTERN_OBSTACLE_SPAWN_RATE = 0.22;
 export const INTERN_TUTORIAL_RUNGS = 12;
+/** Adaptive rookie ramp (v2.1): players with career best < Manager get a longer gentle ramp. */
+export const ROOKIE_TUTORIAL_RUNGS = 20;
+export const ROOKIE_INTERN_SPAWN_RATE_CAP = 0.3;
 export const TUTORIAL_COFFEE_MIN_RUNG = 8;
 export const COFFEE_SPAWN_THRESHOLD = 0.85;
 export const PROMO_DRAIN_PAUSE_MS = 2000;
@@ -39,6 +43,7 @@ export const TUTORIAL_RUNG_SPECS: Omit<Rung, "id">[] = [
 ];
 
 export const REAPPLY_STORAGE_KEY = "corp_ladder_reapply_count";
+export const LAST_RUN_STORAGE_KEY = "corp_ladder_last_run";
 
 export interface TickerHeadline {
   text: string;
@@ -186,6 +191,12 @@ export const FAILURE_BY_RANK: Partial<Record<Rank, string[]>> = {
     "Delegated upward until the task orbited you and collapsed.",
     "Approved a team outing that became a working lunch with slides.",
   ],
+  Director: [
+    "Directed strategy until strategy directed you out the door.",
+    "Your steering committee steered into a quarterly deadline. You were the airbag.",
+    "Signed off on a roadmap that routed through your own exit interview.",
+    "Owned three OKRs and zero outcomes. Finance noticed the ratio.",
+  ],
   CEO: [
     "The board voted unanimously against your vision. And your expense report.",
     "Strategic pivot into a pivot. You were the pivot.",
@@ -218,6 +229,8 @@ export const PROMOTION_DIALOGUES: Partial<Record<Rank, string>> = {
   Intern: "Still an Intern. HR says your badge printer is 'in the queue.'",
   Manager:
     "Promoted to Manager. Your calendar now belongs to everyone else. Stress increased.",
+  Director:
+    "Promoted to Director. You now own a strategy deck and the deadlines that come with it.",
   CEO: "Reached CEO. Strategic budget requests denied. Monocle unlocked. The board is watching.",
 };
 
@@ -240,33 +253,41 @@ export function floorLabel(years: number): string {
   const floor = Math.max(1, Math.floor(years) + 1);
   if (years < 5) return `Floor ${floor} — Intern Pit`;
   if (years < MANAGER_YEARS) return `Floor ${floor} — Open Office`;
-  if (years < CEO_YEARS) return `Floor ${floor} — Middle Management`;
+  if (years < DIRECTOR_YEARS) return `Floor ${floor} — Middle Management`;
+  if (years < CEO_YEARS) return `Floor ${floor} — Director Wing`;
   return `Floor ${floor} — Executive Suite`;
 }
 
 export function rankPropEmoji(rank: Rank): string {
   if (rank === "CEO") return "🧐";
+  if (rank === "Director") return "💼";
   if (rank === "Manager") return "📋";
   return "🪪";
 }
 
 export function rankFromYears(years: number): Rank {
   if (years >= CEO_YEARS) return "CEO";
+  if (years >= DIRECTOR_YEARS) return "Director";
   if (years >= MANAGER_YEARS) return "Manager";
   return "Intern";
 }
 
 export function rankEmoji(rank: Rank): string {
   if (rank === "CEO") return "👑";
+  if (rank === "Director") return "🕴️";
   if (rank === "Manager") return "🧑‍💼";
   return "🧑‍💻";
 }
 
 export function milestoneLabel(years: number): string {
   if (years >= CEO_YEARS) return "Corner office secured";
-  if (years >= MANAGER_YEARS) {
+  if (years >= DIRECTOR_YEARS) {
     const remaining = Math.max(0, CEO_YEARS - years);
     return `CEO myth in ${remaining.toFixed(1)}y`;
+  }
+  if (years >= MANAGER_YEARS) {
+    const remaining = Math.max(0, DIRECTOR_YEARS - years);
+    return `Director in ${remaining.toFixed(1)}y`;
   }
   const remaining = Math.max(0, MANAGER_YEARS - years);
   return `Manager in ${remaining.toFixed(1)}y`;
@@ -274,6 +295,7 @@ export function milestoneLabel(years: number): string {
 
 export function allowedObstacleTypes(rank: Rank, allowEarlyReorg = false): ObstacleType[] {
   if (rank === "CEO") return ["meeting", "reorg", "burnout", "foliage"];
+  if (rank === "Director") return ["meeting", "reorg", "badge_gate", "burnout"];
   if (rank === "Manager") return ["meeting", "reorg", "badge_gate"];
   if (allowEarlyReorg) return ["meeting", "reorg"];
   return ["meeting"];
@@ -283,6 +305,7 @@ export function allowedObstacleTypes(rank: Rank, allowEarlyReorg = false): Obsta
 const OBSTACLE_WEIGHTS: Partial<Record<Rank, Partial<Record<ObstacleType, number>>>> = {
   Intern: { meeting: 1 },
   Manager: { meeting: 0.55, reorg: 0.3, badge_gate: 0.15 },
+  Director: { meeting: 0.45, reorg: 0.28, badge_gate: 0.12, burnout: 0.15 },
   CEO: { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
 };
 

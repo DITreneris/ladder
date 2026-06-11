@@ -34,7 +34,7 @@ def build_welcome_text(preset: ShiftPreset | None = None) -> str:
     play_url = MINI_APP_URL.rstrip("/")
     return (
         "Can you survive the Corporate Ladder?\n\n"
-        "Start as an Intern. Dodge meetings, reorgs, and office chaos.\n"
+        "Start as an Intern. Dodge meetings. Survive the org chart.\n"
         "Coffee gives +25% Energy. Most players never reach Manager.\n\n"
         f"Today's shift: {shift['label']}\n"
         f"{shift['description']}\n\n"
@@ -46,10 +46,10 @@ def build_welcome_text(preset: ShiftPreset | None = None) -> str:
 def build_help_text() -> str:
     return (
         "How to play (about 30–90 seconds):\n\n"
-        "• Tap LEFT or RIGHT each rung — stay on the empty side.\n"
+        "• TAP LEFT or RIGHT for the next rung's safe side.\n"
         "• Meetings, reorgs, and deadlines block one side.\n"
         "• Coffee restores +25% Energy when you pick it up.\n"
-        "• Climb Intern → Manager (10y). CEO (35y) is the boardroom myth.\n"
+        "• Climb Intern → Manager (10y) → Director (20y). CEO (35y) is the boardroom myth.\n"
         "• Scores land on Daily and Weekly leaderboards.\n\n"
         "Tap Punch In & Climb to open the app.\n\n"
         "In a group with other bots, use /go (or /go@this_bot) instead of /start.\n"

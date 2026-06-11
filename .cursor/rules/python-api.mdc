@@ -10,20 +10,24 @@ alwaysApply: false
 
 - `main.py` — FastAPI app, CORS, router mounts
 - `auth/telegram.py` — initData HMAC validation
+- `auth/session.py` — session token create/resolve/prune (v2.0)
 - `routes/` — auth, runs, leaderboard (thin handlers)
 - `routes/_users.py` — user upsert helper (shared by auth + runs)
+- `routes/_cooldowns.py` — Supabase submit cooldown (v2.0)
+- `routes/_plausibility.py` — score plausibility + sprint_mode validation (v2.0)
 - `db/supabase.py` — Supabase client singleton
 - `models.py` — Pydantic request/response models
 
 ## Conventions
 
-- Validate Telegram `initData` on every authenticated endpoint.
-- Score sanity checks: years 0–100, rungs ≈ years × 4, rate limit 10s per user.
-- `GET /leaderboard` accepts optional `initData` query param to mark `is_current_user`.
-- Rate limit is in-memory per process — breaks with multiple API replicas (see architecture.md).
+- Validate Telegram `initData` on every authenticated endpoint (`/auth/me`, `/runs`).
+- Score sanity checks: years 0–100, rungs ≈ years × 4, plausibility cap, `sprint_mode` vs daily preset.
+- `GET /leaderboard` — public list, no initData.
+- `POST /leaderboard/me` — `session_token` marks current user row (v2.0).
+- Rate limit: Supabase `submit_cooldowns` primary (migration 002); in-memory fallback in `runs.py` for tests/dev.
 - All DB writes use service role key; never expose to client.
 - Use pydantic models for request/response; no raw dicts in route signatures.
-- Bot (`apps/bot/`) only handles `/start` and Mini App button — keep minimal.
+- Bot (`apps/bot/`): `/start`, `/go`, `/play`, `/help`; private chat → `web_app` button; groups → `t.me/bot?startapp` URL button.
 
 ## Testing
 
@@ -33,4 +37,4 @@ cd packages/api && pip install -r requirements.txt && pytest
 
 ## Deploy
 
-Railway Dockerfile in `packages/api/`. Health check: `GET /health`.
+Railway Dockerfile in `packages/api/`. Health check: `GET /health`. Run Supabase migration `002_v2_hardening.sql` before v2.0 sign-off.

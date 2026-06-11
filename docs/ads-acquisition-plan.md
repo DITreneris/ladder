@@ -7,13 +7,13 @@ Corporate Ladder has **two separate ad surfaces**. Do not conflate them:
 
 | Lane | What it is | Platform | Current gate |
 |------|------------|----------|--------------|
-| **Acquisition** | Pay to bring **new players** to `@CorporateLadderBot` | AdsGram campaigns, channel posts, press | **Deferred** — public launch review ~2026-06-28 |
+| **Acquisition** | Pay to bring **new players** to `@CorporateLadder_bot` | AdsGram campaigns, channel posts, press | **Deferred** — public launch review ~2026-06-28 |
 | **In-app monetization** | **Rewarded** ad on qualifying game-over → one revive per run | AdsGram Reward block (`revive-game-over`) | **Optional** — test with env flags; live block after moderation |
 
 **Primary growth loop** (unchanged — see [discoverability-plan.md](discoverability-plan.md)):
 
 ```
-@CorporateLadderBot /start → Mini App → play → share → friend opens bot
+@CorporateLadder_bot /start → Mini App → play → share → friend opens bot
 ```
 
 Paid acquisition is a **scale lever after retention is proven**, not a substitute for F&F signal.
@@ -43,7 +43,7 @@ In-app partner blocks: [partner.adsgram.ai](https://partner.adsgram.ai) (publish
 | **Telegram Native** | Sponsored posts in channels and bots | Medium — needs satire/office/gaming/casual channel list; copy must match [satirical-copy](../.cursor/rules/satirical-copy.mdc) | Small budget test after Network baseline CPI |
 | **Telegram Ads β** | Official Telegram Ads (large public channels) | Weakest for cold game launch — broad reach, higher spend, less game intent | Only with data from Network/Native; not first spend |
 
-**Default first campaign (post-GO):** Telegram Network → landing on `https://t.me/CorporateLadderBot` (not raw mini-app URL — same rule as F&F recruitment in [FF_TEST.md](FF_TEST.md)).
+**Default first campaign (post-GO):** Telegram Network → landing on `https://t.me/CorporateLadder_bot` (not raw mini-app URL — same rule as F&F recruitment in [FF_TEST.md](FF_TEST.md)).
 
 ---
 
@@ -134,7 +134,7 @@ Already shipped in repo — **not** acquisition.
 ### Marry — keep
 
 - Retention metrics over vanity installs ([mvp-scope.md](mvp-scope.md) success metrics)
-- `@CorporateLadderBot` as sole paid-ad landing (not `promptanatomy.lol` cold)
+- `@CorporateLadder_bot` as sole paid-ad landing (not `promptanatomy.lol` cold)
 - Satirical copy in any channel or ad creative ([satirical-copy.mdc](../.cursor/rules/satirical-copy.mdc))
 
 ### Kill — do not do (this stage)

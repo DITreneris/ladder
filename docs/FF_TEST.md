@@ -82,9 +82,9 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 **Share message:**
 
-> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/corporateladder_bot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
 
-**Bot (primary entry):** https://t.me/CorporateLadderBot · `@CorporateLadderBot`
+**Bot (primary entry):** https://t.me/corporateladder_bot · `@CorporateLadder_bot`
 
 | # | Tester | Platform | Invited | Runs (≥3?) | Shared? | Notes |
 |---|--------|----------|---------|------------|---------|-------|
@@ -130,17 +130,17 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 **Check-in dates:** Jun 4 · Jun 7 · Jun 10 · Jun 14 review — see [FF_EXECUTION.md](FF_EXECUTION.md) Phase F.
 
-| Metric | Target | Jun 4 | Jun 7 | Jun 10 | Jun 14 |
-|--------|--------|-------|-------|--------|--------|
-| Session length | 30–90s | on track | | on track | |
-| External testers (≥3 runs) | **≥6 / 8** | 0 ext | | **3 / 6** | |
-| Distinct players (14d) | ≥8 | **5** | | **8** | |
-| Share rate | ≥1 pasted in Telegram | unknown | | unknown | |
-| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | **4** (core 3) | |
-| Tier A verification | V-08–V-14 | pending deploy | | pending | |
-| Soft-launch GO gates | all §B green | | | pre-read | **vote** |
+| Metric | Target | Jun 4 | Jun 7 | Jun 10 | **Jun 8** | Jun 14 |
+|--------|--------|-------|-------|--------|-----------|--------|
+| Session length | 30–90s | on track | | on track | **off track** (median ~11.5s/run est.) | |
+| External testers (≥3 runs) | **≥6 / 8** | 0 ext | | **3 / 6** | **4 / 8** | |
+| Distinct players (14d) | ≥8 | **5** | | **8** | **11** | |
+| Share rate | ≥1 pasted in Telegram | unknown | | unknown | unknown | |
+| Daily return (engaged) | ≥2 days/wk | **4 active days** (top 3) | | **4** (core 3) | **8** (core 3) | |
+| Tier A verification | V-08–V-14 | pending deploy | | pending | pending | |
+| Soft-launch GO gates | all §B green | | | pre-read | **pre-read** | **vote** |
 
-**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample. **Jun 10 pre-read (2026-06-05):** [FF_METRICS_2026-06-10.md](FF_METRICS_2026-06-10.md) — 461 runs, 9 users, 3 externals ≥3 runs, prod `main-T7XrL0BN.js`. **Jun 14:** `v1.9.0` + `v2.0.0` tagged — prod bundle per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md).
+**Jun 4 detail:** [FF_METRICS_2026-06-04.md](FF_METRICS_2026-06-04.md) — 346 runs, Manager reached, no CEO in sample. **Jun 10 pre-read (2026-06-05):** [FF_METRICS_2026-06-10.md](FF_METRICS_2026-06-10.md) — 461 runs, 9 users, 3 externals ≥3 runs, prod `main-T7XrL0BN.js`. **Jun 8 (fresh):** [FF_METRICS_2026-06-08.md](FF_METRICS_2026-06-08.md) — 708 runs, 12 users, 4 externals ≥3 runs, CEO reached (12 runs), `migration_002_ok: true`. **Jun 14:** `v1.9.0` + `v2.0.0` tagged — prod bundle per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md).
 
 
 
@@ -181,7 +181,7 @@ ORDER BY runs DESC;
 
 | 7 | 2026-06-07 | |
 
-| 10 | 2026-06-10 | |
+| 10 | 2026-06-10 | [FF_METRICS_2026-06-08.md](FF_METRICS_2026-06-08.md) fresh re-run (708 runs, 4 externals ≥3) |
 
 
 

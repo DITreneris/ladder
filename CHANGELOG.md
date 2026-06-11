@@ -10,13 +10,24 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **[docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md)** — UX/UI audit integrated with ROADMAP release train (v2.1.0 cut → v2.1.1 retention hotfix → v2.2.0); ROADMAP § UX audit → release map
+- **Director rank @ 20y (v2.1 retention sprint)** — intermediate rank between Manager (10y) and CEO (35y); quarterly deadlines (`burnout`) now unlock at Director, desk plants stay CEO-only; new promotion dialogue, failure flavor, HUD/home badge (`badge-rank-director`), milestone chips, How-to-Play ladder, bot `/help`; API `FinalRank` + contiguous rank-band validation (Intern [0,10) / Manager [10,20) / Director [20,35) / CEO [35,…)) — explicit scope exception recorded in [docs/mvp-scope.md](docs/mvp-scope.md); **deploy API together with mini-app** (old API rejects Director submits)
+- **Beat-your-gap home line** — Employee Badge shows last shift vs career record ("Last shift: 12.3y — 4.2y below your record. HR noticed."); last run cached in `localStorage` (`corp_ladder_last_run`)
+- **Share challenge deep link** — share text appends `t.me/<bot>?startapp=c_<years×10>`; mini-app parses `start_param` (`getStartParam()` with `tgWebAppStartParam` fallback), greets challenged colleague with HR toast, and game-over verdict line tracks the challenge target
+- **Adaptive rookie ramp** — players with career best below Manager get gentle Intern spawn rate through 20 rungs (was 12) and a 0.30 spawn-rate cap until Manager promo; veterans keep original ramp (`careerBestYears` fed from profile / post-submit)
 - **[docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md)** — acquisition vs in-app monetization lanes; AdsGram campaign types (Network / Native / Telegram Ads β); organic channel post phases; go/no-go gates before paid spend; timeline aligned with F&F and public launch review (~2026-06-28)
 - **AdsGram rewarded revive** — optional **Mandatory HR Training** on game over (gated: meaningful run, near career high, or near #1); one executive exception per run; score submits after final death; live Reward ads via AdsGram block `revive-game-over` on production (`VITE_ADSGRAM_BLOCK_ID` on Vercel); `VITE_ADSGRAM_REVIVE_ENABLED=true` still allows ad-free revive testing when Block ID is unset locally
 - **TON Builders analytics (Telegram Mini Apps SDK)** — `@telegram-apps/analytics` initializes before first render; `appName` **`corporate_ladder`** (case-sensitive — must match TON Builders Analytics Keys identifier); activates when `VITE_TELEGRAM_ANALYTICS_TOKEN` is set (no-op when unset; complements `@vercel/analytics`, not a replacement)
 - **Live SEO smoke** — `npm run verify:seo:live` curls `sitemap.xml`, `robots.txt`, `llms.txt` on preview (CI)
 - **`ff-metrics.py` migration probe** — reports `migration_002_ok` for Supabase `submit_cooldowns` + `api_sessions` (run before v2.0 sign-off)
+- **`ff-metrics.py` deep analytics** — paginated Supabase fetch; `deep_analytics` block (playtime proxy, progression, retention, core/external segments); **[FF_METRICS_2026-06-08.md](docs/FF_METRICS_2026-06-08.md)** fresh snapshot · **[20260608_analize.md](docs/20260608_analize.md)** insights report
 
 ### Changed
+- **ROADMAP refactor (2026-06-11)** — forward-only working doc (~260 lines): Status dashboard, v2.1.0 active gate, v2.2.0 next leg, consolidated shipped baseline (Director ladder); historical v1.8 gates and F&F research moved to [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md)
+- **F&F window closed early (2026-06-11)** — CONDITIONAL GO verdict + final Supabase metrics in [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md); ROADMAP Status moved to v2.1.0 retention sprint; backlog decisions: drain cap Defer, streak Defer, CEO threshold superseded by Director rank
+- **Agent/docs sync** — verifier v1.9/v2.0/Unreleased checklists; architecture session-token LB flow; ROADMAP v1.9/v2.0 shipped baseline; DESIGN_SYSTEM BGM correction; bot handle `@CorporateLadder_bot`; `revive-monetization` skill; deploy skills migration 002
+- **Bot and SEO copy alignment** — `/start` welcome and `/help` match Tier A home voice; canonical meta description, `llms.txt`, and JSON-LD use Dodge meetings / survive the org chart with tap mechanic for crawlers
+- **Mini-app shell copy trim (Tier A)** — shorter home/how-to/onboarding instructions, tighter game-over and leaderboard labels; game-over flavor shown without outer quote marks; share text unchanged
 - **Monetization** — AdsGram Reward integration verified live in Telegram (rewarded video → run resume on qualifying deaths); no forced interstitials or virtual currency
 - **Leaderboard fetch window** — API loads up to 2000 recent runs before best-per-user aggregation (was 500)
 - **Bot `/start` copy** — `reorg_week` shift description matches mini-app daily modifier
@@ -36,8 +47,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Planned (v1.1)
 - All-time / Legends tab
-- Analytics events
+- Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)
 - Server-side replay validation (full anti-cheat)
+
+### Release note — v2.1.0 cut ceremony (when tagging)
+
+When DEVICE_QA v2.0 is signed and prod deploy is green: move all `[Unreleased]` Added/Changed/Fixed above (except this block and Planned v1.1) into `## [2.1.0] - YYYY-MM-DD`; run verifier; `git tag v2.1.0`; update [ROADMAP.md](ROADMAP.md) Status **Tagged** and release train row **Live**.
 
 ## [2.0.0] - 2026-06-14
 

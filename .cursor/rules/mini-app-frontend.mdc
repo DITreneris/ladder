@@ -10,7 +10,8 @@ alwaysApply: false
 
 - `src/game/` — engine, constants, audio (no DOM)
 - `src/lib/telegram.ts` — WebApp SDK wrapper
-- `src/lib/api.ts` — fetch calls to Railway API
+- `src/lib/api.ts` — fetch calls to Railway API; caches `session_token` for leaderboard highlight
+- `src/lib/revive.ts` — AdsGram rewarded revive gate (optional monetization)
 - `src/lib/branding.ts` — Prompt Anatomy co-branding (`VITE_PROMPT_ANATOMY_URL`)
 - `src/lib/effects.ts` — visual effects (reduced-motion aware)
 - `src/app.ts` — UI controller and DOM wiring
@@ -20,7 +21,7 @@ alwaysApply: false
 ## Rules
 
 - Never embed `TELEGRAM_BOT_TOKEN` or Supabase keys in client code.
-- Use `getInitData()` for all authenticated API calls.
+- Use `getInitData()` for `/auth/me` and `/runs`; use cached `session_token` for `POST /leaderboard/me`.
 - Leaderboard tabs: Daily and Weekly only (v1).
 - Share: prefer `Telegram.WebApp.shareMessage()`, fallback to clipboard.
 - Styling: Tailwind utility classes via Vite plugin; no CDN Tailwind in production.
@@ -28,7 +29,7 @@ alwaysApply: false
 
 ## Shipped mechanics guardrails (v1.6+)
 
-See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline (through v1.8.5). Do not regress without spec update:
+See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline (v1.5 → v1.8.5 + v1.9/v2.0). Do not regress without spec update:
 
 - Rank-gated obstacles: Meeting (Intern) → Reorg (Manager+) → Deadline (`burnout` type, CEO+) → **Gate** (Manager+) → **Plant** (CEO+)
 - **Three-lane corridor (v1.8.5):** center aisle visual only — TAP LEFT/RIGHT unchanged; no center tap
@@ -51,7 +52,7 @@ Do not add Legends tab or new control schemes without scope approval.
 - **`#gameContentColumn` (v1.8.3+)** — single gutter wraps HUD + play + tap deck
 - `#ladderTrack` width from layout — player position from DOM, not fixed 192px
 - In-run copy via **HR memo rail** — avoid shell toasts over tap deck during play
-- **`#imminentHint` (v1.8.5)** — next-rung guidance first ~12 rungs
+- **`#imminentHint` (v1.9)** — next-rung guidance through Intern phase (**40 rungs**, `INTERN_HINT_RUNGS` in `lib/debug.ts`); tap-deck-hint pulse first 5 taps only
 - **Corridor visuals (v1.8.5):** `.rung-center--corridor`, `.player-at-corridor`
 - Layout CI: `npm run qa:layout` — play width stable after first tap
 

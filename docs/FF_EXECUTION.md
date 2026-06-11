@@ -1,7 +1,7 @@
 # F&F execution runbook — Corporate Ladder
 
 **Goal:** Soft-launch GO on **2026-06-14** (F&F expansion only — no public marketing)  
-**Window:** 2026-05-31 → 2026-06-14  
+**Window:** 2026-06-01 → 2026-06-14  
 **Tracker:** [FF_TEST.md](FF_TEST.md) · **GO plan:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) · **Device QA:** [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) + [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md)
 
 ---
@@ -37,7 +37,7 @@
 | API health | [ ] `{"status":"ok"}` |
 | Prod bundle hash | [ ] recorded in [DEBUG_ENV_TRIAGE.md](DEBUG_ENV_TRIAGE.md) |
 | `python scripts/ff-metrics.py` | [ ] `submit_pipeline_ok: true` |
-| Telegram cache bust | [ ] reopen from @CorporateLadderBot |
+| Telegram cache bust | [ ] reopen from @CorporateLadder_bot |
 
 | # | Check | Pass |
 |---|-------|------|
@@ -89,7 +89,7 @@ Log pain items in [FF_TEST.md](FF_TEST.md). Fix P0/P1 before Phase E.
 
 **Invite message:**
 
-> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/CorporateLadderBot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/corporateladder_bot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
 
 Track in [FF_TEST.md](FF_TEST.md) tester table.
 

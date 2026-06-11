@@ -1,6 +1,6 @@
 export type PlayerSide = "left" | "right";
 export type ObstacleType = "meeting" | "reorg" | "burnout" | "badge_gate" | "foliage";
-export type Rank = "Intern" | "Manager" | "CEO";
+export type Rank = "Intern" | "Manager" | "Director" | "CEO";
 export type DeathType = ObstacleType | "energy" | "sprint";
 
 export interface Rung {

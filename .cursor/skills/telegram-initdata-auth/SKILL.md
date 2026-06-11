@@ -22,6 +22,19 @@ See [packages/api/app/auth/telegram.py](../../packages/api/app/auth/telegram.py)
 
 Frontend sends `initData` from `Telegram.WebApp.initData` in POST body as `{ "initData": "..." }`.
 
+## Session token lifecycle (v2.0)
+
+After successful `/auth/me`:
+
+1. API returns `session_token` in profile response ([auth.py](../../packages/api/app/routes/auth.py))
+2. Client caches token in [api.ts](../../apps/mini-app/src/lib/api.ts) (`cachedSessionToken`)
+3. **Leaderboard highlight:** `POST /leaderboard/me` with `{ sessionToken, period }` — initData not in GET URL
+4. **Score submit:** still uses `initData` on `POST /runs` (unchanged)
+
+Token storage: Supabase `api_sessions` table (migration 002). Prune on `/auth/me`: expired rows + max 3 tokens per user.
+
+**Do not** pass initData as leaderboard GET query param — removed in v2.0 for log hygiene.
+
 ## Common Failures
 
 | Error | Cause |

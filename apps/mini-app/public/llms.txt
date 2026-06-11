@@ -1,8 +1,8 @@
 # Corporate Ladder
 
-> Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @CorporateLadder_bot.
+> Corporate Ladder is a satirical office climb in Telegram. Dodge meetings, survive the org chart. Tap left or right each rung. Play free via @CorporateLadder_bot.
 
-Last updated: 2026-06-04
+Last updated: 2026-06-08
 
 ## What it is
 
@@ -12,7 +12,7 @@ Telegram Mini App game (web shell at promptanatomy.lol). Not a standalone browse
 
 1. Open the Telegram bot below.
 2. Tap **Punch In & Climb** (or `/start` / `/go` in groups).
-3. Tap left or right to climb; manage energy; dodge meetings, reorgs, and deadlines.
+3. TAP LEFT or RIGHT each rung — dodge meetings, reorgs, and deadlines; coffee restores +25% energy.
 
 ## Mechanics (short)
 

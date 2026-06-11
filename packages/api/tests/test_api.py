@@ -188,6 +188,75 @@ def test_runs_accepts_legitimate_manager_run(mock_supabase, valid_init_data):
     assert response.status_code == 200
 
 
+def test_runs_rejects_manager_in_director_band(mock_supabase, valid_init_data):
+    """Manager band is [10, 20) — 25y must carry the Director rank."""
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 25,
+            "final_rank": "Manager",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 100,
+        },
+    )
+    assert response.status_code == 400
+    assert "inconsistent" in response.json()["detail"].lower()
+
+
+def test_runs_accepts_legitimate_director_run(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 25,
+            "final_rank": "Director",
+            "termination_cause": "Deadline Crash",
+            "rungs_climbed": 100,
+        },
+    )
+    assert response.status_code == 200
+
+
+def test_runs_rejects_director_below_band(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 15,
+            "final_rank": "Director",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 60,
+        },
+    )
+    assert response.status_code == 400
+    assert "inconsistent" in response.json()["detail"].lower()
+
+
+def test_runs_rejects_director_at_ceo_band(mock_supabase, valid_init_data):
+    """Director band tops out below 35y; 35y+ must be CEO."""
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 240)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 36,
+            "final_rank": "Director",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 144,
+        },
+    )
+    assert response.status_code == 400
+    assert "inconsistent" in response.json()["detail"].lower()
+
+
 def test_leaderboard_me_highlights_user(mock_supabase, valid_init_data):
     runs_module._submit_timestamps.clear()
     auth = client.post("/auth/me", json={"initData": valid_init_data})

@@ -12,7 +12,7 @@ const repoRoot = path.resolve(miniAppRoot, "../..");
 const BOT_URL = "https://t.me/corporateladder_bot";
 const BOT_HANDLE = "CorporateLadder_bot";
 const CANON_DESCRIPTION =
-  `Corporate Ladder is a satirical office climb game in Telegram. Tap left or right, dodge meetings and reorgs, climb the org chart. Play free via @${BOT_HANDLE}.`;
+  `Corporate Ladder is a satirical office climb in Telegram. Dodge meetings, survive the org chart. Tap left or right each rung. Play free via @${BOT_HANDLE}.`;
 const CANON_URL = "https://www.promptanatomy.lol/";
 
 function fail(message) {

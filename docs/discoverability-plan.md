@@ -18,7 +18,7 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 **Primary growth loop:**
 
 ```
-@CorporateLadderBot /start → Mini App → play → share → friend opens bot
+@CorporateLadder_bot /start → Mini App → play → share → friend opens bot
 ```
 
 ---
@@ -42,7 +42,7 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 | Surface | URL | Role |
 |---------|-----|------|
 | Mini App | https://www.promptanatomy.lol | WebApp shell (Telegram-first) |
-| Bot | `@CorporateLadderBot` | Primary entry point |
+| Bot | `@CorporateLadder_bot` | Primary entry point |
 | Ecosystem marketing | https://www.promptanatomy.app | Correct home for public “about” copy |
 
 ---
@@ -65,12 +65,12 @@ Corporate Ladder is a **Telegram Mini App game**. Users find it via the bot, in-
 
 - [x] No layout or shell copy changes beyond `<head>` metadata (OG capture uses `?og=1` dev mode only)
 - [ ] Pasting `https://www.promptanatomy.lol` in Slack/Discord/iMessage shows title + description + image (test after Vercel deploy)
-- [ ] F&F testers recruited via `t.me/CorporateLadderBot` link (ops — share message updated in FF_TEST)
+- [ ] F&F testers recruited via `t.me/CorporateLadder_bot` link (ops — share message updated in FF_TEST)
 
 **Suggested metadata (copy-only in `<head>`):**
 
 ```html
-<meta name="description" content="Satirical office climb game in Telegram. Dodge meetings, survive reorgs, don't burn out. Open @CorporateLadderBot to play." />
+<meta name="description" content="Satirical office climb game in Telegram. Dodge meetings, survive reorgs, don't burn out. Open @CorporateLadder_bot to play." />
 <meta property="og:title" content="Corporate Ladder" />
 <meta property="og:description" content="Climb the corporate ladder in Telegram. Lumberjack meets modern office life." />
 <meta property="og:type" content="website" />

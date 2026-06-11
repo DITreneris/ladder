@@ -1,6 +1,6 @@
 # Device QA — v1.8.1
 
-**Release:** v1.8.1 (2026-05-31) · **Deploy:** https://www.promptanatomy.lol · **Bot:** `@CorporateLadderBot`
+**Release:** v1.8.1 (2026-05-31) · **Deploy:** https://www.promptanatomy.lol · **Bot:** `@CorporateLadder_bot`
 
 **F&F gate:** Sign off before external invites · **Runbook:** [FF_EXECUTION.md](FF_EXECUTION.md) · **iOS owner:** core team
 

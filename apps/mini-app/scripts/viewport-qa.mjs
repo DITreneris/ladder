@@ -135,7 +135,7 @@ async function homeMechanicCopyVisible(page) {
     const startScreen = document.getElementById("startScreen");
     if (!startScreen) return { ok: false, reason: "missing-start-screen" };
     const text = startScreen.textContent ?? "";
-    const ok = text.includes("Tap left") || text.includes("Tap left or right");
+    const ok = text.includes("Dodge meetings") || text.includes("Survive the org chart");
     return { ok, text: text.slice(0, 120) };
   });
 }

@@ -2,6 +2,7 @@ import {
   CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
+  LAST_RUN_STORAGE_KEY,
   MAX_VISIBLE_RUNGS,
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
@@ -53,6 +54,7 @@ import {
   getBotUsername,
   getDisplayName,
   getInitData,
+  getStartParam,
   hapticImpact,
   hapticNotification,
   hideTelegramBack,
@@ -94,6 +96,7 @@ let ceoTrapShown = false;
 let emojiFlashLock = false;
 let playerAtCorridor = true;
 let qaCoffeePickups = 0;
+let challengeTargetYears: number | null = null;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -184,6 +187,25 @@ function incrementReapplyCount(): number {
   return next;
 }
 
+function saveLastRunYears(years: number): void {
+  try {
+    localStorage.setItem(LAST_RUN_STORAGE_KEY, JSON.stringify({ years, at: Date.now() }));
+  } catch {
+    /* ignore */
+  }
+}
+
+function getLastRunYears(): number | null {
+  try {
+    const raw = localStorage.getItem(LAST_RUN_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { years?: unknown };
+    return typeof parsed.years === "number" && Number.isFinite(parsed.years) ? parsed.years : null;
+  } catch {
+    return null;
+  }
+}
+
 function updateImminentRungHint(): void {
   const hint = $("imminentHint");
   if (!engine?.isActive()) {
@@ -226,10 +248,10 @@ function submitFailureMessage(reason: ApiFailureReason): string {
     return `HR couldn't verify your badge. Reopen from @${bot}.`;
   }
   if (reason === "rate_limit") {
-    return "Score filing cooldown. Retry from game over in a few seconds.";
+    return "Score filing cooldown. Retry in a few seconds.";
   }
   if (reason === "validation") {
-    return "HR rejected the filing — score didn't pass audit. Your local run still counts.";
+    return "HR rejected the filing — score didn't pass audit. Local run counts.";
   }
   return "Score not filed with HR. Check connection.";
 }
@@ -315,6 +337,7 @@ function switchTab(tab: Screen): void {
 const RANK_BADGE: Record<Rank, string> = {
   Intern: "badge-rank-intern mt-0.5",
   Manager: "badge-rank-manager mt-0.5",
+  Director: "badge-rank-director mt-0.5",
   CEO: "badge-rank-ceo mt-0.5",
 };
 
@@ -329,6 +352,20 @@ function refreshHomeBadgeUI(): void {
     highScore > 0 ? `Current rank: ${bestRank}` : `Starting rank: Intern`;
   $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
   $("highScoreBadge").textContent = highScore.toFixed(1);
+  refreshBeatGapLine();
+}
+
+function refreshBeatGapLine(): void {
+  const line = $("beatGapLine");
+  const lastRun = getLastRunYears();
+  if (lastRun === null || highScore <= 0 || lastRun >= highScore) {
+    line.textContent = "";
+    line.classList.add("hidden");
+    return;
+  }
+  const gap = (highScore - lastRun).toFixed(1);
+  line.textContent = `Last shift: ${lastRun.toFixed(1)}y — ${gap}y below your record. HR noticed.`;
+  line.classList.remove("hidden");
 }
 
 function updateRankUI(rank: Rank, updatePlayer = true): void {
@@ -1074,6 +1111,7 @@ async function runPostGameOverIo(
       } else if (result.yearsSurvived >= highScore) {
         bestRank = result.finalRank;
       }
+      engine?.setCareerBestYears(highScore);
       $("highScoreBadge").textContent = highScore.toFixed(1);
       refreshHomeBadgeUI();
       refreshCareerHighOnGameOver();
@@ -1103,6 +1141,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   hideHudTapHint();
   hideImminentHint();
   lastGameResult = result;
+  saveLastRunYears(result.yearsSurvived);
   $("playerActionEmoji").classList.remove("idle-bob");
 
   const previousBest = highScore;
@@ -1112,18 +1151,24 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
-  $("terminationReason").textContent = `"${result.terminationDetail}"`;
+  $("terminationReason").textContent = result.terminationDetail;
   $("retryTip").textContent = RETRY_TIPS[result.deathType];
-  $("terminationFlavor").textContent = `"${result.terminationFlavor}"`;
+  $("terminationFlavor").textContent = result.terminationFlavor;
   $("reviewId").textContent = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
 
   const reapplyCount = incrementReapplyCount();
   $("reapplyFlavorLine").textContent = reappliesFlavor(reapplyCount);
 
   const progressionHint = $("progressionHintLine");
-  if (result.finalRank !== "CEO") {
+  if (challengeTargetYears !== null) {
     progressionHint.textContent =
-      "Most employees peak at Manager. CEO at 35y is the boardroom myth HR keeps on the org chart.";
+      result.yearsSurvived > challengeTargetYears
+        ? `Challenge cleared: you outlasted your colleague's ${challengeTargetYears.toFixed(1)}y. HR is re-checking the math.`
+        : `Challenge open: ${(challengeTargetYears - result.yearsSurvived).toFixed(1)}y short of your colleague's ${challengeTargetYears.toFixed(1)}y. The org chart remembers.`;
+    progressionHint.classList.remove("hidden");
+  } else if (result.finalRank !== "CEO") {
+    progressionHint.textContent =
+      "Most employees peak at Manager. Director at 20y is the real ceiling; CEO at 35y is the boardroom myth HR keeps on the org chart.";
     progressionHint.classList.remove("hidden");
   } else {
     progressionHint.textContent = "";
@@ -1194,10 +1239,22 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   });
 }
 
+/** Compact challenge param: years × 10 as integer, e.g. 24.5y → "c_245". */
+function buildChallengeLink(yearsSurvived: number): string {
+  const compact = Math.max(0, Math.round(yearsSurvived * 10));
+  return `https://t.me/${getBotUsername()}?startapp=c_${compact}`;
+}
+
+function parseChallengeParam(param: string): number | null {
+  const match = /^c_(\d{1,4})$/.exec(param);
+  if (!match) return null;
+  return parseInt(match[1]!, 10) / 10;
+}
+
 function buildShareText(): string {
   const years = lastGameResult?.yearsSurvived.toFixed(1) ?? "0.0";
   const rank = lastGameResult?.finalRank ?? "Intern";
-  const botUser = import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadderBot";
+  const botUser = import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadder_bot";
   const detail = lastGameResult?.terminationDetail ?? "";
   const flavor = lastGameResult?.terminationFlavor ?? "";
 
@@ -1206,6 +1263,9 @@ function buildShareText(): string {
     : activeDailyModifier.label;
   const sprintLine =
     lastGameResult?.deathType === "sprint" ? `\n${SPRINT_SHARE_LINE}\n` : "";
+  const challengeLine = lastGameResult
+    ? `Think you can outlast me? ${buildChallengeLink(lastGameResult.yearsSurvived)}\n`
+    : "";
 
   return (
     `CORPORATE PERFORMANCE REVIEW\n` +
@@ -1215,6 +1275,7 @@ function buildShareText(): string {
     sprintLine +
     `Cause: ${detail}\n` +
     `"${flavor}"\n` +
+    challengeLine +
     `Play Corporate Ladder on Telegram @${botUser}\n` +
     getPromptAnatomyShareLine()
   );
@@ -1396,9 +1457,9 @@ function applyMarketingGameOverUi(result: GameOverResult): void {
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
-  $("terminationReason").textContent = `"${result.terminationDetail}"`;
+  $("terminationReason").textContent = result.terminationDetail;
   $("retryTip").textContent = RETRY_TIPS[result.deathType];
-  $("terminationFlavor").textContent = `"${result.terminationFlavor}"`;
+  $("terminationFlavor").textContent = result.terminationFlavor;
   $("reviewId").textContent = "REF-89412";
   $("statBestDelta").textContent = "";
   $("careerHighLine").textContent = "Career high: Intern (3.5y)";
@@ -1528,14 +1589,21 @@ export function mountApp(): void {
             variant: "promo",
             durationMs: 3500,
           });
-        } else if (rank === "CEO") {
+        } else if (rank === "Director") {
           showHrMemo(message, { variant: "promo", durationMs: 2500 });
           showHrMemo("Deadlines joined the org chart. Good luck.", { variant: "alert", durationMs: 2500 });
+        } else if (rank === "CEO") {
+          showHrMemo(message, { variant: "promo", durationMs: 2500 });
+          showHrMemo("Mandatory desk plants now block corridors. Wellness is not optional.", {
+            variant: "alert",
+            durationMs: 2500,
+          });
         } else {
           showHrMemo(message, { variant: "promo", durationMs: 2000 });
         }
         hapticNotification("success");
-        const promoEmoji = rank === "Manager" ? "📋" : rank === "CEO" ? "👑" : "🎉";
+        const promoEmoji =
+          rank === "Manager" ? "📋" : rank === "Director" ? "💼" : rank === "CEO" ? "👑" : "🎉";
         spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
       },
       onGameOver,
@@ -1570,7 +1638,7 @@ export function mountApp(): void {
     () => {
       hideHudTapHint();
       showHrMemo(
-        "Tap LEFT or RIGHT for the next rung's safe side — avoid hazards on the occupied side.",
+        "TAP LEFT or RIGHT — avoid the occupied side.",
         { variant: "info", durationMs: 4500 }
       );
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
@@ -1686,6 +1754,15 @@ export function mountApp(): void {
   syncTelegramBackButton("home");
   syncTelegramMainButton("home");
 
+  const challengeYears = parseChallengeParam(getStartParam());
+  if (challengeYears !== null && challengeYears > 0) {
+    challengeTargetYears = challengeYears;
+    showToast(
+      `A colleague survived ${challengeYears.toFixed(1)}y and HR doubts you can. Punch in.`,
+      { surface: "shell" }
+    );
+  }
+
   const initData = getInitData();
   if (initData) {
     fetchProfile(initData).then((result) => {
@@ -1694,6 +1771,7 @@ export function mountApp(): void {
         const profile = result.profile;
         highScore = profile.best_score;
         bestRank = (profile.best_rank as Rank) || "Intern";
+        engine?.setCareerBestYears(highScore);
         refreshHomeBadgeUI();
         if (profile.first_name || profile.username) {
           username = profile.username ?? profile.first_name ?? username;

@@ -17,17 +17,24 @@ router = APIRouter()
 _submit_timestamps: dict[int, float] = defaultdict(float)
 SUBMIT_COOLDOWN_SECONDS = 10
 MANAGER_YEARS = 10
+DIRECTOR_YEARS = 20
 CEO_YEARS = 35
+
+# Contiguous rank bands: Intern [0,10) / Manager [10,20) / Director [20,35) / CEO [35,...)
+_RANK_BANDS: dict[str, tuple[float, float]] = {
+    "Intern": (0, MANAGER_YEARS),
+    "Manager": (MANAGER_YEARS, DIRECTOR_YEARS),
+    "Director": (DIRECTOR_YEARS, CEO_YEARS),
+    "CEO": (CEO_YEARS, float("inf")),
+}
 
 
 def _validate_rank_years(final_rank: str, years_survived: float) -> None:
-    if final_rank == "Intern" and years_survived >= MANAGER_YEARS:
+    band = _RANK_BANDS.get(final_rank)
+    if band is None:
         raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
-    if final_rank == "Manager" and (
-        years_survived < MANAGER_YEARS or years_survived >= CEO_YEARS
-    ):
-        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
-    if final_rank == "CEO" and years_survived < CEO_YEARS:
+    low, high = band
+    if years_survived < low or years_survived >= high:
         raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
 
 

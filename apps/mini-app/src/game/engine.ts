@@ -11,10 +11,13 @@ import {
   FAILURE_REASONS,
   INTERN_FAKE_PROMO,
   INTERN_TUTORIAL_RUNGS,
+  MANAGER_YEARS,
   MAX_VISIBLE_RUNGS,
   MIN_TAP_INTERVAL_MS,
   PROMOTION_DIALOGUES,
   PROMO_DRAIN_PAUSE_MS,
+  ROOKIE_INTERN_SPAWN_RATE_CAP,
+  ROOKIE_TUTORIAL_RUNGS,
   SPRINT_GAME_OVER,
   TICK_MS,
   TRIAGE_BIAS_RUNGS,
@@ -79,6 +82,7 @@ export class GameEngine {
   private lastTriageAtScore = 0;
   private reviveUsed = false;
   private pendingReviveSnapshot: ReviveSnapshot | null = null;
+  private careerBestYears = 0;
   private visibilityHandler = (): void => {
     this.documentHidden = document.hidden;
   };
@@ -88,7 +92,8 @@ export class GameEngine {
     renderRungs: () => void,
     updatePlayerPosition: (side: PlayerSide) => void,
     onFirstTap: () => void,
-    dailyModifier?: DailyModifier
+    dailyModifier?: DailyModifier,
+    careerBestYears = 0
   ) {
     this.callbacks = callbacks;
     this.renderRungs = renderRungs;
@@ -96,6 +101,12 @@ export class GameEngine {
     this.onFirstTap = onFirstTap;
     this.fixedDailyModifier = dailyModifier;
     this.dailyModifier = dailyModifier ?? resolveDailyModifier();
+    this.careerBestYears = careerBestYears;
+  }
+
+  /** Adaptive rookie ramp input — career best from profile (updates after submit). */
+  setCareerBestYears(years: number): void {
+    this.careerBestYears = Math.max(0, years);
   }
 
   setActiveTicker(headline: TickerHeadline | null): void {
@@ -153,9 +164,17 @@ export class GameEngine {
     return this.pendingReviveSnapshot;
   }
 
+  private isRookie(): boolean {
+    return this.careerBestYears < MANAGER_YEARS;
+  }
+
   private obstacleSpawnRate(): number {
-    if (this.currentRank === "Intern" && this.score < INTERN_TUTORIAL_RUNGS) {
+    const tutorialRungs = this.isRookie() ? ROOKIE_TUTORIAL_RUNGS : INTERN_TUTORIAL_RUNGS;
+    if (this.currentRank === "Intern" && this.score < tutorialRungs) {
       return this.dailyModifier.internObstacleSpawnRate;
+    }
+    if (this.isRookie() && this.currentRank === "Intern") {
+      return Math.min(this.dailyModifier.obstacleSpawnRate, ROOKIE_INTERN_SPAWN_RATE_CAP);
     }
     return this.dailyModifier.obstacleSpawnRate;
   }

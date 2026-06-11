@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## Design system doc
 
-Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
+Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5 shell + v1.9/v2.0 addenda). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
 
 ## v1.6 UI patterns
 
@@ -42,10 +42,19 @@ Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5). Token 
 ## v1.8.5 corridor + hazards
 
 - **Center corridor** — `.player-at-corridor`, `.rung-center--corridor` before first tap; L/R control unchanged
-- **`#imminentHint`** — next-rung panel readable first ~12 rungs
+- **`#imminentHint`** — next-rung panel through Intern phase (**40 rungs**); safe-side glow on imminent rung when `shouldShowImminentHint()` true
 - **Obstacle badges** — slate **Gate** (Manager+), emerald **Plant** (CEO+); same dodge rules as meetings/deadlines
 - **Layout QA** — `npm run qa:layout` after layout changes (post-tap width stable)
 - **320×568** — compact HUD + tap deck; rung rows scale to 32px min so seven rungs fit
+
+## v1.9 / v2.0 UI addenda
+
+- **Sprint HUD chip** — Synergy Sprint wall-clock countdown
+- **Revive button** — `#reviveAdBtn` “Mandatory HR Training” on qualifying game-over
+- **Avatar picker** — `#avatarIconBtn` on home (localStorage emoji)
+- **Game-over toast** — `.toast-above-game-over-actions` above RE-APPLY row
+- **PA logo footer** — official Prompt Anatomy logo asset in `#homeBrandFooter`
+- **Sound FAB** — visible in Telegram light theme
 
 Canonical: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Do not regress without [ROADMAP.md](../../ROADMAP.md) baseline update.
 

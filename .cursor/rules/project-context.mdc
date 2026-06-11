@@ -16,18 +16,20 @@ Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. 
 
 ## MVP v1 Scope
 
-**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening). Soft launch active — see [ROADMAP.md](../../ROADMAP.md) **Status**.
+**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening). **Active:** **v2.1.0** retention sprint — code complete, tag/deploy pending — see [ROADMAP.md](../../ROADMAP.md) **Status**.
 
 **Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
 
-**Operational gate:** F&F window → [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md); DEVICE_QA v2.0 + Vercel OG redeploy. Match ROADMAP § Shipped baseline (v1.5 → v1.8.5) plus [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14).
+**Operational gate:** F&F window → [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md); DEVICE_QA v2.0 + Vercel OG redeploy. Match ROADMAP § Shipped baseline (v1.5 → v1.8.5) plus [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14), [2.0.0](CHANGELOG.md#200---2026-06-14), and `[Unreleased]`.
+
+**Monetization (optional):** AdsGram rewarded revive on qualifying game-over — no virtual currency or forced interstitials. See [docs/ads-acquisition-plan.md](../../docs/ads-acquisition-plan.md).
 
 ## Principles
 
 1. **Humor is the product** — preserve satirical tone in all copy.
 2. **No secrets in frontend** — bot token and Supabase service key stay on Railway only.
 3. **Minimal scope** — do not add v1.1 features without explicit approval.
-4. **Match shipped spec** — [ROADMAP.md](../../ROADMAP.md) § Shipped baseline; scope gates in [docs/mvp-scope.md](../../docs/mvp-scope.md). Do not read [docs/archive/](../../docs/archive/) unless researching v0.1 origin.
+4. **Match shipped spec** — [ROADMAP.md](../../ROADMAP.md) § Shipped baseline; scope gates in [docs/mvp-scope.md](../../docs/mvp-scope.md). Historical ROADMAP gates → [docs/archive/ROADMAP_HISTORY.md](../../docs/archive/ROADMAP_HISTORY.md); v0.1 origin → [docs/archive/](../../docs/archive/) only when researching.
 5. **Terminology** — UI uses Energy / Deadline; code obstacle type `burnout` unchanged.
 
 ## Family

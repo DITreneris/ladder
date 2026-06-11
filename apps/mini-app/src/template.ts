@@ -29,7 +29,7 @@ export const APP_SHELL = `
         <h1 class="font-bold text-sm tracking-wide">Corporate Ladder</h1>
         <p class="text-micro text-emerald-400 flex items-center gap-1">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          <span id="botHandleLabel">@CorporateLadderBot</span>
+          <span id="botHandleLabel">@CorporateLadder_bot</span>
         </p>
       </div>
     </div>
@@ -52,8 +52,8 @@ export const APP_SHELL = `
             ${icon("briefcase", "text-xl")}
           </div>
           <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
-          <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Simulating modern work chaos</p>
-          <p class="home-hero-enter text-caption font-semibold text-slate-600 text-center px-2 mt-2">Tap left or right. Dodge meetings. Survive the org chart.</p>
+          <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Modern work chaos</p>
+          <p class="home-hero-enter text-caption font-semibold text-slate-600 text-center px-2 mt-2">Dodge meetings. Survive the org chart.</p>
         </div>
         <div class="card-light space-y-2 py-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -75,6 +75,7 @@ export const APP_SHELL = `
               <p class="text-nano font-bold uppercase text-slate-400">years</p>
             </div>
           </div>
+          <p id="beatGapLine" class="text-nano font-semibold text-slate-500 truncate hidden"></p>
         </div>
         <div id="homeNewsTicker" class="ticker-bar shrink-0">
           <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
@@ -95,7 +96,7 @@ export const APP_SHELL = `
             <p class="text-caption font-extrabold text-slate-800">Avoid</p>
             <p class="text-caption text-slate-600">Meetings · Reorgs · Deadlines</p>
             <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
-            <p class="text-caption text-slate-600">Intern → Manager (10y). CEO (35y) is the boardroom myth.</p>
+            <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y). CEO (35y) is the boardroom myth.</p>
           </div>
         </div>
         <div id="homeBrandFooter" class="home-brand-footer shrink-0">
@@ -142,7 +143,7 @@ export const APP_SHELL = `
           </div>
           <span id="burnoutPercentLabel" class="text-caption font-bold text-slate-500 w-8 text-right">100%</span>
         </div>
-        <p id="hudTapHint" class="hud-tap-hint hidden">Stand in the corridor. TAP LEFT or RIGHT for the next rung's safe side.</p>
+        <p id="hudTapHint" class="hud-tap-hint hidden">TAP LEFT or RIGHT for the next rung's safe side.</p>
         <p id="imminentHint" class="imminent-hint hidden" aria-live="polite"></p>
       </div>
       <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
@@ -205,7 +206,7 @@ export const APP_SHELL = `
       <div class="card-performance">
         <div class="absolute right-3 bottom-3 w-14 h-14 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-[10px] leading-none -rotate-12 pointer-events-none select-none">REJECTED</div>
         <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
-          <span class="text-caption font-extrabold uppercase text-slate-500">Corporate Performance Card</span>
+          <span class="text-caption font-extrabold uppercase text-slate-500">Performance Card</span>
           <span class="text-micro font-mono text-slate-400" id="reviewId">REF-89412</span>
         </div>
         <div class="grid grid-cols-2 gap-3 text-xs border-b border-slate-100 pb-3">
@@ -222,14 +223,14 @@ export const APP_SHELL = `
             <span id="terminationCauseIcon" class="text-lg leading-none">📅</span>
             <span id="terminationCauseLabel" class="text-xs font-extrabold text-red-800">Meeting Overload</span>
           </div>
-          <p class="font-bold text-red-950 italic" id="terminationReason">"Attended 214 meetings."</p>
+          <p class="font-bold text-red-950 italic" id="terminationReason">Attended 214 meetings.</p>
         </div>
         <p class="text-caption text-slate-600 font-semibold text-center px-2 mt-2" id="retryTip"></p>
-        <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">"Your synergy did not scale optimally with our paradigms."</p>
+        <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">Your synergy did not scale optimally with our paradigms.</p>
       </div>
       <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
         <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
-          ${icon("rotate-right")}<span>RE-APPLY FOR ROLE (TRY AGAIN)</span>
+          ${icon("rotate-right")}<span>RE-APPLY FOR ROLE</span>
         </button>
         <button id="reviveAdBtn" type="button" onclick="onReviveAdClick()" class="hidden btn-cl-secondary w-full py-3 px-6 min-h-[44px] focus-ring flex flex-col items-center gap-0.5">
           <span id="reviveAdTitle" class="text-sm font-extrabold">Mandatory HR Training</span>
@@ -237,7 +238,7 @@ export const APP_SHELL = `
         </button>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">
-            ${icon("share")} Share Results
+            ${icon("share")} Share
           </button>
           <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2.5 px-3 text-xs">
             ${icon("trophy", "text-amber-500")} Leaderboard
@@ -252,7 +253,7 @@ export const APP_SHELL = `
         <div class="flex items-center space-x-3 mb-4">
           <span class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">🏆</span>
           <div>
-            <h3 class="font-black text-slate-900 text-lg leading-none">Global Boardroom</h3>
+            <h3 class="font-black text-slate-900 text-lg leading-none">Boardroom</h3>
             <p class="text-xs text-slate-500">Most career years survived</p>
           </div>
         </div>
@@ -267,7 +268,7 @@ export const APP_SHELL = `
         </div>
       </div>
       <div class="pt-4 border-t border-slate-200 mt-4 space-y-2">
-        <button onclick="goHome()" class="btn-cl-primary-sm">BACK TO THE OFFICE</button>
+        <button onclick="goHome()" class="btn-cl-primary-sm">BACK TO OFFICE</button>
         ${BRAND_FOOTER}
       </div>
     </div>
@@ -277,25 +278,25 @@ export const APP_SHELL = `
           <span class="w-10 h-10 bg-blue-100 text-cl-primary rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">💡</span>
           <div>
             <h3 class="font-black text-slate-900 text-lg leading-none">Employee Playbook</h3>
-            <p class="text-xs text-slate-500">A guide to survive organizational failure</p>
+            <p class="text-xs text-slate-500">A guide to survive office failure</p>
           </div>
         </div>
         <div class="space-y-3.5 text-xs text-slate-600">
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🏃</span>
-            <div><h4 class="font-extrabold text-slate-800">Basic Climbing</h4><p class="mt-0.5 text-caption">Three lanes, two taps: stand in the center corridor, then TAP LEFT or RIGHT for the next rung's safe side. One rung per tap.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Basic Climbing</h4><p class="mt-0.5 text-caption">TAP LEFT or RIGHT for the next rung's safe side.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">📅</span>
-            <div><h4 class="font-extrabold text-slate-800">Meetings</h4><p class="mt-0.5 text-caption">Static blocks. Step on them = instant termination.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Meetings</h4><p class="mt-0.5 text-caption">Static blocks. Touch = termination.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🔄</span>
-            <div><h4 class="font-extrabold text-slate-800">Reorganizations</h4><p class="mt-0.5 text-caption">Swap sides periodically. Time your climbs. Appear after promotion to Manager.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Reorganizations</h4><p class="mt-0.5 text-caption">Sides swap. Time your climbs. Manager rank.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">⏰</span>
-            <div><h4 class="font-extrabold text-slate-800">Deadlines</h4><p class="mt-0.5 text-caption">Quarter-end blocks. Step on them = instant termination. Appear at CEO level.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Deadlines</h4><p class="mt-0.5 text-caption">Quarter-end blocks. Touch = termination. Director rank and up.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🪪</span>
@@ -313,20 +314,21 @@ export const APP_SHELL = `
             <span class="text-xl shrink-0">📈</span>
             <div>
               <h4 class="font-extrabold text-slate-800">Career ladder</h4>
-              <p class="mt-0.5 text-caption font-semibold text-slate-700">Building floors (flavor)</p>
               <ul class="mt-1 text-caption space-y-0.5 list-disc list-inside">
                 <li><strong>Intern Pit (0–&lt;5y):</strong> Onboarding theater. Meetings only.</li>
                 <li><strong>Open Office (5–&lt;10y):</strong> Hot desks. Still Intern rank — meetings only.</li>
-                <li><strong>Middle Management (10–&lt;35y):</strong> Manager rank — reorgs and badge gates.</li>
-                <li><strong>Executive Suite (35y+):</strong> CEO rank — deadlines and desk plants join the stack.</li>
+                <li><strong>Middle Management (10–&lt;20y):</strong> Manager rank — reorgs and badge gates.</li>
+                <li><strong>Director Wing (20–&lt;35y):</strong> Director rank — quarterly deadlines join the stack.</li>
+                <li><strong>Executive Suite (35y+):</strong> CEO rank — desk plants complete the gauntlet.</li>
               </ul>
-              <p class="mt-2 text-caption font-semibold text-slate-700">Rank gates (mechanics)</p>
-              <ul class="mt-1 text-caption space-y-0.5 list-disc list-inside">
-                <li><strong>Intern:</strong> Meetings only — learn safe-side tapping.</li>
+              <ul class="mt-2 text-caption space-y-0.5 list-disc list-inside">
+                <li><strong>Intern:</strong> Meetings only — safe-side tapping.</li>
                 <li><strong>Manager @ 10y:</strong> Reorgs swap sides; badge gates appear.</li>
-                <li><strong>CEO @ 35y:</strong> Deadlines and rare desk plants — coffee is strategic. The boardroom myth HR keeps on the org chart.</li>
+                <li><strong>Director @ 20y:</strong> Deadlines arrive — coffee is strategic.</li>
+                <li><strong>CEO @ 35y:</strong> Rare desk plants on top. The boardroom myth HR keeps on the org chart.</li>
+                <li><strong>Unlock by rank:</strong> Reorg + gates @ Manager; Deadline @ Director; desk plants @ CEO.</li>
               </ul>
-              <p class="mt-2 text-caption"><strong>First climb:</strong> Scripted first 3 rungs, gentler hazard rate through ~3y, hints through 10y. <strong>Reorg Week</strong> shift may add reorgs after that ramp — not on rung one.</p>
+              <p class="mt-2 text-caption"><strong>First climb:</strong> Scripted first 3 rungs, gentler hazard rate through ~3–5y (longer until your first Manager run), hints through 10y. <strong>Reorg Week</strong> shift may add reorgs after ~3y — not on rung one.</p>
             </div>
           </div>
         </div>

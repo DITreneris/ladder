@@ -45,6 +45,7 @@ supabase/.temp/
 # Logs
 *.log
 npm-debug.log*
+scripts/ff-metrics-output.json
 
 # Source audio masters (trimmed copy lives in apps/mini-app/public/audio/)
 MR_Bullet_Be_Streso.mp3*

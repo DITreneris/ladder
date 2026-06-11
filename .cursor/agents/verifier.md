@@ -89,12 +89,41 @@ None (read-only QA). Reference: [DOCS_INDEX.md](../../DOCS_INDEX.md), [AGENTS.md
 - [ ] Control scheme unchanged: TAP LEFT / TAP RIGHT only — no center tap
 - [ ] Scripted tutorial: tap 1 clear → tap 2 meeting on RIGHT (dodge LEFT) → tap 3 coffee on LEFT
 - [ ] HR memo on first tap explains corridor + next-rung safe side
-- [ ] `#imminentHint` readable for first ~12 rungs (and in debug mode)
+- [ ] `#imminentHint` + safe-side glow readable through **Intern phase (40 rungs)**; tap-deck-hint pulse first **5 taps** only (and in debug mode)
 - [ ] Double-tap throttle toast: “Too fast — one tap per beat”
 - [ ] Manager+: occasional **Gate** badge (same L/R dodge as meetings)
 - [ ] CEO+: occasional **Plant** badge (same rules as deadlines)
 - [ ] Obstacle picker uses rank-allowed pool only (no intern fallback noise)
 - [ ] Play-area width stable taps 0–8 (no ladder shrink after first tap)
+
+### v1.9 F&F UX
+
+- [ ] Imminent hint + safe-side glow through full Intern phase (40 rungs, `INTERN_HINT_RUNGS`)
+- [ ] Near-miss wince on safe-side tap past imminent hazard; `prefers-reduced-motion` safe
+- [ ] Synergy Sprint preset (5th daily): 60s wall-clock cap, sprint HUD chip, satirical game-over/share copy
+- [ ] In-run BGM from Manager promo; **no BGM on Home**
+- [ ] Avatar emoji picker on home (localStorage); cycles on tap
+- [ ] Pinned leaderboard self-row with gap-to-#1 line when reachable
+- [ ] Tier A copy: game-over flavor without outer quote marks; shorter home/how-to labels
+- [ ] Home: sound toggle visible in Telegram light theme; PA footer uses official logo asset
+- [ ] Bot `/go`, `/play`, `/help` in addition to `/start`; group keyboard uses `t.me?startapp`
+
+### v2.0 Hardening
+
+- [ ] Corporate triage prompt at Manager+ every ~16 rungs; next tap assigns P1 backlog lane (not a climb)
+- [ ] Background tab: energy drain pauses while document hidden
+- [ ] Leaderboard highlight via `POST /leaderboard/me` + `session_token` — initData not in GET URL
+- [ ] Keyboard arrows show same “Too fast” toast as tap deck
+- [ ] API validates `sprint_mode` against UTC daily preset on Synergy Sprint days
+- [ ] Score plausibility cap rejects outlier years/rungs/session duration
+
+### Unreleased (monetization / analytics / SEO)
+
+- [ ] AdsGram revive: “Mandatory HR Training” on qualifying game-over; one per run; ad-free when Block ID unset + `VITE_ADSGRAM_REVIVE_ENABLED=true`
+- [ ] Score submit deferred on background/close when revive offered but not taken
+- [ ] API 400/422 maps to distinct HR audit toast (not generic connection error)
+- [ ] TON Builders analytics no-op when `VITE_TELEGRAM_ANALYTICS_TOKEN` unset
+- [ ] CI: `verify:seo` + `verify:seo:live` pass; crawler assets in `dist/`
 
 ### Score trust + game-over UX
 

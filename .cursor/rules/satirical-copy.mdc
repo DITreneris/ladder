@@ -36,6 +36,13 @@ Corporate Ladder humor = workplace satire, not generic game fluff.
 - Offensive stereotypes about real companies/people
 - HUD label "Burnout" (use Energy / Deadline)
 
+## Quotation marks
+
+- Game-over flavor: italic, no outer quotes in UI
+- Share payload: straight double quotes around flavor line only
+- Nested terms inside flavor: straight single quotes in source strings
+- No curly quotes in user-visible copy
+
 ## Where Copy Lives
 
 - **`apps/mini-app/src/game/constants.ts`** — primary source: `FAILURE_REASONS`, `FAILURE_BY_RANK`, `PROMOTION_DIALOGUES`, retry tips, termination labels

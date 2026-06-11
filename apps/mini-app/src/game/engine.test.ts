@@ -18,7 +18,14 @@ vi.mock("./audio", () => ({
 import { getDailyModifierById } from "./daily-modifier";
 import { audio } from "./audio";
 import { GameEngine } from "./engine";
-import { COFFEE_RECOVERY, MIN_TAP_INTERVAL_MS, TICK_MS } from "./constants";
+import {
+  COFFEE_RECOVERY,
+  INTERN_OBSTACLE_SPAWN_RATE,
+  MIN_TAP_INTERVAL_MS,
+  OBSTACLE_SPAWN_RATE,
+  ROOKIE_INTERN_SPAWN_RATE_CAP,
+  TICK_MS,
+} from "./constants";
 import type { DailyModifier } from "./daily-modifier";
 import type { GameCallbacks, GameOverResult } from "./types";
 
@@ -485,6 +492,43 @@ describe("GameEngine", () => {
     tapWithCooldown(engine, "left");
     expect(engine.getCurrentRank()).toBe("Manager");
     expect(engine.getRungsClimbed()).toBe(40);
+  });
+
+  it("extends rookie ramp and caps intern spawn rate for new players", () => {
+    const { engine } = createEngine({}, getDailyModifierById("standard"));
+    engine.start();
+    type Internals = { score: number; obstacleSpawnRate: () => number };
+    const internal = engine as unknown as Internals;
+
+    // Rookie (career best 0): gentle rate persists past 12 rungs, capped after 20
+    internal.score = 15;
+    expect(internal.obstacleSpawnRate()).toBe(INTERN_OBSTACLE_SPAWN_RATE);
+    internal.score = 25;
+    expect(internal.obstacleSpawnRate()).toBe(ROOKIE_INTERN_SPAWN_RATE_CAP);
+
+    // Veteran (career best >= Manager): original ramp boundaries
+    engine.setCareerBestYears(15);
+    internal.score = 15;
+    expect(internal.obstacleSpawnRate()).toBe(OBSTACLE_SPAWN_RATE);
+    internal.score = 8;
+    expect(internal.obstacleSpawnRate()).toBe(INTERN_OBSTACLE_SPAWN_RATE);
+  });
+
+  it("promotes to Director at 20.0 years (80 rungs)", () => {
+    const onRankChange = vi.fn();
+    const { engine } = createEngine({ onRankChange });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 79;
+    tapWithCooldown(engine, "left");
+
+    expect(engine.getCurrentRank()).toBe("Director");
+    expect(onRankChange).toHaveBeenCalledWith("Director", expect.stringContaining("Director"));
   });
 
   it("captures revive snapshot on collision death", () => {

@@ -38,7 +38,7 @@ declare global {
         ready: () => void;
         expand: () => void;
         initData: string;
-        initDataUnsafe: { user?: TelegramUser };
+        initDataUnsafe: { user?: TelegramUser; start_param?: string };
         shareMessage?: (params: { text: string }) => void;
         openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink?: (url: string) => void;
@@ -267,5 +267,16 @@ export function isTelegram(): boolean {
 }
 
 export function getBotUsername(): string {
-  return import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadderBot";
+  return import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadder_bot";
+}
+
+/** Mini App launch param: `t.me/bot?startapp=<value>` → initDataUnsafe.start_param (URL fallback for dev). */
+export function getStartParam(): string {
+  const fromTelegram = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+  if (fromTelegram) return fromTelegram;
+  try {
+    return new URLSearchParams(window.location.search).get("tgWebAppStartParam") ?? "";
+  } catch {
+    return "";
+  }
 }

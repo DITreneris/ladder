@@ -24,13 +24,13 @@ A fast-paced Telegram Mini App where players climb the corporate ladder while av
 
 | **Mini App** | https://www.promptanatomy.lol |
 
-| **Telegram bot** | `@CorporateLadderBot` (or your `VITE_BOT_USERNAME`) |
+| **Telegram bot** | `@CorporateLadder_bot` · https://t.me/corporateladder_bot |
 
 | **API health** | https://ladder-production-642d.up.railway.app/health |
 
 
 
-After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with production URLs. *(Live as of 2026-05-31.)*
+After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with production URLs. *(Live as of 2026-06-08.)*
 
 
 
@@ -48,7 +48,7 @@ After first deploy, update this table and [DOCS_INDEX.md](DOCS_INDEX.md) with pr
 
 **Controls:** large tap zones on mobile; arrow keys (← →) in desktop browser. Full rules in the in-app **How to Survive** screen (career ladder: building floors vs rank gates).
 
-**Goal:** maximize Career Years and final rank (Intern → Manager at 10y → CEO at 35y). Compete on Daily and Weekly leaderboards.
+**Goal:** maximize Career Years and final rank (Intern → Manager at 10y → Director at 20y → CEO at 35y). Compete on Daily and Weekly leaderboards.
 
 
 

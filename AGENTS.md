@@ -88,7 +88,7 @@ Copy `.env.example` to `.env` and fill in credentials.
 
 **v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. Through **v1.9.0** + **v2.0.0** tagged — see [CHANGELOG](CHANGELOG.md).
 
-**Active:** Soft launch / F&F — [ROADMAP.md](ROADMAP.md) **Status**, [FF_EXECUTION](docs/FF_EXECUTION.md).
+**Active:** **v2.1.0** retention sprint (code complete, tag pending) — [ROADMAP.md](ROADMAP.md) **Status**, [FF_EXECUTION](docs/FF_EXECUTION.md).
 
 **v1.1 (do NOT implement without approval):** Friends leaderboard, All-time tab, analytics, anti-cheat replay.
 

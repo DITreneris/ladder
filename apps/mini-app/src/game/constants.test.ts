@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   BASE_DRAIN_RATE,
   CEO_YEARS,
+  DIRECTOR_YEARS,
   MANAGER_YEARS,
   REORG_INTERVAL_CEO_MS,
   REORG_INTERVAL_MS,
@@ -22,9 +23,15 @@ describe("rankFromYears", () => {
     expect(rankFromYears(MANAGER_YEARS - 1)).toBe("Intern");
   });
 
-  it("returns Manager at 10 years", () => {
+  it("returns Manager at 10 years up to director threshold", () => {
     expect(rankFromYears(MANAGER_YEARS)).toBe("Manager");
-    expect(rankFromYears(34)).toBe("Manager");
+    expect(rankFromYears(DIRECTOR_YEARS - 1)).toBe("Manager");
+  });
+
+  it("returns Director at 20 years up to CEO threshold", () => {
+    expect(rankFromYears(DIRECTOR_YEARS)).toBe("Director");
+    expect(rankFromYears(34)).toBe("Director");
+    expect(rankFromYears(CEO_YEARS - 1)).toBe("Director");
   });
 
   it("returns CEO at 35 years", () => {
@@ -56,6 +63,10 @@ describe("obstacle gating", () => {
     expect(allowedObstacleTypes("Manager")).toEqual(["meeting", "reorg", "badge_gate"]);
   });
 
+  it("director allows meetings, reorgs, badge gates, and deadlines", () => {
+    expect(allowedObstacleTypes("Director")).toEqual(["meeting", "reorg", "badge_gate", "burnout"]);
+  });
+
   it("CEO allows meetings, reorgs, deadlines, and foliage", () => {
     expect(allowedObstacleTypes("CEO")).toEqual(["meeting", "reorg", "burnout", "foliage"]);
   });
@@ -84,6 +95,16 @@ describe("obstacle gating", () => {
     spy.mockRestore();
   });
 
+  it("pickObstacleType can return burnout for Director", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.95);
+    expect(pickObstacleType("Director")).toBe("burnout");
+    spy.mockRestore();
+  });
+
+  it("pickObstacleType never returns foliage for Director", () => {
+    expect(allowedObstacleTypes("Director")).not.toContain("foliage");
+  });
+
   it("tutorial rung specs only use left or right spawn", () => {
     for (const spec of TUTORIAL_RUNG_SPECS) {
       expect(spec.obstacle === null || spec.obstacle === "left" || spec.obstacle === "right").toBe(true);
@@ -93,6 +114,7 @@ describe("obstacle gating", () => {
 
   it("reorgIntervalForRank returns CEO interval for CEO", () => {
     expect(reorgIntervalForRank("CEO")).toBe(REORG_INTERVAL_CEO_MS);
+    expect(reorgIntervalForRank("Director")).toBe(REORG_INTERVAL_MS);
     expect(reorgIntervalForRank("Intern")).toBe(REORG_INTERVAL_MS);
   });
 });
@@ -103,8 +125,12 @@ describe("milestoneLabel", () => {
     expect(milestoneLabel(5)).toBe("Manager in 5.0y");
   });
 
-  it("shows CEO countdown for manager", () => {
-    expect(milestoneLabel(MANAGER_YEARS)).toBe("CEO myth in 25.0y");
+  it("shows director countdown for manager", () => {
+    expect(milestoneLabel(MANAGER_YEARS)).toBe("Director in 10.0y");
+  });
+
+  it("shows CEO countdown for director", () => {
+    expect(milestoneLabel(DIRECTOR_YEARS)).toBe("CEO myth in 15.0y");
   });
 
   it("shows corner office for CEO", () => {

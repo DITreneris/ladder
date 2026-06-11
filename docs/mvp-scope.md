@@ -2,7 +2,7 @@
 
 **Doc map:** [DOCS_INDEX.md](../DOCS_INDEX.md) · **Shipped inventory:** [ROADMAP.md](../ROADMAP.md) § Shipped baseline · **History:** [CHANGELOG.md](../CHANGELOG.md) · **v0.1 archive:** [archive/README.md](archive/README.md)
 
-**Role of this file:** Scope **boundaries** only (what v1 is, what is deferred, what is forbidden). Do **not** duplicate the mechanics/UI inventory here — that lives in [ROADMAP.md](../ROADMAP.md) § Shipped baseline (through v1.8.5; v1.9 F&F + v2.0 triage in [CHANGELOG](../CHANGELOG.md)).
+**Role of this file:** Scope **boundaries** only (what v1 is, what is deferred, what is forbidden). Do **not** duplicate the mechanics/UI inventory here — that lives in [ROADMAP.md](../ROADMAP.md) § Shipped baseline (v1.5 → v1.8.5 + v1.9/v2.0 + [Unreleased](../CHANGELOG.md#unreleased)).
 
 ---
 
@@ -12,7 +12,7 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 
 **Pitch:** Fast-paced office climb where your energy meter drains like a Friday afternoon.
 
-**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (v1.9.0 + v2.0.0 tagged; soft launch / F&F active).
+**Current release context:** [ROADMAP.md](../ROADMAP.md) **Status** (v1.9.0 + v2.0.0 tagged; **v2.1.0** code complete, tag/deploy pending).
 
 ---
 
@@ -29,6 +29,7 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 | Three-lane **visual** corridor (v1.8.5) — center aisle + TAP LEFT/RIGHT only | Third tap / center spawn / stay-center mechanic |
 | **v2.0** score plausibility cap + session leaderboard tokens | — |
 | **v2.0** Corporate triage rung (Manager+ spawn bias) — [V2_TRIAGE_SPIKE.md](V2_TRIAGE_SPIKE.md) | Other new obstacle logic without product approval |
+| **AdsGram rewarded revive** (optional; one per run; no currency) | Forced interstitials, virtual currency, IAP store |
 
 **Everything shipped in v1.5–v1.8.5** (fairness, narrative, mobile UX, OG meta, corridor onboarding) is **polish on this boundary**, not a new product — see [CHANGELOG](../CHANGELOG.md) and ROADMAP release train.
 
@@ -50,7 +51,7 @@ Telegram Mini App: tap left/right to climb the corporate ladder; dodge meetings,
 - Friends leaderboard
 - All-time / Legends tab
 - Server-side replay validation (anti-cheat)
-- Product analytics (session length, share rate, retention) — not Vercel page views alone
+- Product analytics dashboard / custom event pipeline (session length, share rate, retention funnels) — excludes TON Builders SDK and Vercel page views already shipped in v2.x/[Unreleased]
 - Admin dashboard
 
 Listed in [CHANGELOG](../CHANGELOG.md) `[Unreleased]` → Planned (v1.1). Do not implement as part of v1.9 juice without approval.
@@ -62,8 +63,8 @@ Listed in [CHANGELOG](../CHANGELOG.md) `[Unreleased]` → Planned (v1.1). Do not
 Align with [ROADMAP.md](../ROADMAP.md) § Explicitly out of scope:
 
 - Virtual currency, marketplace, skins, clans, quests, NFTs / blockchain
-- Complex rank tree (Director, VP, …)
-- New obstacle logic (both sides lethal, moving hazards, hold-to-dodge) — except explicit v2 “triage rung” thesis after F&F
+- Complex rank tree (VP, C-suite steps, …) — **scope exception 2026-06-11:** one intermediate **Director** rank @ 20y approved for v2.1.0 (F&F data: zero external CEO runs, best external 25.8y — see [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §E.2); ladder is locked at Intern → Manager → Director → CEO
+- New obstacle logic (both sides lethal, moving hazards, hold-to-dodge) — v2 triage rung shipped; see [V2_TRIAGE_SPIKE.md](V2_TRIAGE_SPIKE.md)
 - Separate antagonist AI / combat
 - Heavy parallax or full arena redesign
 - Breaking fourth wall (“this is a game”)

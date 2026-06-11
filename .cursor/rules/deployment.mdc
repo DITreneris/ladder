@@ -12,11 +12,14 @@ See [DEPLOY.md](../../DEPLOY.md) for the full cold-deploy and post-deploy verifi
 
 All services read a **single repo root** `.env` (see [.env.example](../../.env.example)). Optional sync: `scripts/setup-env.ps1` or `scripts/setup-env.sh`.
 
+Vercel optional: `VITE_TELEGRAM_ANALYTICS_TOKEN`, `VITE_ADSGRAM_REVIVE_ENABLED`, `VITE_ADSGRAM_BLOCK_ID`.
+
 ## 1. Supabase
 
 1. Create project at supabase.com
 2. Run `supabase/migrations/001_initial_schema.sql`
-3. Copy URL + service role key
+3. Run `supabase/migrations/002_v2_hardening.sql` — required for v2.0
+4. Copy URL + service role key; verify `migration_002_ok` via `ff-metrics.py`
 
 ## 2. Railway — API
 
@@ -27,7 +30,7 @@ All services read a **single repo root** `.env` (see [.env.example](../../.env.e
 ## 3. Vercel — Mini App
 
 1. Import repo, root directory `apps/mini-app`
-2. Set env: `VITE_API_URL` (Railway API URL), `VITE_BOT_USERNAME`, `VITE_PROMPT_ANATOMY_URL` (optional; defaults in code)
+2. Set env: `VITE_API_URL` (Railway API URL), `VITE_BOT_USERNAME` (`CorporateLadder_bot`), `VITE_PROMPT_ANATOMY_URL` (optional; defaults in code)
 3. Deploy, copy production URL
 
 ## 4. Railway — Bot
@@ -50,11 +53,11 @@ From repo root:
 .\scripts\smoke-local.ps1
 ```
 
-Smoke runs: API `pytest`, bot import, mini-app `lint` + `test` + `build` + viewport QA, deploy preflight.
+Smoke runs: API `pytest`, bot import, mini-app `lint` + `test` + `build` + viewport/layout/coffee QA + SEO verify, deploy preflight.
 
 ## 7. Post-deploy smoke
 
-- Open Mini App from bot
+- Open Mini App from `@CorporateLadder_bot`
 - Play one run, verify score on Daily leaderboard
-- Test share button
-- v1.6: milestone chip, death cause row, retry tip visible on game over
+- Test share button; triage at Manager+ (v2.0)
+- `python scripts/ff-metrics.py` → `submit_pipeline_ok: true`

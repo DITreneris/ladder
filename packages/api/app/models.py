@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-FinalRank = Literal["Intern", "Manager", "CEO"]
+FinalRank = Literal["Intern", "Manager", "Director", "CEO"]
 
 
 class InitDataRequest(BaseModel):
