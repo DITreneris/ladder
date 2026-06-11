@@ -40,7 +40,9 @@ Re-run [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–5 (corridor, width, c
 
 ---
 
-## Automated coverage (2026-06-11)
+## Automated coverage (2026-06-11, post v2.2.0 train deploy)
+
+Prod bundle to sign against: `main-C0cdc3so.js` @ `d0c9305` (tags `v2.1.0`/`v2.1.1`/`v2.2.0` on `origin`). Local smoke green same day: pytest 30 · vitest 119 · lint/build · deploy preflight · live SEO smoke (prod) · `ff-metrics.py` `submit_pipeline_ok: true`. Bundle markers verified live: `startapp=c_`, `challengeBanner`, `tutorial_complete`/`share_tap`/`share_success`/`revive_offer`/`revive_complete`, "Mandatory HR Training", `/og.png` 200.
 
 Local CI smoke before manual device sign-off:
 

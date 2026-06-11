@@ -19,13 +19,13 @@
 
 | # | Gate | Target | Pass |
 |---|------|--------|------|
-| 1 | `submit_pipeline_ok` | `true` | [ ] |
+| 1 | `submit_pipeline_ok` | `true` | [x] T+0 2026-06-11 post-deploy — re-verify at review |
 | 2 | [DEVICE_QA_v2.0.md](DEVICE_QA_v2.0.md) rows 1–8 | Signed iOS + Android | [ ] |
-| 3 | Externals ≥3 runs | ≥6/8 (or same ratio at larger cohort) | [ ] |
+| 3 | Externals ≥3 runs | ≥6/8 (or same ratio at larger cohort) | [ ] Wave 2 tracker ready ([FF_TEST.md](FF_TEST.md)) |
 | 4 | First-run churn | No dominant 1-run quit after v2.1.1 | [ ] |
 | 5 | Share signal | ≥1 validated Telegram share (native or paste) | [ ] |
-| 6 | OG + SEO | Live after `adopt:og` Vercel redeploy | [ ] |
-| 7 | Median external run proxy | ≥30s (or documented exception) | [ ] |
+| 6 | OG + SEO | Live after `adopt:og` Vercel redeploy | [x] 2026-06-11 — `/og.png` 200 + live SEO smoke green |
+| 7 | Median external run proxy | ≥30s (or documented exception) | [ ] baseline 11.25s — T+7 re-run ~2026-06-18 |
 
 ---
 
