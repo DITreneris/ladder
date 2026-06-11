@@ -6,7 +6,11 @@ import { mountApp } from "./app";
 import { initTelegramAnalytics } from "./lib/telegram-analytics";
 import { APP_SHELL } from "./template";
 
-initTelegramAnalytics();
+try {
+  initTelegramAnalytics();
+} catch (err) {
+  console.warn("[corporate_ladder] Telegram analytics init skipped", err);
+}
 
 document.getElementById("app")!.innerHTML = APP_SHELL;
 mountApp();

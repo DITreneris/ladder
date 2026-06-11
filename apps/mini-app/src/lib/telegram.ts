@@ -45,6 +45,7 @@ declare global {
         MainButton: TelegramMainButton;
         BackButton?: TelegramBackButton;
         themeParams: Record<string, string>;
+        colorScheme?: "light" | "dark";
         safeAreaInset?: SafeAreaInset;
         contentSafeAreaInset?: SafeAreaInset;
         setHeaderColor?: (color: string) => void;
@@ -92,13 +93,23 @@ export function applySafeAreaInsets(): void {
   root.style.setProperty("--tg-content-safe-area-inset-right", insetPx(content.right));
 }
 
+/** Shell copy uses fixed slate utilities; keep the playfield light when Telegram is dark. */
+const TELEGRAM_DARK_VIEWPORT_BG = "#f8fafc";
+
 export function applyTelegramTheme(): void {
   const tg = window.Telegram?.WebApp;
   const root = document.documentElement;
   const params = tg?.themeParams ?? {};
+  const isDarkScheme = tg?.colorScheme === "dark";
+
+  root.classList.toggle("cl-tg-dark", isDarkScheme);
 
   setThemeVar(root, "--cl-bg", params.bg_color, "#020617");
-  setThemeVar(root, "--cl-secondary-bg", params.secondary_bg_color, "#f8fafc");
+  if (isDarkScheme) {
+    root.style.setProperty("--cl-secondary-bg", TELEGRAM_DARK_VIEWPORT_BG);
+  } else {
+    setThemeVar(root, "--cl-secondary-bg", params.secondary_bg_color, TELEGRAM_DARK_VIEWPORT_BG);
+  }
   setThemeVar(root, "--cl-text", params.text_color, "#0f172a");
   setThemeVar(root, "--cl-hint", params.hint_color, "#64748b");
   setThemeVar(root, "--cl-link", params.link_color, "#2563eb");
@@ -120,10 +131,14 @@ export function applyTelegramTheme(): void {
     tg.setHeaderColor("#0f172a");
   }
 
-  if (params.bg_color && tg?.setBackgroundColor) {
-    tg.setBackgroundColor(params.bg_color);
-  } else if (tg?.setBackgroundColor) {
-    tg.setBackgroundColor("#020617");
+  if (tg?.setBackgroundColor) {
+    if (isDarkScheme) {
+      tg.setBackgroundColor(TELEGRAM_DARK_VIEWPORT_BG);
+    } else if (params.bg_color) {
+      tg.setBackgroundColor(params.bg_color);
+    } else {
+      tg.setBackgroundColor("#020617");
+    }
   }
 
   applySafeAreaInsets();

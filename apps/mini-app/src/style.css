@@ -265,6 +265,12 @@
   border-radius: 0;
 }
 
+/* Telegram dark theme: shell uses slate utilities on a light playfield (see applyTelegramTheme). */
+html.cl-in-telegram.cl-tg-dark .cl-viewport {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
 .cl-in-telegram .cl-phone-shell {
   max-width: none;
   border-radius: 0;

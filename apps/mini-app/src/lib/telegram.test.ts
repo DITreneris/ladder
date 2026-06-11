@@ -4,10 +4,14 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { applyTelegramTheme, shareText } from "./telegram";
 
-function mockTelegramTheme(themeParams: Record<string, string>): void {
+function mockTelegramTheme(
+  themeParams: Record<string, string>,
+  colorScheme: "light" | "dark" = "light"
+): void {
   window.Telegram = {
     WebApp: {
       themeParams,
+      colorScheme,
     },
   } as Window["Telegram"];
 }
@@ -38,6 +42,22 @@ describe("applyTelegramTheme", () => {
     applyTelegramTheme();
 
     expect(document.documentElement.style.getPropertyValue("--cl-header-text")).toBe("#ff0000");
+  });
+
+  it("forces a light viewport when Telegram colorScheme is dark", () => {
+    mockTelegramTheme(
+      {
+        bg_color: "#000000",
+        secondary_bg_color: "#1c1c1d",
+        text_color: "#ffffff",
+      },
+      "dark"
+    );
+
+    applyTelegramTheme();
+
+    expect(document.documentElement.classList.contains("cl-tg-dark")).toBe(true);
+    expect(document.documentElement.style.getPropertyValue("--cl-secondary-bg")).toBe("#f8fafc");
   });
 });
 
