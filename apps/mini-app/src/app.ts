@@ -232,23 +232,6 @@ function isTutorialOverlayActive(): boolean {
   return Boolean(engine?.isActive()) && !isTutorialDone() && engine.getRungsClimbed() < 3;
 }
 
-function updateTutorialOverlay(): void {
-  const overlay = $("tutorialOverlay");
-  if (!isTutorialOverlayActive()) {
-    overlay.classList.add("hidden");
-    return;
-  }
-  const climbed = engine.getRungsClimbed();
-  const step = Math.min(3, climbed + 1);
-  $("tutorialStepLabel").textContent = String(step);
-  $("tutorialOverlayText").textContent = describeNextRung(engine.getRungs()[1]);
-  overlay.classList.remove("hidden");
-}
-
-function hideTutorialOverlay(): void {
-  $("tutorialOverlay").classList.add("hidden");
-}
-
 function getTutorialWrongTapMessage(side: PlayerSide): string {
   const next = engine.getRungs()[1];
   if (next?.obstacle) {
@@ -383,6 +366,11 @@ function refreshHomeContextSlot(): void {
 function updateImminentRungHint(): void {
   const hint = $("imminentHint");
   if (!engine?.isActive()) {
+    hint.classList.add("hidden");
+    updateSafeSideTapPulse();
+    return;
+  }
+  if (isTutorialOverlayActive()) {
     hint.classList.add("hidden");
     updateSafeSideTapPulse();
     return;
@@ -1188,13 +1176,14 @@ async function startGame(): Promise<void> {
   hideHudTapHint();
   hideImminentHint();
   hideTapDeckHint();
-  hideTutorialOverlay();
   $("btnTapLeft").classList.remove("safe-side-hint");
   $("btnTapRight").classList.remove("safe-side-hint");
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
   $("burnoutMeter").style.width = "100%";
-  showHudTapHint();
+  if (isTutorialDone()) {
+    showHudTapHint();
+  }
   showTapDeckHint();
   flashBurnoutStress(false);
   playerInPanic = false;
@@ -1223,15 +1212,11 @@ async function startGame(): Promise<void> {
   updateFloorLabel(0);
   updateReorgHudStrip("Intern");
   updateEnergyLabelVisibility();
-  if (!isTutorialDone()) {
-    updateTutorialOverlay();
-  }
   switchTab("game");
   requestAnimationFrame(() => {
     layoutRungs();
     layoutPlayerPosition("center");
-    updateTutorialOverlay();
-    updateSafeSideTapPulse();
+    updateImminentRungHint();
   });
 }
 
@@ -1251,7 +1236,6 @@ async function goHome(): Promise<void> {
   hideHrMemo();
   hideHudTapHint();
   hideTapDeckHint();
-  hideTutorialOverlay();
   $("btnTapLeft").classList.remove("safe-side-hint");
   $("btnTapRight").classList.remove("safe-side-hint");
   flashBurnoutStress(false);
@@ -1540,6 +1524,27 @@ function toggleMute(): void {
 
 let lastPointerTapAt = 0;
 let playAreaResizeObserver: ResizeObserver | null = null;
+let viewportResizeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function onViewportResize(): void {
+  refreshHomePreviewCollapse();
+  if (!engine?.isActive()) return;
+  layoutRungs();
+  layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
+}
+
+function installViewportResizeHandler(): void {
+  const schedule = (): void => {
+    if (viewportResizeTimer !== null) clearTimeout(viewportResizeTimer);
+    viewportResizeTimer = setTimeout(() => {
+      viewportResizeTimer = null;
+      onViewportResize();
+    }, 100);
+  };
+  window.addEventListener("resize", schedule);
+  window.visualViewport?.addEventListener("resize", schedule);
+  window.addEventListener("orientationchange", schedule);
+}
 
 function attachPlayAreaObserver(): void {
   const playArea = $("gamePlayArea");
@@ -1580,12 +1585,10 @@ function attemptGameTap(side: PlayerSide, source: "pointer" | "keyboard", button
   lastPointerTapAt = now;
   const climbedBefore = engine.getRungsClimbed();
   engine.handleTap(side);
-  if (isTutorialOverlayActive() && engine.getRungsClimbed() >= 3 && climbedBefore < 3) {
+  if (!isTutorialDone() && climbedBefore < 3 && engine.getRungsClimbed() >= 3) {
     markTutorialDone();
-    hideTutorialOverlay();
-  } else {
-    updateTutorialOverlay();
   }
+  updateImminentRungHint();
   if (earlyTapsRemaining > 0) {
     earlyTapsRemaining--;
     if (earlyTapsRemaining === 0) hideTapDeckHint();
@@ -1878,10 +1881,12 @@ export function mountApp(): void {
     updatePlayerPosition,
     () => {
       hideHudTapHint();
-      showHrMemo(
-        "TAP LEFT or RIGHT — avoid the occupied side.",
-        { variant: "info", durationMs: 4500 }
-      );
+      if (isTutorialDone()) {
+        showHrMemo(
+          "TAP LEFT or RIGHT — avoid the occupied side.",
+          { variant: "info", durationMs: 4500 }
+        );
+      }
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
         shiftToastShown = true;
         showHrMemo("Shift rules active", { variant: "alert" });
@@ -1902,6 +1907,7 @@ export function mountApp(): void {
   bindTapButton($("btnTapRight"), "right");
 
   attachPlayAreaObserver();
+  installViewportResizeHandler();
 
   window.addEventListener("keydown", (e) => {
     if (!engine.isActive()) return;

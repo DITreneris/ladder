@@ -241,7 +241,7 @@ In-play and failure surfaces — clarity over decoration. Animation classes: [RO
 | **Imminent hint** | `#imminentHint` | Next-rung panel first ~12 rungs; compact 2-line on SE Telegram |
 | **Future rung de-emphasis** | `.rung-future` | Rungs index 2–6 at reduced row opacity; hazard badges stay full contrast (no double fade) |
 | **Imminent hazard warn** | `.next-obstacle-warn` | Red box-shadow pulse on next-rung obstacle (mirrors coffee hint) |
-| **Safe-side hint** | `.safe-side-hint` on imminent rung | Tutorial window aligned to 12 rungs (tap-deck pulse still 5 taps) |
+| **Safe-side hint** | `.safe-side-hint` on `#btnTapLeft` / `#btnTapRight` | First-run rungs 1–3: glow only (no overlay / imminent copy); deck pulse still 5 taps |
 | **Gate badge** | Manager+ obstacles | Slate badge; same dodge as meetings |
 | **Plant badge** | CEO+ obstacles | Emerald badge; same dodge as deadlines |
 
@@ -312,7 +312,7 @@ Shell tokens unchanged from v1.8.5; new surfaces only:
 - [ ] `npm run preview` → `npm run qa:viewport` + `npm run qa:layout` (no horizontal overflow; play width stable after first tap)
 - [ ] `#ladderTrack` fills column at 320px / 390px — no grey dead zones beside ladder
 - [ ] `#gameContentColumn` wraps HUD + play + tap at one width
-- [ ] `#hudTapHint` references TAP LEFT / TAP RIGHT (viewport QA asserts copy)
+- [ ] First-run deck guidance: `#hudTapHint` copy or `.safe-side-hint` glow (viewport QA)
 - [ ] Telegram light + dark theme: shell adapts, next-rung visible
 - [ ] `prefers-reduced-motion`: animations off, game playable
 - [ ] Grep: no `text-[` pixel sizes in `apps/mini-app/src/`

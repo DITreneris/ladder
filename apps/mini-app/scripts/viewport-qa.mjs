@@ -145,8 +145,15 @@ async function hudTapHintReferencesDeck(page) {
     const hint = document.getElementById("hudTapHint");
     if (!hint) return { ok: false, reason: "missing-hint" };
     const text = hint.textContent ?? "";
-    const ok = text.includes("TAP LEFT") || text.includes("TAP RIGHT");
-    return { ok, text };
+    if (text.includes("TAP LEFT") || text.includes("TAP RIGHT")) {
+      return { ok: true, text, mode: "hud-hint" };
+    }
+    const leftGlow = document.getElementById("btnTapLeft")?.classList.contains("safe-side-hint");
+    const rightGlow = document.getElementById("btnTapRight")?.classList.contains("safe-side-hint");
+    if (leftGlow || rightGlow) {
+      return { ok: true, text, mode: "tutorial-glow" };
+    }
+    return { ok: false, text, reason: "no-hint-or-glow" };
   });
 }
 

@@ -130,13 +130,6 @@ export const APP_SHELL = `
       </div>
     </div>
     <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
-      <div id="tutorialOverlay" class="tutorial-overlay hidden" aria-live="polite">
-        <div class="tutorial-overlay-card card-light-sm">
-          <p class="text-nano font-bold uppercase tracking-wider text-cl-primary">Orientation — rung <span id="tutorialStepLabel">1</span>/3</p>
-          <p id="tutorialOverlayText" class="text-caption font-semibold text-slate-700 mt-1"></p>
-          <p class="text-micro text-slate-500 mt-1">Tap the highlighted side on the deck below.</p>
-        </div>
-      </div>
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
       <div id="gameContentColumn" class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 w-full">
       <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col min-w-0 w-full">
@@ -361,6 +354,12 @@ export const APP_SHELL = `
     <div id="toastNotification" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-full shadow-lg z-50 flex items-center space-x-2 opacity-0 pointer-events-none transition-opacity duration-300">
       ${icon("circle-check", "text-emerald-400")}
       <span id="toastText">Done!</span>
+    </div>
+    <div id="portraitGate" class="portrait-gate" aria-live="polite">
+      <div class="portrait-gate-card card-light">
+        <p class="text-lg font-extrabold text-slate-900">Rotate to portrait</p>
+        <p class="text-caption text-slate-600 mt-2">HR only approved vertical ladder climbing. Landscape shifts are out of scope.</p>
+      </div>
     </div>
   </div>
 </div>

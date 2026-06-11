@@ -16,9 +16,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Hero idle sway** — briefcase hero icon gets a subtle idle micro-animation (`home-hero-idle`); disabled for reduced motion and OG capture
 
 ### Changed
+- **First-run tutorial (glow only)** — scripted rungs 1–3 use safe-side button glow + wrong-tap HR memo only; removed overlay card and duplicate hints (`#imminentHint`, HUD tap hint, start memo) until rung 4
 - **Short-viewport home trim** — gameplay preview collapses by default on viewports ≤620px (not just after first run) so the Punch In CTA bar fits 320×568 without scrolling; "How to Survive — show mechanics" toggle unchanged
 
 ### Fixed
+- **Phone landscape / orientation** — portrait gate on squashed landscape viewports; shell height uses `min-height: 100dvh` for Android rotation; resize/orientation handlers refresh home trim and in-run ladder layout
 - **Android Telegram black screen** — on `colorScheme: dark`, keep `.cl-viewport` and WebApp background light so fixed slate shell copy stays readable; guard TON analytics init so a SDK failure cannot block mount
 - **Daily leaderboard stale after game over** — fetch leaderboard after score submit (not in parallel), so gap line, self-row highlight, and Leaderboard tab reflect the run HR just filed
 
