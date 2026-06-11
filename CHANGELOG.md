@@ -9,6 +9,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **[docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)** — pre-launch product audit #2 (CONDITIONAL GO 62/100); integrated with ROADMAP § UX audit and PUBLIC_LAUNCH_REVIEW gates
+
+### Fixed
+- **Daily leaderboard stale after game over** — fetch leaderboard after score submit (not in parallel), so gap line, self-row highlight, and Leaderboard tab reflect the run HR just filed
+
 ### Planned (v1.1)
 - All-time / Legends tab
 - Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)

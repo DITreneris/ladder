@@ -59,7 +59,8 @@ Use this table to pick the right skill, rules, and documents.
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + active gate + § Shipped baseline; historical gates → [archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md) |
-| UX audit / retention polish | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md), [ROADMAP](ROADMAP.md) § UX audit → release map |
+| UX audit / retention polish | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md), [prelaunch_audit2.md](docs/prelaunch_audit2.md), [ROADMAP](ROADMAP.md) § UX audit → release map |
+| Pre-launch GO/NO-GO decision | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [prelaunch_audit2.md](docs/prelaunch_audit2.md), [PUBLIC_LAUNCH_REVIEW_2026-06-28](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md), [FF_METRICS_2026-06-11](docs/FF_METRICS_2026-06-11.md) |
 | F&F gate / device QA | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / shell SEO-GEO | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og`, `verify:seo` |
 | Paid ads / channel promotion / AdsGram acquisition | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md), [DEPLOY.md](DEPLOY.md) § AdsGram revive, [FF_REVIEW_2026-06-14](docs/FF_REVIEW_2026-06-14.md) |
@@ -111,6 +112,8 @@ Use this table to pick the right skill, rules, and documents.
 | `discoverability` | [docs/discoverability-plan.md](docs/discoverability-plan.md) | Product / release | Telegram-first discoverability; minimal web metadata; defers full SEO |
 | `ads-acquisition` | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) | Product / ops | Paid acquisition gates; AdsGram campaign types; channel posts; separate from in-app Reward monetization |
 | `ux-retention-plan` | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md) | Product / frontend | UX audit integrated with ROADMAP release train (v2.1.0 cut → v2.1.1 hotfix → v2.2.0) |
+| `prelaunch-audit2` | [docs/prelaunch_audit2.md](docs/prelaunch_audit2.md) | Product / founders | Pre-launch audit #2 — CONDITIONAL GO, blockers, 7-day plan; maps to ROADMAP + PUBLIC_LAUNCH_REVIEW |
+| `public-launch-review` | [docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) | Product / ops | Public launch GO gate (~Jun 28); inputs include prelaunch_audit2 |
 | `agents` | [AGENTS.md](AGENTS.md) | Agents + leads | Scope, workflow, conventions |
 | `deploy` | [DEPLOY.md](DEPLOY.md) | DevOps / release | Cold-deploy + verification checklist |
 | `changelog` | [CHANGELOG.md](CHANGELOG.md) | Everyone | Keep a Changelog; `[Unreleased]` |

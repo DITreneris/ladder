@@ -1,7 +1,7 @@
 # UX / Retention Action Plan — Corporate Ladder
 
 **Purpose:** Integrate the Jun 2026 UX/UI audit with [ROADMAP.md](../ROADMAP.md) release train — what ships when, what stays deferred, and how to measure success.  
-**Inputs:** F&F metrics ([FF_METRICS_2026-06-08.md](FF_METRICS_2026-06-08.md)), [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md), [20260608_analize.md](20260608_analize.md), marketing captures ([assets/marketing/](assets/marketing/)), design system.  
+**Inputs:** F&F metrics ([FF_METRICS_2026-06-08.md](FF_METRICS_2026-06-08.md)), [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md), [20260608_analize.md](20260608_analize.md), marketing captures ([assets/marketing/](assets/marketing/)), design system. **Launch verdict:** [prelaunch_audit2.md](prelaunch_audit2.md).  
 **Owner:** Product + frontend · **Review:** After each tag + `ff-metrics.py` re-run.
 
 ---

@@ -1,7 +1,7 @@
 # Public launch GO review — ~2026-06-28
 
 **Purpose:** Decide **public launch GO** (paid acquisition pilot + wide channel posts) — not F&F-only expansion.  
-**Inputs:** [FF_METRICS_2026-06-11.md](FF_METRICS_2026-06-11.md) · post–v2.1.1/v2.2.0 metrics re-run · [ads-acquisition-plan.md](ads-acquisition-plan.md)
+**Inputs:** [FF_METRICS_2026-06-11.md](FF_METRICS_2026-06-11.md) · post–v2.1.1/v2.2.0 metrics re-run · [ads-acquisition-plan.md](ads-acquisition-plan.md) · [prelaunch_audit2.md](prelaunch_audit2.md)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Field | Value |
 |-------|-------|
-| **Decision** | [ ] **GO** · [ ] **NO-GO** · [ ] **CONDITIONAL GO** |
+| **Decision** | [ ] **GO** · [ ] **NO-GO** · [x] **CONDITIONAL GO** (pre-audit baseline) |
 | **Review date** | ~2026-06-28 |
-| **One-line reason** | |
+| **One-line reason** | Pre-audit: retention thin (11.25s external median run) — see [prelaunch_audit2.md](prelaunch_audit2.md); re-vote after v2.2.0 deploy + 7d metrics |
 
 ---
 

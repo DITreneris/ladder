@@ -1,6 +1,6 @@
 # Roadmap — Corporate Ladder
 
-**Doc map:** [DOCS_INDEX.md](DOCS_INDEX.md) · **Scope:** [docs/mvp-scope.md](docs/mvp-scope.md) · **Ship history:** [CHANGELOG.md](CHANGELOG.md) · **Visual tokens:** [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) · **Copy tone:** [.cursor/rules/satirical-copy.mdc](.cursor/rules/satirical-copy.mdc)
+**Doc map:** [DOCS_INDEX.md](DOCS_INDEX.md) · **Scope:** [docs/mvp-scope.md](docs/mvp-scope.md) · **Ship history:** [CHANGELOG.md](CHANGELOG.md) · **Visual tokens:** [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) · **Copy tone:** [.cursor/rules/satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) · **Pre-launch audit:** [docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)
 
 **How to use:** Forward-looking working doc — **Status**, active gate, next release leg, and **Shipped baseline** guardrails. Per-release detail lives in [CHANGELOG.md](CHANGELOG.md); do not duplicate CHANGELOG prose here. Historical gates → [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md). Update **Status** when ops change; update **Shipped baseline** when a version is tagged.
 
@@ -20,6 +20,7 @@
 | **Monetization** | **AdsGram rewarded revive** + v2.2 hardening — live with `VITE_ADSGRAM_BLOCK_ID`; no virtual currency / forced interstitials |
 | **Acquisition** | **Deferred** — first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
 | **Public launch** | Gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| **Pre-launch audit** | **CONDITIONAL GO** (62/100) — [prelaunch_audit2.md](docs/prelaunch_audit2.md) · public launch **NO-GO** until post–v2.2.0 metrics |
 
 ### Operational checklist
 
@@ -41,7 +42,7 @@ Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy: [DEPLOY.md](DEP
 | **v2.2.0** | Virality + monetization polish (native share, AdsGram hardening, challenge banner, events) | **Code complete** — deploy pending |
 | **v2.1.1** | Retention hotfix: tutorial overlay, Energy label, tap pulse, home trim | **Tagged in CHANGELOG** — shipped with v2.2.0 train |
 | **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Tagged in CHANGELOG** — deploy pending |
-| **v2.5.0** | Public launch | **Gated** — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| **v2.5.0** | Public launch | **Gated** — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) · audit [prelaunch_audit2.md](docs/prelaunch_audit2.md) |
 | **v1.1** | Legends, friends LB, anti-cheat, analytics dashboard | **Deferred** — explicit approval ([mvp-scope](docs/mvp-scope.md)) |
 
 **Older releases (v1.5–v2.0):** per-version detail in [CHANGELOG.md](CHANGELOG.md) only — historical gates in [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md).
@@ -85,7 +86,14 @@ Ship checklist (from [CHANGELOG Unreleased](CHANGELOG.md#unreleased)):
 
 ## UX audit → release map (2026-06-11)
 
-Jun 2026 UX/UI audit integrated with this release train — full phased plan: **[docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md)**.
+Jun 2026 UX/UI audit integrated with this release train — full phased plan: **[docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md)**.  
+**Pre-launch product audit #2 (2026-06-11):** **[docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)** — CONDITIONAL GO (62/100); confirms retention-first path before v2.5.0 public launch.
+
+| Audit verdict | Implication |
+|---------------|-------------|
+| Soft launch / F&F | OK after v2.2.0 deploy + DEVICE_QA |
+| Public launch / paid ads | **NO-GO** until external median run ≥30s, share validated, QA signed |
+| 7-day plan | Audit §15 — deploy → device QA → ff-metrics → [PUBLIC_LAUNCH_REVIEW](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
 
 | Audit priority | Maps to | Notes |
 |----------------|---------|-------|
@@ -279,4 +287,6 @@ If any answer is no, cut scope or defer.
 | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | F&F runbook |
 | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) | Acquisition vs in-app AdsGram |
 | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md) | UX audit phased plan mapped to release train |
+| [docs/prelaunch_audit2.md](docs/prelaunch_audit2.md) | Pre-launch GO/NO-GO audit #2 — retention, virality, 7-day plan |
+| [docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) | Public launch gate checklist (~Jun 28) |
 | [.cursor/agents/verifier.md](.cursor/agents/verifier.md) | Pre-tag QA |

@@ -921,7 +921,9 @@ function updateLeaderboardSelfRow(
     }
   } else {
     const bestLine =
-      highScore > 0 ? `Career high: ${highScore.toFixed(1)}y (${bestRank}).` : "Play a run to land on the board.";
+      highScore > 0
+        ? `Career high (all shifts): ${highScore.toFixed(1)}y (${bestRank}). Today's run may still be filing.`
+        : "Play a run to land on the board.";
     selfText.textContent = `Not on ${boardLabel} yet. ${bestLine}`;
   }
 
@@ -1233,7 +1235,6 @@ async function runPostGameOverIo(
   result: GameOverResult,
   initData: string
 ): Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }> {
-  const lbPromise = fetchLeaderboard(leaderboardPeriod, getSessionToken());
   let submitResult: SubmitRunResult | null = null;
 
   if (initData) {
@@ -1260,7 +1261,7 @@ async function runPostGameOverIo(
     }
   }
 
-  const lbResult = await lbPromise;
+  const lbResult = await fetchLeaderboard(leaderboardPeriod, getSessionToken());
   return { submitResult, lbResult };
 }
 
