@@ -12,11 +12,11 @@
 
 | | |
 |---|---|
-| **Production** | `main` — deploy **v2.2.0** bundle after push; OG image adopted locally (`npm run adopt:og`) — **Vercel redeploy pending** |
-| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** on `main` · **`v2.1.0` / `v2.1.1` / `v2.2.0`** tags pending push |
+| **Production** | `main` @ `d0c9305` — **v2.2.0 train live** on Vercel (`main-C0cdc3so.js`, 2026-06-11) · OG redeployed (`/og.png` 200) · API health ok |
+| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** on `main` · **`v2.1.0` / `v2.1.1` / `v2.2.0`** @ `ddfc968` on `origin` (2026-06-11) |
 | **F&F verdict** | **CONDITIONAL GO** — pipeline green, retention thin; see [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §A/§D |
-| **Active** | **v2.2.0** — **Code complete**, tag/deploy pending — no public marketing |
-| **Next actions** | Push + Vercel/Railway redeploy · DEVICE_QA v2.0 manual sign-off (iOS + Android) · OG redeploy · re-run `ff-metrics.py` ~1 week post-deploy · [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| **Active** | **v2.2.0** — **Tagged + Live** (2026-06-11) — no public marketing |
+| **Next actions** | DEVICE_QA v2.0 manual sign-off (iOS + Android) · share + challenge link device validation · Wave 2 externals ([FF_TEST.md](docs/FF_TEST.md)) · re-run `ff-metrics.py` ~2026-06-18 · [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
 | **Monetization** | **AdsGram rewarded revive** + v2.2 hardening — live with `VITE_ADSGRAM_BLOCK_ID`; no virtual currency / forced interstitials |
 | **Acquisition** | **Deferred** — first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
 | **Public launch** | Gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
@@ -26,8 +26,8 @@
 
 | Item | Status |
 |------|--------|
-| [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) rows 1–8 signed (iOS + Android) | [ ] manual — devices (automated smoke: pytest 30 + vitest 117, 2026-06-11) |
-| Vercel OG redeploy after `npm run adopt:og` | [x] adopt local 2026-06-11 · [ ] Vercel prod redeploy |
+| [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) rows 1–8 signed (iOS + Android) | [ ] manual — devices (automated smoke: pytest 30 + vitest 119, 2026-06-11 post-train) |
+| Vercel OG redeploy after `npm run adopt:og` | [x] adopt local 2026-06-11 · [x] Vercel prod redeploy 2026-06-11 (`/og.png` 200) |
 | `python scripts/ff-metrics.py` → `migration_002_ok: true` in prod | [x] 2026-06-11 ([FF_METRICS_2026-06-11](docs/FF_METRICS_2026-06-11.md)) |
 | GO verdict filled in [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | [x] 2026-06-11 — CONDITIONAL GO |
 
@@ -39,9 +39,9 @@ Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy: [DEPLOY.md](DEP
 
 | Version | Theme | Status |
 |---------|--------|--------|
-| **v2.2.0** | Virality + monetization polish (native share, AdsGram hardening, challenge banner, events) | **Code complete** — deploy pending |
-| **v2.1.1** | Retention hotfix: tutorial overlay, Energy label, tap pulse, home trim | **Tagged in CHANGELOG** — shipped with v2.2.0 train |
-| **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Tagged in CHANGELOG** — deploy pending |
+| **v2.2.0** | Virality + monetization polish (native share, AdsGram hardening, challenge banner, events) | **Tagged + Live** (2026-06-11) |
+| **v2.1.1** | Retention hotfix: tutorial overlay, Energy label, tap pulse, home trim | **Tagged + Live** — shipped with v2.2.0 train |
+| **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Tagged + Live** (2026-06-11) |
 | **v2.5.0** | Public launch | **Gated** — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) · audit [prelaunch_audit2.md](docs/prelaunch_audit2.md) |
 | **v1.1** | Legends, friends LB, anti-cheat, analytics dashboard | **Deferred** — explicit approval ([mvp-scope](docs/mvp-scope.md)) |
 

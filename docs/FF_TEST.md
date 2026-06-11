@@ -99,6 +99,24 @@ Wave 1 sprint fixes (2026-06-01): C-02 career high trust, C-03 coffee animation 
 
 **Completion count (externals with ≥3 runs):** ___ / 8 (GO requires ≥6)
 
+### Wave 2 — fresh externals (post v2.2.0 deploy, 2026-06-11 →)
+
+**Target:** 3–5 fresh externals (not core team, not Wave 1) · 3-run script · measures v2.1.1 tutorial + v2.2.0 native share against the 11.25s median baseline ([FF_METRICS_2026-06-11.md](FF_METRICS_2026-06-11.md)).
+
+**Invite message (reuse):**
+
+> Corporate Ladder — satirical office climb game in Telegram (**soft launch — your feedback shapes the game**). Open **https://t.me/corporateladder_bot** and play **3 runs** over the next few days. Tell me: (1) do taps feel responsive? (2) boring after run 2? (3) would you share your score?
+
+| # | Tester | Platform | Invited | Runs (≥3?) | Shared? | Notes |
+|---|--------|----------|---------|------------|---------|-------|
+| W2-1 | | iOS | [ ] | [ ] | [ ] | |
+| W2-2 | | Android | [ ] | [ ] | [ ] | |
+| W2-3 | | iOS / Android | [ ] | [ ] | [ ] | |
+| W2-4 | | iOS / Android | [ ] | [ ] | [ ] | |
+| W2-5 | | iOS / Android | [ ] | [ ] | [ ] | |
+
+**Log per tester:** session length proxy + share signal (native `share_success` event or paste screenshot). Feed into `python scripts/ff-metrics.py` re-run T+7 and [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](PUBLIC_LAUNCH_REVIEW_2026-06-28.md) gates #3–#5.
+
 
 
 ---

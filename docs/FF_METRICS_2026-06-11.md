@@ -27,3 +27,17 @@
 - External cohort grew (15 externals in 14d vs 8 in prior review); ≥3-run count improved to 6 but median session length still below 30s target.
 - Re-run ~1 week after **v2.1.1** + **v2.2.0** deploy to measure tutorial overlay + native share impact.
 - Full JSON: stdout from `scripts/ff-metrics.py` on 2026-06-11.
+
+## Post-deploy T+0 re-run (2026-06-11, after v2.2.0 train push)
+
+Prod bundle `main-C0cdc3so.js` @ `d0c9305`; tags `v2.1.0`/`v2.1.1`/`v2.2.0` on `origin`.
+
+| Check | Value |
+|-------|-------|
+| `migration_002_ok` | **true** |
+| `submit_pipeline_ok` | **true** |
+| `users_total` / `runs_total` | 20 / 829 |
+| Median run seconds (external, pre-deploy data) | 11.25s — baseline for T+7 (~2026-06-18) re-run |
+| Returned after first run (all-time) | 5/19 (26.3%) |
+
+This run still reflects pre-deploy behavior; the **T+7 re-run (~2026-06-18)** is the first read on v2.1.1 tutorial + v2.2.0 native share.
