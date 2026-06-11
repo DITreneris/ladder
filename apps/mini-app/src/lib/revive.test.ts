@@ -78,6 +78,15 @@ describe("shouldOfferRevive", () => {
       )
     ).toBe(false);
   });
+
+  it("offers first-run near PB at 5y (v2.2 gate)", () => {
+    expect(
+      shouldOfferRevive(
+        { ...baseResult, yearsSurvived: 5 },
+        { highScore: 7.5, reviveUsedThisRun: false, leaderboardGap: null, reapplyCount: 0 }
+      )
+    ).toBe(true);
+  });
 });
 
 describe("buildReviveCopy", () => {

@@ -75,5 +75,8 @@ export async function showRewardedAd(): Promise<void> {
   if (!blockId) return;
 
   const ad = await getController();
-  await ad.show();
+  const result = await ad.show();
+  if (result.error || !result.done) {
+    throw new Error(result.description || "AdsGram rewarded ad did not complete");
+  }
 }

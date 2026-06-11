@@ -44,6 +44,8 @@ export const TUTORIAL_RUNG_SPECS: Omit<Rung, "id">[] = [
 
 export const REAPPLY_STORAGE_KEY = "corp_ladder_reapply_count";
 export const LAST_RUN_STORAGE_KEY = "corp_ladder_last_run";
+/** First-run tutorial overlay (v2.1.1) — set after scripted rungs 1–3 complete. */
+export const TUTORIAL_DONE_STORAGE_KEY = "corp_ladder_tutorial_done";
 
 export interface TickerHeadline {
   text: string;

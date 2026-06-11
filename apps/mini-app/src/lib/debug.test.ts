@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeNextRung, describeTapResult, INTERN_HINT_RUNGS, shouldShowImminentHint } from "./debug";
+import { describeNextRung, describeTapResult, getSafeTapSide, INTERN_HINT_RUNGS, shouldShowImminentHint } from "./debug";
 import type { Rung } from "../game/types";
 
 describe("debug helpers", () => {
@@ -21,6 +21,21 @@ describe("debug helpers", () => {
   it("describes death on obstacle side", () => {
     const rung: Rung = { id: 4, obstacle: "left", type: "meeting", coffee: null };
     expect(describeTapResult("left", rung, "death")).toContain("GAME OVER");
+  });
+
+  it("getSafeTapSide returns opposite of obstacle", () => {
+    const rung: Rung = { id: 5, obstacle: "right", type: "meeting", coffee: null };
+    expect(getSafeTapSide(rung)).toBe("left");
+  });
+
+  it("getSafeTapSide returns coffee side", () => {
+    const rung: Rung = { id: 6, obstacle: null, type: null, coffee: "left" };
+    expect(getSafeTapSide(rung)).toBe("left");
+  });
+
+  it("getSafeTapSide returns null for clear rung", () => {
+    const rung: Rung = { id: 7, obstacle: null, type: null, coffee: null };
+    expect(getSafeTapSide(rung)).toBeNull();
   });
 });
 

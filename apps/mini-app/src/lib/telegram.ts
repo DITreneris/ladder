@@ -248,9 +248,16 @@ export function getDisplayName(fallback = "CorporateSlave"): string {
   return user.username ?? user.first_name ?? fallback;
 }
 
-/** Clipboard fallback only — shareMessage(msg_id) needs bot savePreparedInlineMessage (v1.1). */
-export function shareText(_text: string): boolean {
-  return false;
+/** Native Telegram share when WebApp.shareMessage is available; else clipboard in app.ts. */
+export function shareText(text: string): boolean {
+  const share = window.Telegram?.WebApp?.shareMessage;
+  if (typeof share !== "function") return false;
+  try {
+    share({ text });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function openExternalLink(url: string): void {

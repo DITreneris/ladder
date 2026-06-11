@@ -8,6 +8,7 @@ import {
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
   SPRINT_SHARE_LINE,
+  TUTORIAL_DONE_STORAGE_KEY,
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
   floorLabel,
@@ -27,7 +28,8 @@ import { fetchLeaderboard, fetchLeaderboardMe, fetchProfile, getSessionToken, su
 import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/avatar";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
-import { debugLog, describeNextRung, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
+import { trackEvent } from "./lib/analytics";
+import { debugLog, describeNextRung, getSafeTapSide, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
 import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
 import { icon } from "./lib/icons";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
@@ -61,6 +63,7 @@ import {
   hideHomeMainButton,
   initTelegram,
   isTelegram,
+  shareText,
   showHomeMainButton,
   showTelegramBack,
 } from "./lib/telegram";
@@ -97,6 +100,8 @@ let emojiFlashLock = false;
 let playerAtCorridor = true;
 let qaCoffeePickups = 0;
 let challengeTargetYears: number | null = null;
+let challengeBannerDismissed = false;
+let homePreviewExpanded = false;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -206,19 +211,134 @@ function getLastRunYears(): number | null {
   }
 }
 
+function isTutorialDone(): boolean {
+  try {
+    return localStorage.getItem(TUTORIAL_DONE_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markTutorialDone(): void {
+  try {
+    localStorage.setItem(TUTORIAL_DONE_STORAGE_KEY, "1");
+  } catch {
+    /* ignore */
+  }
+  trackEvent("tutorial_complete");
+}
+
+function isTutorialOverlayActive(): boolean {
+  return Boolean(engine?.isActive()) && !isTutorialDone() && engine.getRungsClimbed() < 3;
+}
+
+function updateTutorialOverlay(): void {
+  const overlay = $("tutorialOverlay");
+  if (!isTutorialOverlayActive()) {
+    overlay.classList.add("hidden");
+    return;
+  }
+  const climbed = engine.getRungsClimbed();
+  const step = Math.min(3, climbed + 1);
+  $("tutorialStepLabel").textContent = String(step);
+  $("tutorialOverlayText").textContent = describeNextRung(engine.getRungs()[1]);
+  overlay.classList.remove("hidden");
+}
+
+function hideTutorialOverlay(): void {
+  $("tutorialOverlay").classList.add("hidden");
+}
+
+function getTutorialWrongTapMessage(side: PlayerSide): string {
+  const next = engine.getRungs()[1];
+  if (next?.obstacle) {
+    const blocked = side === "left" ? "LEFT" : "RIGHT";
+    return `That ${blocked} lane is occupied — try the other side. HR is watching.`;
+  }
+  if (next?.coffee) {
+    const coffeeSide = next.coffee === "left" ? "LEFT" : "RIGHT";
+    return `Coffee is on ${coffeeSide} — tap ${coffeeSide} for +25% Energy.`;
+  }
+  return "Try the other side for this rung.";
+}
+
+function updateSafeSideTapPulse(): void {
+  const leftBtn = $("btnTapLeft");
+  const rightBtn = $("btnTapRight");
+  leftBtn.classList.remove("safe-side-hint");
+  rightBtn.classList.remove("safe-side-hint");
+
+  if (!engine?.isActive() || respectsReducedMotion()) return;
+  if (!shouldShowImminentHint(engine.getRungsClimbed())) return;
+
+  const safeSide = getSafeTapSide(engine.getRungs()[1]);
+  if (safeSide === "left") leftBtn.classList.add("safe-side-hint");
+  else if (safeSide === "right") rightBtn.classList.add("safe-side-hint");
+}
+
+function updateEnergyLabelVisibility(): void {
+  const label = $("energyLabel");
+  if (!engine?.isActive()) {
+    label.classList.add("hidden");
+    return;
+  }
+  label.classList.toggle("hidden", getReapplyCount() >= 5);
+}
+
+function refreshHomePreviewCollapse(): void {
+  const wrap = $("homeGameplayPreviewWrap");
+  const toggle = $("homePreviewToggle");
+  const hasPlayed = getReapplyCount() >= 1 || getLastRunYears() !== null;
+  if (!hasPlayed || homePreviewExpanded) {
+    wrap.classList.remove("is-collapsed");
+    toggle.classList.add("hidden");
+    if (hasPlayed && homePreviewExpanded) {
+      toggle.textContent = "How to Survive — hide mechanics";
+    }
+    return;
+  }
+  wrap.classList.add("is-collapsed");
+  toggle.classList.remove("hidden");
+  toggle.textContent = "How to Survive — show mechanics";
+}
+
+function toggleHomeGameplayPreview(): void {
+  homePreviewExpanded = !homePreviewExpanded;
+  refreshHomePreviewCollapse();
+}
+
+function refreshChallengeBanner(): void {
+  const banner = $("challengeBanner");
+  if (challengeTargetYears === null || challengeBannerDismissed) {
+    banner.classList.add("hidden");
+    return;
+  }
+  $("challengeBannerText").textContent =
+    `A colleague survived ${challengeTargetYears.toFixed(1)}y — HR doubts you can beat them. Punch in.`;
+  banner.classList.remove("hidden");
+}
+
+function dismissChallengeBanner(): void {
+  challengeBannerDismissed = true;
+  $("challengeBanner").classList.add("hidden");
+}
+
 function updateImminentRungHint(): void {
   const hint = $("imminentHint");
   if (!engine?.isActive()) {
     hint.classList.add("hidden");
+    updateSafeSideTapPulse();
     return;
   }
   const next = engine.getRungs()[1];
   if (!shouldShowImminentHint(engine.getRungsClimbed())) {
     hint.classList.add("hidden");
+    updateSafeSideTapPulse();
     return;
   }
   hint.textContent = describeNextRung(next);
   hint.classList.remove("hidden");
+  updateSafeSideTapPulse();
 }
 
 function updateMilestoneChip(years: number): void {
@@ -353,6 +473,8 @@ function refreshHomeBadgeUI(): void {
   $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
   $("highScoreBadge").textContent = highScore.toFixed(1);
   refreshBeatGapLine();
+  refreshHomePreviewCollapse();
+  refreshChallengeBanner();
 }
 
 function refreshBeatGapLine(): void {
@@ -848,6 +970,7 @@ function hideHudTapHint(): void {
 
 function hideImminentHint(): void {
   $("imminentHint").classList.add("hidden");
+  updateSafeSideTapPulse();
 }
 
 function updateSprintTimerChip(): void {
@@ -865,7 +988,7 @@ function hideReviveOffer(): void {
   $("reviveAdBtn").classList.add("hidden");
 }
 
-function buildReviveContext(result: GameOverResult, lbResult?: LeaderboardResult): ReviveContext {
+function buildReviveContext(result: GameOverResult, lbResult?: LeaderboardResult): ReviveContext & { reapplyCount: number } {
   let leaderboardGap: number | null = null;
   if (lbResult?.ok && lbResult.entries[0]) {
     const top = lbResult.entries[0];
@@ -879,6 +1002,7 @@ function buildReviveContext(result: GameOverResult, lbResult?: LeaderboardResult
     highScore,
     reviveUsedThisRun: engine.hasUsedRevive(),
     leaderboardGap,
+    reapplyCount: getReapplyCount(),
   };
 }
 
@@ -899,6 +1023,7 @@ function updateReviveOffer(result: GameOverResult, lbResult?: LeaderboardResult)
     $("reviveAdTitle").textContent = copy.title;
     $("reviveAdSubline").textContent = copy.subline;
     $("reviveAdBtn").classList.remove("hidden");
+    trackEvent("revive_offer", { years: result.yearsSurvived, gap: ctx.leaderboardGap });
     debugLog("revive", "revive_offer_shown", {
       years: result.yearsSurvived,
       gap: ctx.leaderboardGap,
@@ -955,6 +1080,7 @@ async function onReviveAdClick(): Promise<void> {
     engine.restoreFromRevive(snapshot);
     hideReviveOffer();
     debugLog("revive", "revive_ad_completed", {});
+    trackEvent("revive_complete");
     showToast(REVIVE_TOAST_COMPLETE, { surface: "shell" });
 
     playerAtCorridor = false;
@@ -973,6 +1099,7 @@ async function onReviveAdClick(): Promise<void> {
     hapticImpact("medium");
   } catch {
     debugLog("revive", "revive_ad_failed", {});
+    showToast("HR Training unavailable — re-apply when ads load.", { surface: "shell" });
   } finally {
     btn.disabled = false;
   }
@@ -989,6 +1116,9 @@ async function startGame(): Promise<void> {
   hideHudTapHint();
   hideImminentHint();
   hideTapDeckHint();
+  hideTutorialOverlay();
+  $("btnTapLeft").classList.remove("safe-side-hint");
+  $("btnTapRight").classList.remove("safe-side-hint");
   $("burnoutMeter").className =
     "h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75";
   $("burnoutMeter").style.width = "100%";
@@ -1012,15 +1142,24 @@ async function startGame(): Promise<void> {
   audio.prepareBgmForRun();
   engine.start();
   attachPlayAreaObserver();
+  if (challengeTargetYears !== null) {
+    dismissChallengeBanner();
+  }
   updateSprintTimerChip();
   updateRankUI("Intern");
   updateMilestoneChip(0);
   updateFloorLabel(0);
   updateReorgHudStrip("Intern");
+  updateEnergyLabelVisibility();
+  if (!isTutorialDone()) {
+    updateTutorialOverlay();
+  }
   switchTab("game");
   requestAnimationFrame(() => {
     layoutRungs();
     layoutPlayerPosition("center");
+    updateTutorialOverlay();
+    updateSafeSideTapPulse();
   });
 }
 
@@ -1040,6 +1179,9 @@ async function goHome(): Promise<void> {
   hideHrMemo();
   hideHudTapHint();
   hideTapDeckHint();
+  hideTutorialOverlay();
+  $("btnTapLeft").classList.remove("safe-side-hint");
+  $("btnTapRight").classList.remove("safe-side-hint");
   flashBurnoutStress(false);
   playerInPanic = false;
   enableVerticalSwipe();
@@ -1283,9 +1425,18 @@ function buildShareText(): string {
 
 function copyShareText(): void {
   const text = buildShareText();
+  trackEvent("share_tap");
+  if (shareText(text)) {
+    trackEvent("share_success", { method: "native" });
+    showToast("Share sheet opened in Telegram.", { surface: "shell" });
+    return;
+  }
   if (navigator.clipboard?.writeText) {
     navigator.clipboard.writeText(text).then(
-      () => showToast("Review copied! Paste into Telegram to share."),
+      () => {
+        trackEvent("share_success", { method: "clipboard" });
+        showToast("Review copied! Paste into Telegram to share.");
+      },
       () => showToast("Could not copy — try again.")
     );
   } else {
@@ -1344,8 +1495,26 @@ function attemptGameTap(side: PlayerSide, source: "pointer" | "keyboard", button
     }
     return;
   }
+
+  if (isTutorialOverlayActive()) {
+    const required = getSafeTapSide(engine.getRungs()[1]);
+    if (required !== null && side !== required) {
+      showHrMemo(getTutorialWrongTapMessage(side), { variant: "info", durationMs: 2200 });
+      hapticImpact("rigid");
+      if (source === "pointer" && buttonEl) triggerClimbPop(buttonEl);
+      return;
+    }
+  }
+
   lastPointerTapAt = now;
+  const climbedBefore = engine.getRungsClimbed();
   engine.handleTap(side);
+  if (isTutorialOverlayActive() && engine.getRungsClimbed() >= 3 && climbedBefore < 3) {
+    markTutorialDone();
+    hideTutorialOverlay();
+  } else {
+    updateTutorialOverlay();
+  }
   if (earlyTapsRemaining > 0) {
     earlyTapsRemaining--;
     if (earlyTapsRemaining === 0) hideTapDeckHint();
@@ -1553,6 +1722,7 @@ export function mountApp(): void {
     {
       onScoreUpdate: (years, energy) => {
         updateSprintTimerChip();
+        updateEnergyLabelVisibility();
         $("gameYearsLabel").textContent = years.toFixed(1);
         if (earlyTapsRemaining > 0 && engine.getRungsClimbed() > 0) {
           triggerClimbPop($("gameYearsLabel"));
@@ -1696,6 +1866,8 @@ export function mountApp(): void {
     }
   };
   (window as unknown as Record<string, unknown>).copyShareText = copyShareText;
+  (window as unknown as Record<string, unknown>).toggleHomeGameplayPreview = toggleHomeGameplayPreview;
+  (window as unknown as Record<string, unknown>).dismissChallengeBanner = dismissChallengeBanner;
   (window as unknown as Record<string, unknown>).openPromptAnatomy = openPromptAnatomy;
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;
   (window as unknown as Record<string, unknown>).dismissAuthBanner = dismissAuthBanner;
@@ -1757,10 +1929,8 @@ export function mountApp(): void {
   const challengeYears = parseChallengeParam(getStartParam());
   if (challengeYears !== null && challengeYears > 0) {
     challengeTargetYears = challengeYears;
-    showToast(
-      `A colleague survived ${challengeYears.toFixed(1)}y and HR doubts you can. Punch in.`,
-      { surface: "shell" }
-    );
+    challengeBannerDismissed = false;
+    refreshChallengeBanner();
   }
 
   const initData = getInitData();

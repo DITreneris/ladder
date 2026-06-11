@@ -12,22 +12,22 @@
 
 | | |
 |---|---|
-| **Production** | `main` live — prod bundle per [DEBUG_ENV_TRIAGE](docs/DEBUG_ENV_TRIAGE.md); **Vercel redeploy** for new `og.png` after adopt |
-| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** on `main` (soft-launch GO; `git describe --tags`) |
-| **F&F verdict** | **CONDITIONAL GO** (filled early 2026-06-11) — pipeline green, retention thin; see [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §A/§D |
-| **Active** | **v2.1.0 retention sprint** — **Code complete**, tag/deploy pending — no public marketing |
-| **Next actions** | Tag v2.1.0 · deploy API with mini-app · DEVICE_QA v2.0 sign-off · Vercel OG redeploy · verifier · `ff-metrics.py` re-run · public launch review ~2026-06-28 |
-| **Monetization** | **AdsGram rewarded revive** in repo — live on production with `VITE_ADSGRAM_BLOCK_ID`; no virtual currency / forced interstitials |
-| **Acquisition** | **Deferred** — no paid ads during F&F; first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
-| **Public launch** | Gated — review ~2026-06-28 after soft launch metrics |
+| **Production** | `main` — deploy **v2.2.0** bundle after push; OG image adopted locally (`npm run adopt:og`) — **Vercel redeploy pending** |
+| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** on `main` · **`v2.1.0` / `v2.1.1` / `v2.2.0`** tags pending push |
+| **F&F verdict** | **CONDITIONAL GO** — pipeline green, retention thin; see [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §A/§D |
+| **Active** | **v2.2.0** — **Code complete**, tag/deploy pending — no public marketing |
+| **Next actions** | Push + Vercel/Railway redeploy · DEVICE_QA v2.0 manual sign-off (iOS + Android) · OG redeploy · re-run `ff-metrics.py` ~1 week post-deploy · [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| **Monetization** | **AdsGram rewarded revive** + v2.2 hardening — live with `VITE_ADSGRAM_BLOCK_ID`; no virtual currency / forced interstitials |
+| **Acquisition** | **Deferred** — first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
+| **Public launch** | Gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
 
 ### Operational checklist
 
 | Item | Status |
 |------|--------|
-| [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) rows 1–8 signed (iOS + Android) | [ ] manual — devices |
-| Vercel OG redeploy after `npm run adopt:og` | [ ] manual — Vercel |
-| `python scripts/ff-metrics.py` → `migration_002_ok: true` in prod | [x] 2026-06-08 ([FF_METRICS_2026-06-08](docs/FF_METRICS_2026-06-08.md)) |
+| [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) rows 1–8 signed (iOS + Android) | [ ] manual — devices (automated smoke: pytest 30 + vitest 117, 2026-06-11) |
+| Vercel OG redeploy after `npm run adopt:og` | [x] adopt local 2026-06-11 · [ ] Vercel prod redeploy |
+| `python scripts/ff-metrics.py` → `migration_002_ok: true` in prod | [x] 2026-06-11 ([FF_METRICS_2026-06-11](docs/FF_METRICS_2026-06-11.md)) |
 | GO verdict filled in [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | [x] 2026-06-11 — CONDITIONAL GO |
 
 Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy: [DEPLOY.md](DEPLOY.md) · Tracker: [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md)
@@ -38,9 +38,10 @@ Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy: [DEPLOY.md](DEP
 
 | Version | Theme | Status |
 |---------|--------|--------|
-| **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Code complete** — active gate |
-| **v2.2.0** | Virality + monetization polish (native share, prod AdsGram hardening, challenge banner, lightweight events) | **Planned** |
-| **v2.5.0** | Public launch | **Gated** — ~2026-06-28 review |
+| **v2.2.0** | Virality + monetization polish (native share, AdsGram hardening, challenge banner, events) | **Code complete** — deploy pending |
+| **v2.1.1** | Retention hotfix: tutorial overlay, Energy label, tap pulse, home trim | **Tagged in CHANGELOG** — shipped with v2.2.0 train |
+| **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Tagged in CHANGELOG** — deploy pending |
+| **v2.5.0** | Public launch | **Gated** — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
 | **v1.1** | Legends, friends LB, anti-cheat, analytics dashboard | **Deferred** — explicit approval ([mvp-scope](docs/mvp-scope.md)) |
 
 **Older releases (v1.5–v2.0):** per-version detail in [CHANGELOG.md](CHANGELOG.md) only — historical gates in [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md).

@@ -9,6 +9,43 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Planned (v1.1)
+- All-time / Legends tab
+- Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)
+- Server-side replay validation (full anti-cheat)
+
+## [2.2.0] - 2026-06-11
+
+Virality + monetization polish (retention execution plan Phase 2).
+
+### Added
+- **Native Telegram share** — `Telegram.WebApp.shareMessage({ text })` when available; clipboard + toast fallback unchanged
+- **Challenge home banner** — `#challengeBanner` for incoming `startapp=c_*` deep links; dismiss on tap or first Punch In
+- **Lightweight funnel events** — `lib/analytics.ts` wraps TON Builders SDK: `tutorial_complete`, `share_tap`, `share_success`, `revive_offer`, `revive_complete`
+- **[docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md)** — public launch GO gate checklist
+
+### Changed
+- **AdsGram hardening** — `showRewardedAd()` rejects incomplete/error ads; game-over toast when HR Training unavailable
+- **Revive gate (first run)** — offers revive at ≥5y when within 3y of career high on first daily death (`reapplyCount ≤ 1`)
+- **Share UX** — success toast distinguishes native share vs clipboard
+
+## [2.1.1] - 2026-06-11
+
+First-session retention hotfix (UX audit Phase 1).
+
+### Added
+- **First-run tutorial overlay** — forced correct L/R on scripted rungs 1–3; wrong-side HR memo instead of death; `corp_ladder_tutorial_done` flag
+- **HUD Energy label** — visible for first 5 runs (`getReapplyCount() < 5`)
+- **Safe-side tap deck pulse** — `#btnTapLeft` / `#btnTapRight` pulse linked to `#imminentHint` via `getSafeTapSide()`
+- **Home above-fold trim** — `#homeGameplayPreview` collapses after first run; "How to Survive — show mechanics" expander
+
+### Changed
+- **`getSafeTapSide()`** exported from `lib/debug.ts` for imminent-hint + tutorial gating
+
+## [2.1.0] - 2026-06-11
+
+Retention sprint — Director rank, beat-your-gap, challenge links, rookie ramp, AdsGram, TON analytics, SEO.
+
 ### Added
 - **[docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md)** — UX/UI audit integrated with ROADMAP release train (v2.1.0 cut → v2.1.1 retention hotfix → v2.2.0); ROADMAP § UX audit → release map
 - **Director rank @ 20y (v2.1 retention sprint)** — intermediate rank between Manager (10y) and CEO (35y); quarterly deadlines (`burnout`) now unlock at Director, desk plants stay CEO-only; new promotion dialogue, failure flavor, HUD/home badge (`badge-rank-director`), milestone chips, How-to-Play ladder, bot `/help`; API `FinalRank` + contiguous rank-band validation (Intern [0,10) / Manager [10,20) / Director [20,35) / CEO [35,…)) — explicit scope exception recorded in [docs/mvp-scope.md](docs/mvp-scope.md); **deploy API together with mini-app** (old API rejects Director submits)
@@ -21,6 +58,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Live SEO smoke** — `npm run verify:seo:live` curls `sitemap.xml`, `robots.txt`, `llms.txt` on preview (CI)
 - **`ff-metrics.py` migration probe** — reports `migration_002_ok` for Supabase `submit_cooldowns` + `api_sessions` (run before v2.0 sign-off)
 - **`ff-metrics.py` deep analytics** — paginated Supabase fetch; `deep_analytics` block (playtime proxy, progression, retention, core/external segments); **[FF_METRICS_2026-06-08.md](docs/FF_METRICS_2026-06-08.md)** fresh snapshot · **[20260608_analize.md](docs/20260608_analize.md)** insights report
+- **[docs/FF_METRICS_2026-06-11.md](docs/FF_METRICS_2026-06-11.md)** — post–v2.1.0 deploy baseline snapshot
 
 ### Changed
 - **ROADMAP refactor (2026-06-11)** — forward-only working doc (~260 lines): Status dashboard, v2.1.0 active gate, v2.2.0 next leg, consolidated shipped baseline (Director ladder); historical v1.8 gates and F&F research moved to [docs/archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md)
@@ -44,15 +82,6 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Google Search Console sitemap** — production `sitemap.xml` no longer falls through SPA rewrite (was HTTP 500 / “could not read sitemap”)
 - **Home screen UI** — sound toggle visible in Telegram light theme; CTA bar no longer shows office-grid pattern above Punch In; Prompt Anatomy footer uses official logo asset
 - **Coffee QA flake (CI)** — longer tap gaps and timeouts in `qa:coffee`; one retry on GitHub Actions runners
-
-### Planned (v1.1)
-- All-time / Legends tab
-- Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)
-- Server-side replay validation (full anti-cheat)
-
-### Release note — v2.1.0 cut ceremony (when tagging)
-
-When DEVICE_QA v2.0 is signed and prod deploy is green: move all `[Unreleased]` Added/Changed/Fixed above (except this block and Planned v1.1) into `## [2.1.0] - YYYY-MM-DD`; run verifier; `git tag v2.1.0`; update [ROADMAP.md](ROADMAP.md) Status **Tagged** and release train row **Live**.
 
 ## [2.0.0] - 2026-06-14
 

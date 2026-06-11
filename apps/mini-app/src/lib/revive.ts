@@ -19,12 +19,23 @@ export function hasReviveStakeSignal(result: GameOverResult, ctx: ReviveContext)
   return meaningfulRun || nearPB || nearLB;
 }
 
-export function shouldOfferRevive(result: GameOverResult, ctx: ReviveContext): boolean {
+export function shouldOfferRevive(result: GameOverResult, ctx: ReviveContext & { reapplyCount?: number }): boolean {
   if (!isReviveFeatureEnabled()) return false;
   if (ctx.reviveUsedThisRun) return false;
   if (result.deathType === "sprint") return false;
   if (result.yearsSurvived < 3) return false;
-  return hasReviveStakeSignal(result, ctx);
+  if (hasReviveStakeSignal(result, ctx)) return true;
+  // v2.2: first daily run — meaningful near-miss deaths (≥5y, within 3y of PB)
+  if (
+    ctx.reapplyCount !== undefined &&
+    ctx.reapplyCount <= 1 &&
+    result.yearsSurvived >= 5 &&
+    ctx.highScore > 0 &&
+    ctx.highScore - result.yearsSurvived <= 3
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export function buildReviveCopy(

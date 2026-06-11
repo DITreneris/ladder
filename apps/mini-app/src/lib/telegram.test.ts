@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { afterEach, describe, expect, it } from "vitest";
-import { applyTelegramTheme } from "./telegram";
+import { applyTelegramTheme, shareText } from "./telegram";
 
 function mockTelegramTheme(themeParams: Record<string, string>): void {
   window.Telegram = {
@@ -38,5 +38,28 @@ describe("applyTelegramTheme", () => {
     applyTelegramTheme();
 
     expect(document.documentElement.style.getPropertyValue("--cl-header-text")).toBe("#ff0000");
+  });
+});
+
+describe("shareText", () => {
+  afterEach(() => {
+    delete window.Telegram;
+  });
+
+  it("returns false when shareMessage unavailable", () => {
+    expect(shareText("hello")).toBe(false);
+  });
+
+  it("calls WebApp.shareMessage when available", () => {
+    let shared = "";
+    window.Telegram = {
+      WebApp: {
+        shareMessage: ({ text }: { text: string }) => {
+          shared = text;
+        },
+      },
+    } as Window["Telegram"];
+    expect(shareText("review")).toBe(true);
+    expect(shared).toBe("review");
   });
 });

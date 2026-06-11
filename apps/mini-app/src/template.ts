@@ -90,6 +90,11 @@ export const APP_SHELL = `
           </div>
           <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1 line-clamp-2"></p>
         </div>
+        <div id="challengeBanner" class="hidden shrink-0 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
+          <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
+          <button type="button" id="challengeBannerDismiss" onclick="dismissChallengeBanner()" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+        </div>
+        <div id="homeGameplayPreviewWrap" class="shrink-0 space-y-1">
         <div id="homeGameplayPreview" class="card-light-sm shrink-0">
           <span class="text-xl shrink-0" aria-hidden="true">🏃</span>
           <div class="min-w-0 flex-1 space-y-1">
@@ -98,6 +103,10 @@ export const APP_SHELL = `
             <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
             <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y). CEO (35y) is the boardroom myth.</p>
           </div>
+        </div>
+        <button type="button" id="homePreviewToggle" onclick="toggleHomeGameplayPreview()" class="hidden text-micro font-bold text-cl-primary focus-ring rounded px-1 min-h-[44px]">
+          How to Survive — show mechanics
+        </button>
         </div>
         <div id="homeBrandFooter" class="home-brand-footer shrink-0">
           ${BRAND_FOOTER}
@@ -119,6 +128,13 @@ export const APP_SHELL = `
       </div>
     </div>
     <div id="gameScreen" class="hidden flex-col flex-grow min-h-0 relative select-none">
+      <div id="tutorialOverlay" class="tutorial-overlay hidden" aria-live="polite">
+        <div class="tutorial-overlay-card card-light-sm">
+          <p class="text-nano font-bold uppercase tracking-wider text-cl-primary">Orientation — rung <span id="tutorialStepLabel">1</span>/3</p>
+          <p id="tutorialOverlayText" class="text-caption font-semibold text-slate-700 mt-1"></p>
+          <p class="text-micro text-slate-500 mt-1">Tap the highlighted side on the deck below.</p>
+        </div>
+      </div>
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
       <div id="gameContentColumn" class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 w-full">
       <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col min-w-0 w-full">
@@ -137,6 +153,7 @@ export const APP_SHELL = `
           </div>
         </div>
         <div class="flex items-center gap-2">
+          <span id="energyLabel" class="text-micro font-bold uppercase tracking-wide text-slate-500 shrink-0 hidden">Energy</span>
           <span class="flex shrink-0 items-center gap-1 text-caption font-bold text-slate-500">${icon("bolt", "text-amber-500")}</span>
           <div class="h-2 flex-1 overflow-hidden rounded-full border border-slate-200 bg-slate-100 p-px">
             <div id="burnoutMeter" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-full transition-all duration-75" style="width: 100%;"></div>

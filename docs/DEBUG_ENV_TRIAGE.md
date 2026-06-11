@@ -8,8 +8,8 @@ Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |
 |---------|-------------|------------|----------------|-----------------|-------|
-| Telegram prod | `main-CJgmaRAS.js` (2026-06-04 curl) | verify rows 1–5 | verify row 4 | verify row 3 | Matches local build; DEVICE_QA v2.0 pending |
-| Local build | `main-CJgmaRAS.js` (2026-06-04) | `qa:layout` pass | `qa:coffee` pass | smoke pass | smoke-local 2026-06-04 |
+| Telegram prod | `main-C5waaxFU.js` (2026-06-11 curl) | verify rows 1–5 | verify row 4 | verify row 3 | `b7c19be` v2.1.0 sprint; DEVICE_QA v2.0 pending |
+| Local build | `main-DEv7UjEZ.js` (2026-06-11) | `qa:layout` pass | `qa:coffee` pass | vitest 119 pass | v2.1.1 + v2.2.0 retention train |
 | Browser preview | local `npm run build` | Run `npm run qa:layout` | `npm run qa:coffee` | same | |
 | npm run dev | n/a (HMR) | Visual | `?debug=1` | `?debug=1` | |
 

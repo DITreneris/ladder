@@ -495,6 +495,41 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   animation: safe-side-hint 1.2s ease-in-out infinite;
 }
 
+.btn-tap-zone.safe-side-hint {
+  animation: safe-side-hint 1.2s ease-in-out infinite;
+}
+
+.tutorial-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 0.75rem 9.5rem;
+  pointer-events: none;
+  background: linear-gradient(to top, rgb(15 23 42 / 0.35), transparent 45%);
+}
+
+.tutorial-overlay-card {
+  max-width: 100%;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.12);
+}
+
+#homeGameplayPreviewWrap.is-collapsed #homeGameplayPreview {
+  display: none;
+}
+
+#homeGameplayPreviewWrap.is-collapsed #homePreviewToggle {
+  display: block;
+}
+
+#challengeBanner:not(.hidden) + #homeGameplayPreviewWrap,
+#challengeBanner:not(.hidden) ~ #homeBrandFooter {
+  /* spacing handled by space-y on parent */
+}
+
 #toastNotification.toast-above-tap-deck {
   bottom: calc(7rem + 2rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
 }

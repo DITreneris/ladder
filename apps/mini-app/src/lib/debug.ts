@@ -38,8 +38,16 @@ function persistDebugFromUrl(): void {
   }
 }
 
-function oppositeSide(side: PlayerSide): PlayerSide {
+export function oppositeSide(side: PlayerSide): PlayerSide {
   return side === "left" ? "right" : "left";
+}
+
+/** Safe tap side for imminent rung; null when either side works (clear corridor). */
+export function getSafeTapSide(rung: Rung | undefined): PlayerSide | null {
+  if (!rung) return null;
+  if (rung.obstacle) return oppositeSide(rung.obstacle);
+  if (rung.coffee) return rung.coffee;
+  return null;
 }
 
 function sideLabel(side: PlayerSide): string {

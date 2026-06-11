@@ -37,3 +37,20 @@ Re-run [DEVICE_QA_v1.8.5.md](DEVICE_QA_v1.8.5.md) rows 1–5 (corridor, width, c
 | Android | | | per [DEBUG_ENV_TRIAGE](DEBUG_ENV_TRIAGE.md) |
 
 **Due:** 2026-06-10 · **Gate:** [FF_REVIEW_2026-06-14.md](FF_REVIEW_2026-06-14.md) §B row 4 (rows 1–8 required for soft-launch GO)
+
+---
+
+## Automated coverage (2026-06-11)
+
+Local CI smoke before manual device sign-off:
+
+| Row | Automated signal |
+|-----|------------------|
+| 4 Tutorial rungs 1–3 | `engine.test.ts` — `TUTORIAL_RUNG_SPECS` + v2.1.1 overlay gating in app |
+| 7 LB highlight | `api.test.ts` + session token flow |
+| 8 Score submit | API pytest submit pipeline |
+| Share | `copyShareText` native + clipboard paths; manual paste still required for gate #8 |
+
+**Manual only:** triage prompt (1–3), background drain (5), keyboard throttle (6), layout/tap feel, Telegram BackButton, native share on device.
+
+Operator: complete iOS + Android columns above, then update sign-off table.
