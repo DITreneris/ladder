@@ -11,6 +11,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - **[docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)** — pre-launch product audit #2 (CONDITIONAL GO 62/100); integrated with ROADMAP § UX audit and PUBLIC_LAUNCH_REVIEW gates
+- **Home context slot** — news ticker, daily shift, and challenge banner now share one rotating slot (`#homeContextSlot`, 6s crossfade); challenge pins until dismissed; daily shift shown statically under reduced motion and capture modes — trims home above-the-fold density per 2026 front-page audit
+- **Home badge skeleton** — Employee Badge fields pulse (`.home-skeleton`) while the HR file (`/auth/me`) loads in Telegram, instead of default values popping in
+- **Hero idle sway** — briefcase hero icon gets a subtle idle micro-animation (`home-hero-idle`); disabled for reduced motion and OG capture
+
+### Changed
+- **Short-viewport home trim** — gameplay preview collapses by default on viewports ≤620px (not just after first run) so the Punch In CTA bar fits 320×568 without scrolling; "How to Survive — show mechanics" toggle unchanged
 
 ### Fixed
 - **Daily leaderboard stale after game over** — fetch leaderboard after score submit (not in parallel), so gap line, self-row highlight, and Leaderboard tab reflect the run HR just filed

@@ -167,12 +167,12 @@ async function memoVisiblePlayAreaRatio(page) {
 async function homeColumnAlignment(page) {
   return page.evaluate(() => {
     const badge = document.querySelector("#startScreen .card-light");
-    const ticker = document.getElementById("homeNewsTicker");
-    const preview = document.getElementById("homeGameplayPreview");
+    const contextSlot = document.getElementById("homeContextSlot");
+    const previewWrap = document.getElementById("homeGameplayPreviewWrap");
     const ctaBar = document.querySelector("#startScreen .start-cta-bar");
-    if (!badge || !ticker || !preview || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
+    if (!badge || !contextSlot || !previewWrap || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
 
-    const boxes = [badge, ticker, preview, ctaBar].map((el) => {
+    const boxes = [badge, contextSlot, previewWrap, ctaBar].map((el) => {
       const r = el.getBoundingClientRect();
       return { w: r.width, l: r.left };
     });
@@ -184,8 +184,8 @@ async function homeColumnAlignment(page) {
     return {
       ok: widthDelta <= 2 && leftDelta <= 2,
       badgeWidth: widths[0],
-      tickerWidth: widths[1],
-      previewWidth: widths[2],
+      contextSlotWidth: widths[1],
+      previewWrapWidth: widths[2],
       ctaBarWidth: widths[3],
       widthDelta,
       leftDelta,

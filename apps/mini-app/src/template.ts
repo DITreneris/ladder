@@ -48,7 +48,7 @@ export const APP_SHELL = `
         <button type="button" onclick="dismissAuthBanner()" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
         <div class="text-center">
-          <div class="home-hero-enter home-hero-enter-icon inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
+          <div class="home-hero-enter home-hero-enter-icon home-hero-idle inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
             ${icon("briefcase", "text-xl")}
           </div>
           <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
@@ -77,22 +77,24 @@ export const APP_SHELL = `
           </div>
           <p id="beatGapLine" class="text-nano font-semibold text-slate-500 truncate hidden"></p>
         </div>
-        <div id="homeNewsTicker" class="ticker-bar shrink-0">
-          <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
-          <div class="news-ticker-track min-w-0 flex-1">
-            <span id="newsTickerText" class="news-ticker-text text-caption font-mono"></span>
+        <div id="homeContextSlot" class="home-context-slot shrink-0">
+          <div id="homeNewsTicker" class="home-context-item invisible ticker-bar">
+            <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
+            <div class="news-ticker-track min-w-0 flex-1">
+              <span id="newsTickerText" class="news-ticker-text text-caption font-mono"></span>
+            </div>
           </div>
-        </div>
-        <div id="dailyShiftBlock" class="shift-badge-enter">
-          <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
-            <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
-            <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+          <div id="dailyShiftBlock" class="home-context-item shift-badge-enter">
+            <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
+              <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
+              <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+            </div>
+            <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1 line-clamp-2"></p>
           </div>
-          <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1 line-clamp-2"></p>
-        </div>
-        <div id="challengeBanner" class="hidden shrink-0 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
-          <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
-          <button type="button" id="challengeBannerDismiss" onclick="dismissChallengeBanner()" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+          <div id="challengeBanner" class="home-context-item invisible rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
+            <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
+            <button type="button" id="challengeBannerDismiss" onclick="dismissChallengeBanner()" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+          </div>
         </div>
         <div id="homeGameplayPreviewWrap" class="shrink-0 space-y-1">
         <div id="homeGameplayPreview" class="card-light-sm shrink-0">

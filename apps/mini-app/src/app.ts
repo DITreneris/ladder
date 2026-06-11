@@ -285,14 +285,22 @@ function updateEnergyLabelVisibility(): void {
   label.classList.toggle("hidden", getReapplyCount() >= 5);
 }
 
+// Short Telegram viewports (e.g. 320x568) cannot fit the expanded preview plus the CTA bar.
+const SHORT_VIEWPORT_MAX_HEIGHT = 620;
+
+function isShortViewport(): boolean {
+  return window.innerHeight > 0 && window.innerHeight <= SHORT_VIEWPORT_MAX_HEIGHT;
+}
+
 function refreshHomePreviewCollapse(): void {
   const wrap = $("homeGameplayPreviewWrap");
   const toggle = $("homePreviewToggle");
   const hasPlayed = getReapplyCount() >= 1 || getLastRunYears() !== null;
-  if (!hasPlayed || homePreviewExpanded) {
+  const collapseByDefault = hasPlayed || isShortViewport();
+  if (!collapseByDefault || homePreviewExpanded) {
     wrap.classList.remove("is-collapsed");
     toggle.classList.add("hidden");
-    if (hasPlayed && homePreviewExpanded) {
+    if (collapseByDefault && homePreviewExpanded) {
       toggle.textContent = "How to Survive — hide mechanics";
     }
     return;
@@ -308,19 +316,68 @@ function toggleHomeGameplayPreview(): void {
 }
 
 function refreshChallengeBanner(): void {
-  const banner = $("challengeBanner");
-  if (challengeTargetYears === null || challengeBannerDismissed) {
-    banner.classList.add("hidden");
-    return;
+  if (challengeTargetYears !== null) {
+    $("challengeBannerText").textContent =
+      `A colleague survived ${challengeTargetYears.toFixed(1)}y — HR doubts you can beat them. Punch in.`;
   }
-  $("challengeBannerText").textContent =
-    `A colleague survived ${challengeTargetYears.toFixed(1)}y — HR doubts you can beat them. Punch in.`;
-  banner.classList.remove("hidden");
+  refreshHomeContextSlot();
 }
 
 function dismissChallengeBanner(): void {
   challengeBannerDismissed = true;
-  $("challengeBanner").classList.add("hidden");
+  refreshHomeContextSlot();
+}
+
+type HomeContextItemId = "homeNewsTicker" | "dailyShiftBlock" | "challengeBanner";
+const HOME_CONTEXT_ITEMS: HomeContextItemId[] = ["homeNewsTicker", "dailyShiftBlock", "challengeBanner"];
+const HOME_CONTEXT_ROTATION: HomeContextItemId[] = ["dailyShiftBlock", "homeNewsTicker"];
+const HOME_CONTEXT_ROTATE_MS = 6000;
+let homeContextTimer: ReturnType<typeof setInterval> | null = null;
+let homeContextIndex = 0;
+let homeContextActiveId: HomeContextItemId | null = null;
+
+function setHomeContextActive(activeId: HomeContextItemId): void {
+  if (homeContextActiveId === activeId) return;
+  homeContextActiveId = activeId;
+  for (const id of HOME_CONTEXT_ITEMS) {
+    const el = $(id);
+    el.classList.toggle("invisible", id !== activeId);
+    el.classList.remove("home-context-item--enter");
+  }
+  if (!respectsReducedMotion()) {
+    const activeEl = $(activeId);
+    void activeEl.offsetWidth;
+    activeEl.classList.add("home-context-item--enter");
+  }
+}
+
+function stopHomeContextRotation(): void {
+  if (homeContextTimer !== null) {
+    clearInterval(homeContextTimer);
+    homeContextTimer = null;
+  }
+}
+
+function refreshHomeContextSlot(): void {
+  stopHomeContextRotation();
+  if (challengeTargetYears !== null && !challengeBannerDismissed) {
+    setHomeContextActive("challengeBanner");
+    return;
+  }
+  const staticMode =
+    respectsReducedMotion() ||
+    document.documentElement.dataset.ogCapture === "1" ||
+    getCaptureFlags().capture !== null;
+  if (staticMode) {
+    setHomeContextActive("dailyShiftBlock");
+    return;
+  }
+  setHomeContextActive(HOME_CONTEXT_ROTATION[homeContextIndex]);
+  homeContextTimer = setInterval(() => {
+    if (document.hidden) return;
+    homeContextIndex = (homeContextIndex + 1) % HOME_CONTEXT_ROTATION.length;
+    setHomeContextActive(HOME_CONTEXT_ROTATION[homeContextIndex]);
+  }, HOME_CONTEXT_ROTATE_MS);
 }
 
 function updateImminentRungHint(): void {
@@ -445,6 +502,11 @@ function switchTab(tab: Screen): void {
   el.classList.add("flex");
   syncTelegramBackButton(tab);
   syncTelegramMainButton(tab);
+  if (tab === "home") {
+    refreshHomeContextSlot();
+  } else {
+    stopHomeContextRotation();
+  }
   audio.nav();
   if (tab !== "game") {
     audio.stopBgm();
@@ -464,6 +526,14 @@ const RANK_BADGE: Record<Rank, string> = {
 function playerDisplayEmoji(rank: Rank): string {
   if (rank === "Intern") return getStoredAvatarEmoji();
   return rankEmoji(rank);
+}
+
+const HOME_SKELETON_FIELD_IDS = ["usernameInput", "userTitleLabel", "homeMilestoneLabel", "highScoreBadge"];
+
+function setHomeBadgeSkeleton(on: boolean): void {
+  for (const id of HOME_SKELETON_FIELD_IDS) {
+    $(id).classList.toggle("home-skeleton", on);
+  }
 }
 
 function refreshHomeBadgeUI(): void {
@@ -1932,25 +2002,30 @@ export function mountApp(): void {
     challengeTargetYears = challengeYears;
     challengeBannerDismissed = false;
     refreshChallengeBanner();
+  } else {
+    refreshHomeContextSlot();
   }
 
   const initData = getInitData();
-  if (initData) {
-    fetchProfile(initData).then((result) => {
-      if (result.ok) {
-        hideAuthDegradedBanner();
-        const profile = result.profile;
-        highScore = profile.best_score;
-        bestRank = (profile.best_rank as Rank) || "Intern";
-        engine?.setCareerBestYears(highScore);
-        refreshHomeBadgeUI();
-        if (profile.first_name || profile.username) {
-          username = profile.username ?? profile.first_name ?? username;
-          ($("usernameInput") as HTMLInputElement).value = username;
+  if (initData && isTelegram()) {
+    setHomeBadgeSkeleton(true);
+    fetchProfile(initData)
+      .then((result) => {
+        if (result.ok) {
+          hideAuthDegradedBanner();
+          const profile = result.profile;
+          highScore = profile.best_score;
+          bestRank = (profile.best_rank as Rank) || "Intern";
+          engine?.setCareerBestYears(highScore);
+          refreshHomeBadgeUI();
+          if (profile.first_name || profile.username) {
+            username = profile.username ?? profile.first_name ?? username;
+            ($("usernameInput") as HTMLInputElement).value = username;
+          }
+        } else {
+          showAuthDegradedBanner(result.reason);
         }
-      } else {
-        showAuthDegradedBanner(result.reason);
-      }
-    });
+      })
+      .finally(() => setHomeBadgeSkeleton(false));
   }
 }

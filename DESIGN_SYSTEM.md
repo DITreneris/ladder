@@ -93,6 +93,9 @@ Set by [`applyTelegramTheme()`](apps/mini-app/src/lib/telegram.ts) from `themePa
 | `card-light-sm` | How-to-play row |
 | `card-performance` | Game-over performance card |
 | `ticker-bar` | Compact home news strip + amber promo surfaces; `#newsTickerText` scrolls one headline from `NEWS_TICKER_HEADLINES` (game-over foreshadow unchanged) |
+| `home-context-slot` / `home-context-item` | Home single-height grid cell shared by news ticker, daily shift, and challenge banner; one item visible at a time (`invisible` toggle preserves column width), `home-context-item--enter` crossfade |
+| `home-skeleton` | Pulse placeholder on Employee Badge fields while `/auth/me` resolves (Telegram only) |
+| `home-hero-idle` | Briefcase hero idle sway (long rest, brief tilt) chained after `home-hero-enter` |
 | `tap-controls-bar` | Fixed bottom grid for TAP LEFT / TAP RIGHT deck |
 | `cl-shell-gutter` | Shared 16px horizontal padding for home, game HUD/memo/play area, and game-over column |
 | `btn-tap-zone` | Game climb button — h-28, gradient slate, snippet parity |
@@ -134,7 +137,7 @@ Set in `updateRankUI()` via `RANK_BADGE` map in [`app.ts`](apps/mini-app/src/app
 
 Game animations live in `style.css` (climb-pop, shake-finite, ticker-scroll, etc.). All listed in the `@media (prefers-reduced-motion: reduce)` block — animations disabled, game remains playable.
 
-**Do not add** decorative marketing animations to shell screens beyond existing row-fade-in and home hero entrance (`home-hero-enter`). Home shows a **compact scrolling news strip** (`ticker-bar` + `news-ticker-text`); ticker pool still drives optional game-over foreshadow.
+**Do not add** decorative marketing animations to shell screens beyond existing row-fade-in, home hero entrance + idle sway (`home-hero-enter`, `home-hero-idle`), and the home context crossfade (`home-context-item--enter`). Home shows a **compact scrolling news strip** (`ticker-bar` + `news-ticker-text`); ticker pool still drives optional game-over foreshadow. All of the above are registered in the `prefers-reduced-motion: reduce` block; under reduced motion the home context slot pins the daily shift statically.
 
 ---
 
@@ -149,7 +152,7 @@ Shell buttons: `min-h-[44px]` via `btn-cl-*` utilities. **Exceptions (documented
 - Hide in-app `.cl-header` — use Telegram native title + `BackButton` API
 - Floating `.sound-fab` for mute toggle (not duplicated in header)
 - Safe-area padding on `.cl-phone-shell` via `--tg-content-safe-area-inset-*` + `env(safe-area-inset-*)`
-- Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + scrolling news strip (`ticker-bar` + `news-ticker-text`; static via `news-ticker-text--static` only for `prefers-reduced-motion` and capture/OG modes) + daily shift pill (`#dailyShiftDescription` line-clamp-2; full copy on pill `title`) + `#homeGameplayPreview` (`card-light-sm` full width) + `#homeBrandFooter` (Prompt Anatomy co-brand **above** `.start-cta-bar`) + `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden) + `.cl-telegram-cta-hint`; `#startScreen` is the sole home scroll container with MainButton bottom padding (`3.25rem + safe-area`); `#authDegradedBanner` two-line offline copy when profile sync fails
+- Home: compact hero + mechanic pitch + identity card (Employee Badge / ACTIVE EMPLOYMENT / `#homeMilestoneLabel`) + **rotating context slot** `#homeContextSlot` — news strip (`ticker-bar` + `news-ticker-text`; static via `news-ticker-text--static` only for `prefers-reduced-motion` and capture/OG modes), daily shift pill (`#dailyShiftDescription` line-clamp-2; full copy on pill `title`), and challenge banner share one grid cell, 6s crossfade, challenge pinned until dismissed, daily shift static under reduced motion / capture + `#homeGameplayPreview` (`card-light-sm` full width; collapsed by default on viewports ≤620px so the CTA bar fits 320×568) + `#homeBrandFooter` (Prompt Anatomy co-brand **above** `.start-cta-bar`) + `.start-cta-bar`; Telegram home uses native `MainButton` (inline `.cl-primary-btn` hidden) + `.cl-telegram-cta-hint`; `#startScreen` is the sole home scroll container with MainButton bottom padding (`3.25rem + safe-area`); `#authDegradedBanner` two-line offline copy when profile sync fails; Employee Badge fields show `.home-skeleton` pulse while `/auth/me` resolves
 - Game: compact `.game-hud` with optional `#hudTapHint` chip (deck-first copy: TAP LEFT / TAP RIGHT); first-run `.tap-deck-hint` pulse on `#tapControlsBar` (first 5 taps); `#hrMemoRail` below HUD for in-run People Ops memos (queued, consolidated on promotion); `#gamePlayArea` for responsive full-column ladder (`cl-shell-gutter`, `#ladderTrack` width 100%); fixed `.tap-controls-bar` full-bleed with visible TAP LEFT / TAP RIGHT `btn-tap-zone` buttons; rung height scales dynamically (40–52px) to fit 7 visible rungs; player position from DOM slot centers; keyboard hints hidden in Telegram; **BGM: Home silent; in-run chorus from Manager promo** (quiet→full ramp ~12s); shell toast on game-over uses `.toast-above-game-over-actions`; mute feedback uses HR memo in-run
 - Minimum readable type in Telegram: 11px (`text-nano`), 12px (`text-micro`)
 - **Favicon:** briefcase on `cl-primary` → `cl-accent-indigo` gradient — `public/favicon.svg`, `public/apple-touch-icon.png` (matches home hero icon)
@@ -281,6 +284,15 @@ Shell tokens unchanged from v1.8.5; new surfaces only:
 | Game over | `.toast-above-game-over-actions` | Submit toast above RE-APPLY row |
 | Telegram | `.sound-fab` | Visible in light theme |
 | Onboarding | `#imminentHint` | Through Intern phase (40 rungs) |
+
+### v2.2 home polish (Unreleased)
+
+| Surface | Element | Notes |
+|---------|---------|-------|
+| Home | `#homeContextSlot` | Ticker / daily shift / challenge in one rotating slot (6s crossfade; challenge pinned; static shift under reduced motion / capture) |
+| Home | `.home-skeleton` | Employee Badge skeleton pulse while `/auth/me` resolves |
+| Home | `home-hero-idle` | Briefcase hero idle sway after entrance; off for reduced motion + OG capture |
+| Home | Preview collapse | `#homeGameplayPreview` collapsed by default on viewports ≤620px (toggle stays) |
 
 ---
 
