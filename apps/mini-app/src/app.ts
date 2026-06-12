@@ -7,7 +7,6 @@ import {
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
-  SPRINT_SHARE_LINE,
   TUTORIAL_DONE_STORAGE_KEY,
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
@@ -30,7 +29,8 @@ import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
 import { trackEvent } from "./lib/analytics";
 import { debugLog, describeNextRung, getSafeTapSide, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
-import { getPromptAnatomyShareLine, openPromptAnatomy } from "./lib/branding";
+import { openPromptAnatomy } from "./lib/branding";
+import { buildShareMessageText } from "./lib/share-copy";
 import { icon } from "./lib/icons";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
@@ -1438,12 +1438,6 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   });
 }
 
-/** Compact challenge param: years × 10 as integer, e.g. 24.5y → "c_245". */
-function buildChallengeLink(yearsSurvived: number): string {
-  const compact = Math.max(0, Math.round(yearsSurvived * 10));
-  return `https://t.me/${getBotUsername()}?startapp=c_${compact}`;
-}
-
 function parseChallengeParam(param: string): number | null {
   const match = /^c_(\d{1,4})$/.exec(param);
   if (!match) return null;
@@ -1451,33 +1445,22 @@ function parseChallengeParam(param: string): number | null {
 }
 
 function buildShareText(): string {
-  const years = lastGameResult?.yearsSurvived.toFixed(1) ?? "0.0";
-  const rank = lastGameResult?.finalRank ?? "Intern";
-  const botUser = import.meta.env.VITE_BOT_USERNAME ?? "CorporateLadder_bot";
-  const detail = lastGameResult?.terminationDetail ?? "";
-  const flavor = lastGameResult?.terminationFlavor ?? "";
-
-  const shiftLabel = lastGameResult
-    ? engine.getDailyModifier().label
-    : activeDailyModifier.label;
-  const sprintLine =
-    lastGameResult?.deathType === "sprint" ? `\n${SPRINT_SHARE_LINE}\n` : "";
-  const challengeLine = lastGameResult
-    ? `Think you can outlast me? ${buildChallengeLink(lastGameResult.yearsSurvived)}\n`
-    : "";
-
-  return (
-    `CORPORATE PERFORMANCE REVIEW\n` +
-    `Employee: ${username}\n` +
-    `${years} Years | Final Rank: ${rank}\n` +
-    `Shift: ${shiftLabel}\n` +
-    sprintLine +
-    `Cause: ${detail}\n` +
-    `"${flavor}"\n` +
-    challengeLine +
-    `Play Corporate Ladder on Telegram @${botUser}\n` +
-    getPromptAnatomyShareLine()
-  );
+  if (!lastGameResult) {
+    return buildShareMessageText({
+      yearsSurvived: 0,
+      finalRank: "Intern",
+      terminationDetail: "",
+      terminationFlavor: "",
+      deathType: "meeting",
+    });
+  }
+  return buildShareMessageText({
+    yearsSurvived: lastGameResult.yearsSurvived,
+    finalRank: lastGameResult.finalRank,
+    terminationDetail: lastGameResult.terminationDetail,
+    terminationFlavor: lastGameResult.terminationFlavor,
+    deathType: lastGameResult.deathType,
+  });
 }
 
 function fallbackClipboard(text: string): Promise<void> {

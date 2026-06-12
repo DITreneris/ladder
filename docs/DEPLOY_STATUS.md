@@ -20,6 +20,7 @@ Track manual deploy progress through **soft-launch GO** and **v2.2.0 retention e
 | 17 | v2.1.1 retention hotfix | **Done** | Tagged `v2.1.1` @ `ddfc968` · live 2026-06-11 |
 | 18 | v2.2.0 virality polish | **Done** | Tagged `v2.2.0` @ `ddfc968` · live 2026-06-11 (+ LB stale fix `d0c9305`) |
 | 19 | v2.2.1 post-train patch | **Done** | Pushed `5928b85` · tagged **`v2.2.1`** · CI green · Vercel live `main-E7DOQaNb.js` · Railway health ok |
+| 20 | Share hook trim (3-line body) | **Pending deploy** | Local CI green (pytest 44 · vitest 132 · build `main-Dy1-b8HI.js`) — push + Railway API → Vercel; re-run DEVICE_QA rows 11–12 |
 
 **Operational debt:**
 

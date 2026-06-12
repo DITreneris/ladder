@@ -92,7 +92,7 @@ None (read-only QA). Reference skills when validating domains: [share-virality](
 
 - [ ] Home shows today's shift label and flavor before first play
 - [ ] Same UTC calendar day yields the same preset (or dev `?dailyPreset=` override)
-- [ ] Share text includes `Shift:` line with preset label
+- [ ] Share body is 3-line hook (`{rank} · {years}y — {death}.` / challenge CTA / URL); PA co-brand on card only
 - [ ] Reorg Week: next rung (`rungs[1]`) still does not swap during reorg tick
 - [ ] `prefers-reduced-motion`: shift badge / ticker emphasis do not block play
 - [ ] Bot `/start` mentions today's shift label

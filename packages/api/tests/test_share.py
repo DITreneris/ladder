@@ -7,7 +7,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.share_copy import build_share_text
+from app.share_copy import (
+    SPRINT_SHARE_LINE,
+    build_inline_article,
+    build_share_text,
+    _pick_death_line,
+)
 from app.telegram.bot_api import BotApiError, save_prepared_inline_message
 from tests.conftest import TEST_USER, build_init_data
 
@@ -23,19 +28,31 @@ SHARE_PAYLOAD = {
 }
 
 
-def test_build_share_text_includes_challenge_and_shift():
+def test_pick_death_line_prefers_short_flavor():
+    assert _pick_death_line("Long detail here.", "Short flavor.") == "Short flavor"
+
+
+def test_pick_death_line_falls_back_to_detail():
+    long_flavor = "x" * 100
+    assert _pick_death_line("First sentence. Second.", long_flavor) == "First sentence"
+
+
+def test_build_share_text_variant_a_hook():
     from app.models import SharePrepareRequest
 
     body = SharePrepareRequest(initData="x", **SHARE_PAYLOAD)
     text = build_share_text(TEST_USER, body)
-    assert "CORPORATE PERFORMANCE REVIEW" in text
-    assert "Employee: testuser" in text
-    assert "12.5 Years | Final Rank: Manager" in text
-    assert "Shift: Meeting Monday" in text
-    assert "Cause: Reply-All collision on rung 14" in text
-    assert "startapp=c_125" in text
-    assert "@CorporateLadder_bot" in text
-    assert "Prompt Anatomy" in text
+    lines = text.split("\n")
+    assert len(lines) == 3
+    assert lines[0] == (
+        "Manager · 12.5y — Your synergy did not scale optimally with our paradigms."
+    )
+    assert lines[1] == "Think you can outlast me?"
+    assert "startapp=c_125" in lines[2]
+    assert "Employee:" not in text
+    assert "CORPORATE PERFORMANCE REVIEW" not in text
+    assert "Prompt Anatomy" not in text
+    assert "Shift:" not in text
 
 
 def test_build_share_text_sprint_line():
@@ -46,7 +63,19 @@ def test_build_share_text_sprint_line():
         **{**SHARE_PAYLOAD, "death_type": "sprint"},
     )
     text = build_share_text(TEST_USER, body)
-    assert "Sprint archived at the buzzer" in text
+    assert SPRINT_SHARE_LINE.rstrip(".") in text.split("\n")[0]
+
+
+def test_build_inline_article_card_has_pa_on_description_only():
+    from app.models import SharePrepareRequest
+
+    body = SharePrepareRequest(initData="x", **SHARE_PAYLOAD)
+    share_text = build_share_text(TEST_USER, body)
+    article = build_inline_article(share_text, body, TEST_USER)
+    assert article["title"] == "Manager · 12.5y — Corporate Ladder"
+    assert "Built with Prompt Anatomy" in article["description"]
+    assert "promptanatomy" not in article["description"].lower()
+    assert "Prompt Anatomy" not in article["input_message_content"]["message_text"]
 
 
 def test_share_prepare_valid(mock_supabase, valid_init_data, monkeypatch):
@@ -73,7 +102,9 @@ def test_share_prepare_valid(mock_supabase, valid_init_data, monkeypatch):
     assert captured["user_id"] == TEST_USER["id"]
     assert captured["result"]["type"] == "article"
     assert captured["kwargs"]["allow_group_chats"] is True
-    assert "startapp=c_125" in captured["result"]["input_message_content"]["message_text"]
+    msg = captured["result"]["input_message_content"]["message_text"]
+    assert len(msg.split("\n")) == 3
+    assert "startapp=c_125" in msg
 
 
 def test_share_prepare_invalid_init():

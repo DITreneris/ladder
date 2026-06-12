@@ -20,8 +20,8 @@
 | 8 | **Score submit** | Offline game over | Failure toast; career high unchanged | [ ] | [ ] |
 | 9 | **429 cooldown** | Two quick deaths | "Score filing cooldown" toast | [ ] | [ ] |
 | 10 | **Synergy Sprint** | On sprint day, 60s cap | Sprint HUD + timeout game over | [ ] | [ ] |
-| 11 | **Native share (DM)** | Finish run → Share → send to saved messages or contact | Prepared performance review sends; `share_success` native or clipboard toast | [ ] | [ ] |
-| 12 | **Native share (group)** | Open via `/go@bot` in supergroup → finish run → Share to same group | Message appears in group; no WebView crash | [ ] | [ ] |
+| 11 | **Native share (DM)** | Finish run → Share → send to saved messages or contact | **3-line** body + inline card + Punch In button; no PA URL in body; `share_success` native or clipboard toast | [ ] | [ ] |
+| 12 | **Native share (group)** | Open via `/go@bot` in supergroup → finish run → Share to same group | Same 3-line body; no WebView crash | [ ] | [ ] |
 
 ---
 
@@ -54,6 +54,16 @@ From Railway access logs `logs.1781234407184.json` ([20260612_analize.md](202606
 | 11–12 **Share** | **0× `/share/prepare`** in log window | [ ] Complete rows 11–12; re-export Railway logs and confirm prepare hit |
 
 ### Share validation procedure (rows 11–12)
+
+Expected **message body** (after share hook trim):
+
+```
+Director · 20.8y — {one death line}.
+Think you can outlast me?
+https://t.me/CorporateLadder_bot?startapp=c_208
+```
+
+Plus inline article card (title, description with PA co-brand) and **Punch In & Climb** button.
 
 1. Open mini-app from @CorporateLadder_bot on **physical device** (not desktop browser).
 2. Finish one run → tap **Share** on game-over.

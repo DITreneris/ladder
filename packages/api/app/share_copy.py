@@ -10,9 +10,11 @@ from app.config import settings
 from app.models import SharePrepareRequest
 
 SPRINT_SHARE_LINE = "Sprint archived at the buzzer — velocity noted, outcomes pending."
+PA_CARD_SUFFIX = " Built with Prompt Anatomy"
 MAX_MESSAGE_TEXT = 4096
 MAX_TITLE = 64
 MAX_DESCRIPTION = 256
+MAX_DEATH_LINE = 90
 
 
 def _truncate(text: str, max_len: int) -> str:
@@ -23,39 +25,50 @@ def _truncate(text: str, max_len: int) -> str:
     return text[: max_len - 1] + "…"
 
 
-def _display_name(tg_user: dict) -> str:
-    return tg_user.get("username") or tg_user.get("first_name") or "CorporateSlave"
-
-
 def build_challenge_link(years_survived: float) -> str:
     compact = max(0, round(years_survived * 10))
     bot = settings.telegram_bot_username.lstrip("@")
     return f"https://t.me/{bot}?startapp=c_{compact}"
 
 
-def build_share_text(tg_user: dict, body: SharePrepareRequest) -> str:
-    """Mirror mini-app buildShareText() for native share payload."""
+def _pick_death_line(detail: str, flavor: str) -> str:
+    """One punchline for share body — flavor if short, else first sentence of detail."""
+    flavor_clean = flavor.strip().strip('"')
+    if flavor_clean and len(flavor_clean) <= MAX_DEATH_LINE:
+        return flavor_clean.rstrip(".")
+
+    detail = detail.strip()
+    if detail:
+        period_idx = detail.find(".")
+        first = detail[: period_idx + 1] if period_idx >= 0 else detail
+        return _truncate(first.strip().rstrip("."), MAX_DEATH_LINE)
+
+    if flavor_clean:
+        return _truncate(flavor_clean.rstrip("."), MAX_DEATH_LINE)
+
+    return "HR filed the paperwork"
+
+
+def _card_description(detail: str, flavor: str) -> str:
+    base = detail.strip() or flavor.strip().strip('"')
+    max_base = MAX_DESCRIPTION - len(PA_CARD_SUFFIX)
+    return _truncate(base, max_base) + PA_CARD_SUFFIX
+
+
+def build_share_text(_tg_user: dict, body: SharePrepareRequest) -> str:
+    """3-line viral hook — must match apps/mini-app/src/lib/share-copy.ts."""
     years = f"{body.years_survived:.1f}"
     rank = body.final_rank
-    bot_user = settings.telegram_bot_username.lstrip("@")
-    detail = body.termination_detail
-    flavor = body.termination_flavor
-    shift_label = body.shift_label
+    if body.death_type == "sprint":
+        short_death = SPRINT_SHARE_LINE.rstrip(".")
+    else:
+        short_death = _pick_death_line(body.termination_detail, body.termination_flavor)
 
-    sprint_line = f"\n{SPRINT_SHARE_LINE}\n" if body.death_type == "sprint" else ""
-    challenge_line = f"Think you can outlast me? {build_challenge_link(body.years_survived)}\n"
-
+    challenge_url = build_challenge_link(body.years_survived)
     text = (
-        "CORPORATE PERFORMANCE REVIEW\n"
-        f"Employee: {_display_name(tg_user)}\n"
-        f"{years} Years | Final Rank: {rank}\n"
-        f"Shift: {shift_label}\n"
-        f"{sprint_line}"
-        f"Cause: {detail}\n"
-        f'"{flavor}"\n'
-        f"{challenge_line}"
-        f"Play Corporate Ladder on Telegram @{bot_user}\n"
-        f"Built with Prompt Anatomy — {settings.prompt_anatomy_url}"
+        f"{rank} · {years}y — {short_death}.\n"
+        "Think you can outlast me?\n"
+        f"{challenge_url}"
     )
     return _truncate(text, MAX_MESSAGE_TEXT)
 
@@ -66,8 +79,8 @@ def build_inline_article(
     tg_user: dict,
 ) -> dict[str, Any]:
     years = f"{body.years_survived:.1f}"
-    title = _truncate(f"Corporate Performance Review — {years}y {body.final_rank}", MAX_TITLE)
-    description = _truncate(body.termination_detail, MAX_DESCRIPTION)
+    title = _truncate(f"{body.final_rank} · {years}y — Corporate Ladder", MAX_TITLE)
+    description = _card_description(body.termination_detail, body.termination_flavor)
     result_id = f"share-{tg_user['id']}-{int(time.time())}-{uuid.uuid4().hex[:8]}"
 
     challenge_url = build_challenge_link(body.years_survived)

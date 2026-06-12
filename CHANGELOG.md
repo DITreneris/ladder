@@ -9,6 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- **Share copy hook trim** — native + clipboard share body shortened to 3-line Variant A hook (`{rank} · {years}y — {death}.` / challenge CTA / URL); one death line only; Prompt Anatomy co-brand on inline card description only (not message body)
+
 ### Added
 - **Agent docs P4** — debug-triage Step 0 buckets (share crash, Android black screen, analytics block, LB stale, 429 spam); DESIGN_SYSTEM v2.1/v2.2 header sync; ff-metrics-release T+7 + gate #8 ceremony; DOCS_INDEX cohort outreach task router row
 - **Soft-launch ops docs** — v2.2.1 release cut in ROADMAP Status mirrors; DEBUG_ENV_TRIAGE prod/local bundle hashes; FF_METRICS_2026-06-18 T+7 template; DEVICE_QA share/429 validation procedures
