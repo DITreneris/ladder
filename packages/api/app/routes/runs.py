@@ -18,6 +18,7 @@ router = APIRouter()
 
 # Legacy in-memory fallback when submit_cooldowns table unavailable (tests/dev)
 _submit_timestamps: dict[int, float] = defaultdict(float)
+_submit_last_years: dict[int, float] = defaultdict(float)
 SUBMIT_COOLDOWN_SECONDS = 10
 MANAGER_YEARS = 10
 DIRECTOR_YEARS = 20
@@ -48,9 +49,9 @@ def _get_user_from_init(init_data: str) -> dict:
         raise HTTPException(status_code=401, detail=str(e)) from e
 
 
-def _check_rate_limit(telegram_id: int) -> None:
+def _check_rate_limit(telegram_id: int, incoming_years: float | None = None) -> None:
     try:
-        check_submit_cooldown(telegram_id)
+        check_submit_cooldown(telegram_id, incoming_years=incoming_years)
     except HTTPException:
         raise
     except Exception as exc:
@@ -61,10 +62,12 @@ def _check_rate_limit(telegram_id: int) -> None:
         )
         now = time.time()
         if now - _submit_timestamps[telegram_id] < SUBMIT_COOLDOWN_SECONDS:
+            if incoming_years is not None and incoming_years > _submit_last_years[telegram_id]:
+                return
             raise HTTPException(status_code=429, detail="Too many submissions") from None
 
 
-def _record_rate_limit(telegram_id: int) -> None:
+def _record_rate_limit(telegram_id: int, years_survived: float | None = None) -> None:
     try:
         record_submit_cooldown(telegram_id)
     except Exception as exc:
@@ -74,6 +77,8 @@ def _record_rate_limit(telegram_id: int) -> None:
             exc,
         )
         _submit_timestamps[telegram_id] = time.time()
+        if years_survived is not None:
+            _submit_last_years[telegram_id] = years_survived
 
 
 @router.post("")
@@ -83,7 +88,7 @@ def submit_run(body: RunSubmitRequest):
     auth_date = int(tg_user.get("auth_date", time.time()))
 
     try:
-        _check_rate_limit(telegram_id)
+        _check_rate_limit(telegram_id, body.years_survived)
 
         expected_rungs = body.years_survived * 4
         if abs(body.rungs_climbed - expected_rungs) > 1:
@@ -111,7 +116,7 @@ def submit_run(body: RunSubmitRequest):
                 {"best_score": body.years_survived, "best_rank": body.final_rank}
             ).eq("id", user_id).execute()
 
-        _record_rate_limit(telegram_id)
+        _record_rate_limit(telegram_id, body.years_survived)
 
         return {"ok": True, "years_survived": body.years_survived}
     except HTTPException as exc:

@@ -105,6 +105,7 @@ Use this table to pick the right skill, rules, and documents.
 | `debug-repro` | [docs/DEBUG_REPRO.md](docs/DEBUG_REPRO.md) | QA | Manual R1–R5 reaction + L1–L5 layout checklist |
 | `debug-env` | [docs/DEBUG_ENV_TRIAGE.md](docs/DEBUG_ENV_TRIAGE.md) | QA | Prod bundle hash triage table |
 | `debug-incident-2026-06-01` | [docs/DEBUG_FIX_2026-06-01.md](docs/DEBUG_FIX_2026-06-01.md) | QA / agents | F&F debug postmortem — ladder width, lessons learned, CHANGELOG cross-links |
+| `debug-incident-2026-06-12` | [docs/DEBUG_SUBMIT_2026-06-12.md](docs/DEBUG_SUBMIT_2026-06-12.md) | QA / agents | Score submit / LB stale — 429, rank bands, revive defer, prod bundle, plausibility |
 | `ff-test` | [docs/FF_TEST.md](docs/FF_TEST.md) | Product | Friends-and-family protocol + v1.9 decision |
 | `ff-metrics-2026-06-04` | [docs/FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md) | Product | F&F data snapshot (Phase 0 gate) |
 | `ff-metrics-2026-06-10` | [docs/FF_METRICS_2026-06-10.md](docs/FF_METRICS_2026-06-10.md) | Product | Pre-review metrics template (fill Jun 10) |

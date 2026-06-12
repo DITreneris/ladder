@@ -11,11 +11,14 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - **Revive score defer removed** — scores ≥3y with revive eligible now submit immediately (then show HR Training offer); fixes high scores visible on game over but missing from daily LB
-- **Score submit 429 retry** — mini-app waits out the 10s API cooldown and retries once when `POST /runs` returns rate limit (fixes lost high scores on rapid Re-apply, e.g. Kristupas power-user pattern)
+- **Score submit 429 retry** — mini-app waits out the 10s API cooldown and retries up to 3 times when `POST /runs` returns rate limit (fixes lost high scores on rapid Re-apply, e.g. Kristupas power-user pattern)
 - **Score submit rank band** — `final_rank` derived from `rankFromYears(yearsSurvived)` at submit and game over (v2.1 Director bands); prevents Manager label @ 25–30y validation rejects
-- **Revive deferred flush** — pending score kept if flush submit fails (429/network) so Re-apply/Home can retry
+- **API submit cooldown upgrade** — within 10s window, accepts a new run when `years_survived` beats the last filed score (power-user rapid Re-apply); normalizes `final_rank` + `rungs_climbed` on `POST /runs` to stop 422/400 from stale clients
+- **API cooldown NameError** — `_check_rate_limit` no longer references out-of-scope `body` (was forcing in-memory fallback without upgrade bypass on every submit check exception)
 
 ### Added
+- **[docs/DEBUG_SUBMIT_2026-06-12.md](docs/DEBUG_SUBMIT_2026-06-12.md)** — score-submit / LB-stale debug postmortem (429, rank bands, revive defer, prod bundle drift, plausibility 400 bucket)
+- **Score filing UX** — “Filing score with HR…” toast on game-over submit; clearer auto-retry copy on rate limit
 - **Agent docs P4** — debug-triage Step 0 buckets (share crash, Android black screen, analytics block, LB stale, 429 spam); DESIGN_SYSTEM v2.1/v2.2 header sync; ff-metrics-release T+7 + gate #8 ceremony; DOCS_INDEX cohort outreach task router row
 - **Soft-launch ops docs** — v2.2.1 release cut in ROADMAP Status mirrors; DEBUG_ENV_TRIAGE prod/local bundle hashes; FF_METRICS_2026-06-18 T+7 template; DEVICE_QA share/429 validation procedures
 

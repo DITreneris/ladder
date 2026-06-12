@@ -104,32 +104,43 @@ def test_runs_invalid_init_data():
 
 
 def test_runs_invalid_final_rank(mock_supabase, valid_init_data):
+    """Unknown client rank is normalized from years (no 422)."""
     runs_module._submit_timestamps.clear()
     response = client.post(
         "/runs",
         json={
             "initData": valid_init_data,
-            "years_survived": 1,
+            "years_survived": 25,
             "final_rank": "VP",
-            "rungs_climbed": 4,
+            "rungs_climbed": 100,
         },
     )
-    assert response.status_code == 422
+    assert response.status_code == 200
 
 
-def test_runs_rank_years_mismatch(mock_supabase, valid_init_data):
+def test_runs_rate_limit_allows_higher_score(mock_supabase, valid_init_data):
     runs_module._submit_timestamps.clear()
-    response = client.post(
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    low = client.post(
         "/runs",
         json={
-            "initData": valid_init_data,
-            "years_survived": 1,
-            "final_rank": "CEO",
-            "rungs_climbed": 4,
+            "initData": init_data,
+            "years_survived": 3,
+            "final_rank": "Intern",
+            "rungs_climbed": 12,
         },
     )
-    assert response.status_code == 400
-    assert "inconsistent" in response.json()["detail"].lower()
+    high = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 25,
+            "final_rank": "Manager",
+            "rungs_climbed": 100,
+        },
+    )
+    assert low.status_code == 200
+    assert high.status_code == 200
 
 
 def test_runs_validation_error_does_not_rate_limit(mock_supabase, valid_init_data):
@@ -188,8 +199,8 @@ def test_runs_accepts_legitimate_manager_run(mock_supabase, valid_init_data):
     assert response.status_code == 200
 
 
-def test_runs_rejects_manager_in_director_band(mock_supabase, valid_init_data):
-    """Manager band is [10, 20) — 25y must carry the Director rank."""
+def test_runs_normalizes_stale_manager_rank(mock_supabase, valid_init_data):
+    """Stale client rank is rewritten from years before validation."""
     runs_module._submit_timestamps.clear()
     init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
     response = client.post(
@@ -202,8 +213,7 @@ def test_runs_rejects_manager_in_director_band(mock_supabase, valid_init_data):
             "rungs_climbed": 100,
         },
     )
-    assert response.status_code == 400
-    assert "inconsistent" in response.json()["detail"].lower()
+    assert response.status_code == 200
 
 
 def test_runs_accepts_legitimate_director_run(mock_supabase, valid_init_data):
@@ -222,7 +232,7 @@ def test_runs_accepts_legitimate_director_run(mock_supabase, valid_init_data):
     assert response.status_code == 200
 
 
-def test_runs_rejects_director_below_band(mock_supabase, valid_init_data):
+def test_runs_normalizes_stale_director_rank(mock_supabase, valid_init_data):
     runs_module._submit_timestamps.clear()
     init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
     response = client.post(
@@ -235,12 +245,11 @@ def test_runs_rejects_director_below_band(mock_supabase, valid_init_data):
             "rungs_climbed": 60,
         },
     )
-    assert response.status_code == 400
-    assert "inconsistent" in response.json()["detail"].lower()
+    assert response.status_code == 200
 
 
-def test_runs_rejects_director_at_ceo_band(mock_supabase, valid_init_data):
-    """Director band tops out below 35y; 35y+ must be CEO."""
+def test_runs_normalizes_ceo_band_from_years(mock_supabase, valid_init_data):
+    """35y+ runs are stored as CEO even when client sends Director."""
     runs_module._submit_timestamps.clear()
     init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 240)
     response = client.post(
@@ -253,8 +262,7 @@ def test_runs_rejects_director_at_ceo_band(mock_supabase, valid_init_data):
             "rungs_climbed": 144,
         },
     )
-    assert response.status_code == 400
-    assert "inconsistent" in response.json()["detail"].lower()
+    assert response.status_code == 200
 
 
 def test_leaderboard_me_highlights_user(mock_supabase, valid_init_data):

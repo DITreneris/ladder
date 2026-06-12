@@ -1,6 +1,8 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+from app.ranks import rank_from_years
 
 FinalRank = Literal["Intern", "Manager", "Director", "CEO"]
 
@@ -23,12 +25,33 @@ class UserProfile(BaseModel):
 class RunSubmitRequest(BaseModel):
     init_data: str = Field(..., alias="initData")
     years_survived: float = Field(..., ge=0, le=100)
-    final_rank: FinalRank
+    final_rank: FinalRank = "Intern"
     termination_cause: str | None = None
     rungs_climbed: int = Field(..., ge=0)
     sprint_mode: bool = False
 
     model_config = {"populate_by_name": True}
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_submit_payload(cls, data: object) -> object:
+        if not isinstance(data, dict):
+            return data
+        normalized = dict(data)
+        years_raw = normalized.get("years_survived")
+        try:
+            years = float(years_raw)
+        except (TypeError, ValueError):
+            years = None
+        if years is not None:
+            normalized["final_rank"] = rank_from_years(years)
+        rungs = normalized.get("rungs_climbed")
+        if rungs is not None:
+            try:
+                normalized["rungs_climbed"] = int(round(float(rungs)))
+            except (TypeError, ValueError):
+                pass
+        return normalized
 
 
 class LeaderboardEntry(BaseModel):

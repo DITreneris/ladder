@@ -36,7 +36,10 @@ describe("submitRun", () => {
     let runsCalls = 0;
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => {
+      vi.fn(async (url: RequestInfo | URL) => {
+        if (!String(url).includes("/runs")) {
+          return new Response(null, { status: 204 });
+        }
         runsCalls += 1;
         if (runsCalls === 1) {
           return new Response(JSON.stringify({ detail: "Too many submissions" }), { status: 429 });

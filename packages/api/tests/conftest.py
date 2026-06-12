@@ -141,6 +141,44 @@ def mock_supabase(monkeypatch):
             def select(*_args, **_kwargs):
                 sel = MagicMock()
 
+                def eq(_field, _value):
+                    eq_chain = MagicMock()
+
+                    def gte(_field2, _value2):
+                        gte_chain = MagicMock()
+
+                        def order(_field3, desc=False):
+                            order_chain = MagicMock()
+
+                            def limit(_n):
+                                lim = MagicMock()
+
+                                def execute():
+                                    rows = [
+                                        {
+                                            "years_survived": r["years_survived"],
+                                            "final_rank": r.get("final_rank", "Intern"),
+                                            "created_at": "2026-05-31T12:00:00+00:00",
+                                        }
+                                        for r in runs_store
+                                        if _field == "user_id" and r.get("user_id") == _value
+                                    ]
+                                    if desc and rows:
+                                        rows = [rows[-1]]
+                                    return MagicMock(data=rows)
+
+                                lim.execute = execute
+                                return lim
+
+                            order_chain.limit = limit
+                            return order_chain
+
+                        gte_chain.order = order
+                        return gte_chain
+
+                    eq_chain.gte = gte
+                    return eq_chain
+
                 def gte(_field, _value):
                     gte_chain = MagicMock()
 
@@ -175,6 +213,7 @@ def mock_supabase(monkeypatch):
                     gte_chain.order = order
                     return gte_chain
 
+                sel.eq = eq
                 sel.gte = gte
                 return sel
 

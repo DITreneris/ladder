@@ -414,7 +414,7 @@ function submitFailureMessage(reason: ApiFailureReason): string {
     return `HR couldn't verify your badge. Reopen from @${bot}.`;
   }
   if (reason === "rate_limit") {
-    return "Score filing cooldown. Retry in a few seconds.";
+    return "Score filing cooldown — HR is retrying automatically.";
   }
   if (reason === "validation") {
     return "HR rejected the filing — score didn't pass audit. Local run counts.";
@@ -1300,6 +1300,7 @@ async function runPostGameOverIo(
   let submitResult: SubmitRunResult | null = null;
 
   if (initData) {
+    showToast("Filing score with HR…", { surface: "shell" });
     submitResult = await submitRun(initData, {
       yearsSurvived: result.yearsSurvived,
       finalRank: result.finalRank,

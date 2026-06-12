@@ -29,7 +29,7 @@ Load this skill **before** deep-diving game logic or UX copy. Target: **15 minut
 | **LB stale** | Game-over gap wrong until refresh | Submit-then-fetch order in `app.ts` (v2.2.1); network tab `/runs` then `/leaderboard` |
 | **429 spam** | Cooldown toast loop / rapid retry | `submit_cooldowns` table populated (`ff-metrics.py` → `hardening_table_rows`); Railway 429 logs — [score-pipeline](../score-pipeline/SKILL.md) |
 
-**Jun 12 prod evidence:** 0× `/share/prepare`, 39× HTTP 429, `submit_cooldowns` 0 rows — see [DEVICE_QA_v2.0.md](../../docs/DEVICE_QA_v2.0.md) § Jun 12 prod evidence and [20260612_analize.md](../../docs/20260612_analize.md).
+**Jun 12 prod evidence:** 0× `/share/prepare`, 39× HTTP 429, `submit_cooldowns` 0 rows — see [DEVICE_QA_v2.0.md](../../docs/DEVICE_QA_v2.0.md) § Jun 12 prod evidence and [20260612_analize.md](../../docs/20260612_analize.md). **Score submit incident:** [DEBUG_SUBMIT_2026-06-12.md](../../docs/DEBUG_SUBMIT_2026-06-12.md).
 
 Work **one bucket at a time**.
 

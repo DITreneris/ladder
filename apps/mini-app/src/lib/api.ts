@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 export const API_TIMEOUT_MS = 8000;
 /** Matches API SUBMIT_COOLDOWN_SECONDS + 1s buffer for 429 retry. */
 export const SUBMIT_COOLDOWN_RETRY_MS = 11_000;
-export const SUBMIT_MAX_ATTEMPTS = 2;
+export const SUBMIT_MAX_ATTEMPTS = 3;
 
 export interface UserProfile {
   telegram_id: number;
@@ -140,6 +140,7 @@ export async function submitRun(
   if (!initData) return { ok: false, reason: "auth" };
   const rungsClimbed = Math.max(0, Math.round(payload.rungsClimbed));
   const yearsSurvived = Number(payload.yearsSurvived);
+  if (!Number.isFinite(yearsSurvived)) return { ok: false, reason: "validation" };
   const finalRank = rankFromYears(yearsSurvived);
   const body = {
     initData,
@@ -161,7 +162,10 @@ export async function submitRun(
     }
     break;
   }
-  return lastResult ?? { ok: false, reason: "server" };
+  if (lastResult && !lastResult.ok) {
+    return { ok: false, reason: lastResult.reason };
+  }
+  return { ok: false, reason: "server" };
 }
 
 async function fetchLeaderboardMe(
