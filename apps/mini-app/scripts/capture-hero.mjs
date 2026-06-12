@@ -9,8 +9,8 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const marketingHome = path.resolve(__dirname, "../../../docs/assets/marketing/01-home.png");
-const legacyOut = path.resolve(__dirname, "../../../docs/assets/gameplay.png");
+const marketingHome = path.resolve(__dirname, "../design/marketing/01-home.png");
+const legacyOut = path.resolve(__dirname, "../design/gameplay.png");
 
 await mkdir(path.dirname(legacyOut), { recursive: true });
 
@@ -25,4 +25,4 @@ await new Promise((resolve, reject) => {
 });
 
 await copyFile(marketingHome, legacyOut);
-console.log("Saved docs/assets/gameplay.png (copy of marketing/01-home.png)");
+console.log("Saved design/gameplay.png (copy of marketing/01-home.png)");

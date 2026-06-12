@@ -1,5 +1,5 @@
 /**
- * Adopt manual OG artwork from docs/assets/Corporate_Ladder_og.png.
+ * Adopt manual OG artwork from apps/mini-app/design/Corporate_Ladder_og.png.
  * Usage: npm run adopt:og
  */
 import { chromium } from "playwright";
@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const miniAppRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(miniAppRoot, "../..");
-const sourcePath = path.join(repoRoot, "docs", "assets", "Corporate_Ladder_og.png");
+const sourcePath = path.join(miniAppRoot, "design", "Corporate_Ladder_og.png");
 const ogOutPath = path.join(miniAppRoot, "public", "og.png");
 const githubOutPath = path.join(repoRoot, ".github", "social-preview.png");
 

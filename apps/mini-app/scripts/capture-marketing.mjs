@@ -9,7 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outDir = path.resolve(__dirname, "../../../docs/assets/marketing");
+const outDir = path.resolve(__dirname, "../design/marketing");
 const previewUrl = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
 
 const SHOTS = [
@@ -39,10 +39,10 @@ try {
       path: path.join(outDir, shot.file),
     });
     await page.close();
-    console.log(`Saved docs/assets/marketing/${shot.file} — ${shot.label}`);
+    console.log(`Saved design/marketing/${shot.file} — ${shot.label}`);
   }
 } finally {
   await browser.close();
 }
 
-console.log("\nMarketing capture complete. Review rubric in docs/assets/marketing/README.md");
+console.log("\nMarketing capture complete. Shots in apps/mini-app/design/marketing/");

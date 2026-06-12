@@ -55,3 +55,19 @@ MR_Bullet_Be_Streso.mp3*
 
 # OG capture cache (intermediate crop)
 apps/mini-app/public/og-cache/
+
+# === Local-only (not pushed to GitHub) ===
+docs/
+.cursor/
+scripts/
+AGENTS.md
+DOCS_INDEX.md
+ROADMAP.md
+DEPLOY.md
+DESIGN_SYSTEM.md
+CHANGELOG.md
+apps/mini-app/design/
+
+# Dev artifacts
+logs.*.json
+packages/debug-*.log
