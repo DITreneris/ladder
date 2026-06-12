@@ -59,7 +59,7 @@ apps/mini-app/public/og-cache/
 # === Local-only (not pushed to GitHub) ===
 docs/
 .cursor/
-scripts/
+/scripts/
 AGENTS.md
 DOCS_INDEX.md
 ROADMAP.md
