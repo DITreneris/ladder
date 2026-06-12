@@ -5,7 +5,7 @@ description: Deploy Corporate Ladder to Vercel, Railway, Supabase, and BotFather
 
 # Mini App Deploy Checklist
 
-**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — **v2.2.1 code complete** (2026-06-12); deploy Railway API → Vercel mini-app; public launch gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28](../../docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md); DEVICE_QA v2.0 + share rows 11–12; [FF_EXECUTION](../../docs/FF_EXECUTION.md).
+**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — **v2.2.1 Tagged + Live** (2026-06-12, `5928b85`); gate #8 hardening pending; DEVICE_QA v2.0 + share rows 11–12; [FF_EXECUTION](../../docs/FF_EXECUTION.md).
 
 ## Prerequisites
 

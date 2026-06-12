@@ -16,7 +16,7 @@ Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. 
 
 ## MVP v1 Scope
 
-**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening), **v2.1.0 / v2.1.1 / v2.2.0** (tagged 2026-06-11), **v2.2.1** (changelog cut 2026-06-12). **Active:** **v2.2.1** — Code complete; Railway API + Vercel deploy pending — see [ROADMAP.md](../../ROADMAP.md) **Status**.
+**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening), **v2.1.0 / v2.1.1 / v2.2.0** (tagged 2026-06-11), **v2.2.1** (@ `5928b85`, 2026-06-12). **Active:** **v2.2.1** — Tagged + Live — see [ROADMAP.md](../../ROADMAP.md) **Status**.
 
 **Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
 

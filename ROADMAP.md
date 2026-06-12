@@ -12,11 +12,11 @@
 
 | | |
 |---|---|
-| **Production** | Vercel `main-5Cc-kozO.js` (2026-06-12 curl) · **v2.2.1 deploy pending** (local build `main-CvPR04Oz.js`) · API health ok · OG `/og.png` 200 |
-| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** · **`v2.1.0` / `v2.1.1` / `v2.2.0`** @ `ddfc968` · **`v2.2.1`** changelog cut 2026-06-12 (git tag + prod deploy pending) |
+| **Production** | Vercel **`main-E7DOQaNb.js`** @ `5928b85` (2026-06-12) · Railway API health ok · OG `/og.png` 200 |
+| **Tagged** | `v1.8.5` @ `46abf19` · **`v1.9.0` + `v2.0.0`** · **`v2.1.0` / `v2.1.1` / `v2.2.0`** @ `ddfc968` · **`v2.2.1`** @ `5928b85` on `origin` (2026-06-12) |
 | **F&F verdict** | **CONDITIONAL GO** — pipeline green, retention thin; see [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) §A/§D |
-| **Active** | **v2.2.1** — post–v2.2.0 patch (share prepare, API hardening, home UX) — **Code complete**; Railway API + Vercel redeploy pending |
-| **Next actions** | Deploy API → mini-app for v2.2.1 · DEVICE_QA v2.0 manual sign-off (iOS + Android) · share rows 11–12 · [FF_COHORT_OUTREACH_2026-06-12.md](docs/FF_COHORT_OUTREACH_2026-06-12.md) warm leads · `ff-metrics.py` ~2026-06-18 · [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| **Active** | **v2.2.1** — **Tagged + Live** (2026-06-12) — gate #8 hardening rows pending · no public marketing |
+| **Next actions** | Confirm gate #8 (`hardening_table_rows` > 0) · DEVICE_QA v2.0 manual sign-off (iOS + Android) · share rows 11–12 · [FF_COHORT_OUTREACH_2026-06-12.md](docs/FF_COHORT_OUTREACH_2026-06-12.md) warm leads · `ff-metrics.py` ~2026-06-18 · [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
 | **Monetization** | **AdsGram rewarded revive** + v2.2 hardening — live with `VITE_ADSGRAM_BLOCK_ID`; no virtual currency / forced interstitials |
 | **Acquisition** | **Deferred** — first pilot after public launch GO (~2026-06-28) — [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md) |
 | **Public launch** | Gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
@@ -27,7 +27,7 @@
 | Item | Status |
 |------|--------|
 | [DEVICE_QA_v2.0.md](docs/DEVICE_QA_v2.0.md) rows 1–8 signed (iOS + Android) | [ ] manual — devices (CI smoke green 2026-06-12: pytest 41 + vitest 126) |
-| v2.2.1 API + mini-app deploy (`hardening_table_rows` > 0) | [ ] Railway API first, then Vercel — see [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) step 19 |
+| v2.2.1 API + mini-app deploy (`hardening_table_rows` > 0) | [ ] Vercel live · hardening rows 0 post-push — device cooldown test |
 | Vercel OG redeploy after `npm run adopt:og` | [x] adopt local 2026-06-11 · [x] Vercel prod redeploy 2026-06-11 (`/og.png` 200) |
 | `python scripts/ff-metrics.py` → `migration_002_ok: true` in prod | [x] 2026-06-11 ([FF_METRICS_2026-06-11](docs/FF_METRICS_2026-06-11.md)) |
 | GO verdict filled in [FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | [x] 2026-06-11 — CONDITIONAL GO |
@@ -40,7 +40,7 @@ Runbook: [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) · Deploy: [DEPLOY.md](DEP
 
 | Version | Theme | Status |
 |---------|--------|--------|
-| **v2.2.1** | Post–v2.2.0 patch: share prepare, API cooldown persistence, Android dark fix, home UX, LB ordering | **Code complete** (2026-06-12) — deploy + tag pending |
+| **v2.2.1** | Post–v2.2.0 patch: share prepare, API cooldown persistence, Android dark fix, home UX, LB ordering | **Tagged + Live** (2026-06-12) @ `5928b85` |
 | **v2.2.0** | Virality + monetization polish (native share, AdsGram hardening, challenge banner, events) | **Tagged + Live** (2026-06-11) |
 | **v2.1.1** | Retention hotfix: tutorial overlay, Energy label, tap pulse, home trim | **Tagged + Live** — shipped with v2.2.0 train |
 | **v2.1.0** | Retention sprint: Director @ 20y, beat-your-gap, challenge link, rookie ramp, AdsGram, TON analytics, SEO | **Tagged + Live** (2026-06-11) |

@@ -8,8 +8,8 @@ Re-check after each deploy.
 
 | Surface | Bundle hash | 4 plotiai? | Kava reaction? | Death reaction? | Notes |
 |---------|-------------|------------|----------------|-----------------|-------|
-| Telegram prod | `main-5Cc-kozO.js` (2026-06-12 curl) | verify rows 1–5 | verify row 4 | verify row 3 | Vercel redeploy after v2.2.0; **v2.2.1 tag pending** — local repo ahead (`main-CvPR04Oz.js`); DEVICE_QA v2.0 unsigned |
-| Local build | `main-CvPR04Oz.js` (2026-06-12) | `qa:layout` pass | vitest 126 pass | pytest 41 pass | smoke-local green 2026-06-12; deploy API first then mini-app for v2.2.1 |
+| Telegram prod | `main-E7DOQaNb.js` (2026-06-12 post-push) | verify rows 1–5 | verify row 4 | verify row 3 | Vercel live @ `5928b85` · tag **`v2.2.1`** · DEVICE_QA v2.0 unsigned · gate #8 hardening rows still 0 — confirm Railway API deploy + device cooldown |
+| Local build | `main-CvPR04Oz.js` (2026-06-12 pre-push) | `qa:layout` pass | vitest 126 pass | pytest 41 pass | Vercel prod hash may differ from local (CI build) |
 | Browser preview | local `npm run build` | Run `npm run qa:layout` | `npm run qa:coffee` | same | |
 | npm run dev | n/a (HMR) | Visual | `?debug=1` | `?debug=1` | |
 
