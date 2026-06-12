@@ -122,7 +122,7 @@ These are **new work** mapped to a release leg without changing MVP scope.
 | 3 | Pulse safe-side `btn-tap-zone` when `#imminentHint` active | `app.ts`, `style.css` | High |
 | 4 | `HapticFeedback.impactOccurred('light')` on tap | `app.ts`, `telegram.ts` | Medium |
 | 5 | Game-over `#progressionHintLine` default — rank vs years one-liner | `app.ts`, `constants.ts` | Medium |
-| 6 | Home — collapse `#homeGameplayPreview` behind “How to Survive” link after first run | `template.ts`, `app.ts` | High |
+| 6 | Home — collapse `#homeGameplayPreview` behind “How to Survive” link after first run | `template.ts`, `app.ts` | High — **superseded (2026-06):** collapse only on viewports ≤620px; returning users on tall screens keep full preview |
 
 **Pillar checklist** (ROADMAP §): all items pass — mechanics clarity, readable HUD, &lt;200ms motion, satire tone, no new screens required.
 

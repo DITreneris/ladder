@@ -16,13 +16,15 @@ Telegram Mini App: climb the corporate ladder, avoid meetings/reorgs/deadlines. 
 
 ## MVP v1 Scope
 
-**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening). **Active:** **v2.1.0** retention sprint — code complete, tag/deploy pending — see [ROADMAP.md](../../ROADMAP.md) **Status**.
+**Shipped:** core gameplay through **v1.8.5** (tagged `46abf19`), **v1.9.0** (F&F UX + OG adopt + onboarding), **v2.0.0** (triage + hardening), **v2.1.0 / v2.1.1 / v2.2.0** (tagged 2026-06-11), **v2.2.1** (changelog cut 2026-06-12). **Active:** **v2.2.1** — Code complete; Railway API + Vercel deploy pending — see [ROADMAP.md](../../ROADMAP.md) **Status**.
 
 **Out:** Friends leaderboard (v1.1), All-time tab (v1.1), currency, skins, clans, quests, NFTs.
 
-**Operational gate:** F&F window → [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md); DEVICE_QA v2.0 + Vercel OG redeploy. Match ROADMAP § Shipped baseline (v1.5 → v1.8.5) plus [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14), [2.0.0](CHANGELOG.md#200---2026-06-14), and `[Unreleased]`.
+**Operational gate:** Soft launch / F&F → [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md) · v2.2.1 deploy (API first) · DEVICE_QA v2.0 manual sign-off · share rows 11–12 · cohort outreach [FF_COHORT_OUTREACH_2026-06-12.md](../../docs/FF_COHORT_OUTREACH_2026-06-12.md) · public launch gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](../../docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md). Match ROADMAP § Shipped baseline through v2.2.1 plus [CHANGELOG 2.2.1](CHANGELOG.md#221---2026-06-12).
 
 **Monetization (optional):** AdsGram rewarded revive on qualifying game-over — no virtual currency or forced interstitials. See [docs/ads-acquisition-plan.md](../../docs/ads-acquisition-plan.md).
+
+**Share:** Native Telegram share via `POST /share/prepare` → `WebApp.shareMessage(preparedMessageId)` — not `shareMessage({ text })`. Clipboard fallback on failure.
 
 ## Principles
 
@@ -39,7 +41,7 @@ Sibling repo: [DITreneris/site](https://github.com/DITreneris/site) (Prompt Anat
 ## Key Docs
 
 - [DOCS_INDEX.md](../../DOCS_INDEX.md) — document map (update when adding docs, agents, or skills)
-- [ROADMAP.md](../../ROADMAP.md) — Status block, release train, shipped baseline through v1.9.0 / v2.0.0
+- [ROADMAP.md](../../ROADMAP.md) — Status block, release train, shipped baseline through v2.2.1
 - [docs/FF_EXECUTION.md](../../docs/FF_EXECUTION.md) — F&F runbook (current operational gate)
 - [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) — mini-app visual canon
 - [DEPLOY.md](../../DEPLOY.md) — production deploy checklist

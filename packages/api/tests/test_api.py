@@ -348,3 +348,33 @@ def test_create_session_prunes_old_tokens(mock_supabase):
     for _ in range(5):
         create_session(tg_id)
     assert len(mock_supabase.sessions_store) <= 3
+
+
+def test_first_row_helper():
+    from unittest.mock import MagicMock
+
+    from app.db.postgrest_helpers import first_row
+
+    assert first_row(MagicMock(data=[])) is None
+    assert first_row(MagicMock(data=None)) is None
+    assert first_row(MagicMock(data=[{"telegram_id": 1}])) == {"telegram_id": 1}
+    assert first_row(MagicMock(data={"telegram_id": 2})) == {"telegram_id": 2}
+
+
+def test_runs_persists_submit_cooldown_row(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
+    payload = {
+        "initData": valid_init_data,
+        "years_survived": 2,
+        "final_rank": "Intern",
+        "rungs_climbed": 8,
+    }
+    response = client.post("/runs", json=payload)
+    assert response.status_code == 200
+    assert TEST_USER["id"] in mock_supabase.cooldowns_store
+
+
+def test_runs_missing_fields_returns_422(mock_supabase):
+    response = client.post("/runs", json={"initData": "not-valid"})
+    assert response.status_code == 422

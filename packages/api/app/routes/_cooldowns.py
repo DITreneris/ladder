@@ -1,10 +1,14 @@
 """Shared submit cooldown backed by Supabase."""
 
+import logging
 import time
 
 from fastapi import HTTPException
 
+from app.db.postgrest_helpers import first_row
 from app.db.supabase import get_supabase
+
+logger = logging.getLogger(__name__)
 
 SUBMIT_COOLDOWN_SECONDS = 10
 
@@ -15,10 +19,10 @@ def check_submit_cooldown(telegram_id: int) -> None:
         db.table("submit_cooldowns")
         .select("last_submit_at")
         .eq("telegram_id", telegram_id)
-        .maybe_single()
+        .limit(1)
         .execute()
     )
-    row = result.data if result else None
+    row = first_row(result)
     if not row:
         return
     last = row.get("last_submit_at")
@@ -36,10 +40,10 @@ def record_submit_cooldown(telegram_id: int) -> None:
         db.table("submit_cooldowns")
         .select("telegram_id")
         .eq("telegram_id", telegram_id)
-        .maybe_single()
+        .limit(1)
         .execute()
     )
-    if existing and existing.data:
+    if first_row(existing):
         db.table("submit_cooldowns").update({"last_submit_at": now_iso}).eq(
             "telegram_id", telegram_id
         ).execute()
@@ -47,6 +51,7 @@ def record_submit_cooldown(telegram_id: int) -> None:
         db.table("submit_cooldowns").insert(
             {"telegram_id": telegram_id, "last_submit_at": now_iso}
         ).execute()
+    logger.debug("submit_cooldown recorded telegram_id=%s", telegram_id)
 
 
 def _now_iso() -> str:

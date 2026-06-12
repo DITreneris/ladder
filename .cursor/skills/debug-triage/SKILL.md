@@ -23,6 +23,13 @@ Load this skill **before** deep-diving game logic or UX copy. Target: **15 minut
 | **Layout height** | “Rungs squashed”, “can’t see ladder” | Play area height + rung height; HR memo visible |
 | **Reactions** | “No emoji”, “coffee invisible”, “tap dead” | [DEBUG_REPRO.md](../../docs/DEBUG_REPRO.md) R1–R5 |
 | **API / trust** | “Score not saved”, “leaderboard empty”, “career high wrong” | Network tab, `/runs`, `/leaderboard`, [`score-trust.ts`](../../apps/mini-app/src/lib/score-trust.ts), CHANGELOG trust fixes |
+| **Share crash** | Share tap crashes WebView in group | Bundle hash; never `shareMessage({ text })`; grep `/share/prepare` in Railway logs — [share-virality](../share-virality/SKILL.md) |
+| **Android black screen** | Blank WebView on dark theme | `.cl-viewport` light override; `telegram-analytics.ts` init guard — [DEVICE_QA_v2.0](../../docs/DEVICE_QA_v2.0.md) |
+| **Analytics block** | App never mounts / white screen | Console errors; TON analytics init wrapped — do not block mount |
+| **LB stale** | Game-over gap wrong until refresh | Submit-then-fetch order in `app.ts` (v2.2.1); network tab `/runs` then `/leaderboard` |
+| **429 spam** | Cooldown toast loop / rapid retry | `submit_cooldowns` table populated (`ff-metrics.py` → `hardening_table_rows`); Railway 429 logs — [score-pipeline](../score-pipeline/SKILL.md) |
+
+**Jun 12 prod evidence:** 0× `/share/prepare`, 39× HTTP 429, `submit_cooldowns` 0 rows — see [DEVICE_QA_v2.0.md](../../docs/DEVICE_QA_v2.0.md) § Jun 12 prod evidence and [20260612_analize.md](../../docs/20260612_analize.md).
 
 Work **one bucket at a time**.
 

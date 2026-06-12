@@ -28,7 +28,7 @@ Telegram Mini App game: tap left/right to climb a corporate ladder, avoid obstac
 | File | Purpose |
 |------|---------|
 | [DOCS_INDEX.md](DOCS_INDEX.md) | Navigation map for humans and agents |
-| [ROADMAP.md](ROADMAP.md) | **Status** block, release train, shipped baseline (v1.5 → v2.0.0) |
+| [ROADMAP.md](ROADMAP.md) | **Status** block, release train, shipped baseline (v1.5 → v2.2.1) |
 | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | F&F operational gate (device QA → tag → testers) |
 | [CHANGELOG.md](CHANGELOG.md) | Per-release shipped detail (Keep a Changelog) |
 | [docs/mvp-scope.md](docs/mvp-scope.md) | Scope boundaries, v1.1 deferrals, out-of-scope (not feature inventory) |
@@ -47,7 +47,7 @@ Shared practices with [DITreneris/site](https://github.com/DITreneris/site): doc
 
 | Path | Purpose |
 |------|---------|
-| `apps/mini-app/` | Vite + TypeScript frontend → Vercel |
+| `apps/mini-app/` | Vite + TypeScript frontend → Vercel; key libs: `analytics.ts`, `telegram-analytics.ts`, `pending-submit.ts`, `adsgram.ts`, `capture-mode.ts` |
 | `apps/bot/` | aiogram Telegram bot → Railway |
 | `packages/api/` | FastAPI REST API → Railway |
 | `supabase/migrations/` | Postgres schema migrations |
@@ -86,11 +86,11 @@ Copy `.env.example` to `.env` and fill in credentials.
 
 ## MVP boundaries
 
-**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. Through **v1.9.0** + **v2.0.0** tagged — see [CHANGELOG](CHANGELOG.md).
+**v1 (shipped):** Gameplay, Telegram auth, Daily + Weekly leaderboards, share, bot. Through **v2.2.1** changelog cut — see [CHANGELOG](CHANGELOG.md).
 
-**Active:** **v2.1.0** retention sprint (code complete, tag pending) — [ROADMAP.md](ROADMAP.md) **Status**, [FF_EXECUTION](docs/FF_EXECUTION.md).
+**Active gate:** v2.2.1 deploy pending · public launch review (~Jun 28) — [PUBLIC_LAUNCH_REVIEW_2026-06-28.md](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md); operational: DEVICE_QA v2.0 + share rows 11–12 + cohort outreach — [ROADMAP.md](ROADMAP.md) **Status**, [FF_EXECUTION](docs/FF_EXECUTION.md), [FF_COHORT_OUTREACH_2026-06-12](docs/FF_COHORT_OUTREACH_2026-06-12.md).
 
-**v1.1 (do NOT implement without approval):** Friends leaderboard, All-time tab, analytics, anti-cheat replay.
+**v1.1 (do NOT implement without approval):** Friends leaderboard, All-time tab, product analytics dashboard, server-side anti-cheat replay. TON Builders SDK + lightweight funnel events (v2.x) are **in scope** — not v1.1 dashboard.
 
 **Never:** Virtual currency, skins, clans, quests, NFTs.
 
@@ -135,7 +135,7 @@ After layout changes: `cd apps/mini-app && npm run preview` then `npm run qa:vie
 
 [DEPLOY.md](DEPLOY.md) · [.cursor/rules/deployment.mdc](.cursor/rules/deployment.mdc) · [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md)
 
-Current gate: soft launch — [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), Vercel OG redeploy — [ROADMAP.md](ROADMAP.md) **Status**.
+Current gate: v2.2.1 deploy pending — DEVICE_QA v2.0 manual sign-off, share rows 11–12, T+7 metrics ~Jun 18, [PUBLIC_LAUNCH_REVIEW_2026-06-28](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) — [ROADMAP.md](ROADMAP.md) **Status**.
 
 ## Agent roles
 

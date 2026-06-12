@@ -207,17 +207,18 @@ Schedule for v1.8.5 patch or early v1.9. OK to document as known limits for F&F.
 | **Files** | `packages/api/app/routes/share.py`, `apps/mini-app/src/lib/telegram.ts`, `app.ts` `copyShareText()` |
 | **Tasks** | [x] Native `shareMessage` via `savePreparedInlineMessage` + `POST /share/prepare` |
 | **Tasks** | [x] Clipboard fallback on prepare failure / user decline |
-| **Tasks** | [ ] Verify native share on iOS/Android Telegram in DM + group **Verify** |
-| **Acceptance** | Share button always gives clear next step (native send or copied / failed) |
+| **Tasks** | [ ] Verify native share on iOS/Android Telegram in DM + group — **Jun 12 Railway logs: 0× `/share/prepare`** ([20260612_analize.md](20260612_analize.md) §5b) |
+| **Acceptance** | Share button always gives clear next step (native send or copied / failed); `/share/prepare` visible in Railway logs |
 
 ### P2-3 · In-memory rate limit (10s submit cooldown)
 
 | **ID** | C-07 |
 | **Files** | `packages/api/app/routes/runs.py` — `_submit_timestamps` |
 | **Bug** | Per-process dict; resets on deploy; not shared across Railway workers |
-| **Tasks** | [ ] **Verify** double-submit on quick retry → 429 UX acceptable for F&F |
+| **Tasks** | [ ] **Verify** double-submit on quick retry → 429 UX acceptable for F&F — **Jun 12 logs: 39× 429 fired**; DEVICE_QA row 9 unsigned |
 | **Tasks** | [x] v2.0: Supabase-backed cooldown (`submit_cooldowns`) |
-| **Acceptance** | F&F: user sees “Score filing cooldown…” toast; no silent drop |
+| **Tasks** | [ ] **Fix** prod persistence — Jun 12 audit: 0 rows in `submit_cooldowns` / `api_sessions`; in-memory fallback active ([20260612_analize.md](20260612_analize.md) §5, §5b) |
+| **Acceptance** | F&F: user sees “Score filing cooldown…” toast; no silent drop; hardening tables populated after deploy |
 
 ### P2-4 · `initData` in leaderboard GET query string
 

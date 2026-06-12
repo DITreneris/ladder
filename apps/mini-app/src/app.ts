@@ -280,8 +280,7 @@ function isShortViewport(): boolean {
 function refreshHomePreviewCollapse(): void {
   const wrap = $("homeGameplayPreviewWrap");
   const toggle = $("homePreviewToggle");
-  const hasPlayed = getReapplyCount() >= 1 || getLastRunYears() !== null;
-  const collapseByDefault = hasPlayed || isShortViewport();
+  const collapseByDefault = isShortViewport();
   if (!collapseByDefault || homePreviewExpanded) {
     wrap.classList.remove("is-collapsed");
     toggle.classList.add("hidden");
@@ -526,10 +525,15 @@ function setHomeBadgeSkeleton(on: boolean): void {
   }
 }
 
+function rankFromCareerHigh(years: number): Rank {
+  return years > 0 ? rankFromYears(Math.floor(years)) : "Intern";
+}
+
 function refreshHomeBadgeUI(): void {
   $("avatarIcon").textContent = getStoredAvatarEmoji();
+  const displayRank = highScore > 0 ? rankFromCareerHigh(highScore) : null;
   $("userTitleLabel").textContent =
-    highScore > 0 ? `Current rank: ${bestRank}` : `Starting rank: Intern`;
+    displayRank ? `Current rank: ${displayRank}` : `Starting rank: Intern`;
   $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
   $("highScoreBadge").textContent = highScore.toFixed(1);
   refreshBeatGapLine();
@@ -1305,11 +1309,7 @@ async function runPostGameOverIo(
       const profileResult = await fetchProfile(initData);
       const profileBest = profileResult.ok ? profileResult.profile.best_score : undefined;
       highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, profileBest);
-      if (profileResult.ok) {
-        bestRank = (profileResult.profile.best_rank as Rank) || result.finalRank;
-      } else if (result.yearsSurvived >= highScore) {
-        bestRank = result.finalRank;
-      }
+      bestRank = rankFromCareerHigh(highScore);
       engine?.setCareerBestYears(highScore);
       $("highScoreBadge").textContent = highScore.toFixed(1);
       refreshHomeBadgeUI();
@@ -2056,7 +2056,7 @@ export function mountApp(): void {
           hideAuthDegradedBanner();
           const profile = result.profile;
           highScore = profile.best_score;
-          bestRank = (profile.best_rank as Rank) || "Intern";
+          bestRank = rankFromCareerHigh(highScore);
           engine?.setCareerBestYears(highScore);
           refreshHomeBadgeUI();
           if (profile.first_name || profile.username) {

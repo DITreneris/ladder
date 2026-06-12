@@ -1,11 +1,15 @@
 """Short-lived API session tokens (opaque, stored in Supabase)."""
 
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException
 
+from app.db.postgrest_helpers import first_row
 from app.db.supabase import get_supabase
+
+logger = logging.getLogger(__name__)
 
 SESSION_TTL_HOURS = 24
 MAX_ACTIVE_SESSIONS_PER_USER = 3
@@ -46,6 +50,7 @@ def create_session(telegram_id: int) -> str:
             "expires_at": expires_at.isoformat(),
         }
     ).execute()
+    logger.debug("api_session created telegram_id=%s", telegram_id)
     return token
 
 
@@ -57,10 +62,10 @@ def resolve_session_token(token: str) -> int:
         db.table("api_sessions")
         .select("telegram_id, expires_at")
         .eq("token", token)
-        .maybe_single()
+        .limit(1)
         .execute()
     )
-    row = result.data if result else None
+    row = first_row(result)
     if not row:
         raise HTTPException(status_code=401, detail="Invalid session token")
     expires_at = datetime.fromisoformat(row["expires_at"].replace("Z", "+00:00"))

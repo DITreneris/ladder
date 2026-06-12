@@ -9,9 +9,14 @@ alwaysApply: false
 ## Structure
 
 - `src/game/` — engine, constants, audio (no DOM)
-- `src/lib/telegram.ts` — WebApp SDK wrapper
-- `src/lib/api.ts` — fetch calls to Railway API; caches `session_token` for leaderboard highlight
+- `src/lib/telegram.ts` — WebApp SDK wrapper; `getStartParam()` for challenge links
+- `src/lib/api.ts` — fetch calls to Railway API; caches `session_token`; `prepareShare()` for `/share/prepare`
 - `src/lib/revive.ts` — AdsGram rewarded revive gate (optional monetization)
+- `src/lib/adsgram.ts` — AdsGram SDK + `showRewardAd()`
+- `src/lib/pending-submit.ts` — score defer on pagehide when revive offered
+- `src/lib/analytics.ts` — TON Builders funnel events (share, revive, tutorial)
+- `src/lib/telegram-analytics.ts` — SDK init; `appName` must be `corporate_ladder`
+- `src/lib/avatar.ts`, `hr-memo.ts`, `capture-mode.ts` — home avatar, in-run memos, OG capture
 - `src/lib/branding.ts` — Prompt Anatomy co-branding (`VITE_PROMPT_ANATOMY_URL`)
 - `src/lib/effects.ts` — visual effects (reduced-motion aware)
 - `src/app.ts` — UI controller and DOM wiring
@@ -21,7 +26,7 @@ alwaysApply: false
 ## Rules
 
 - Never embed `TELEGRAM_BOT_TOKEN` or Supabase keys in client code.
-- Use `getInitData()` for `/auth/me` and `/runs`; use cached `session_token` for `POST /leaderboard/me`.
+- Use `getInitData()` for `/auth/me`, `/runs`, and `/share/prepare`; use cached `session_token` for `POST /leaderboard/me`.
 - Leaderboard tabs: Daily and Weekly only (v1).
 - Share: `POST /share/prepare` then `WebApp.shareMessage(preparedMessageId)`; clipboard fallback on failure.
 - Styling: Tailwind utility classes via Vite plugin; no CDN Tailwind in production.
@@ -29,9 +34,12 @@ alwaysApply: false
 
 ## Shipped mechanics guardrails (v1.6+)
 
-See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline (v1.5 → v1.8.5 + v1.9/v2.0). Do not regress without spec update:
+See [ROADMAP.md](../../ROADMAP.md) § Shipped baseline (v1.5 → v2.2.0 + `[Unreleased]`). Do not regress without spec update:
 
-- Rank-gated obstacles: Meeting (Intern) → Reorg (Manager+) → Deadline (`burnout` type, CEO+) → **Gate** (Manager+) → **Plant** (CEO+)
+- Rank-gated obstacles: Meeting (Intern) → Reorg (Manager+) → Deadline (`burnout` type, **Director+** 20y) → **Gate** (Manager+) → **Plant** (**CEO+** only)
+- **Director @ 20y (v2.1.0):** Intern → Manager @ 10y → Director @ 20y → CEO @ 35y
+- **Adaptive rookie ramp (v2.1.0):** 20 rungs / 0.30 spawn cap until Manager for low career-best players
+- **Challenge param (v2.1.0):** `startapp=c_*` via `getStartParam()`; beat-your-gap in `corp_ladder_last_run` localStorage
 - **Three-lane corridor (v1.8.5):** center aisle visual only — TAP LEFT/RIGHT unchanged; no center tap
 - **Scripted tutorial (v1.8.5):** first 3 imminent rungs — clear → meeting RIGHT → coffee LEFT
 - Intern tutorial ramp: lower spawn rate first 12 rungs; forced coffee inject on `rungs[2]` by rung 8 if none collected (v1.8.4)
@@ -57,6 +65,14 @@ Do not add Legends tab or new control schemes without scope approval.
 - Layout CI: `npm run qa:layout` — play width stable after first tap
 
 UI patterns: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Release Status: [ROADMAP.md](../../ROADMAP.md).
+
+## Platform + analytics (v2.1+)
+
+- TON Builders init before first render — [telegram-analytics.ts](../../apps/mini-app/src/lib/telegram-analytics.ts); `appName` must be **`corporate_ladder`** (case-sensitive)
+- Funnel events via [analytics.ts](../../apps/mini-app/src/lib/analytics.ts) — `tutorial_complete`, `share_tap`, `share_success`, `revive_offer`, `revive_complete`; not v1.1 analytics dashboard
+- Analytics init failure must not block app mount (guard in bootstrap)
+- Score defer on pagehide when revive offered — [pending-submit.ts](../../apps/mini-app/src/lib/pending-submit.ts)
+- Daily leaderboard fetch after score submit completes (not in parallel with submit)
 
 ## Local Dev
 

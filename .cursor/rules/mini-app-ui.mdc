@@ -8,11 +8,11 @@ alwaysApply: false
 
 ## Design system doc
 
-Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5 shell + v1.9/v2.0 addenda). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
+Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5 shell + v2.1/v2.2 addenda). Token source: [apps/mini-app/src/style.css](../../apps/mini-app/src/style.css).
 
 ## v1.6 UI patterns
 
-- **Milestone chip** (HUD) — `Manager in X.y` / `CEO in X.y` progress during play
+- **Milestone chip** (HUD) — `Manager in X.y` / `Director in X.y` / `CEO in X.y` progress during play
 - **Death cause row** (game over) — icon + label per failure type
 - **Retry tip** (game over) — satirical one-liner from `constants.ts`
 - **Tap-zone glow** — `tap-zone-left/right:active` border feedback
@@ -55,6 +55,18 @@ Canonical reference: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md) (v1.8.5 shell + 
 - **Game-over toast** — `.toast-above-game-over-actions` above RE-APPLY row
 - **PA logo footer** — official Prompt Anatomy logo asset in `#homeBrandFooter`
 - **Sound FAB** — visible in Telegram light theme
+
+## v2.1 / v2.2 UI addenda
+
+- **`#homeContextSlot`** — single rotating slot: news ticker, daily shift, challenge banner (6s crossfade); challenge pins until dismissed; daily shift static under reduced-motion
+- **`#challengeBanner`** — incoming `startapp=c_*`; dismiss on tap or first Punch In
+- **`.home-skeleton`** — Employee Badge fields pulse while `/auth/me` loads (no default pop-in)
+- **`.home-hero-idle`** — briefcase hero micro-animation; disabled under reduced-motion and capture mode
+- **`#homeGameplayPreview`** — collapses by default ≤620px only; taller viewports show full Avoid/Climb card
+- **First-run tutorial** — glow-only safe-side buttons rungs 1–3; wrong-tap HR memo; no overlay card
+- **`#reviveAdBtn`** — Mandatory HR Training; `.toast-above-game-over-actions` when ad unavailable
+- **Landscape** — portrait gate on squashed landscape viewports; shell `min-height: 100dvh`
+- **Android dark theme** — `.cl-viewport` and WebApp background stay light so slate shell copy stays readable
 
 Canonical: [DESIGN_SYSTEM.md](../../DESIGN_SYSTEM.md). Do not regress without [ROADMAP.md](../../ROADMAP.md) baseline update.
 

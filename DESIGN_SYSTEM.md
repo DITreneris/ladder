@@ -1,9 +1,9 @@
 # Corporate Ladder — Design System
 
-**Status:** v1.8.5 shell + v1.9/v2.0 addenda (F&F UX, sprint HUD, revive, avatar)  
+**Status:** v1.8.5 shell + v1.9/v2.0/v2.1/v2.2 addenda (F&F UX, sprint HUD, revive, avatar, home polish)  
 **Audience:** Frontend developers, coding agents  
 **Scope:** Telegram Mini App shell + game chrome (`apps/mini-app`) — not a visual redesign  
-**Release context:** [ROADMAP.md](ROADMAP.md) Status · [CHANGELOG 1.9.0](CHANGELOG.md#190---2026-06-14) · [2.0.0](CHANGELOG.md#200---2026-06-14)
+**Release context:** [ROADMAP.md](ROADMAP.md) Status · [CHANGELOG 2.2.1](CHANGELOG.md#221---2026-06-12) · [2.2.0](CHANGELOG.md#220---2026-06-11) · [2.0.0](CHANGELOG.md#200---2026-06-14)
 
 **Family sibling:** [DITreneris/site](https://github.com/DITreneris/site) shares token/utility *process*; do **not** import Prompt Anatomy navy/gold brand or marketing layout.
 
@@ -285,14 +285,15 @@ Shell tokens unchanged from v1.8.5; new surfaces only:
 | Telegram | `.sound-fab` | Visible in light theme |
 | Onboarding | `#imminentHint` | Through Intern phase (40 rungs) |
 
-### v2.2 home polish (Unreleased)
+### v2.2 home polish (v2.2.0 + v2.2.1)
 
 | Surface | Element | Notes |
 |---------|---------|-------|
 | Home | `#homeContextSlot` | Ticker / daily shift / challenge in one rotating slot (6s crossfade; challenge pinned; static shift under reduced motion / capture) |
 | Home | `.home-skeleton` | Employee Badge skeleton pulse while `/auth/me` resolves |
 | Home | `home-hero-idle` | Briefcase hero idle sway after entrance; off for reduced motion + OG capture |
-| Home | Preview collapse | `#homeGameplayPreview` collapsed by default on viewports ≤620px (toggle stays) |
+| Home | Preview collapse | `#homeGameplayPreview` collapsed by default on viewports ≤620px only (all players); expanded on taller viewports; toggle stays on short screens |
+| Home | Badge rank label | "Current rank" from `rankFromYears(floor(best_score))` — matches `#homeMilestoneLabel`, not stale profile `best_rank` alone |
 
 ---
 

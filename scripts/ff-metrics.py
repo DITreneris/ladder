@@ -84,6 +84,17 @@ def probe_migration_002(db) -> bool:
     return ok
 
 
+def probe_hardening_table_counts(db) -> dict[str, int]:
+    """Row counts for v2 hardening tables (service role read)."""
+    counts: dict[str, int] = {}
+    for table, col in (("submit_cooldowns", "telegram_id"), ("api_sessions", "token")):
+        try:
+            counts[table] = db.table(table).select(col, count="exact").execute().count or 0
+        except Exception:
+            counts[table] = -1
+    return counts
+
+
 def _fetch_all(
     db,
     table: str,
@@ -479,10 +490,12 @@ def query_supabase(env: dict[str, str]) -> dict:
     ]
 
     deep_analytics = _compute_deep_analytics(all_users, all_runs, runs_14d, since, user_map)
+    hardening_counts = probe_hardening_table_counts(db)
 
     return {
         "supabase_url_host": url.replace("https://", "").split("/")[0],
         "migration_002_ok": probe_migration_002(db),
+        "hardening_table_rows": hardening_counts,
         "users_total": users_count,
         "runs_total": runs_count,
         "runs_14d": runs_14d_count,

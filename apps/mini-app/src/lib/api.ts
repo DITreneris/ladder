@@ -106,6 +106,8 @@ export async function fetchProfile(initData: string): Promise<ProfileResult> {
   return { ok: true, profile: result.data, sessionToken: token };
 }
 
+const SUBMIT_RANKS = ["Intern", "Manager", "Director", "CEO"] as const;
+
 export async function submitRun(
   initData: string,
   payload: {
@@ -117,13 +119,16 @@ export async function submitRun(
   }
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
+  const finalRank = SUBMIT_RANKS.includes(payload.finalRank as (typeof SUBMIT_RANKS)[number])
+    ? payload.finalRank
+    : "Intern";
   const result = await apiPost<{ ok: boolean }>("/runs", {
     initData,
-    years_survived: payload.yearsSurvived,
-    final_rank: payload.finalRank,
-    termination_cause: payload.terminationCause,
-    rungs_climbed: payload.rungsClimbed,
-    sprint_mode: payload.sprintMode ?? false,
+    years_survived: Number(payload.yearsSurvived),
+    final_rank: finalRank,
+    termination_cause: payload.terminationCause ?? "",
+    rungs_climbed: Math.max(0, Math.round(payload.rungsClimbed)),
+    sprint_mode: Boolean(payload.sprintMode),
   });
   if (!result.ok) return result;
   return { ok: true };

@@ -22,6 +22,7 @@ Corporate Ladder humor = workplace satire, not generic game fluff.
 | UI / HUD | **Energy**, **Deadline** (not "Burnout meter/cloud") |
 | API `termination_cause` | Human strings e.g. `"Deadline Crash"`, `"Meeting Collision"` |
 | Code obstacle type | `burnout` (engine ID — do not rename without migration plan) |
+| Rank ladder (UI) | Intern → Manager (10y) → **Director (20y)** → CEO (35y) — How-to-Play and home preview |
 
 ## Examples (good)
 
@@ -43,9 +44,18 @@ Corporate Ladder humor = workplace satire, not generic game fluff.
 - Nested terms inside flavor: straight single quotes in source strings
 - No curly quotes in user-visible copy
 
+## Challenge + share copy
+
+- **Challenge greet (home banner):** colleague survived Xy — HR doubts you can beat them
+- **Game-over challenge line:** cleared vs still open — years short of colleague's target; org-chart remembers
+- **Share payload:** flavor line + `Shift:` line + challenge URL — built server-side in `packages/api/app/share_copy.py`
+- **Revive sublines:** gap-to-#1, gap-to-PB, or default executive exception — via `buildReviveCopy()` in `revive.ts`
+- **Share success toast:** distinguish native Telegram share vs clipboard fallback
+
 ## Where Copy Lives
 
 - **`apps/mini-app/src/game/constants.ts`** — primary source: `FAILURE_REASONS`, `FAILURE_BY_RANK`, `PROMOTION_DIALOGUES`, retry tips, termination labels
 - Game over / promotion UI strings in `template.ts` / `app.ts`
 - Bot welcome message in `apps/bot/main.py`
+- Share + challenge strings in `packages/api/app/share_copy.py`
 - Historical tone only (not routine audits): [docs/archive/primal.txt](../../docs/archive/primal.txt)

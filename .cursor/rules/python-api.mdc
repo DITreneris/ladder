@@ -11,7 +11,10 @@ alwaysApply: false
 - `main.py` — FastAPI app, CORS, router mounts
 - `auth/telegram.py` — initData HMAC validation
 - `auth/session.py` — session token create/resolve/prune (v2.0)
-- `routes/` — auth, runs, leaderboard (thin handlers)
+- `routes/` — auth, runs, leaderboard, share (thin handlers)
+- `routes/share.py` — `POST /share/prepare` (native Telegram share)
+- `share_copy.py` — share text + challenge link builder
+- `telegram/bot_api.py` — `savePreparedInlineMessage` (Bot API)
 - `routes/_users.py` — user upsert helper (shared by auth + runs)
 - `routes/_cooldowns.py` — Supabase submit cooldown (v2.0)
 - `routes/_plausibility.py` — score plausibility + sprint_mode validation (v2.0)
@@ -20,8 +23,10 @@ alwaysApply: false
 
 ## Conventions
 
-- Validate Telegram `initData` on every authenticated endpoint (`/auth/me`, `/runs`).
+- Validate Telegram `initData` on every authenticated endpoint (`/auth/me`, `/runs`, `/share/prepare`).
 - Score sanity checks: years 0–100, rungs ≈ years × 4, plausibility cap, `sprint_mode` vs daily preset.
+- `final_rank` contiguous bands (v2.1.0): Intern `[0,10)` · Manager `[10,20)` · Director `[20,35)` · CEO `[35,∞)` — deploy API with mini-app when bands change.
+- `POST /share/prepare` requires `TELEGRAM_BOT_TOKEN` on API (server-side Bot API); optional `TELEGRAM_BOT_USERNAME` for challenge links in share copy.
 - `GET /leaderboard` — public list, no initData.
 - `POST /leaderboard/me` — `session_token` marks current user row (v2.0).
 - Rate limit: Supabase `submit_cooldowns` primary (migration 002); in-memory fallback in `runs.py` for tests/dev.

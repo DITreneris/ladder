@@ -41,3 +41,5 @@ Prod bundle `main-C0cdc3so.js` @ `d0c9305`; tags `v2.1.0`/`v2.1.1`/`v2.2.0` on `
 | Returned after first run (all-time) | 5/19 (26.3%) |
 
 This run still reflects pre-deploy behavior; the **T+7 re-run (~2026-06-18)** is the first read on v2.1.1 tutorial + v2.2.0 native share.
+
+**Next snapshot:** [FF_METRICS_2026-06-12.md](FF_METRICS_2026-06-12.md) · [20260612_analize.md](20260612_analize.md)

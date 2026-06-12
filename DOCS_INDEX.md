@@ -52,6 +52,10 @@ Use this table to pick the right skill, rules, and documents.
 | Satirical copy, promotions, failures | — | [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | `constants.ts`, `template.ts`, [ROADMAP](ROADMAP.md) § Narrative thesis |
 | Telegram initData, `/auth/me` | `telegram-initdata-auth` | [python-api.mdc](.cursor/rules/python-api.mdc) | [docs/architecture.md](docs/architecture.md), `packages/api/`, `apps/mini-app/src/lib/telegram.ts` |
 | Score submit → leaderboard | `score-pipeline` | [python-api.mdc](.cursor/rules/python-api.mdc), [supabase-db.mdc](.cursor/rules/supabase-db.mdc) | `packages/api/`, [supabase/migrations/](supabase/migrations/) |
+| Native share, challenge links, `/share/prepare` | `share-virality` | [mini-app-frontend.mdc](.cursor/rules/mini-app-frontend.mdc), [python-api.mdc](.cursor/rules/python-api.mdc) | [share-virality](.cursor/skills/share-virality/SKILL.md), `packages/api/app/routes/share.py`, `apps/mini-app/src/lib/api.ts` |
+| First-run tutorial, home trim, context slot | `retention-ux` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [retention-ux](.cursor/skills/retention-ux/SKILL.md), [UX_RETENTION_PLAN](docs/UX_RETENTION_PLAN.md), `app.ts` |
+| F&F metrics, GO/NO-GO, release cut | `ff-metrics-release` | [project-context.mdc](.cursor/rules/project-context.mdc), [deployment.mdc](.cursor/rules/deployment.mdc) | [ff-metrics-release](.cursor/skills/ff-metrics-release/SKILL.md), `scripts/ff-metrics.py`, [PUBLIC_LAUNCH_REVIEW](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md) |
+| F&F cohort warm-lead outreach | — | [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [FF_COHORT_OUTREACH_2026-06-12](docs/FF_COHORT_OUTREACH_2026-06-12.md), [FF_METRICS_2026-06-12](docs/FF_METRICS_2026-06-12.md), [20260612_analize](docs/20260612_analize.md) |
 | AdsGram revive / game-over monetization | `revive-monetization` | [project-context.mdc](.cursor/rules/project-context.mdc) | [revive-monetization](.cursor/skills/revive-monetization/SKILL.md), [ads-acquisition-plan](docs/ads-acquisition-plan.md), `lib/revive.ts` |
 | API routes, validation, rate limits | — | [python-api.mdc](.cursor/rules/python-api.mdc) | `packages/api/` |
 | Schema, RLS, migrations | — | [supabase-db.mdc](.cursor/rules/supabase-db.mdc) | `supabase/migrations/` |
@@ -59,8 +63,8 @@ Use this table to pick the right skill, rules, and documents.
 | Changelog, release notes | Changelog Maintainer | [changelog.mdc](.cursor/rules/changelog.mdc) | [CHANGELOG.md](CHANGELOG.md) |
 | Pre-merge / feature QA | `verifier` | [project-context.mdc](.cursor/rules/project-context.mdc) | [.cursor/agents/verifier.md](.cursor/agents/verifier.md), [scripts/smoke-local.ps1](scripts/smoke-local.ps1) |
 | Release train / pillar work | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [ROADMAP.md](ROADMAP.md) Status + active gate + § Shipped baseline; historical gates → [archive/ROADMAP_HISTORY.md](docs/archive/ROADMAP_HISTORY.md) |
-| UX audit / retention polish | — | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md), [prelaunch_audit2.md](docs/prelaunch_audit2.md), [ROADMAP](ROADMAP.md) § UX audit → release map |
-| Pre-launch GO/NO-GO decision | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [prelaunch_audit2.md](docs/prelaunch_audit2.md), [PUBLIC_LAUNCH_REVIEW_2026-06-28](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md), [FF_METRICS_2026-06-11](docs/FF_METRICS_2026-06-11.md) |
+| UX audit / retention polish | `retention-ux` | [mini-app-ui.mdc](.cursor/rules/mini-app-ui.mdc), [satirical-copy.mdc](.cursor/rules/satirical-copy.mdc) | [retention-ux](.cursor/skills/retention-ux/SKILL.md), [docs/UX_RETENTION_PLAN.md](docs/UX_RETENTION_PLAN.md), [prelaunch_audit2.md](docs/prelaunch_audit2.md) |
+| Pre-launch GO/NO-GO decision | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [prelaunch_audit2.md](docs/prelaunch_audit2.md), [PUBLIC_LAUNCH_REVIEW_2026-06-28](docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md), [FF_METRICS_2026-06-12](docs/FF_METRICS_2026-06-12.md), [20260612_analize](docs/20260612_analize.md) |
 | F&F gate / device QA | `verifier` | [deployment.mdc](.cursor/rules/deployment.mdc) | [FF_EXECUTION](docs/FF_EXECUTION.md), [DEVICE_QA_v2.0](docs/DEVICE_QA_v2.0.md), [DEPLOY_STATUS](docs/DEPLOY_STATUS.md) |
 | Discoverability / shell SEO-GEO | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/discoverability-plan.md](docs/discoverability-plan.md), [docs/assets/README.md](docs/assets/README.md), `npm run adopt:og`, `verify:seo` |
 | Paid ads / channel promotion / AdsGram acquisition | — | [project-context.mdc](.cursor/rules/project-context.mdc) | [docs/ads-acquisition-plan.md](docs/ads-acquisition-plan.md), [DEPLOY.md](DEPLOY.md) § AdsGram revive, [FF_REVIEW_2026-06-14](docs/FF_REVIEW_2026-06-14.md) |
@@ -89,7 +93,7 @@ Use this table to pick the right skill, rules, and documents.
 | ID | Path | Audience | Notes |
 |----|------|----------|-------|
 | `readme` | [README.md](README.md) | Developers | Onboarding, quick start |
-| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Forward-only working doc: Status, v2.1 gate, v2.2 leg, shipped baseline; historical gates → [ROADMAP_HISTORY](docs/archive/ROADMAP_HISTORY.md) |
+| `roadmap` | [ROADMAP.md](ROADMAP.md) | Everyone | Status, v2.2 shipped, public launch gate; historical gates → [ROADMAP_HISTORY](docs/archive/ROADMAP_HISTORY.md) |
 | `assets` | [docs/assets/README.md](docs/assets/README.md) | Marketing / OG | OG source (`Corporate_Ladder_og.png`) vs Playwright marketing shots |
 | `license` | [LICENSE](LICENSE) | Legal / GitHub | Proprietary — all rights reserved |
 | `deploy-status` | [docs/DEPLOY_STATUS.md](docs/DEPLOY_STATUS.md) | Release | Manual deploy progress tracker |
@@ -105,6 +109,12 @@ Use this table to pick the right skill, rules, and documents.
 | `ff-metrics-2026-06-04` | [docs/FF_METRICS_2026-06-04.md](docs/FF_METRICS_2026-06-04.md) | Product | F&F data snapshot (Phase 0 gate) |
 | `ff-metrics-2026-06-10` | [docs/FF_METRICS_2026-06-10.md](docs/FF_METRICS_2026-06-10.md) | Product | Pre-review metrics template (fill Jun 10) |
 | `20260608-analize` | [docs/20260608_analize.md](docs/20260608_analize.md) | Product | Supabase deep analysis + insights (2026-06-08) |
+| `ff-metrics-2026-06-11` | [docs/FF_METRICS_2026-06-11.md](docs/FF_METRICS_2026-06-11.md) | Product | F&F snapshot post v2.2.0 T+0 baseline |
+| `ff-metrics-2026-06-12` | [docs/FF_METRICS_2026-06-12.md](docs/FF_METRICS_2026-06-12.md) | Product | F&F snapshot post Jun 11 signup wave (28 users / 888 runs) |
+| `20260612-analize` | [docs/20260612_analize.md](docs/20260612_analize.md) | Product | Supabase deep analysis + insights (2026-06-12) |
+| `ff-cohort-outreach-2026-06-12` | [docs/FF_COHORT_OUTREACH_2026-06-12.md](docs/FF_COHORT_OUTREACH_2026-06-12.md) | Product / ops | Jun 11 warm cohort DM tracker + message template |
+| `ff-metrics-2026-06-18` | [docs/FF_METRICS_2026-06-18.md](docs/FF_METRICS_2026-06-18.md) | Product | T+7 metrics ceremony template (~Jun 18) |
+| `20260618-analize` | [docs/20260618_analize.md](docs/20260618_analize.md) | Product | T+7 analysis template (~Jun 18) |
 | `ff-deploy-checklist` | [docs/FF_DEPLOY_CHECKLIST.md](docs/FF_DEPLOY_CHECKLIST.md) | Deploy | Combined v1.9 + v2.0 deploy; tags deferred to Jun 14 GO |
 | `ff-review-2026-06-14` | [docs/FF_REVIEW_2026-06-14.md](docs/FF_REVIEW_2026-06-14.md) | Product | Soft launch GO plan + Jun 14 decision (F&F only; no public marketing) |
 | `ff-execution` | [docs/FF_EXECUTION.md](docs/FF_EXECUTION.md) | Product / deploy | F&F gate runbook: deploy smoke, QA sign-off, dogfood, monitor, review |
@@ -171,6 +181,9 @@ Main session handles game/API/copy work inline using skills and rules above.
 |-------|------|--------------|
 | `telegram-initdata-auth` | [.cursor/skills/telegram-initdata-auth/SKILL.md](.cursor/skills/telegram-initdata-auth/SKILL.md) | Telegram login, initData HMAC, `/auth/me` failures |
 | `score-pipeline` | [.cursor/skills/score-pipeline/SKILL.md](.cursor/skills/score-pipeline/SKILL.md) | Score submission, leaderboard, `game_runs` schema |
+| `share-virality` | [.cursor/skills/share-virality/SKILL.md](.cursor/skills/share-virality/SKILL.md) | Native share, `POST /share/prepare`, challenge deep links |
+| `retention-ux` | [.cursor/skills/retention-ux/SKILL.md](.cursor/skills/retention-ux/SKILL.md) | First-run tutorial, home trim, context slot, onboarding |
+| `ff-metrics-release` | [.cursor/skills/ff-metrics-release/SKILL.md](.cursor/skills/ff-metrics-release/SKILL.md) | F&F metrics, release cut, GO/NO-GO gates |
 | `mini-app-deploy` | [.cursor/skills/mini-app-deploy/SKILL.md](.cursor/skills/mini-app-deploy/SKILL.md) | Production setup, env vars, first launch |
 | `changelog-maintainer` | [.cursor/skills/changelog-maintainer/SKILL.md](.cursor/skills/changelog-maintainer/SKILL.md) | Changelog updates, weekly cyclic review, release cut |
 | `debug-triage` | [.cursor/skills/debug-triage/SKILL.md](.cursor/skills/debug-triage/SKILL.md) | Gameplay “feels broken”, layout shift, prod vs repo, postmortems |
@@ -200,7 +213,7 @@ Main session handles game/API/copy work inline using skills and rules above.
 ├── apps/mini-app/          # Vite + TS → Vercel
 │   └── src/
 │       ├── game/           # Engine, constants, audio (no DOM)
-│       ├── lib/            # telegram.ts, api.ts, branding.ts, effects.ts
+│       ├── lib/            # telegram.ts, api.ts, analytics.ts, revive.ts, pending-submit.ts, branding.ts, effects.ts
 │       ├── app.ts          # UI controller
 │       ├── template.ts     # HTML shell
 │       └── style.css       # Design tokens and utilities
@@ -224,5 +237,12 @@ Update **DOCS_INDEX.md** when you add or rename:
 - `.cursor/agents/` or `.cursor/skills/` entries
 - Deploy scripts or env vars that affect operators
 - Scope doc ([docs/mvp-scope.md](docs/mvp-scope.md)) full refresh — review registry and task router
+
+**On every tagged release**, also sync:
+1. [ROADMAP.md](ROADMAP.md) Status + Shipped baseline
+2. [.cursor/rules/project-context.mdc](.cursor/rules/project-context.mdc) + [AGENTS.md](AGENTS.md) + [.cursor/rules/deployment.mdc](.cursor/rules/deployment.mdc) + [mini-app-deploy SKILL](.cursor/skills/mini-app-deploy/SKILL.md)
+3. [.cursor/agents/verifier.md](.cursor/agents/verifier.md) Release slice section
+4. Affected skills (score-pipeline, revive, share-virality, retention-ux, deploy)
+5. [CHANGELOG.md](CHANGELOG.md) `[Unreleased]` entry for doc-only changes
 
 Then add a bullet under [CHANGELOG.md](CHANGELOG.md) → `[Unreleased]`.

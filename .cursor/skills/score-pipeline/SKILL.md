@@ -18,6 +18,7 @@ Game Over (engine.ts)
   → upsert user + insert game_runs + submit_cooldowns
   → update best_score if improved
 Leaderboard:
+  → submitRun completes first (Unreleased: daily LB fetch after submit, not parallel)
   → GET /leaderboard?period=daily|weekly
   → POST /leaderboard/me { sessionToken, period } for self-row highlight
 ```
@@ -39,7 +40,12 @@ Leaderboard:
 
 - `years_survived`: 0–100 (lower cap on Synergy Sprint days)
 - `rungs_climbed` ≈ `years_survived * 4` (±1 tolerance)
-- `final_rank` consistent with years (v1.8.2): Intern < 10y, Manager 10–<35y, CEO ≥ 35y — else 400
+- `final_rank` consistent with years (v2.1.0 contiguous bands) — else 400:
+  - Intern: `[0, 10)`
+  - Manager: `[10, 20)`
+  - Director: `[20, 35)`
+  - CEO: `[35, ∞)`
+- **Deploy rule:** ship API with mini-app when rank bands change — old API rejects Director submits
 - `sprint_mode`: must match UTC daily preset (`synergy_sprint` on sprint days only) — v2.0
 - Plausibility cap: session duration vs rungs/years — `_plausibility.py` (not full replay)
 - Rate limit: 1 submit per 10s per telegram_id via Supabase `submit_cooldowns` (migration 002); in-memory fallback in tests/dev
@@ -80,6 +86,7 @@ Career high on home must not bump until submit succeeds:
 | API route | `packages/api/app/routes/runs.py`, `routes/_cooldowns.py`, `routes/_plausibility.py` |
 | DB schema | `supabase/migrations/001_initial_schema.sql`, `002_v2_hardening.sql` |
 | Leaderboard | `packages/api/app/routes/leaderboard.py` |
+| Share prepare | `packages/api/app/routes/share.py` (see [share-virality](../share-virality/SKILL.md)) |
 
 ## Debugging
 

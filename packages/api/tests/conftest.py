@@ -72,7 +72,20 @@ def mock_supabase(monkeypatch):
                         ms.execute = execute
                         return ms
 
+                    def limit(_n):
+                        lim = MagicMock()
+
+                        def execute():
+                            if field == "telegram_id":
+                                user = users_store.get(value)
+                                return MagicMock(data=[user] if user else [])
+                            return MagicMock(data=[])
+
+                        lim.execute = execute
+                        return lim
+
                     eq_chain.maybe_single = maybe_single
+                    eq_chain.limit = limit
                     return eq_chain
 
                 sel.eq = eq
@@ -189,7 +202,26 @@ def mock_supabase(monkeypatch):
                         ms.execute = execute
                         return ms
 
+                    def limit(_n):
+                        lim = MagicMock()
+
+                        def execute():
+                            if field == "telegram_id" and value in cooldowns:
+                                return MagicMock(
+                                    data=[
+                                        {
+                                            "telegram_id": value,
+                                            "last_submit_at": cooldowns[value],
+                                        }
+                                    ]
+                                )
+                            return MagicMock(data=[])
+
+                        lim.execute = execute
+                        return lim
+
                     eq_chain.maybe_single = maybe_single
+                    eq_chain.limit = limit
                     return eq_chain
 
                 sel.eq = eq
@@ -260,6 +292,17 @@ def mock_supabase(monkeypatch):
                         ms.execute = execute
                         return ms
 
+                    def limit(_n):
+                        lim = MagicMock()
+
+                        def execute():
+                            if field == "token" and value in sessions:
+                                return MagicMock(data=[sessions[value]])
+                            return MagicMock(data=[])
+
+                        lim.execute = execute
+                        return lim
+
                     def execute():
                         if field == "telegram_id":
                             rows = [v for v in sessions.values() if v.get("telegram_id") == value]
@@ -269,6 +312,7 @@ def mock_supabase(monkeypatch):
                         return MagicMock(data=[])
 
                     eq_chain.maybe_single = maybe_single
+                    eq_chain.limit = limit
                     eq_chain.execute = execute
                     return eq_chain
 
@@ -318,6 +362,7 @@ def mock_supabase(monkeypatch):
 
     db.table = table
     db.sessions_store = sessions
+    db.cooldowns_store = cooldowns
 
     def get_supabase():
         return db

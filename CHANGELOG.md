@@ -10,6 +10,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- **Agent docs P4** — debug-triage Step 0 buckets (share crash, Android black screen, analytics block, LB stale, 429 spam); DESIGN_SYSTEM v2.1/v2.2 header sync; ff-metrics-release T+7 + gate #8 ceremony; DOCS_INDEX cohort outreach task router row
+- **Soft-launch ops docs** — v2.2.1 release cut in ROADMAP Status mirrors; DEBUG_ENV_TRIAGE prod/local bundle hashes; FF_METRICS_2026-06-18 T+7 template; DEVICE_QA share/429 validation procedures
+
+### Planned (v1.1)
+- All-time / Legends tab
+- Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)
+- Server-side replay validation (full anti-cheat)
+
+## [2.2.1] - 2026-06-12
+
+Post–v2.2.0 patch — home UX, share prepare, API hardening, agent docs.
+
+### Added
 - **`POST /share/prepare`** — authenticated share prep for native Telegram `shareMessage` (Bot API 8.0+)
 - **[docs/prelaunch_audit2.md](docs/prelaunch_audit2.md)** — pre-launch product audit #2 (CONDITIONAL GO 62/100); integrated with ROADMAP § UX audit and PUBLIC_LAUNCH_REVIEW gates
 - **Home context slot** — news ticker, daily shift, and challenge banner now share one rotating slot (`#homeContextSlot`, 6s crossfade); challenge pins until dismissed; daily shift shown statically under reduced motion and capture modes — trims home above-the-fold density per 2026 front-page audit
@@ -17,19 +30,18 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Hero idle sway** — briefcase hero icon gets a subtle idle micro-animation (`home-hero-idle`); disabled for reduced motion and OG capture
 
 ### Changed
+- **Agent docs** — synced Cursor rules, skills, and verifier with v2.2.0 + post-train fixes (P0–P3 doc refresh); debug-triage P4 buckets; DESIGN_SYSTEM v2.1/v2.2 header
 - **First-run tutorial (glow only)** — scripted rungs 1–3 use safe-side button glow + wrong-tap HR memo only; removed overlay card and duplicate hints (`#imminentHint`, HUD tap hint, start memo) until rung 4
-- **Short-viewport home trim** — gameplay preview collapses by default on viewports ≤620px (not just after first run) so the Punch In CTA bar fits 320×568 without scrolling; "How to Survive — show mechanics" toggle unchanged
+- **Home mechanics preview** — `#homeGameplayPreview` collapses by default on viewports ≤620px only (320×568 CTA fit); returning players on taller screens see the full Avoid/Climb card without toggling
 
 ### Fixed
+- **API submit cooldown persistence** — `submit_cooldowns` and `api_sessions` reads use `limit(1)` instead of `maybe_single()` (avoids PGRST116 on empty rows that forced in-memory-only rate limits in production); cooldown write failures log a warning before in-memory fallback
+- **Score submit payload** — mini-app coerces `rungs_climbed` to integer and guards `final_rank` before `POST /runs` (reduces 422 validation failures on rapid retry)
+- **Employee Badge rank label** — "Current rank" on home derives from career-high years (`rankFromYears`) so it matches `#homeMilestoneLabel` when profile `best_rank` is stale (e.g. Director years with legacy Manager row)
 - **Native Telegram share** — `POST /share/prepare` calls Bot API `savePreparedInlineMessage`; mini-app opens `WebApp.shareMessage(preparedMessageId)` with `shareMessageSent`/`Failed` handling; clipboard fallback on prepare failure, unsupported client, or user decline (fixes v2.2.0 invalid `shareMessage({ text })` crash in groups)
 - **Phone landscape / orientation** — portrait gate on squashed landscape viewports; shell height uses `min-height: 100dvh` for Android rotation; resize/orientation handlers refresh home trim and in-run ladder layout
 - **Android Telegram black screen** — on `colorScheme: dark`, keep `.cl-viewport` and WebApp background light so fixed slate shell copy stays readable; guard TON analytics init so a SDK failure cannot block mount
 - **Daily leaderboard stale after game over** — fetch leaderboard after score submit (not in parallel), so gap line, self-row highlight, and Leaderboard tab reflect the run HR just filed
-
-### Planned (v1.1)
-- All-time / Legends tab
-- Product analytics dashboard / custom event pipeline (not TON Builders SDK or Vercel page views)
-- Server-side replay validation (full anti-cheat)
 
 ## [2.2.0] - 2026-06-11
 
@@ -471,7 +483,11 @@ Initial monorepo scaffold — MVP v1 foundation.
 ### Security
 - Bot token and Supabase service role key restricted to Railway API; never exposed in frontend
 
-[Unreleased]: https://github.com/DITreneris/ladder/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/DITreneris/ladder/compare/v2.2.1...HEAD
+[2.2.1]: https://github.com/DITreneris/ladder/compare/v2.2.0...v2.2.1
+[2.2.0]: https://github.com/DITreneris/ladder/compare/v2.1.1...v2.2.0
+[2.1.1]: https://github.com/DITreneris/ladder/compare/v2.1.0...v2.1.1
+[2.1.0]: https://github.com/DITreneris/ladder/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/DITreneris/ladder/compare/v1.9.0...v2.0.0
 [1.9.0]: https://github.com/DITreneris/ladder/compare/v1.8.5...v1.9.0
 [1.8.4]: compare/v1.8.3...v1.8.4

@@ -5,7 +5,7 @@ description: Deploy Corporate Ladder to Vercel, Railway, Supabase, and BotFather
 
 # Mini App Deploy Checklist
 
-**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — soft launch; `v1.9.0` + `v2.0.0` tagged; **Vercel OG redeploy** after `npm run adopt:og`; [FF_EXECUTION](../../docs/FF_EXECUTION.md).
+**Human checklist:** [DEPLOY.md](../../DEPLOY.md). **Current gate:** [ROADMAP.md](../../ROADMAP.md) Status + [docs/DEPLOY_STATUS.md](../../docs/DEPLOY_STATUS.md) — **v2.2.1 code complete** (2026-06-12); deploy Railway API → Vercel mini-app; public launch gated — [PUBLIC_LAUNCH_REVIEW_2026-06-28](../../docs/PUBLIC_LAUNCH_REVIEW_2026-06-28.md); DEVICE_QA v2.0 + share rows 11–12; [FF_EXECUTION](../../docs/FF_EXECUTION.md).
 
 ## Prerequisites
 
@@ -85,7 +85,10 @@ CI parity ([.github/workflows/ci.yml](../../.github/workflows/ci.yml)): API `pyt
 - [ ] Mini App loads inside Telegram
 - [ ] Complete a run, score appears on Daily leaderboard; self-row via session token
 - [ ] Weekly tab loads
-- [ ] Share button works (native or clipboard fallback)
+- [ ] Share: `POST /share/prepare` → native `WebApp.shareMessage(preparedMessageId)` in private + group chat; clipboard fallback on failure
+- [ ] Challenge deep link `startapp=c_*` opens `#challengeBanner` on home
+- [ ] Director rank submit succeeds (API + mini-app deployed together)
+- [ ] Revive on prod with `VITE_ADSGRAM_BLOCK_ID` when enabled
 - [ ] v2.0: triage prompt at Manager+; background tab energy pause
 - [ ] v1.9: near-miss wince; Synergy Sprint on sprint days; no home BGM
 - [ ] v1.8.5: center corridor; scripted tutorial; gate/plant obstacles

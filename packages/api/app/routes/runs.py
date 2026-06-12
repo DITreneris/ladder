@@ -1,7 +1,10 @@
+import logging
 import time
 from collections import defaultdict
 
 from fastapi import APIRouter, HTTPException
+
+logger = logging.getLogger(__name__)
 
 from app.auth.telegram import TelegramAuthError, validate_init_data
 from app.config import settings
@@ -50,7 +53,12 @@ def _check_rate_limit(telegram_id: int) -> None:
         check_submit_cooldown(telegram_id)
     except HTTPException:
         raise
-    except Exception:
+    except Exception as exc:
+        logger.warning(
+            "submit_cooldown check failed telegram_id=%s: %s — using in-memory fallback",
+            telegram_id,
+            exc,
+        )
         now = time.time()
         if now - _submit_timestamps[telegram_id] < SUBMIT_COOLDOWN_SECONDS:
             raise HTTPException(status_code=429, detail="Too many submissions") from None
@@ -59,7 +67,12 @@ def _check_rate_limit(telegram_id: int) -> None:
 def _record_rate_limit(telegram_id: int) -> None:
     try:
         record_submit_cooldown(telegram_id)
-    except Exception:
+    except Exception as exc:
+        logger.warning(
+            "submit_cooldown persist failed telegram_id=%s: %s — using in-memory fallback",
+            telegram_id,
+            exc,
+        )
         _submit_timestamps[telegram_id] = time.time()
 
 
