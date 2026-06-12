@@ -82,34 +82,45 @@ def submit_run(body: RunSubmitRequest):
     telegram_id = tg_user["id"]
     auth_date = int(tg_user.get("auth_date", time.time()))
 
-    _check_rate_limit(telegram_id)
+    try:
+        _check_rate_limit(telegram_id)
 
-    expected_rungs = body.years_survived * 4
-    if abs(body.rungs_climbed - expected_rungs) > 1:
-        raise HTTPException(status_code=400, detail="Score inconsistent with rungs climbed")
+        expected_rungs = body.years_survived * 4
+        if abs(body.rungs_climbed - expected_rungs) > 1:
+            raise HTTPException(status_code=400, detail="Score inconsistent with rungs climbed")
 
-    _validate_rank_years(body.final_rank, body.years_survived)
-    validate_score_plausibility(body, auth_date)
+        _validate_rank_years(body.final_rank, body.years_survived)
+        validate_score_plausibility(body, auth_date)
 
-    user = upsert_user(tg_user)
-    user_id = user["id"]
+        user = upsert_user(tg_user)
+        user_id = user["id"]
 
-    db = get_supabase()
-    db.table("game_runs").insert(
-        {
-            "user_id": user_id,
-            "years_survived": body.years_survived,
-            "final_rank": body.final_rank,
-            "termination_cause": body.termination_cause,
-            "rungs_climbed": body.rungs_climbed,
-        }
-    ).execute()
+        db = get_supabase()
+        db.table("game_runs").insert(
+            {
+                "user_id": user_id,
+                "years_survived": body.years_survived,
+                "final_rank": body.final_rank,
+                "termination_cause": body.termination_cause,
+                "rungs_climbed": body.rungs_climbed,
+            }
+        ).execute()
 
-    if body.years_survived > float(user.get("best_score", 0)):
-        db.table("users").update(
-            {"best_score": body.years_survived, "best_rank": body.final_rank}
-        ).eq("id", user_id).execute()
+        if body.years_survived > float(user.get("best_score", 0)):
+            db.table("users").update(
+                {"best_score": body.years_survived, "best_rank": body.final_rank}
+            ).eq("id", user_id).execute()
 
-    _record_rate_limit(telegram_id)
+        _record_rate_limit(telegram_id)
 
-    return {"ok": True, "years_survived": body.years_survived}
+        return {"ok": True, "years_survived": body.years_survived}
+    except HTTPException as exc:
+        logger.warning(
+            "submit_run rejected telegram_id=%s status=%s detail=%s years=%s rank=%s",
+            telegram_id,
+            exc.status_code,
+            exc.detail,
+            body.years_survived,
+            body.final_rank,
+        )
+        raise

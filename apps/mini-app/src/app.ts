@@ -1102,10 +1102,12 @@ function updateReviveOffer(result: GameOverResult, lbResult?: LeaderboardResult)
 async function flushPendingSubmit(): Promise<SubmitRunResult | null> {
   if (!pendingSubmitDeferred || !pendingSubmitResult) return null;
   const result = pendingSubmitResult;
-  pendingSubmitDeferred = false;
-  pendingSubmitResult = null;
   const initData = getInitData();
   const { submitResult } = await runPostGameOverIo(result, initData);
+  if (submitResult?.ok) {
+    pendingSubmitDeferred = false;
+    pendingSubmitResult = null;
+  }
   showSubmitResultToast(submitResult);
   return submitResult;
 }
@@ -1402,12 +1404,15 @@ async function onGameOver(result: GameOverResult): Promise<void> {
     awaitingReviveRunSubmit = false;
     postGameIo = runPostGameOverIo(result, initData);
   } else if (initData && isReviveEligibleBase(result)) {
-    pendingSubmitDeferred = true;
     pendingSubmitResult = result;
-    postGameIo = fetchLeaderboard(leaderboardPeriod, getSessionToken()).then((lbResult) => ({
-      submitResult: null,
-      lbResult,
-    }));
+    postGameIo = runPostGameOverIo(result, initData).then(({ submitResult, lbResult }) => {
+      if (submitResult && !submitResult.ok) {
+        pendingSubmitDeferred = true;
+      } else {
+        pendingSubmitDeferred = false;
+      }
+      return { submitResult, lbResult };
+    });
   } else {
     postGameIo = runPostGameOverIo(result, initData);
   }
@@ -1424,12 +1429,12 @@ async function onGameOver(result: GameOverResult): Promise<void> {
       triggerDeathCauseHold($("terminationCauseRow"));
       void postGameIo.then(({ submitResult, lbResult }) => {
         applyLeaderboardGap(result, lbResult);
-        if (pendingSubmitDeferred) {
+        const reviveEligible = isReviveEligibleBase(result);
+        if (reviveEligible) {
           updateReviveOffer(result, lbResult);
-          const ctx = buildReviveContext(result, lbResult);
-          if (!shouldOfferRevive(result, ctx)) {
-            void flushPendingSubmit();
-          }
+        }
+        if (pendingSubmitDeferred && !shouldOfferRevive(result, buildReviveContext(result, lbResult))) {
+          void flushPendingSubmit();
         } else {
           showSubmitResultToast(submitResult);
         }

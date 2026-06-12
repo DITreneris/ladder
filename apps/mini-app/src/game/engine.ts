@@ -611,7 +611,7 @@ export class GameEngine {
 
     const result: GameOverResult = {
       yearsSurvived,
-      finalRank: this.currentRank,
+      finalRank: rankFromYears(yearsSurvived),
       rungsClimbed: this.score,
       terminationCause: cause,
       terminationDetail: detail,

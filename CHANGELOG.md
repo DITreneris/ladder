@@ -9,8 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Changed
-- **Share copy hook trim** — native + clipboard share body shortened to 3-line Variant A hook (`{rank} · {years}y — {death}.` / challenge CTA / URL); one death line only; Prompt Anatomy co-brand on inline card description only (not message body)
+### Fixed
+- **Revive score defer removed** — scores ≥3y with revive eligible now submit immediately (then show HR Training offer); fixes high scores visible on game over but missing from daily LB
+- **Score submit 429 retry** — mini-app waits out the 10s API cooldown and retries once when `POST /runs` returns rate limit (fixes lost high scores on rapid Re-apply, e.g. Kristupas power-user pattern)
+- **Score submit rank band** — `final_rank` derived from `rankFromYears(yearsSurvived)` at submit and game over (v2.1 Director bands); prevents Manager label @ 25–30y validation rejects
+- **Revive deferred flush** — pending score kept if flush submit fails (429/network) so Re-apply/Home can retry
 
 ### Added
 - **Agent docs P4** — debug-triage Step 0 buckets (share crash, Android black screen, analytics block, LB stale, 429 spam); DESIGN_SYSTEM v2.1/v2.2 header sync; ff-metrics-release T+7 + gate #8 ceremony; DOCS_INDEX cohort outreach task router row

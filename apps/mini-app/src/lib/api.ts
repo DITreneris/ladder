@@ -1,5 +1,10 @@
+import { rankFromYears } from "../game/constants";
+
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 export const API_TIMEOUT_MS = 8000;
+/** Matches API SUBMIT_COOLDOWN_SECONDS + 1s buffer for 429 retry. */
+export const SUBMIT_COOLDOWN_RETRY_MS = 11_000;
+export const SUBMIT_MAX_ATTEMPTS = 2;
 
 export interface UserProfile {
   telegram_id: number;
@@ -81,7 +86,9 @@ async function fetchWithTimeout(
 async function apiPost<T>(
   path: string,
   body: unknown
-): Promise<{ ok: true; data: T } | { ok: false; reason: ApiFailureReason }> {
+): Promise<
+  { ok: true; data: T } | { ok: false; reason: ApiFailureReason; status?: number; detail?: string }
+> {
   try {
     const res = await fetchWithTimeout(`${API_URL}${path}`, {
       method: "POST",
@@ -89,7 +96,14 @@ async function apiPost<T>(
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      return { ok: false, reason: statusToReason(res.status) };
+      let detail: string | undefined;
+      try {
+        const errBody = (await res.json()) as { detail?: unknown };
+        detail = typeof errBody.detail === "string" ? errBody.detail : JSON.stringify(errBody.detail);
+      } catch {
+        detail = undefined;
+      }
+      return { ok: false, reason: statusToReason(res.status), status: res.status, detail };
     }
     return { ok: true, data: (await res.json()) as T };
   } catch {
@@ -106,7 +120,12 @@ export async function fetchProfile(initData: string): Promise<ProfileResult> {
   return { ok: true, profile: result.data, sessionToken: token };
 }
 
-const SUBMIT_RANKS = ["Intern", "Manager", "Director", "CEO"] as const;
+
+function sleepMs(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
 export async function submitRun(
   initData: string,
@@ -119,19 +138,30 @@ export async function submitRun(
   }
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
-  const finalRank = SUBMIT_RANKS.includes(payload.finalRank as (typeof SUBMIT_RANKS)[number])
-    ? payload.finalRank
-    : "Intern";
-  const result = await apiPost<{ ok: boolean }>("/runs", {
+  const rungsClimbed = Math.max(0, Math.round(payload.rungsClimbed));
+  const yearsSurvived = Number(payload.yearsSurvived);
+  const finalRank = rankFromYears(yearsSurvived);
+  const body = {
     initData,
-    years_survived: Number(payload.yearsSurvived),
+    years_survived: yearsSurvived,
     final_rank: finalRank,
     termination_cause: payload.terminationCause ?? "",
-    rungs_climbed: Math.max(0, Math.round(payload.rungsClimbed)),
+    rungs_climbed: rungsClimbed,
     sprint_mode: Boolean(payload.sprintMode),
-  });
-  if (!result.ok) return result;
-  return { ok: true };
+  };
+
+  let lastResult: { ok: true; data: { ok: boolean } } | { ok: false; reason: ApiFailureReason; status?: number; detail?: string } | null =
+    null;
+  for (let attempt = 1; attempt <= SUBMIT_MAX_ATTEMPTS; attempt++) {
+    lastResult = await apiPost<{ ok: boolean }>("/runs", body);
+    if (lastResult.ok) return { ok: true };
+    if (lastResult.reason === "rate_limit" && attempt < SUBMIT_MAX_ATTEMPTS) {
+      await sleepMs(SUBMIT_COOLDOWN_RETRY_MS);
+      continue;
+    }
+    break;
+  }
+  return lastResult ?? { ok: false, reason: "server" };
 }
 
 async function fetchLeaderboardMe(
