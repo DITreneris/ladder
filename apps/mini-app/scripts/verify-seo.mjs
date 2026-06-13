@@ -14,6 +14,10 @@ const BOT_HANDLE = "CorporateLadder_bot";
 const CANON_DESCRIPTION =
   `Corporate Ladder is a satirical office climb in Telegram. Dodge meetings, survive the org chart. Tap left or right each rung. Play free via @${BOT_HANDLE}.`;
 const CANON_URL = "https://www.promptanatomy.lol/";
+const BLOG_STACK_URL =
+  "https://www.promptanatomy.blog/articles/how-to-build-a-telegram-game-stack/";
+const BLOG_SOFT_LAUNCH_URL =
+  "https://www.promptanatomy.blog/articles/corporate-ladder-soft-launch/";
 
 function fail(message) {
   console.error(`FAIL: ${message}`);
@@ -78,6 +82,15 @@ if (!llms.includes(BOT_URL)) {
 if (!llms.includes(`@${BOT_HANDLE}`)) {
   fail("llms.txt must reference canonical bot handle");
 }
+if (!llms.includes(BLOG_STACK_URL)) {
+  fail("llms.txt must link to blog Telegram Game Stack article (GEO canonical)");
+}
+if (!llms.includes(BLOG_SOFT_LAUNCH_URL)) {
+  fail("llms.txt must link to blog Corporate Ladder Soft Launch article");
+}
+if (!llms.includes("2026-06-15")) {
+  fail("llms.txt must state soft-launch date for AI citation accuracy");
+}
 ok("llms.txt");
 
 const indexHtml = readRequired("index.html");
@@ -95,6 +108,12 @@ if (!indexHtml.includes(BOT_URL)) {
 }
 if (!indexHtml.includes("PlayAction")) {
   fail("index.html JSON-LD must include PlayAction entry point");
+}
+if (!indexHtml.includes("subjectOf")) {
+  fail("index.html JSON-LD must include subjectOf blog articles for GEO");
+}
+if (!indexHtml.includes(BLOG_STACK_URL)) {
+  fail("index.html JSON-LD must reference blog stack article URL");
 }
 if (!indexHtml.includes("<noscript>")) {
   fail("index.html must include noscript fallback");
