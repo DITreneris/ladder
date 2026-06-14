@@ -289,6 +289,29 @@ def test_runs_rejects_impossible_tap_rate(mock_supabase, valid_init_data):
     assert "minimum run duration" in detail or "run duration plausibility" in detail
 
 
+def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
+    """120ms tap floor allows ~8.3 rungs/s — must not reject a paced Manager run."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    rungs = 72  # 18.0y Manager
+    elapsed = max(1, int(rungs * 0.12))
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 18.0,
+            "final_rank": "Manager",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": rungs,
+            "run_started_at": now - elapsed,
+            "run_ended_at": now,
+        },
+    )
+    assert response.status_code == 200
+
+
 def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
     mock_supabase.cooldowns_store.clear()
     auth_date = int(time.time()) - 3600

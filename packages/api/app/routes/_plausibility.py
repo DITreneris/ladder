@@ -9,10 +9,11 @@ from app.models import RunSubmitRequest
 from app.ranks import MAX_YEARS_NORMAL
 
 MAX_YEARS_SPRINT = 25.0
-MAX_RUNGS_PER_SECOND = 2.5
+MIN_TAP_INTERVAL_S = 0.12
+# Match mini-app MIN_TAP_INTERVAL_MS (120) — one climb per tap, ~8.33 rungs/s max.
+MAX_RUNGS_PER_SECOND = 1.0 / MIN_TAP_INTERVAL_S
 SPRINT_SESSION_CAP_SECONDS = 60
 MAX_RUN_DURATION_SECONDS = 600
-MIN_TAP_INTERVAL_S = 0.12
 MIN_TAP_TOLERANCE = 0.85
 CLOCK_SKEW_TOLERANCE_S = 30
 
@@ -42,7 +43,9 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
     else:
         run_elapsed = min(run_elapsed, MAX_RUN_DURATION_SECONDS)
 
-    max_rungs = int(run_elapsed * MAX_RUNGS_PER_SECOND) + 2
+    # +1s bucket: client sends unix seconds (floor start, ceil end); fast legal
+    # runs can pack ~8.3 rungs/s into a single second boundary.
+    max_rungs = int((run_elapsed + 1) * MAX_RUNGS_PER_SECOND) + 2
     if body.rungs_climbed > max_rungs:
         raise HTTPException(
             status_code=400,

@@ -165,18 +165,6 @@ export async function submitRun(
   const yearsSurvived = Number(payload.yearsSurvived);
   if (!Number.isFinite(yearsSurvived)) return { ok: false, reason: "validation" };
   const finalRank = rankFromYears(yearsSurvived);
-  const runEndedAt = payload.runEndedAt ?? Date.now();
-  const body = {
-    initData,
-    years_survived: yearsSurvived,
-    final_rank: finalRank,
-    termination_cause: payload.terminationCause ?? "",
-    rungs_climbed: rungsClimbed,
-    sprint_mode: Boolean(payload.sprintMode),
-    run_started_at: Math.floor(payload.runStartedAt / 1000),
-    run_ended_at: Math.floor(runEndedAt / 1000),
-  };
-
   const previousBest = callbacks?.previousBestScore ?? 0;
   let immediateRetryUsed = false;
 
@@ -186,6 +174,17 @@ export async function submitRun(
     | null = null;
 
   for (let attempt = 1; attempt <= SUBMIT_MAX_ATTEMPTS; attempt++) {
+    const runEndedAt = payload.runEndedAt ?? Date.now();
+    const body = {
+      initData,
+      years_survived: yearsSurvived,
+      final_rank: finalRank,
+      termination_cause: payload.terminationCause ?? "",
+      rungs_climbed: rungsClimbed,
+      sprint_mode: Boolean(payload.sprintMode),
+      run_started_at: Math.floor(payload.runStartedAt / 1000),
+      run_ended_at: Math.ceil(runEndedAt / 1000),
+    };
     lastResult = await apiPost<{ ok: boolean; best_score: number; best_rank: string }>("/runs", body);
     if (lastResult.ok) {
       return {

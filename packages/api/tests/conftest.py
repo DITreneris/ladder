@@ -29,7 +29,8 @@ def run_timestamps_for_rungs(rungs: int, auth_date: int | None = None) -> tuple[
     """Build plausible run_started_at/run_ended_at (unix seconds) for test payloads."""
     now = int(time.time())
     min_elapsed = max(1, int(rungs * 0.12 * 0.85))
-    run_elapsed = max(min_elapsed, int(rungs / 2.5) + 1)
+    max_rungs_per_second = 1.0 / 0.12
+    run_elapsed = max(min_elapsed, int(rungs / max_rungs_per_second) + 1)
     run_ended_at = now
     run_started_at = run_ended_at - run_elapsed
     if auth_date is not None and run_started_at < auth_date:
