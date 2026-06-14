@@ -312,6 +312,28 @@ def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
     assert response.status_code == 200
 
 
+def test_runs_accepts_rungs_at_tight_second_boundary(mock_supabase, valid_init_data):
+    """72 rungs in an 8s unix-second window must pass (worst-case second quantization)."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    rungs = 72
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 18.0,
+            "final_rank": "Manager",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": rungs,
+            "run_started_at": now - 8,
+            "run_ended_at": now,
+        },
+    )
+    assert response.status_code == 200
+
+
 def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
     mock_supabase.cooldowns_store.clear()
     auth_date = int(time.time()) - 3600

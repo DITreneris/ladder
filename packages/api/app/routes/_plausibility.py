@@ -43,9 +43,9 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
     else:
         run_elapsed = min(run_elapsed, MAX_RUN_DURATION_SECONDS)
 
-    # +1s bucket: client sends unix seconds (floor start, ceil end); fast legal
-    # runs can pack ~8.3 rungs/s into a single second boundary.
-    max_rungs = int((run_elapsed + 1) * MAX_RUNGS_PER_SECOND) + 2
+    # +2s bucket: client sends unix seconds (floor start, ceil end); up to ~2s of
+    # real play can collapse into one integer second boundary at fast tap rates.
+    max_rungs = int((run_elapsed + 2) * MAX_RUNGS_PER_SECOND) + 2
     if body.rungs_climbed > max_rungs:
         raise HTTPException(
             status_code=400,
