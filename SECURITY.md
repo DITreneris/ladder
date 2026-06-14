@@ -24,6 +24,10 @@ Dependabot is configured in [.github/dependabot.yml](.github/dependabot.yml) for
 
 Remove overrides when `npm audit --audit-level=high` passes without them.
 
+### pip-audit (API)
+
+`fastapi==0.115.6` pins `starlette<0.47.0`, which has open advisories fixed only in `starlette>=0.47.2`. CI ignores those IDs until a post-launch FastAPI bump (see dependabot ignore rules). `python-dotenv` is pinned at `1.2.2`.
+
 ## Score integrity
 
 `POST /runs` requires `run_started_at` and `run_ended_at` (unix seconds). Plausibility checks use run duration and minimum tap-interval floor — not Telegram session idle time alone.
