@@ -19,6 +19,7 @@ const baseResult: GameOverResult = {
   terminationDetail: "detail",
   terminationFlavor: "flavor",
   deathType: "meeting",
+  runStartedAt: Date.now() - 60_000,
 };
 
 describe("shouldOfferRevive", () => {

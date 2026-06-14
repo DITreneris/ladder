@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from app.auth.telegram import TelegramAuthError, validate_init_data
 from app.config import settings
+from app.middleware.rate_limit import limiter
 from app.models import SharePrepareRequest, SharePrepareResponse
 from app.share_copy import build_inline_article, build_share_text
 from app.telegram.bot_api import BotApiError, save_prepared_inline_message
@@ -17,7 +18,8 @@ def _get_user_from_init(init_data: str) -> dict:
 
 
 @router.post("/prepare", response_model=SharePrepareResponse)
-def prepare_share(body: SharePrepareRequest):
+@limiter.limit("10/minute")
+def prepare_share(request: Request, body: SharePrepareRequest):
     tg_user = _get_user_from_init(body.init_data)
     share_text = build_share_text(tg_user, body)
     inline_result = build_inline_article(share_text, body, tg_user)

@@ -17,7 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements-dev.txt
+      - run: pip-audit -r requirements.txt
       - run: python -m pytest
 
   bot:
@@ -30,13 +31,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
-      - run: python -c "import main"
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest
 
   mini-app:
     runs-on: ubuntu-latest
     env:
-      VITE_API_URL: https://ladder-production-642d.up.railway.app
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'https://ladder-production-642d.up.railway.app' }}
     defaults:
       run:
         working-directory: apps/mini-app
@@ -54,6 +55,7 @@ jobs:
             echo "VITE_API_URL must be set for CI build"
             exit 1
           fi
+      - run: npm audit --audit-level=high
       - run: npm run lint
       - run: npm test
       - run: npm run build

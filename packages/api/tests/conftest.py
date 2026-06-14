@@ -25,6 +25,43 @@ def build_init_data(user: dict, bot_token: str = BOT_TOKEN, auth_date: int | Non
     return f"auth_date={ts}&user={user_json}&hash={hash_val}"
 
 
+def run_timestamps_for_rungs(rungs: int, auth_date: int | None = None) -> tuple[int, int]:
+    """Build plausible run_started_at/run_ended_at (unix seconds) for test payloads."""
+    now = int(time.time())
+    min_elapsed = max(1, int(rungs * 0.12 * 0.85))
+    run_elapsed = max(min_elapsed, int(rungs / 2.5) + 1)
+    run_ended_at = now
+    run_started_at = run_ended_at - run_elapsed
+    if auth_date is not None and run_started_at < auth_date:
+        run_started_at = auth_date
+        run_ended_at = max(run_started_at + min_elapsed, run_ended_at)
+    return run_started_at, run_ended_at
+
+
+def runs_payload(
+    init_data: str,
+    *,
+    years_survived: float,
+    final_rank: str,
+    rungs_climbed: int,
+    auth_date: int | None = None,
+    **extra,
+) -> dict:
+    """Standard /runs JSON body with plausible run timestamps."""
+    if auth_date is None:
+        auth_date = int(time.time()) - 120
+    started, ended = run_timestamps_for_rungs(rungs_climbed, auth_date=auth_date)
+    return {
+        "initData": init_data,
+        "years_survived": years_survived,
+        "final_rank": final_rank,
+        "rungs_climbed": rungs_climbed,
+        "run_started_at": started,
+        "run_ended_at": ended,
+        **extra,
+    }
+
+
 @pytest.fixture(autouse=True)
 def configure_test_settings(monkeypatch):
     monkeypatch.setattr(settings, "telegram_bot_token", BOT_TOKEN)
@@ -42,6 +79,15 @@ def standard_daily_preset(monkeypatch):
 @pytest.fixture
 def valid_init_data() -> str:
     return build_init_data(TEST_USER, auth_date=int(time.time()) - 120)
+
+
+@pytest.fixture(autouse=True)
+def clear_leaderboard_cache():
+    from app.routes import leaderboard as lb_module
+
+    lb_module._lb_cache.clear()
+    yield
+    lb_module._lb_cache.clear()
 
 
 @pytest.fixture
@@ -417,6 +463,7 @@ def mock_supabase(monkeypatch):
     monkeypatch.setattr("app.routes.leaderboard.get_supabase", get_supabase)
     monkeypatch.setattr("app.auth.session.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes._cooldowns.get_supabase", get_supabase)
+    monkeypatch.setattr("app.main.get_supabase", get_supabase)
     monkeypatch.setattr("app.db.supabase._client", None)
 
     return db

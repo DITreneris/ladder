@@ -1,16 +1,29 @@
+import time
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.routes import runs as runs_module
-from tests.conftest import TEST_USER, build_init_data
+from tests.conftest import TEST_USER, build_init_data, run_timestamps_for_rungs, runs_payload
 
 client = TestClient(app)
 
 
-def test_health():
+def test_health(mock_supabase):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "ok", "db": "ok"}
+
+
+def test_health_db_unavailable_returns_503(monkeypatch):
+    def _raise_db():
+        raise RuntimeError("db down")
+
+    monkeypatch.setattr("app.main.get_supabase", _raise_db)
+    monkeypatch.setattr("app.db.supabase._client", None)
+    response = client.get("/health")
+    assert response.status_code == 503
+    assert response.json()["db"] == "unavailable"
 
 
 def test_leaderboard_daily(mock_supabase):
@@ -48,41 +61,41 @@ def test_auth_me_invalid_hash():
 def test_runs_valid(mock_supabase, valid_init_data):
     response = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "termination_cause": "Meeting collision",
-            "rungs_climbed": 20,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            termination_cause="Meeting collision",
+        ),
     )
     assert response.status_code == 200
     assert response.json() == {"ok": True, "years_survived": 5}
 
 
 def test_runs_rung_mismatch(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     response = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "rungs_climbed": 99,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=99,
+        ),
     )
     assert response.status_code == 400
     assert "inconsistent" in response.json()["detail"].lower()
 
 
 def test_runs_rate_limit(mock_supabase, valid_init_data):
-    payload = {
-        "initData": valid_init_data,
-        "years_survived": 3,
-        "final_rank": "Intern",
-        "rungs_climbed": 12,
-    }
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
+    payload = runs_payload(
+        valid_init_data,
+        years_survived=3,
+        final_rank="Intern",
+        rungs_climbed=12,
+    )
     first = client.post("/runs", json=payload)
     assert first.status_code == 200
     second = client.post("/runs", json=payload)
@@ -90,7 +103,7 @@ def test_runs_rate_limit(mock_supabase, valid_init_data):
 
 
 def test_runs_invalid_init_data():
-    runs_module._submit_timestamps.clear()
+    started, ended = run_timestamps_for_rungs(4)
     response = client.post(
         "/runs",
         json={
@@ -98,113 +111,123 @@ def test_runs_invalid_init_data():
             "years_survived": 1,
             "final_rank": "Intern",
             "rungs_climbed": 4,
+            "run_started_at": started,
+            "run_ended_at": ended,
         },
     )
     assert response.status_code == 401
 
 
 def test_runs_invalid_final_rank(mock_supabase, valid_init_data):
-    """Unknown client rank is normalized from years (no 422)."""
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     response = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 25,
-            "final_rank": "VP",
-            "rungs_climbed": 100,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=25,
+            final_rank="VP",
+            rungs_climbed=100,
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_rate_limit_allows_higher_score(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     low = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 3,
-            "final_rank": "Intern",
-            "rungs_climbed": 12,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=3,
+            final_rank="Intern",
+            rungs_climbed=12,
+            auth_date=auth_date,
+        ),
     )
     high = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 25,
-            "final_rank": "Manager",
-            "rungs_climbed": 100,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=25,
+            final_rank="Manager",
+            rungs_climbed=100,
+            auth_date=auth_date,
+        ),
     )
     assert low.status_code == 200
     assert high.status_code == 200
 
 
 def test_runs_validation_error_does_not_rate_limit(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     bad = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "rungs_climbed": 99,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=99,
+        ),
     )
     assert bad.status_code == 400
     good = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "termination_cause": "Meeting collision",
-            "rungs_climbed": 20,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            termination_cause="Meeting collision",
+        ),
     )
     assert good.status_code == 200
 
 
 def test_runs_rejects_implausible_score(mock_supabase, valid_init_data, monkeypatch):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 26,
-            "final_rank": "Manager",
-            "rungs_climbed": 104,
-            "sprint_mode": True,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=26,
+            final_rank="Manager",
+            rungs_climbed=104,
+            auth_date=auth_date,
+            sprint_mode=True,
+        ),
     )
     assert response.status_code == 400
     assert "plausible" in response.json()["detail"].lower()
 
 
 def test_runs_accepts_board_member_run(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 3600
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 58.5,
-            "final_rank": "Board Member",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 234,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=58.5,
+            final_rank="Board Member",
+            rungs_climbed=234,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
-def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+def test_runs_rejects_idle_auth_date_forge(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 3600
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
     response = client.post(
         "/runs",
         json={
@@ -213,14 +236,77 @@ def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
             "final_rank": "Angel Investor",
             "termination_cause": "Reorganization",
             "rungs_climbed": 400,
+            "run_started_at": now - 10,
+            "run_ended_at": now,
         },
+    )
+    assert response.status_code == 400
+    detail = response.json()["detail"].lower()
+    assert "minimum run duration" in detail or "run duration plausibility" in detail
+
+
+def test_runs_rejects_run_started_before_auth_date(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 60
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 5,
+            "final_rank": "Intern",
+            "rungs_climbed": 20,
+            "run_started_at": auth_date - 120,
+            "run_ended_at": int(time.time()),
+        },
+    )
+    assert response.status_code == 400
+    assert "session open" in response.json()["detail"].lower()
+
+
+def test_runs_rejects_impossible_tap_rate(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 50,
+            "final_rank": "Board Member",
+            "rungs_climbed": 200,
+            "run_started_at": now - 5,
+            "run_ended_at": now,
+        },
+    )
+    assert response.status_code == 400
+    detail = response.json()["detail"].lower()
+    assert "minimum run duration" in detail or "run duration plausibility" in detail
+
+
+def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 3600
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    response = client.post(
+        "/runs",
+        json=runs_payload(
+            init_data,
+            years_survived=99.9,
+            final_rank="Angel Investor",
+            rungs_climbed=400,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_rank_band_boundaries(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 3600
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     cases = [
         (49.9, "CEO", 200),
         (50.0, "Board Member", 200),
@@ -228,132 +314,142 @@ def test_rank_band_boundaries(mock_supabase, valid_init_data):
         (75.0, "Angel Investor", 300),
     ]
     for years, rank, rungs in cases:
-        runs_module._submit_timestamps.clear()
+        mock_supabase.cooldowns_store.clear()
         response = client.post(
             "/runs",
-            json={
-                "initData": init_data,
-                "years_survived": years,
-                "final_rank": rank,
-                "termination_cause": "Reorganization",
-                "rungs_climbed": rungs,
-            },
+            json=runs_payload(
+                init_data,
+                years_survived=years,
+                final_rank=rank,
+                rungs_climbed=rungs,
+                auth_date=auth_date,
+                termination_cause="Reorganization",
+            ),
         )
         assert response.status_code == 200, (years, rank, response.json())
 
 
 def test_runs_normalizes_board_member_from_years(mock_supabase, valid_init_data):
-    """50y+ runs normalize to Board Member even when client sends CEO."""
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 3600
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 58.5,
-            "final_rank": "CEO",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 234,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=58.5,
+            final_rank="CEO",
+            rungs_climbed=234,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_accepts_legitimate_manager_run(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 15,
-            "final_rank": "Manager",
-            "termination_cause": "Meeting collision",
-            "rungs_climbed": 60,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=15,
+            final_rank="Manager",
+            rungs_climbed=60,
+            auth_date=auth_date,
+            termination_cause="Meeting collision",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_normalizes_stale_manager_rank(mock_supabase, valid_init_data):
-    """Stale client rank is rewritten from years before validation."""
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 25,
-            "final_rank": "Manager",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 100,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=25,
+            final_rank="Manager",
+            rungs_climbed=100,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_accepts_legitimate_director_run(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 25,
-            "final_rank": "Director",
-            "termination_cause": "Deadline Crash",
-            "rungs_climbed": 100,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=25,
+            final_rank="Director",
+            rungs_climbed=100,
+            auth_date=auth_date,
+            termination_cause="Deadline Crash",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_normalizes_stale_director_rank(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 15,
-            "final_rank": "Director",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 60,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=15,
+            final_rank="Director",
+            rungs_climbed=60,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_runs_normalizes_ceo_band_from_years(mock_supabase, valid_init_data):
-    """35y+ runs are stored as CEO even when client sends Director."""
-    runs_module._submit_timestamps.clear()
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 240)
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 240
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 36,
-            "final_rank": "Director",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 144,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=36,
+            final_rank="Director",
+            rungs_climbed=144,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+        ),
     )
     assert response.status_code == 200
 
 
 def test_leaderboard_me_highlights_user(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     auth = client.post("/auth/me", json={"initData": valid_init_data})
     token = auth.json()["session_token"]
     client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "termination_cause": "Meeting collision",
-            "rungs_climbed": 20,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            termination_cause="Meeting collision",
+        ),
     )
     lb = client.get("/leaderboard?period=daily")
     assert all(not e["is_current_user"] for e in lb.json()["entries"])
@@ -374,55 +470,72 @@ def test_leaderboard_me_invalid_token(mock_supabase):
 
 
 def test_runs_sprint_mode_required_on_sprint_day(mock_supabase, valid_init_data, monkeypatch):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
     response = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "rungs_climbed": 20,
-            "sprint_mode": False,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            sprint_mode=False,
+        ),
     )
     assert response.status_code == 400
     assert "sprint_mode required" in response.json()["detail"].lower()
 
 
 def test_runs_sprint_mode_rejected_on_non_sprint_day(mock_supabase, valid_init_data, monkeypatch):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "standard")
     response = client.post(
         "/runs",
-        json={
-            "initData": valid_init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "rungs_climbed": 20,
-            "sprint_mode": True,
-        },
+        json=runs_payload(
+            valid_init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            sprint_mode=True,
+        ),
     )
     assert response.status_code == 400
     assert "sprint_mode invalid" in response.json()["detail"].lower()
 
 
 def test_runs_accepts_sprint_mode_on_sprint_day(mock_supabase, valid_init_data, monkeypatch):
-    runs_module._submit_timestamps.clear()
+    mock_supabase.cooldowns_store.clear()
     monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
-    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "termination_cause": "Sprint standdown",
-            "rungs_climbed": 20,
-            "sprint_mode": True,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            auth_date=auth_date,
+            termination_cause="Sprint standdown",
+            sprint_mode=True,
+        ),
     )
     assert response.status_code == 200
+
+
+def test_runs_cooldown_db_unavailable_returns_503(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    with patch("app.routes.runs.check_submit_cooldown", side_effect=RuntimeError("db down")):
+        response = client.post(
+            "/runs",
+            json=runs_payload(
+                valid_init_data,
+                years_survived=2,
+                final_rank="Intern",
+                rungs_climbed=8,
+            ),
+        )
+    assert response.status_code == 503
 
 
 def test_create_session_prunes_old_tokens(mock_supabase):
@@ -446,14 +559,13 @@ def test_first_row_helper():
 
 
 def test_runs_persists_submit_cooldown_row(mock_supabase, valid_init_data):
-    runs_module._submit_timestamps.clear()
     mock_supabase.cooldowns_store.clear()
-    payload = {
-        "initData": valid_init_data,
-        "years_survived": 2,
-        "final_rank": "Intern",
-        "rungs_climbed": 8,
-    }
+    payload = runs_payload(
+        valid_init_data,
+        years_survived=2,
+        final_rank="Intern",
+        rungs_climbed=8,
+    )
     response = client.post("/runs", json=payload)
     assert response.status_code == 200
     assert TEST_USER["id"] in mock_supabase.cooldowns_store

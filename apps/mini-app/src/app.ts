@@ -1310,6 +1310,7 @@ async function runPostGameOverIo(
       terminationCause: result.terminationCause,
       rungsClimbed: result.rungsClimbed,
       sprintMode: Boolean(activeDailyModifier.sprintDurationMs),
+      runStartedAt: result.runStartedAt,
     });
     if (submitResult.ok) {
       const profileResult = await fetchProfile(initData);

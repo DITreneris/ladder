@@ -1,6 +1,5 @@
 import logging
 import time
-from collections import defaultdict
 
 from fastapi import APIRouter, HTTPException
 
@@ -17,11 +16,6 @@ from app.routes._users import upsert_user
 
 router = APIRouter()
 
-# Legacy in-memory fallback when submit_cooldowns table unavailable (tests/dev)
-_submit_timestamps: dict[int, float] = defaultdict(float)
-_submit_last_years: dict[int, float] = defaultdict(float)
-SUBMIT_COOLDOWN_SECONDS = 10
-
 
 def _get_user_from_init(init_data: str) -> dict:
     try:
@@ -36,30 +30,25 @@ def _check_rate_limit(telegram_id: int, incoming_years: float | None = None) -> 
     except HTTPException:
         raise
     except Exception as exc:
-        logger.warning(
-            "submit_cooldown check failed telegram_id=%s: %s — using in-memory fallback",
+        logger.error(
+            "submit_cooldown check failed telegram_id=%s: %s",
             telegram_id,
             exc,
+            exc_info=exc,
         )
-        now = time.time()
-        if now - _submit_timestamps[telegram_id] < SUBMIT_COOLDOWN_SECONDS:
-            if incoming_years is not None and incoming_years > _submit_last_years[telegram_id]:
-                return
-            raise HTTPException(status_code=429, detail="Too many submissions") from None
+        raise HTTPException(status_code=503, detail="Submit temporarily unavailable") from exc
 
 
 def _record_rate_limit(telegram_id: int, years_survived: float | None = None) -> None:
     try:
         record_submit_cooldown(telegram_id)
     except Exception as exc:
-        logger.warning(
-            "submit_cooldown persist failed telegram_id=%s: %s — using in-memory fallback",
+        logger.error(
+            "submit_cooldown persist failed telegram_id=%s: %s",
             telegram_id,
             exc,
+            exc_info=exc,
         )
-        _submit_timestamps[telegram_id] = time.time()
-        if years_survived is not None:
-            _submit_last_years[telegram_id] = years_survived
 
 
 @router.post("")

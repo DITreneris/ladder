@@ -71,6 +71,7 @@ describe("GameEngine", () => {
 
     expect(onGameOver).toHaveBeenCalledTimes(1);
     expect(onGameOver.mock.calls[0]![0].deathType).toBe("meeting");
+    expect(onGameOver.mock.calls[0]![0].runStartedAt).toBeGreaterThan(0);
     expect(engine.isActive()).toBe(false);
   });
 
@@ -130,7 +131,7 @@ describe("GameEngine", () => {
   it("does not call onScoreUpdate after energy depletion game over", () => {
     const onScoreUpdate = vi.fn();
     const onGameOver = vi.fn();
-    const { engine } = createEngine({ onScoreUpdate, onGameOver });
+    const { engine } = createEngine({ onScoreUpdate, onGameOver }, getDailyModifierById("standard"));
 
     engine.start();
     tapWithCooldown(engine, "left");
@@ -618,7 +619,7 @@ describe("GameEngine", () => {
   it("restores energy death with refill", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.99);
     const onGameOver = vi.fn();
-    const { engine } = createEngine({ onGameOver });
+    const { engine } = createEngine({ onGameOver }, getDailyModifierById("standard"));
     engine.start();
     tapWithCooldown(engine, "left");
     vi.advanceTimersByTime(TICK_MS * 5000);

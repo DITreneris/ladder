@@ -53,6 +53,7 @@ describe("submitRun", () => {
       finalRank: "Manager",
       terminationCause: "test",
       rungsClimbed: 120,
+      runStartedAt: Date.now() - 60_000,
     });
 
     await vi.advanceTimersByTimeAsync(SUBMIT_COOLDOWN_RETRY_MS);
@@ -65,5 +66,7 @@ describe("submitRun", () => {
     const firstBody = JSON.parse(String(apiCall?.[1]?.body));
     expect(firstBody.final_rank).toBe("Director");
     expect(firstBody.years_survived).toBe(30);
+    expect(firstBody.run_started_at).toBeTypeOf("number");
+    expect(firstBody.run_ended_at).toBeTypeOf("number");
   });
 });

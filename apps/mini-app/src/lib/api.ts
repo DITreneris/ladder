@@ -135,6 +135,8 @@ export async function submitRun(
     terminationCause: string;
     rungsClimbed: number;
     sprintMode?: boolean;
+    runStartedAt: number;
+    runEndedAt?: number;
   }
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
@@ -142,6 +144,7 @@ export async function submitRun(
   const yearsSurvived = Number(payload.yearsSurvived);
   if (!Number.isFinite(yearsSurvived)) return { ok: false, reason: "validation" };
   const finalRank = rankFromYears(yearsSurvived);
+  const runEndedAt = payload.runEndedAt ?? Date.now();
   const body = {
     initData,
     years_survived: yearsSurvived,
@@ -149,6 +152,8 @@ export async function submitRun(
     termination_cause: payload.terminationCause ?? "",
     rungs_climbed: rungsClimbed,
     sprint_mode: Boolean(payload.sprintMode),
+    run_started_at: Math.floor(payload.runStartedAt / 1000),
+    run_ended_at: Math.floor(runEndedAt / 1000),
   };
 
   let lastResult: { ok: true; data: { ok: boolean } } | { ok: false; reason: ApiFailureReason; status?: number; detail?: string } | null =

@@ -27,6 +27,8 @@ class RunSubmitRequest(BaseModel):
     termination_cause: str | None = None
     rungs_climbed: int = Field(..., ge=0)
     sprint_mode: bool = False
+    run_started_at: int = Field(..., alias="runStartedAt", gt=0)
+    run_ended_at: int = Field(..., alias="runEndedAt", gt=0)
 
     model_config = {"populate_by_name": True}
 

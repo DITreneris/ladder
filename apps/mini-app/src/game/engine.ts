@@ -617,6 +617,7 @@ export class GameEngine {
       terminationDetail: detail,
       terminationFlavor: funnyQuote,
       deathType,
+      runStartedAt: this.runStartedAt,
     };
     this.callbacks.onGameOver(result);
   }

@@ -5,6 +5,7 @@ import logging
 import os
 from pathlib import Path
 
+from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, WebAppInfo
@@ -22,9 +23,9 @@ logger = logging.getLogger(__name__)
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 MINI_APP_URL = os.getenv("MINI_APP_URL", "http://localhost:5173")
-# Optional BotFather direct-link short name → https://t.me/bot/appname (groups/channels)
 MINI_APP_SHORT_NAME = os.getenv("MINI_APP_SHORT_NAME", "").strip()
 BOT_USERNAME = ""
+HEALTH_PORT = int(os.getenv("PORT", "8080"))
 
 GROUP_CHAT_TYPES = frozenset({"group", "supergroup"})
 
@@ -58,7 +59,6 @@ def build_help_text() -> str:
 
 
 def direct_mini_app_link(bot_username: str) -> str:
-    """Telegram allows web_app inline buttons only in private chats; groups need a t.me link."""
     user = bot_username.lstrip("@")
     if MINI_APP_SHORT_NAME:
         return f"https://t.me/{user}/{MINI_APP_SHORT_NAME}"
@@ -154,12 +154,28 @@ async def cmd_help(message: Message):
         await message.answer(build_help_text())
 
 
+async def health_handler(_request: web.Request) -> web.Response:
+    return web.json_response({"status": "ok"})
+
+
+async def start_health_server() -> web.AppRunner:
+    app = web.Application()
+    app.router.add_get("/health", health_handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", HEALTH_PORT)
+    await site.start()
+    logger.info("Health server listening on port %s", HEALTH_PORT)
+    return runner
+
+
 async def main():
     global BOT_USERNAME
     if not BOT_TOKEN:
         logger.error("TELEGRAM_BOT_TOKEN not set")
         return
 
+    health_runner = await start_health_server()
     bot = Bot(token=BOT_TOKEN)
     me = await bot.get_me()
     BOT_USERNAME = me.username or ""
@@ -175,7 +191,10 @@ async def main():
         me.id,
         MINI_APP_URL,
     )
-    await dp.start_polling(bot, drop_pending_updates=True)
+    try:
+        await dp.start_polling(bot, drop_pending_updates=True)
+    finally:
+        await health_runner.cleanup()
 
 
 if __name__ == "__main__":

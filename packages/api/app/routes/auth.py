@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from app.auth.session import create_session
 from app.auth.telegram import TelegramAuthError, validate_init_data
 from app.config import settings
+from app.middleware.rate_limit import limiter
 from app.models import InitDataRequest, UserProfile
 from app.routes._users import upsert_user
 
@@ -17,7 +18,8 @@ def _get_user_from_init(init_data: str) -> dict:
 
 
 @router.post("/me", response_model=UserProfile)
-def auth_me(body: InitDataRequest):
+@limiter.limit("20/minute")
+def auth_me(request: Request, body: InitDataRequest):
     tg_user = _get_user_from_init(body.init_data)
     user = upsert_user(tg_user)
     session_token = create_session(tg_user["id"])

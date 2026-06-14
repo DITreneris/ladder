@@ -59,11 +59,11 @@ apps/mini-app/public/og-cache/
 # === Local-only (not pushed to GitHub) ===
 docs/
 .cursor/
-/scripts/
+/scripts/*
+!scripts/smoke-ci.sh
 AGENTS.md
 DOCS_INDEX.md
 ROADMAP.md
-DEPLOY.md
 DESIGN_SYSTEM.md
 CHANGELOG.md
 apps/mini-app/design/

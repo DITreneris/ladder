@@ -18,6 +18,8 @@ export interface GameOverResult {
   terminationDetail: string;
   terminationFlavor: string;
   deathType: DeathType;
+  /** Unix ms when the player tapped to start the run (first tap). */
+  runStartedAt: number;
 }
 
 export interface ReviveSnapshot {
