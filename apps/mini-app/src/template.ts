@@ -77,6 +77,14 @@ export const APP_SHELL = `
           </div>
           <p id="beatGapLine" class="text-nano font-semibold text-slate-500 truncate hidden"></p>
         </div>
+        <div id="homeSecondaryNav" class="home-secondary-nav shrink-0 grid grid-cols-2 gap-2">
+          <button type="button" data-action="open-leaderboard" class="btn-cl-secondary py-2.5 px-3 text-xs min-h-[44px]">
+            ${icon("trophy", "text-amber-500")} Leaderboard
+          </button>
+          <button type="button" data-action="open-howtoplay" class="btn-cl-secondary py-2.5 px-3 text-xs min-h-[44px]">
+            ${icon("circle-question", "text-cl-primary")} How to Survive
+          </button>
+        </div>
         <div id="homeContextSlot" class="home-context-slot shrink-0">
           <div id="homeNewsTicker" class="home-context-item invisible ticker-bar">
             <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
@@ -96,36 +104,13 @@ export const APP_SHELL = `
             <button type="button" id="challengeBannerDismiss" data-action="dismiss-challenge" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
           </div>
         </div>
-        <div id="homeGameplayPreviewWrap" class="shrink-0 space-y-1">
-        <div id="homeGameplayPreview" class="card-light-sm shrink-0">
-          <span class="text-xl shrink-0" aria-hidden="true">🏃</span>
-          <div class="min-w-0 flex-1 space-y-1">
-            <p class="text-caption font-extrabold text-slate-800">Avoid</p>
-            <p class="text-caption text-slate-600">Meetings · Reorgs · Deadlines</p>
-            <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
-            <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y) → CEO (35y) → Board (50y) → Angel (75y).</p>
-          </div>
-        </div>
-        <button type="button" id="homePreviewToggle" data-action="toggle-home-preview" class="hidden text-micro font-bold text-cl-primary focus-ring rounded px-1 min-h-[44px]">
-          How to Survive — show mechanics
-        </button>
-        </div>
         <div id="homeBrandFooter" class="home-brand-footer shrink-0">
           ${BRAND_FOOTER}
         </div>
-        <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
+        <div class="start-cta-bar shrink-0 pb-4 pt-3 border-t border-slate-200">
           <button type="button" data-action="start-game" class="cl-primary-btn w-full py-4 px-6 text-lg">
             ${icon("play")}<span>PUNCH IN &amp; CLIMB</span>
           </button>
-          <p class="cl-telegram-cta-hint text-micro font-semibold text-slate-500 text-center">Punch In lives in Telegram&apos;s bar below.</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button type="button" data-action="open-leaderboard" class="btn-cl-secondary py-2 px-3 text-xs">
-              ${icon("trophy", "text-amber-500")} Leaderboard
-            </button>
-            <button type="button" data-action="open-howtoplay" class="btn-cl-secondary py-2 px-3 text-xs">
-              ${icon("circle-question", "text-cl-primary")} How to Survive
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -213,7 +198,10 @@ export const APP_SHELL = `
           ${icon("triangle-exclamation", "text-2xl")}
         </span>
         <h2 class="text-2xl font-black text-red-600 tracking-tight leading-none uppercase">Employment Terminated</h2>
-        <p class="text-micro text-slate-500 font-bold uppercase mt-1 tracking-wide">HR Exit Interview in Progress</p>
+        <p class="text-micro text-slate-500 font-bold uppercase mt-1 tracking-wide">Performance review complete</p>
+        <div id="syncStatusChip" class="sync-status-chip hidden mt-2 mx-auto max-w-xs" aria-live="polite">
+          <span id="syncStatusText" class="sync-status-chip-text"></span>
+        </div>
       </div>
       <div class="card-performance">
         <div class="absolute right-3 bottom-3 w-14 h-14 border-4 border-red-500/20 text-red-500/20 flex items-center justify-center rounded-full font-black text-[10px] leading-none -rotate-12 pointer-events-none select-none">REJECTED</div>
@@ -239,6 +227,13 @@ export const APP_SHELL = `
         </div>
         <p class="text-caption text-slate-600 font-semibold text-center px-2 mt-2" id="retryTip"></p>
         <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">Your synergy did not scale optimally with our paradigms.</p>
+        <div id="hrStampPad" class="hr-stamp-pad hidden mt-3">
+          <button type="button" id="hrStampBtn" class="hr-stamp-btn focus-ring" aria-label="Vent to HR — stamp paperwork">
+            <span class="hr-stamp-btn-label">Vent to HR</span>
+            <span class="hr-stamp-btn-sub">Stamps: <span id="hrStampCount">0</span></span>
+          </button>
+          <span id="hrStampPop" class="hr-stamp-pop hidden" aria-hidden="true"></span>
+        </div>
       </div>
       <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
         <button type="button" data-action="start-game" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">

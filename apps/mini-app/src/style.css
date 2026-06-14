@@ -366,8 +366,7 @@ html.cl-in-telegram .home-brand-footer .brand-attribution-link {
 }
 
 html.cl-in-telegram .start-cta-bar {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  display: none;
 }
 
 html.cl-in-telegram .text-nano {
@@ -417,14 +416,6 @@ html.cl-in-telegram .text-micro {
 
 .cl-in-telegram #startScreen .cl-primary-btn {
   display: none;
-}
-
-.cl-telegram-cta-hint {
-  display: none;
-}
-
-html.cl-in-telegram .cl-telegram-cta-hint {
-  display: block;
 }
 
 .game-hud {
@@ -544,14 +535,6 @@ html.cl-in-telegram .cl-telegram-cta-hint {
 
 .btn-tap-zone.safe-side-hint {
   animation: safe-side-hint 1.2s ease-in-out infinite;
-}
-
-#homeGameplayPreviewWrap.is-collapsed #homeGameplayPreview {
-  display: none;
-}
-
-#homeGameplayPreviewWrap.is-collapsed #homePreviewToggle {
-  display: block;
 }
 
 #toastNotification.toast-above-tap-deck {
@@ -1639,5 +1622,122 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   height: auto;
   border-radius: 1.25rem;
   background: #f1f5f9;
+}
+
+.sync-status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sync-status-chip--syncing {
+  background: rgb(241 245 249);
+  color: rgb(71 85 105);
+  border: 1px solid rgb(226 232 240);
+}
+
+.sync-status-chip--retrying {
+  background: rgb(255 251 235);
+  color: rgb(180 83 9);
+  border: 1px solid rgb(253 230 138);
+}
+
+.sync-status-chip--ok {
+  background: rgb(236 253 245);
+  color: rgb(4 120 87);
+  border: 1px solid rgb(167 243 208);
+}
+
+.sync-status-chip--failed {
+  background: rgb(254 242 242);
+  color: rgb(185 28 28);
+  border: 1px solid rgb(254 202 202);
+  cursor: pointer;
+}
+
+.hr-stamp-pad {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hr-stamp-btn {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px dashed rgb(203 213 225);
+  background: rgb(248 250 252);
+  text-align: center;
+}
+
+.hr-stamp-btn-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgb(51 65 85);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.hr-stamp-btn-sub {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgb(100 116 139);
+  margin-top: 0.15rem;
+}
+
+.hr-stamp-pop {
+  position: absolute;
+  top: -0.25rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.25rem;
+  border: 2px solid rgb(220 38 38);
+  color: rgb(220 38 38);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hr-stamp-pop--animate {
+  animation: hr-stamp-pop-in 0.35s ease-out forwards;
+}
+
+@keyframes hr-stamp-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(-12deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+.card-performance.shake-element {
+  animation: shake-finite 0.45s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hr-stamp-pop--animate {
+    animation: none;
+    opacity: 1;
+  }
 }
 

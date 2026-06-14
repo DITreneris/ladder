@@ -23,7 +23,7 @@ export const ROOKIE_TUTORIAL_RUNGS = 20;
 export const ROOKIE_INTERN_SPAWN_RATE_CAP = 0.3;
 export const TUTORIAL_COFFEE_MIN_RUNG = 8;
 export const COFFEE_SPAWN_THRESHOLD = 0.85;
-export const PROMO_DRAIN_PAUSE_MS = 2000;
+export const PROMO_DRAIN_PAUSE_MS = 800;
 export const MIN_TAP_INTERVAL_MS = 120;
 
 /** Corporate triage rung (v2.0) — Manager+ spawn-bias choice every N rungs. */

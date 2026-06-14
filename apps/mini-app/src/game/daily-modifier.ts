@@ -92,7 +92,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   synergy_sprint: {
     id: "synergy_sprint",
     label: "Synergy Sprint",
-    description: "60 seconds. Velocity is a feeling. Outcomes are quarterly. Timer − mercy. Score = years at buzzer.",
+    description: "60 seconds. Velocity is a feeling. Outcomes are quarterly. Leaderboard caps at 25y — HR audits velocity. Timer − mercy. Score = years at buzzer.",
     obstacleSpawnRate: 0.4,
     internObstacleSpawnRate: 0.26,
     coffeeSpawnThreshold: 0.8,

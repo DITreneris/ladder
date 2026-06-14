@@ -125,7 +125,7 @@ export function triggerDeathEmoji(deathType: DeathType, onComplete?: () => void)
     return;
   }
 
-  setTimeout(() => onComplete?.(), 350);
+  setTimeout(() => onComplete?.(), 150);
 }
 
 export function triggerRankPop(el: HTMLElement): void {

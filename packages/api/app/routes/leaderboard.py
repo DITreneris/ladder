@@ -63,7 +63,7 @@ def _fetch_best_by_user_rpc(since: datetime) -> dict[int, dict] | None:
     data = getattr(result, "data", None)
     rows = data if isinstance(data, list) else []
     if not rows:
-        return None
+        return {}
     return _rows_to_best_by_user(rows)
 
 

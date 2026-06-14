@@ -31,7 +31,7 @@ describe("hr-memo", () => {
     expect(scheduler.isShowing()).toBe(true);
     expect(scheduler.getQueueLength()).toBe(1);
 
-    vi.advanceTimersByTime(2500);
+    vi.advanceTimersByTime(1800);
     expect(shown).toEqual(["First", "Second"]);
 
     vi.advanceTimersByTime(1000);
@@ -61,5 +61,21 @@ describe("hr-memo", () => {
 
     vi.advanceTimersByTime(5000);
     expect(shown).toEqual(["First"]);
+  });
+
+  it("drops oldest non-promo when queue exceeds cap", () => {
+    const shown: string[] = [];
+    const scheduler = createHrMemoSchedulerForTests(
+      (entry) => {
+        shown.push(entry.text);
+      },
+      () => {}
+    );
+
+    scheduler.show("Info one", { variant: "info" });
+    scheduler.show("Info two", { variant: "info" });
+    scheduler.show("Info three", { variant: "info" });
+
+    expect(scheduler.getQueueLength()).toBeLessThanOrEqual(2);
   });
 });

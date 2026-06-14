@@ -70,7 +70,11 @@ def test_runs_valid(mock_supabase, valid_init_data):
         ),
     )
     assert response.status_code == 200
-    assert response.json() == {"ok": True, "years_survived": 5}
+    data = response.json()
+    assert data["ok"] is True
+    assert data["years_survived"] == 5
+    assert data["best_score"] == 5
+    assert data["best_rank"] == "Intern"
 
 
 def test_runs_rung_mismatch(mock_supabase, valid_init_data):
@@ -569,6 +573,65 @@ def test_runs_persists_submit_cooldown_row(mock_supabase, valid_init_data):
     response = client.post("/runs", json=payload)
     assert response.status_code == 200
     assert TEST_USER["id"] in mock_supabase.cooldowns_store
+
+
+def test_runs_cooldown_persist_failure_returns_503(mock_supabase, valid_init_data, monkeypatch):
+    mock_supabase.cooldowns_store.clear()
+    payload = runs_payload(
+        valid_init_data,
+        years_survived=3,
+        final_rank="Intern",
+        rungs_climbed=12,
+    )
+
+    def fail_record(_telegram_id: int) -> None:
+        raise RuntimeError("cooldown write failed")
+
+    monkeypatch.setattr("app.routes.runs.record_submit_cooldown", fail_record)
+    response = client.post("/runs", json=payload)
+    assert response.status_code == 503
+    assert len(mock_supabase.runs_store) == 0
+
+
+def test_runs_weaker_score_does_not_lower_best_score(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    high = runs_payload(
+        valid_init_data,
+        years_survived=20,
+        final_rank="Director",
+        rungs_climbed=80,
+    )
+    assert client.post("/runs", json=high).status_code == 200
+    mock_supabase.cooldowns_store.clear()
+
+    low = runs_payload(
+        valid_init_data,
+        years_survived=10,
+        final_rank="Manager",
+        rungs_climbed=40,
+    )
+    response = client.post("/runs", json=low)
+    assert response.status_code == 200
+    assert response.json()["best_score"] == 20
+
+
+def test_leaderboard_uses_rpc_path(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    mock_supabase.rpc_calls.clear()
+    payload = runs_payload(
+        valid_init_data,
+        years_survived=12,
+        final_rank="Manager",
+        rungs_climbed=48,
+    )
+    assert client.post("/runs", json=payload).status_code == 200
+
+    response = client.get("/leaderboard?period=daily")
+    assert response.status_code == 200
+    assert "leaderboard_best_runs" in mock_supabase.rpc_calls
+    entries = response.json()["entries"]
+    assert len(entries) == 1
+    assert entries[0]["years_survived"] == 12
 
 
 def test_runs_missing_fields_returns_422(mock_supabase):

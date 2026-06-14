@@ -62,6 +62,20 @@ def runs_payload(
     }
 
 
+from app.main import app
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limit_storage():
+    """Clear in-memory SlowAPI counters so TestClient IP doesn't exhaust /runs cap."""
+    storage = getattr(app.state.limiter, "_storage", None)
+    if storage is not None and hasattr(storage, "storage") and hasattr(storage.storage, "clear"):
+        storage.storage.clear()
+    yield
+    if storage is not None and hasattr(storage, "storage") and hasattr(storage.storage, "clear"):
+        storage.storage.clear()
+
+
 @pytest.fixture(autouse=True)
 def configure_test_settings(monkeypatch):
     monkeypatch.setattr(settings, "telegram_bot_token", BOT_TOKEN)
@@ -131,6 +145,12 @@ def mock_supabase(monkeypatch):
                             if field == "telegram_id":
                                 user = users_store.get(value)
                                 return MagicMock(data=[user] if user else [])
+                            if field == "id":
+                                user = next(
+                                    (u for u in users_store.values() if u.get("id") == value),
+                                    None,
+                                )
+                                return MagicMock(data=[user] if user else [])
                             return MagicMock(data=[])
 
                         lim.execute = execute
@@ -160,6 +180,24 @@ def mock_supabase(monkeypatch):
                 def eq(field, value):
                     eq_chain = MagicMock()
 
+                    def lt(field2, value2):
+                        lt_chain = MagicMock()
+
+                        def execute():
+                            for tg_id, row in users_store.items():
+                                if field == "id" and row.get("id") == value:
+                                    if field2 == "best_score" and float(row.get("best_score", 0)) >= value2:
+                                        continue
+                                    row.update(payload)
+                                if field == "telegram_id" and tg_id == value:
+                                    if field2 == "best_score" and float(row.get("best_score", 0)) >= value2:
+                                        continue
+                                    row.update(payload)
+                            return MagicMock(data=[])
+
+                        lt_chain.execute = execute
+                        return lt_chain
+
                     def execute():
                         for tg_id, row in users_store.items():
                             if field == "id" and row.get("id") == value:
@@ -168,6 +206,7 @@ def mock_supabase(monkeypatch):
                                 row.update(payload)
                         return MagicMock(data=[])
 
+                    eq_chain.lt = lt
                     eq_chain.execute = execute
                     return eq_chain
 
@@ -184,11 +223,29 @@ def mock_supabase(monkeypatch):
                 ins = MagicMock()
 
                 def execute():
-                    runs_store.append(payload)
-                    return MagicMock(data=[payload])
+                    row = {**payload, "id": f"run-{len(runs_store)}"}
+                    runs_store.append(row)
+                    return MagicMock(data=[row])
 
                 ins.execute = execute
                 return ins
+
+            def delete():
+                del_chain = MagicMock()
+
+                def eq(field, value):
+                    eq_chain = MagicMock()
+
+                    def execute():
+                        if field == "id":
+                            runs_store[:] = [r for r in runs_store if r.get("id") != value]
+                        return MagicMock(data=[])
+
+                    eq_chain.execute = execute
+                    return eq_chain
+
+                del_chain.eq = eq
+                return del_chain
 
             def select(*_args, **_kwargs):
                 sel = MagicMock()
@@ -271,6 +328,7 @@ def mock_supabase(monkeypatch):
 
             chain.insert = insert
             chain.select = select
+            chain.delete = delete
 
         elif name == "submit_cooldowns":
 
@@ -454,6 +512,44 @@ def mock_supabase(monkeypatch):
     db.table = table
     db.sessions_store = sessions
     db.cooldowns_store = cooldowns
+    db.runs_store = runs_store
+    db.users_store = users_store
+    db.rpc_calls: list[str] = []
+
+    def rpc(name: str, params: dict | None = None):
+        db.rpc_calls.append(name)
+        rpc_chain = MagicMock()
+
+        def execute():
+            if name == "leaderboard_best_runs":
+                rows: list[dict] = []
+                by_user: dict[int, dict] = {}
+                for run in runs_store:
+                    user_id = run.get("user_id")
+                    user_row = next(
+                        (u for u in users_store.values() if u.get("id") == user_id),
+                        None,
+                    )
+                    if not user_row:
+                        continue
+                    tg_id = user_row["telegram_id"]
+                    score = float(run["years_survived"])
+                    if tg_id not in by_user or score > by_user[tg_id]["years_survived"]:
+                        by_user[tg_id] = {
+                            "telegram_id": tg_id,
+                            "username": user_row.get("username") or user_row.get("first_name") or "Employee",
+                            "first_name": user_row.get("first_name"),
+                            "years_survived": score,
+                            "final_rank": run.get("final_rank", "Intern"),
+                        }
+                rows = list(by_user.values())
+                return MagicMock(data=rows)
+            return MagicMock(data=[])
+
+        rpc_chain.execute = execute
+        return rpc_chain
+
+    db.rpc = rpc
 
     def get_supabase():
         return db

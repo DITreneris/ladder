@@ -252,22 +252,25 @@ describe("GameEngine", () => {
     expect(internal.rungs[2].obstacle).toBe("left");
   });
 
-  it("pauses energy drain for 2s after promotion", () => {
+  it("pauses energy drain for 0.8s after promotion", () => {
     const { engine } = createEngine();
     engine.start();
     tapWithCooldown(engine, "left");
     tapWithCooldown(engine, "left");
     tapWithCooldown(engine, "left");
 
-    type EngineInternals = { score: number };
+    type EngineInternals = { score: number; drainPausedUntil: number };
     const internal = engine as unknown as EngineInternals;
-    internal.score = 40;
+    internal.score = 39;
     tapWithCooldown(engine, "left");
 
     const afterPromo = engine.getTimeLeft();
-    vi.advanceTimersByTime(1500);
+    const pauseRemaining = internal.drainPausedUntil - Date.now();
+    expect(pauseRemaining).toBeGreaterThan(0);
+
+    vi.advanceTimersByTime(Math.max(0, pauseRemaining - 50));
     expect(engine.getTimeLeft()).toBe(afterPromo);
-    vi.advanceTimersByTime(1500);
+    vi.advanceTimersByTime(200);
     expect(engine.getTimeLeft()).toBeLessThan(afterPromo);
   });
 
@@ -432,6 +435,20 @@ describe("GameEngine", () => {
     Object.defineProperty(document, "hidden", { configurable: true, value: false });
     document.dispatchEvent(new Event("visibilitychange"));
     expect(engine.getTimeLeft()).toBe(energyBefore);
+  });
+
+  it("ignores taps while document is hidden", () => {
+    if (typeof document === "undefined") return;
+    const { engine } = createEngine();
+    engine.start();
+    tapWithCooldown(engine, "left");
+    const scoreBefore = engine.getRungsClimbed();
+    Object.defineProperty(document, "hidden", { configurable: true, value: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+    tapWithCooldown(engine, "right");
+    expect(engine.getRungsClimbed()).toBe(scoreBefore);
+    Object.defineProperty(document, "hidden", { configurable: true, value: false });
+    document.dispatchEvent(new Event("visibilitychange"));
   });
 
   it("triggers triage prompt at Manager+ after interval rungs", () => {

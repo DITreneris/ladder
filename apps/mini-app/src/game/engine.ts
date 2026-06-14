@@ -498,6 +498,10 @@ export class GameEngine {
       debugTapResult(side, this.rungs[1], "inactive");
       return;
     }
+    if (this.documentHidden) {
+      debugTapResult(side, this.rungs[1], "inactive");
+      return;
+    }
 
     const now = Date.now();
     if (now - this.lastTapAt < MIN_TAP_INTERVAL_MS) {

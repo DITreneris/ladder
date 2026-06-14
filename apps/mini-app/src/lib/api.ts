@@ -44,12 +44,18 @@ export type ProfileResult =
   | { ok: false; reason: ApiFailureReason };
 
 export type SubmitRunResult =
-  | { ok: true }
-  | { ok: false; reason: ApiFailureReason };
+  | { ok: true; bestScore: number; bestRank: string }
+  | { ok: false; reason: ApiFailureReason; detail?: string };
 
 export type LeaderboardResult =
   | { ok: true; entries: LeaderboardEntry[] }
   | { ok: false; reason: ApiFailureReason };
+
+export interface SubmitRunCallbacks {
+  onRetry?: (attempt: number, waitMs: number, secondsRemaining: number) => void;
+  /** Local career high before this run — enables immediate 429 retry when beating PB. */
+  previousBestScore?: number;
+}
 
 let cachedSessionToken: string | null = null;
 
@@ -120,10 +126,24 @@ export async function fetchProfile(initData: string): Promise<ProfileResult> {
   return { ok: true, profile: result.data, sessionToken: token };
 }
 
-
-function sleepMs(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
+async function sleepMsWithCountdown(
+  ms: number,
+  onTick?: (secondsRemaining: number) => void
+): Promise<void> {
+  const started = Date.now();
+  const tick = (): void => {
+    const elapsed = Date.now() - started;
+    const remaining = Math.max(0, ms - elapsed);
+    const sec = Math.ceil(remaining / 1000);
+    onTick?.(sec);
+  };
+  tick();
+  const interval = setInterval(tick, 100);
+  await new Promise<void>((resolve) => {
+    setTimeout(() => {
+      clearInterval(interval);
+      resolve();
+    }, ms);
   });
 }
 
@@ -137,7 +157,8 @@ export async function submitRun(
     sprintMode?: boolean;
     runStartedAt: number;
     runEndedAt?: number;
-  }
+  },
+  callbacks?: SubmitRunCallbacks
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
   const rungsClimbed = Math.max(0, Math.round(payload.rungsClimbed));
@@ -156,19 +177,45 @@ export async function submitRun(
     run_ended_at: Math.floor(runEndedAt / 1000),
   };
 
-  let lastResult: { ok: true; data: { ok: boolean } } | { ok: false; reason: ApiFailureReason; status?: number; detail?: string } | null =
-    null;
+  const previousBest = callbacks?.previousBestScore ?? 0;
+  let immediateRetryUsed = false;
+
+  let lastResult:
+    | { ok: true; data: { ok: boolean; best_score: number; best_rank: string } }
+    | { ok: false; reason: ApiFailureReason; status?: number; detail?: string }
+    | null = null;
+
   for (let attempt = 1; attempt <= SUBMIT_MAX_ATTEMPTS; attempt++) {
-    lastResult = await apiPost<{ ok: boolean }>("/runs", body);
-    if (lastResult.ok) return { ok: true };
-    if (lastResult.reason === "rate_limit" && attempt < SUBMIT_MAX_ATTEMPTS) {
-      await sleepMs(SUBMIT_COOLDOWN_RETRY_MS);
+    lastResult = await apiPost<{ ok: boolean; best_score: number; best_rank: string }>("/runs", body);
+    if (lastResult.ok) {
+      return {
+        ok: true,
+        bestScore: lastResult.data.best_score,
+        bestRank: lastResult.data.best_rank,
+      };
+    }
+    const retriable =
+      (lastResult.reason === "rate_limit" || lastResult.reason === "server") &&
+      attempt < SUBMIT_MAX_ATTEMPTS;
+    if (retriable) {
+      if (lastResult.reason === "rate_limit") {
+        const canImmediateRetry =
+          !immediateRetryUsed && yearsSurvived > previousBest && previousBest >= 0;
+        if (canImmediateRetry) {
+          immediateRetryUsed = true;
+          continue;
+        }
+      }
+      callbacks?.onRetry?.(attempt, SUBMIT_COOLDOWN_RETRY_MS, Math.ceil(SUBMIT_COOLDOWN_RETRY_MS / 1000));
+      await sleepMsWithCountdown(SUBMIT_COOLDOWN_RETRY_MS, (sec) => {
+        callbacks?.onRetry?.(attempt, SUBMIT_COOLDOWN_RETRY_MS, sec);
+      });
       continue;
     }
     break;
   }
   if (lastResult && !lastResult.ok) {
-    return { ok: false, reason: lastResult.reason };
+    return { ok: false, reason: lastResult.reason, detail: lastResult.detail };
   }
   return { ok: false, reason: "server" };
 }
@@ -218,7 +265,7 @@ export async function prepareShare(payload: SharePreparePayload): Promise<Prepar
 
 export async function fetchLeaderboard(
   period: "daily" | "weekly",
-  sessionToken?: string | null
+  _sessionToken?: string | null
 ): Promise<LeaderboardResult> {
   try {
     const params = new URLSearchParams({ period, limit: "50" });
@@ -227,23 +274,31 @@ export async function fetchLeaderboard(
       return { ok: false, reason: statusToReason(res.status) };
     }
     const data = (await res.json()) as LeaderboardResponse;
-    const entries = [...data.entries];
-
-    const token = sessionToken ?? cachedSessionToken;
-    if (token) {
-      const me = await fetchLeaderboardMe(period, token);
-      if (me?.on_board && me.rank != null) {
-        for (const entry of entries) {
-          if (entry.rank === me.rank) {
-            entry.is_current_user = true;
-            break;
-          }
-        }
-      }
-    }
-
-    return { ok: true, entries };
+    return { ok: true, entries: [...data.entries] };
   } catch {
     return { ok: false, reason: "network" };
   }
+}
+
+export async function fetchLeaderboardWithMeHighlight(
+  period: "daily" | "weekly",
+  sessionToken?: string | null
+): Promise<LeaderboardResult> {
+  const result = await fetchLeaderboard(period);
+  if (!result.ok) return result;
+
+  const token = sessionToken ?? cachedSessionToken;
+  if (token) {
+    const me = await fetchLeaderboardMe(period, token);
+    if (me?.on_board && me.rank != null) {
+      for (const entry of result.entries) {
+        if (entry.rank === me.rank) {
+          entry.is_current_user = true;
+          break;
+        }
+      }
+    }
+  }
+
+  return result;
 }

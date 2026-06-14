@@ -30,7 +30,7 @@ import {
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
 import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
-import { fetchLeaderboard, fetchLeaderboardMe, fetchProfile, getSessionToken, prepareShare, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
+import { fetchLeaderboard, fetchLeaderboardWithMeHighlight, fetchLeaderboardMe, fetchProfile, getSessionToken, prepareShare, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/avatar";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
@@ -86,6 +86,9 @@ import {
   type ReviveContext,
 } from "./lib/revive";
 import { shouldFlushPendingSubmitOnLeave } from "./lib/pending-submit";
+import { bindSyncStatusRetry, resetSyncStatus, setSyncRetryHandler, setSyncStatus } from "./lib/sync-status";
+import { mountHrStamp, notifySyncEnded, notifySyncRetrying, notifySyncStarted, resetHrStamp } from "./lib/hr-stamp";
+import { shouldClearPendingOnRevive } from "./lib/submit-orchestrator";
 
 type Screen = "home" | "game" | "gameover" | "leaderboard" | "howtoplay";
 type LeaderboardPeriod = "daily" | "weekly";
@@ -114,7 +117,6 @@ let playerAtCorridor = true;
 let qaCoffeePickups = 0;
 let challengeTargetYears: number | null = null;
 let challengeBannerDismissed = false;
-let homePreviewExpanded = false;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -127,7 +129,11 @@ let lastFloorBand: FloorBand = "default";
 let marketingGameCapture = false;
 let pendingSubmitDeferred = false;
 let pendingSubmitResult: GameOverResult | null = null;
+let submitQueue: Promise<unknown> = Promise.resolve();
+let activeGameOverSubmit: Promise<SubmitRunResult | null> | null = null;
+let lastSubmitGameOverResult: GameOverResult | null = null;
 let awaitingReviveRunSubmit = false;
+let toastHideTimer: ReturnType<typeof setTimeout> | null = null;
 let reviveContinuedAt: number | null = null;
 
 const $ = (id: string) => document.getElementById(id)!;
@@ -313,35 +319,6 @@ function updateEnergyLabelVisibility(): void {
   label.classList.toggle("hidden", getReapplyCount() >= 5);
 }
 
-// Short Telegram viewports (e.g. 320x568) cannot fit the expanded preview plus the CTA bar.
-const SHORT_VIEWPORT_MAX_HEIGHT = 620;
-
-function isShortViewport(): boolean {
-  return window.innerHeight > 0 && window.innerHeight <= SHORT_VIEWPORT_MAX_HEIGHT;
-}
-
-function refreshHomePreviewCollapse(): void {
-  const wrap = $("homeGameplayPreviewWrap");
-  const toggle = $("homePreviewToggle");
-  const collapseByDefault = isShortViewport();
-  if (!collapseByDefault || homePreviewExpanded) {
-    wrap.classList.remove("is-collapsed");
-    toggle.classList.add("hidden");
-    if (collapseByDefault && homePreviewExpanded) {
-      toggle.textContent = "How to Survive — hide mechanics";
-    }
-    return;
-  }
-  wrap.classList.add("is-collapsed");
-  toggle.classList.remove("hidden");
-  toggle.textContent = "How to Survive — show mechanics";
-}
-
-function toggleHomeGameplayPreview(): void {
-  homePreviewExpanded = !homePreviewExpanded;
-  refreshHomePreviewCollapse();
-}
-
 function refreshChallengeBanner(): void {
   if (challengeTargetYears !== null) {
     $("challengeBannerText").textContent =
@@ -446,12 +423,14 @@ function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   toast.classList.toggle("toast-above-game-over-actions", aboveGameOverActions);
   $("toastText").textContent = msg;
   toast.style.opacity = "1";
-  setTimeout(() => {
+  if (toastHideTimer) clearTimeout(toastHideTimer);
+  toastHideTimer = setTimeout(() => {
     toast.style.opacity = "0";
+    toastHideTimer = null;
   }, 2500);
 }
 
-function submitFailureMessage(reason: ApiFailureReason): string {
+function submitFailureMessage(reason: ApiFailureReason, detail?: string): string {
   const bot = getBotUsername();
   if (reason === "auth") {
     return `HR couldn't verify your badge. Reopen from @${bot}.`;
@@ -460,6 +439,9 @@ function submitFailureMessage(reason: ApiFailureReason): string {
     return "Score filing cooldown — HR is retrying automatically.";
   }
   if (reason === "validation") {
+    if (detail?.includes("25 years")) {
+      return "Synergy Sprint caps at 25y on the leaderboard — HR rejected the over-velocity filing.";
+    }
     return "HR rejected the filing — score didn't pass audit. Local run counts.";
   }
   return "Score not filed with HR. Check connection.";
@@ -582,7 +564,6 @@ function refreshHomeBadgeUI(): void {
   $("homeMilestoneLabel").textContent = milestoneLabel(highScore);
   $("highScoreBadge").textContent = highScore.toFixed(1);
   refreshBeatGapLine();
-  refreshHomePreviewCollapse();
   refreshChallengeBanner();
 }
 
@@ -963,10 +944,21 @@ async function renderLeaderboard(): Promise<void> {
 
   const token = getSessionToken();
   const boardLabel = leaderboardPeriod === "weekly" ? "the last 7 days board" : "today's board";
-  const mePromise = token ? fetchLeaderboardMe(leaderboardPeriod, token) : Promise.resolve(null);
 
-  const result = await fetchLeaderboard(leaderboardPeriod, token);
-  const me = await mePromise;
+  const [result, me] = await Promise.all([
+    fetchLeaderboard(leaderboardPeriod),
+    token ? fetchLeaderboardMe(leaderboardPeriod, token) : Promise.resolve(null),
+  ]);
+
+  if (result.ok && me?.on_board && me.rank != null) {
+    for (const entry of result.entries) {
+      if (entry.rank === me.rank) {
+        entry.is_current_user = true;
+        break;
+      }
+    }
+  }
+
   list.innerHTML = "";
 
   if (!result.ok) {
@@ -1084,7 +1076,6 @@ function bindShellActions(): void {
       showToast("Avatar updated for your employee badge.");
     },
     "dismiss-challenge": dismissChallengeBanner,
-    "toggle-home-preview": toggleHomeGameplayPreview,
     "revive-ad": onReviveAdClick,
     "copy-share": copyShareText,
   };
@@ -1196,12 +1187,14 @@ async function flushPendingSubmit(): Promise<SubmitRunResult | null> {
   if (!pendingSubmitDeferred || !pendingSubmitResult) return null;
   const result = pendingSubmitResult;
   const initData = getInitData();
-  const { submitResult } = await runPostGameOverIo(result, initData);
+  const submitResult = await runSubmitOnly(result, initData);
   if (submitResult?.ok) {
     pendingSubmitDeferred = false;
     pendingSubmitResult = null;
   }
-  showSubmitResultToast(submitResult);
+  if (submitResult && !submitResult.ok) {
+    showSubmitResultToast(submitResult);
+  }
   return submitResult;
 }
 
@@ -1234,8 +1227,19 @@ async function onReviveAdClick(): Promise<void> {
 
   try {
     await showRewardedAd();
-    pendingSubmitDeferred = false;
-    pendingSubmitResult = null;
+
+    if (activeGameOverSubmit) {
+      await activeGameOverSubmit;
+    }
+    if (pendingSubmitDeferred && pendingSubmitResult) {
+      await flushPendingSubmit();
+    }
+
+    if (shouldClearPendingOnRevive(pendingSubmitDeferred)) {
+      pendingSubmitDeferred = false;
+      pendingSubmitResult = null;
+    }
+
     awaitingReviveRunSubmit = true;
     reviveContinuedAt = Date.now();
     engine.restoreFromRevive(snapshot);
@@ -1270,6 +1274,8 @@ async function startGame(): Promise<void> {
   if (pendingSubmitDeferred) {
     await flushPendingSubmit();
   }
+  resetSyncStatus();
+  resetHrStamp();
   awaitingReviveRunSubmit = false;
   reviveContinuedAt = null;
   hideReviveOffer();
@@ -1329,6 +1335,8 @@ async function goHome(): Promise<void> {
   if (pendingSubmitDeferred) {
     await flushPendingSubmit();
   }
+  resetSyncStatus();
+  resetHrStamp();
   awaitingReviveRunSubmit = false;
   reviveContinuedAt = null;
   hideReviveOffer();
@@ -1380,46 +1388,113 @@ function refreshCareerHighOnGameOver(): void {
 }
 
 function showSubmitResultToast(submitResult: SubmitRunResult | null): void {
-  if (!submitResult) return;
+  if (!submitResult || submitResult.ok) return;
   if (!$("gameOverScreen").classList.contains("hidden")) {
-    if (submitResult.ok) {
-      showToast("Score submitted to the boardroom!", { surface: "shell" });
-    } else {
-      showToast(submitFailureMessage(submitResult.reason), { surface: "shell" });
-    }
+    const detail = !submitResult.ok ? submitResult.detail : undefined;
+    showToast(submitFailureMessage(submitResult.reason, detail), { surface: "shell" });
   }
 }
 
-async function runPostGameOverIo(
-  result: GameOverResult,
-  initData: string
-): Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }> {
-  let submitResult: SubmitRunResult | null = null;
+async function executeSubmitOnly(result: GameOverResult, initData: string): Promise<SubmitRunResult | null> {
+  if (!initData) return null;
 
-  if (initData) {
-    showToast("Filing score with HR…", { surface: "shell" });
-    submitResult = await submitRun(initData, {
+  lastSubmitGameOverResult = result;
+  setSyncStatus("syncing");
+  notifySyncStarted();
+
+  const previousBest = highScore;
+  const submitResult = await submitRun(
+    initData,
+    {
       yearsSurvived: result.yearsSurvived,
       finalRank: result.finalRank,
       terminationCause: result.terminationCause,
       rungsClimbed: result.rungsClimbed,
       sprintMode: Boolean(activeDailyModifier.sprintDurationMs),
       runStartedAt: result.runStartedAt,
-    });
-    if (submitResult.ok) {
-      const profileResult = await fetchProfile(initData);
-      const profileBest = profileResult.ok ? profileResult.profile.best_score : undefined;
-      highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, profileBest);
-      bestRank = rankFromCareerHigh(highScore);
-      engine?.setCareerBestYears(highScore);
-      $("highScoreBadge").textContent = highScore.toFixed(1);
-      refreshHomeBadgeUI();
-      refreshCareerHighOnGameOver();
+    },
+    {
+      previousBestScore: previousBest,
+      onRetry: (_attempt, _waitMs, secondsRemaining) => {
+        setSyncStatus("retrying", secondsRemaining);
+        notifySyncRetrying();
+      },
+    }
+  );
+
+  notifySyncEnded();
+
+  if (submitResult.ok) {
+    pendingSubmitDeferred = false;
+    pendingSubmitResult = null;
+    highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, submitResult.bestScore);
+    bestRank = rankFromCareerHigh(highScore);
+    engine?.setCareerBestYears(highScore);
+    $("highScoreBadge").textContent = highScore.toFixed(1);
+    refreshHomeBadgeUI();
+    refreshCareerHighOnGameOver();
+    refreshOptimisticBestDelta(result, previousBest, false);
+    setSyncStatus("ok");
+  } else {
+    setSyncStatus("failed");
+    if (isReviveEligibleBase(result)) {
+      pendingSubmitDeferred = true;
+      pendingSubmitResult = result;
     }
   }
 
-  const lbResult = await fetchLeaderboard(leaderboardPeriod, getSessionToken());
-  return { submitResult, lbResult };
+  return submitResult;
+}
+
+async function runSubmitOnly(result: GameOverResult, initData: string): Promise<SubmitRunResult | null> {
+  if (!initData) return null;
+  const chained = submitQueue.then(() => executeSubmitOnly(result, initData));
+  submitQueue = chained.catch(() => undefined);
+  return chained;
+}
+
+function enrichGameOverAsync(result: GameOverResult, submitResult: SubmitRunResult | null): void {
+  void fetchLeaderboardWithMeHighlight(leaderboardPeriod, getSessionToken()).then((lbResult) => {
+    applyLeaderboardGap(result, lbResult);
+    if (isReviveEligibleBase(result)) {
+      updateReviveOffer(result, lbResult);
+    }
+    if (submitResult && !submitResult.ok && pendingSubmitDeferred) {
+      if (!shouldOfferRevive(result, buildReviveContext(result, lbResult.ok ? lbResult : undefined))) {
+        void flushPendingSubmit();
+      }
+    }
+  });
+}
+
+function refreshOptimisticBestDelta(
+  result: GameOverResult,
+  previousBest: number,
+  pendingStamp: boolean
+): void {
+  const deltaEl = $("statBestDelta");
+  if (result.yearsSurvived > previousBest) {
+    const delta = previousBest > 0 ? result.yearsSurvived - previousBest : result.yearsSurvived;
+    const suffix = pendingStamp ? " (pending HR stamp)" : "";
+    deltaEl.textContent =
+      previousBest > 0
+        ? `+${delta.toFixed(1)} Years (new record!)${suffix}`
+        : `New personal best!${suffix}`;
+    deltaEl.className = "text-nano font-bold text-emerald-600 mt-0.5";
+  }
+}
+
+function retryLastSubmit(): void {
+  if (!lastSubmitGameOverResult) return;
+  const initData = getInitData();
+  if (!initData) return;
+  void runSubmitOnly(lastSubmitGameOverResult, initData).then((submitResult) => {
+    if (submitResult?.ok) {
+      enrichGameOverAsync(lastSubmitGameOverResult!, submitResult);
+    } else if (submitResult && !submitResult.ok) {
+      showSubmitResultToast(submitResult);
+    }
+  });
 }
 
 function seedGameOverForQa(): void {
@@ -1492,11 +1567,10 @@ $("retryTip").textContent =
     $("careerHighLine").textContent = "";
   }
 
+  const initData = getInitData();
+
   if (result.yearsSurvived > previousBest) {
-    const delta = previousBest > 0 ? result.yearsSurvived - previousBest : result.yearsSurvived;
-    $("statBestDelta").textContent =
-      previousBest > 0 ? `+${delta.toFixed(1)} Years (new record!)` : "New personal best!";
-    $("statBestDelta").className = "text-nano font-bold text-emerald-600 mt-0.5";
+    refreshOptimisticBestDelta(result, previousBest, Boolean(initData));
   } else if (previousBest > 0) {
     $("statBestDelta").textContent = `${(previousBest - result.yearsSurvived).toFixed(1)} short of your best`;
     $("statBestDelta").className = "text-nano font-bold text-slate-500 mt-0.5";
@@ -1504,27 +1578,26 @@ $("retryTip").textContent =
     $("statBestDelta").textContent = "";
   }
 
-  const initData = getInitData();
   $("leaderboardGapLine").textContent = "";
   $("leaderboardGapLine").classList.add("hidden");
+  resetSyncStatus();
+  resetHrStamp();
 
-  let postGameIo: Promise<{ submitResult: SubmitRunResult | null; lbResult: LeaderboardResult }>;
-
-  if (awaitingReviveRunSubmit) {
-    awaitingReviveRunSubmit = false;
-    postGameIo = runPostGameOverIo(result, initData);
-  } else if (initData && isReviveEligibleBase(result)) {
-    pendingSubmitResult = result;
-    postGameIo = runPostGameOverIo(result, initData).then(({ submitResult, lbResult }) => {
-      if (submitResult && !submitResult.ok) {
-        pendingSubmitDeferred = true;
-      } else {
-        pendingSubmitDeferred = false;
+  let submitPromise: Promise<SubmitRunResult | null> = Promise.resolve(null);
+  if (initData) {
+    if (awaitingReviveRunSubmit) {
+      awaitingReviveRunSubmit = false;
+    } else if (isReviveEligibleBase(result)) {
+      pendingSubmitResult = result;
+      pendingSubmitDeferred = false;
+    }
+    activeGameOverSubmit = runSubmitOnly(result, initData);
+    submitPromise = activeGameOverSubmit;
+    void submitPromise.finally(() => {
+      if (activeGameOverSubmit === submitPromise) {
+        activeGameOverSubmit = null;
       }
-      return { submitResult, lbResult };
     });
-  } else {
-    postGameIo = runPostGameOverIo(result, initData);
   }
 
   flashBurnoutStress(false);
@@ -1532,24 +1605,29 @@ $("retryTip").textContent =
   hapticNotification("error");
   triggerDeathFlash();
 
-  triggerDeathEmoji(result.deathType, () => {
-    triggerShake($("gameScreen"), () => {
-      enableVerticalSwipe();
-      switchTab("gameover");
-      triggerDeathCauseHold($("terminationCauseRow"));
-      void postGameIo.then(({ submitResult, lbResult }) => {
-        applyLeaderboardGap(result, lbResult);
-        const reviveEligible = isReviveEligibleBase(result);
-        if (reviveEligible) {
-          updateReviveOffer(result, lbResult);
-        }
-        if (pendingSubmitDeferred && !shouldOfferRevive(result, buildReviveContext(result, lbResult))) {
-          void flushPendingSubmit();
-        } else {
-          showSubmitResultToast(submitResult);
-        }
-      });
+  const fastDeath = getReapplyCount() >= 3;
+
+  const showGameOverActions = (): void => {
+    enableVerticalSwipe();
+    switchTab("gameover");
+    triggerDeathCauseHold($("terminationCauseRow"));
+    if (isReviveEligibleBase(result)) {
+      updateReviveOffer(result, undefined);
+    }
+    void submitPromise.then((submitResult) => {
+      if (submitResult && !submitResult.ok) {
+        showSubmitResultToast(submitResult);
+      }
+      enrichGameOverAsync(result, submitResult);
     });
+  };
+
+  triggerDeathEmoji(result.deathType, () => {
+    showGameOverActions();
+    if (!fastDeath && !respectsReducedMotion()) {
+      const card = $("gameOverScreen").querySelector(".card-performance") as HTMLElement | null;
+      if (card) triggerShake(card);
+    }
   });
 }
 
@@ -1660,7 +1738,6 @@ let playAreaResizeObserver: ResizeObserver | null = null;
 let viewportResizeTimer: ReturnType<typeof setTimeout> | null = null;
 
 function onViewportResize(): void {
-  refreshHomePreviewCollapse();
   if (!engine?.isActive()) return;
   layoutRungs();
   layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
@@ -1912,6 +1989,9 @@ function mountOgCaptureMode(): void {
 export function mountApp(): void {
   initTelegram();
   installPendingSubmitLifecycleGuards();
+  bindSyncStatusRetry();
+  setSyncRetryHandler(retryLastSubmit);
+  mountHrStamp();
   mountDebugStrip();
   username = getDisplayName();
   $("botHandleLabel").textContent = `@${getBotUsername()}`;
@@ -1966,31 +2046,30 @@ export function mountApp(): void {
         if (rank === "Manager") {
           showHrMemoCombined([message, "Reorgs now swap sides. Time your climbs."], {
             variant: "promo",
-            durationMs: 3500,
+            durationMs: 2000,
           });
         } else if (rank === "Director") {
-          showHrMemo(message, { variant: "promo", durationMs: 2500 });
-          showHrMemo("Deadlines joined the org chart. Good luck.", { variant: "alert", durationMs: 2500 });
+          showHrMemoCombined(
+            [message, "Deadlines joined the org chart. Good luck."],
+            { variant: "promo", durationMs: 2000 }
+          );
         } else if (rank === "CEO") {
-          showHrMemo(message, { variant: "promo", durationMs: 2500 });
-          showHrMemo("Mandatory desk plants now block corridors. Wellness is not optional.", {
-            variant: "alert",
-            durationMs: 2500,
-          });
+          showHrMemoCombined(
+            [message, "Mandatory desk plants now block corridors. Wellness is not optional."],
+            { variant: "promo", durationMs: 2000 }
+          );
         } else if (rank === "Board Member") {
-          showHrMemo(message, { variant: "promo", durationMs: 2500 });
-          showHrMemo("Governance meetings now outrank product deadlines. Quorum optional.", {
-            variant: "alert",
-            durationMs: 2500,
-          });
+          showHrMemoCombined(
+            [message, "Governance meetings now outrank product deadlines. Quorum optional."],
+            { variant: "promo", durationMs: 2000 }
+          );
         } else if (rank === "Angel Investor") {
-          showHrMemo(message, { variant: "promo", durationMs: 2500 });
-          showHrMemo("Portfolio reviews replace performance reviews. Due diligence is vibes-based.", {
-            variant: "alert",
-            durationMs: 2500,
-          });
+          showHrMemoCombined(
+            [message, "Portfolio reviews replace performance reviews. Due diligence is vibes-based."],
+            { variant: "promo", durationMs: 2000 }
+          );
         } else {
-          showHrMemo(message, { variant: "promo", durationMs: 2000 });
+          showHrMemo(message, { variant: "promo", durationMs: 1800 });
         }
         hapticNotification("success");
         const promoEmoji =
@@ -2029,7 +2108,7 @@ export function mountApp(): void {
       onTriagePrompt: () => {
         showHrMemoCombined([TRIAGE_PROMPT, "Your next tap assigns backlog — not a climb."], {
           variant: "alert",
-          durationMs: 5000,
+          durationMs: 2500,
         });
         hapticImpact("medium");
       },
@@ -2038,10 +2117,10 @@ export function mountApp(): void {
     updatePlayerPosition,
     () => {
       hideHudTapHint();
-      if (isTutorialDone()) {
+      if (isTutorialDone() && getReapplyCount() <= 1) {
         showHrMemo(
           "TAP LEFT or RIGHT — avoid the occupied side.",
-          { variant: "info", durationMs: 4500 }
+          { variant: "info", durationMs: 2500 }
         );
       }
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
@@ -2109,7 +2188,6 @@ export function mountApp(): void {
     }
   };
   (window as unknown as Record<string, unknown>).copyShareText = copyShareText;
-  (window as unknown as Record<string, unknown>).toggleHomeGameplayPreview = toggleHomeGameplayPreview;
   (window as unknown as Record<string, unknown>).dismissChallengeBanner = dismissChallengeBanner;
   (window as unknown as Record<string, unknown>).openPromptAnatomy = openPromptAnatomy;
   (window as unknown as Record<string, unknown>).toggleMute = toggleMute;

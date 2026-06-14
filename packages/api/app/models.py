@@ -20,6 +20,13 @@ class UserProfile(BaseModel):
     session_token: str | None = None
 
 
+class RunSubmitResponse(BaseModel):
+    ok: bool = True
+    years_survived: float
+    best_score: float
+    best_rank: str
+
+
 class RunSubmitRequest(BaseModel):
     init_data: str = Field(..., alias="initData")
     years_survived: float = Field(..., ge=0, le=100)

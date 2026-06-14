@@ -109,11 +109,17 @@ async function homeCtaReachable(page) {
     const startScreen = document.getElementById("startScreen");
     if (!startScreen) return { ok: false, reason: "missing-start-screen" };
 
+    const inTelegram = document.documentElement.classList.contains("cl-in-telegram");
     const inlineCta = startScreen.querySelector("button.cl-primary-btn");
     const inlineVisible =
       inlineCta && window.getComputedStyle(inlineCta).display !== "none";
     const scrollTarget =
-      inlineVisible && inlineCta ? inlineCta : startScreen.querySelector(".start-cta-bar");
+      inlineVisible && inlineCta
+        ? inlineCta
+        : inTelegram
+          ? document.getElementById("homeSecondaryNav")
+          : startScreen.querySelector(".start-cta-bar button.cl-primary-btn") ??
+            startScreen.querySelector(".start-cta-bar");
     if (!scrollTarget) return { ok: false, reason: "missing-cta" };
 
     startScreen.scrollTop = startScreen.scrollHeight;
@@ -127,6 +133,37 @@ async function homeCtaReachable(page) {
       scrollHeight: startScreen.scrollHeight,
       clientHeight: startScreen.clientHeight,
     };
+  });
+}
+
+async function homeSecondaryNavVisibleWithoutScroll(page) {
+  return page.evaluate(() => {
+    const startScreen = document.getElementById("startScreen");
+    const nav = document.getElementById("homeSecondaryNav");
+    if (!startScreen || !nav) return { ok: false, reason: "missing-secondary-nav" };
+
+    startScreen.scrollTop = 0;
+    const containerRect = startScreen.getBoundingClientRect();
+    const buttons = nav.querySelectorAll("button[data-action]");
+    if (buttons.length < 2) return { ok: false, reason: "missing-nav-buttons" };
+
+    const labels = [];
+    let allInView = true;
+    for (const btn of buttons) {
+      const rect = btn.getBoundingClientRect();
+      const inView =
+        rect.top >= containerRect.top - 1 &&
+        rect.bottom <= containerRect.bottom + 1 &&
+        rect.left >= containerRect.left - 1 &&
+        rect.right <= containerRect.right + 1;
+      if (!inView) allInView = false;
+      labels.push((btn.textContent ?? "").trim().slice(0, 40));
+    }
+
+    const hasLeaderboard = labels.some((t) => t.includes("Leaderboard"));
+    const hasHowTo = labels.some((t) => t.includes("How to Survive"));
+
+    return { ok: allInView && hasLeaderboard && hasHowTo, allInView, hasLeaderboard, hasHowTo, labels };
   });
 }
 
@@ -174,12 +211,11 @@ async function memoVisiblePlayAreaRatio(page) {
 async function homeColumnAlignment(page) {
   return page.evaluate(() => {
     const badge = document.querySelector("#startScreen .card-light");
+    const secondaryNav = document.getElementById("homeSecondaryNav");
     const contextSlot = document.getElementById("homeContextSlot");
-    const previewWrap = document.getElementById("homeGameplayPreviewWrap");
-    const ctaBar = document.querySelector("#startScreen .start-cta-bar");
-    if (!badge || !contextSlot || !previewWrap || !ctaBar) return { ok: false, reason: "missing-home-blocks" };
+    if (!badge || !secondaryNav || !contextSlot) return { ok: false, reason: "missing-home-blocks" };
 
-    const boxes = [badge, contextSlot, previewWrap, ctaBar].map((el) => {
+    const boxes = [badge, secondaryNav, contextSlot].map((el) => {
       const r = el.getBoundingClientRect();
       return { w: r.width, l: r.left };
     });
@@ -191,9 +227,8 @@ async function homeColumnAlignment(page) {
     return {
       ok: widthDelta <= 2 && leftDelta <= 2,
       badgeWidth: widths[0],
-      contextSlotWidth: widths[1],
-      previewWrapWidth: widths[2],
-      ctaBarWidth: widths[3],
+      secondaryNavWidth: widths[1],
+      contextSlotWidth: widths[2],
       widthDelta,
       leftDelta,
     };
@@ -373,6 +408,16 @@ async function main() {
               screen: screen.label,
               type: "home-brand-not-visible",
               ...homeBrand,
+            });
+          }
+
+          const homeNav = await homeSecondaryNavVisibleWithoutScroll(page);
+          if (!homeNav.ok) {
+            failures.push({
+              viewport: vp.label,
+              screen: screen.label,
+              type: "home-secondary-nav-not-visible",
+              ...homeNav,
             });
           }
         }
