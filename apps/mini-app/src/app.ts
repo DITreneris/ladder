@@ -1063,6 +1063,43 @@ function setLeaderboardPeriod(period: LeaderboardPeriod): void {
   renderLeaderboard();
 }
 
+function bindShellActions(): void {
+  const handlers: Record<string, () => void> = {
+    "go-home": goHome,
+    "start-game": startGame,
+    "open-leaderboard": () => {
+      switchTab("leaderboard");
+      renderLeaderboard();
+    },
+    "open-howtoplay": () => switchTab("howtoplay"),
+    "open-prompt-anatomy": openPromptAnatomy,
+    "toggle-mute": toggleMute,
+    "dismiss-auth-banner": dismissAuthBanner,
+    "cycle-avatar": () => {
+      const next = cycleAvatarEmoji(getStoredAvatarEmoji() as AvatarEmoji);
+      $("avatarIcon").textContent = next;
+      if (engine?.getCurrentRank() === "Intern" && !playerInPanic) {
+        $("playerActionEmoji").textContent = next;
+      }
+      showToast("Avatar updated for your employee badge.");
+    },
+    "dismiss-challenge": dismissChallengeBanner,
+    "toggle-home-preview": toggleHomeGameplayPreview,
+    "revive-ad": onReviveAdClick,
+    "copy-share": copyShareText,
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
+    const action = el.dataset.action;
+    const handler = action ? handlers[action] : undefined;
+    if (!handler) return;
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      handler();
+    });
+  });
+}
+
 let tapHintTimer: ReturnType<typeof setTimeout> | null = null;
 let tapDeckHintTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -2046,6 +2083,8 @@ export function mountApp(): void {
   document.querySelectorAll("[data-lb-tab]").forEach((btn) => {
     btn.addEventListener("click", () => setLeaderboardPeriod(btn.getAttribute("data-lb-tab") as LeaderboardPeriod));
   });
+
+  bindShellActions();
 
   (window as unknown as Record<string, unknown>).goHome = goHome;
   (window as unknown as Record<string, unknown>).startGame = startGame;

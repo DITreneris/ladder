@@ -5,7 +5,7 @@ import { PROMPT_ANATOMY_LOGO } from "./lib/branding";
 
 export const BRAND_FOOTER = `
       <div class="brand-attribution">
-        <button type="button" onclick="openPromptAnatomy()" class="brand-attribution-link" aria-label="Visit Prompt Anatomy">
+        <button type="button" data-action="open-prompt-anatomy" class="brand-attribution-link" aria-label="Visit Prompt Anatomy">
           <img src="${PROMPT_ANATOMY_LOGO}" alt="" class="brand-attribution-logo" width="18" height="18" loading="lazy" />
           <span>Prompt Anatomy</span>
           ${icon("arrow-up-right-from-square", "text-nano opacity-60")}
@@ -17,12 +17,12 @@ export const APP_SHELL = `
   <div class="cl-phone-notch absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-5 bg-black rounded-b-xl z-50 flex items-center justify-center">
     <div class="w-12 h-1 rounded-full mb-1" style="background: var(--cl-border);"></div>
   </div>
-  <button id="soundToggleBtn" type="button" onclick="toggleMute()" class="sound-fab focus-ring" title="Toggle Sound" aria-label="Toggle sound">
+  <button id="soundToggleBtn" type="button" data-action="toggle-mute" class="sound-fab focus-ring" title="Toggle Sound" aria-label="Toggle sound">
     <span id="soundIcon" class="inline-flex">${icon("volume-high", "text-sm")}</span>
   </button>
   <div class="cl-header flex items-center justify-between pt-5 pb-3 px-3 rounded-t-2xl border-b select-none z-40">
     <div class="flex items-center space-x-2">
-      <button onclick="goHome()" class="cl-header-muted min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors duration-150 focus-ring rounded-lg" aria-label="Back to home">
+      <button type="button" data-action="go-home" class="cl-header-muted min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors duration-150 focus-ring rounded-lg" aria-label="Back to home">
         ${icon("chevron-left", "text-lg")}
       </button>
       <div>
@@ -45,7 +45,7 @@ export const APP_SHELL = `
           <span id="authDegradedLead"></span>
           <span id="authDegradedSub" class="block text-micro font-semibold mt-0.5"></span>
         </p>
-        <button type="button" onclick="dismissAuthBanner()" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
+        <button type="button" data-action="dismiss-auth-banner" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
         <div class="text-center">
           <div class="home-hero-enter home-hero-enter-icon home-hero-idle inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
@@ -61,7 +61,7 @@ export const APP_SHELL = `
             <span class="text-nano bg-amber-100 text-amber-800 font-extrabold px-2 py-0.5 rounded-full">ACTIVE EMPLOYMENT</span>
           </div>
           <div class="flex items-center space-x-3">
-            <button type="button" id="avatarIconBtn" onclick="cycleAvatarEmoji()" class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0 focus-ring min-h-[44px] min-w-[44px]" aria-label="Change employee avatar emoji">
+            <button type="button" id="avatarIconBtn" data-action="cycle-avatar" class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-base border-2 border-indigo-200 shrink-0 focus-ring min-h-[44px] min-w-[44px]" aria-label="Change employee avatar emoji">
               <span id="avatarIcon">🧑‍💻</span>
             </button>
             <div class="flex-grow min-w-0">
@@ -93,7 +93,7 @@ export const APP_SHELL = `
           </div>
           <div id="challengeBanner" class="home-context-item invisible rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
             <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
-            <button type="button" id="challengeBannerDismiss" onclick="dismissChallengeBanner()" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+            <button type="button" id="challengeBannerDismiss" data-action="dismiss-challenge" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
           </div>
         </div>
         <div id="homeGameplayPreviewWrap" class="shrink-0 space-y-1">
@@ -106,7 +106,7 @@ export const APP_SHELL = `
             <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y) → CEO (35y) → Board (50y) → Angel (75y).</p>
           </div>
         </div>
-        <button type="button" id="homePreviewToggle" onclick="toggleHomeGameplayPreview()" class="hidden text-micro font-bold text-cl-primary focus-ring rounded px-1 min-h-[44px]">
+        <button type="button" id="homePreviewToggle" data-action="toggle-home-preview" class="hidden text-micro font-bold text-cl-primary focus-ring rounded px-1 min-h-[44px]">
           How to Survive — show mechanics
         </button>
         </div>
@@ -114,15 +114,15 @@ export const APP_SHELL = `
           ${BRAND_FOOTER}
         </div>
         <div class="start-cta-bar shrink-0 pb-4 pt-3 space-y-2 border-t border-slate-200">
-          <button onclick="startGame()" class="cl-primary-btn w-full py-4 px-6 text-lg">
+          <button type="button" data-action="start-game" class="cl-primary-btn w-full py-4 px-6 text-lg">
             ${icon("play")}<span>PUNCH IN &amp; CLIMB</span>
           </button>
           <p class="cl-telegram-cta-hint text-micro font-semibold text-slate-500 text-center">Punch In lives in Telegram&apos;s bar below.</p>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2 px-3 text-xs">
+            <button type="button" data-action="open-leaderboard" class="btn-cl-secondary py-2 px-3 text-xs">
               ${icon("trophy", "text-amber-500")} Leaderboard
             </button>
-            <button onclick="switchTab('howtoplay')" class="btn-cl-secondary py-2 px-3 text-xs">
+            <button type="button" data-action="open-howtoplay" class="btn-cl-secondary py-2 px-3 text-xs">
               ${icon("circle-question", "text-cl-primary")} How to Survive
             </button>
           </div>
@@ -241,22 +241,22 @@ export const APP_SHELL = `
         <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">Your synergy did not scale optimally with our paradigms.</p>
       </div>
       <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
-        <button onclick="startGame()" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
+        <button type="button" data-action="start-game" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
           ${icon("rotate-right")}<span>RE-APPLY FOR ROLE</span>
         </button>
-        <button id="reviveAdBtn" type="button" onclick="onReviveAdClick()" class="hidden btn-cl-secondary w-full py-3 px-6 min-h-[44px] focus-ring flex flex-col items-center gap-0.5">
+        <button id="reviveAdBtn" type="button" data-action="revive-ad" class="hidden btn-cl-secondary w-full py-3 px-6 min-h-[44px] focus-ring flex flex-col items-center gap-0.5">
           <span id="reviveAdTitle" class="text-sm font-extrabold">Mandatory HR Training</span>
           <span id="reviveAdSubline" class="text-nano font-semibold text-slate-500">One executive exception this shift</span>
         </button>
         <div class="grid grid-cols-2 gap-2">
-          <button id="shareBtn" type="button" onclick="copyShareText()" class="btn-cl-share py-2.5 px-3 text-xs">
+          <button id="shareBtn" type="button" data-action="copy-share" class="btn-cl-share py-2.5 px-3 text-xs">
             ${icon("share")} Share
           </button>
-          <button onclick="switchTab('leaderboard')" class="btn-cl-secondary py-2.5 px-3 text-xs">
+          <button type="button" data-action="open-leaderboard" class="btn-cl-secondary py-2.5 px-3 text-xs">
             ${icon("trophy", "text-amber-500")} Leaderboard
           </button>
         </div>
-        <button onclick="goHome()" class="btn-cl-muted text-xs">Back to Corporate Lounge</button>
+        <button type="button" data-action="go-home" class="btn-cl-muted text-xs">Back to Corporate Lounge</button>
         ${BRAND_FOOTER}
       </div>
     </div>
@@ -280,7 +280,7 @@ export const APP_SHELL = `
         </div>
       </div>
       <div class="pt-4 border-t border-slate-200 mt-4 space-y-2">
-        <button onclick="goHome()" class="btn-cl-primary-sm">BACK TO OFFICE</button>
+        <button type="button" data-action="go-home" class="btn-cl-primary-sm">BACK TO OFFICE</button>
         ${BRAND_FOOTER}
       </div>
     </div>
@@ -350,7 +350,7 @@ export const APP_SHELL = `
         </div>
       </div>
       <div class="pt-4 mt-4 space-y-2">
-        <button onclick="goHome()" class="btn-cl-primary-sm">I UNDERSTAND SYNERGY</button>
+        <button type="button" data-action="go-home" class="btn-cl-primary-sm">I UNDERSTAND SYNERGY</button>
         ${BRAND_FOOTER}
       </div>
     </div>
