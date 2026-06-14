@@ -795,12 +795,14 @@ html.cl-in-telegram .text-micro {
 .news-ticker-text {
   display: inline-block;
   white-space: nowrap;
+  min-width: max-content;
   animation: ticker-scroll var(--ticker-duration, 20s) linear infinite;
 }
 
 .news-ticker-text--static {
   animation: none;
   transform: none;
+  min-width: 0;
 }
 
 @keyframes ticker-scroll {

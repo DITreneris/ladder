@@ -432,6 +432,17 @@ export function formatTickerText(headline: TickerHeadline): string {
   return `* ${headline.text} *`;
 }
 
+export const TICKER_MARQUEE_SEPARATOR = " · ";
+
+export function formatTickerMarqueeText(headlines: TickerHeadline[]): string {
+  return headlines.map(formatTickerText).join(TICKER_MARQUEE_SEPARATOR);
+}
+
+/** Seconds for one full marquee pass; ~0.12s per char, clamped for readability. */
+export function tickerMarqueeDurationSec(text: string): number {
+  return Math.min(60, Math.max(30, Math.round(text.length * 0.12)));
+}
+
 export function reappliesFlavor(runCount: number): string {
   for (const tier of REAPPLY_FLAVOR) {
     if (runCount >= tier.minRuns) return tier.line;

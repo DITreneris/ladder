@@ -73,7 +73,7 @@ export class GameEngine {
   private drainPausedUntil = 0;
   private dailyModifier: DailyModifier;
   private readonly fixedDailyModifier?: DailyModifier;
-  private activeTicker: TickerHeadline | null = null;
+  private activeTickerSet: TickerHeadline[] = [];
   private rankBandPromoShown = new Set<number>();
   private lastTapAt = 0;
   private runStartedAt = 0;
@@ -111,8 +111,13 @@ export class GameEngine {
     this.careerBestYears = Math.max(0, years);
   }
 
+  setActiveTickerSet(headlines: TickerHeadline[]): void {
+    this.activeTickerSet = headlines;
+  }
+
+  /** @deprecated Use setActiveTickerSet — kept for single-headline callers */
   setActiveTicker(headline: TickerHeadline | null): void {
-    this.activeTicker = headline;
+    this.activeTickerSet = headline ? [headline] : [];
   }
 
   getDailyModifier(): DailyModifier {
@@ -599,11 +604,10 @@ export class GameEngine {
   }
 
   private pickFlavorQuote(deathType: DeathType): string {
-    if (
-      this.activeTicker?.deathType === deathType &&
-      Math.random() < 0.2
-    ) {
-      return `Headline vindicated: ${this.activeTicker.text}`;
+    const matches = this.activeTickerSet.filter((h) => h.deathType === deathType);
+    if (matches.length > 0 && Math.random() < 0.2) {
+      const pick = matches[Math.floor(Math.random() * matches.length)]!;
+      return `Headline vindicated: ${pick.text}`;
     }
 
     if (this.dailyModifier.id !== "standard") {

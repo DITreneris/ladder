@@ -14,12 +14,13 @@ import {
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
   floorLabel,
-  formatTickerText,
+  formatTickerMarqueeText,
   MEETING_MONDAY_OPENING_MEMO,
   milestoneLabel,
   obstacleBadgeDisplay,
   pickTickerHeadlineSet,
   rankEmoji,
+  tickerMarqueeDurationSec,
   rankFromYears,
   rankPropEmoji,
   type TickerHeadline,
@@ -114,12 +115,8 @@ let playerEmojiFlashTimer: ReturnType<typeof setTimeout> | null = null;
 let activeDailyModifier: DailyModifier = resolveDailyModifier();
 let shiftToastShown = false;
 let meetingMondayMemoShown = false;
-let activeTickerHeadline: TickerHeadline | null = null;
 let tickerHeadlineSet: TickerHeadline[] = [];
-let tickerRotateIndex = 0;
-let tickerRotateTimer: ReturnType<typeof setInterval> | null = null;
 let tickerCacheKey: string | null = null;
-const TICKER_ROTATE_MS = 9000;
 let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
 let boardTrapShown = false;
@@ -227,12 +224,13 @@ function tickerCacheKeyFor(utcDate: Date, presetId: DailyModifier["id"], careerB
   return `${utcDate.toISOString().slice(0, 10)}|${presetId}|${rankFromYears(careerBest)}`;
 }
 
-function mountTickerHeadlineDOM(): void {
-  if (!activeTickerHeadline) return;
-  const formatted = formatTickerText(activeTickerHeadline);
+function mountTickerMarqueeDOM(): void {
+  if (tickerHeadlineSet.length === 0) return;
+  const text = formatTickerMarqueeText(tickerHeadlineSet);
   const tickerEl = $("newsTickerText");
   tickerEl.classList.remove("news-ticker-text--static");
-  tickerEl.textContent = formatted;
+  tickerEl.textContent = text;
+  tickerEl.style.setProperty("--ticker-duration", `${tickerMarqueeDurationSec(text)}s`);
   if (shouldTickerScroll()) {
     void tickerEl.offsetWidth;
   } else {
@@ -240,43 +238,10 @@ function mountTickerHeadlineDOM(): void {
   }
 }
 
-function showTickerHeadlineAt(index: number): void {
-  if (tickerHeadlineSet.length === 0) return;
-  tickerRotateIndex = ((index % tickerHeadlineSet.length) + tickerHeadlineSet.length) % tickerHeadlineSet.length;
-  activeTickerHeadline = tickerHeadlineSet[tickerRotateIndex]!;
-  mountTickerHeadlineDOM();
-}
-
-function stopTickerRotation(): void {
-  if (tickerRotateTimer !== null) {
-    clearInterval(tickerRotateTimer);
-    tickerRotateTimer = null;
-  }
-}
-
-function shouldRotateTickerHeadlines(): boolean {
-  if (tickerHeadlineSet.length <= 1) return false;
-  if (respectsReducedMotion()) return false;
-  if (document.documentElement.dataset.ogCapture === "1") return false;
-  if (getCaptureFlags().capture !== null) return false;
-  return true;
-}
-
-function startTickerRotation(): void {
-  stopTickerRotation();
-  if (!shouldRotateTickerHeadlines()) return;
-  tickerRotateTimer = setInterval(() => {
-    if (document.hidden) return;
-    if ($("startScreen").classList.contains("hidden")) return;
-    showTickerHeadlineAt(tickerRotateIndex + 1);
-  }, TICKER_ROTATE_MS);
-}
-
 function ensureTickerHeadlines(): void {
   const key = tickerCacheKeyFor(new Date(), activeDailyModifier.id, highScore);
   if (key === tickerCacheKey && tickerHeadlineSet.length > 0) {
-    showTickerHeadlineAt(tickerRotateIndex);
-    startTickerRotation();
+    mountTickerMarqueeDOM();
     return;
   }
   tickerCacheKey = key;
@@ -284,9 +249,7 @@ function ensureTickerHeadlines(): void {
     presetId: activeDailyModifier.id,
     careerBestYears: highScore,
   });
-  tickerRotateIndex = 0;
-  showTickerHeadlineAt(0);
-  startTickerRotation();
+  mountTickerMarqueeDOM();
 }
 
 function getReapplyCount(): number {
@@ -537,8 +500,6 @@ function switchTab(tab: Screen): void {
   if (tab === "home") {
     refreshHomeContextSlot();
     ensureTickerHeadlines();
-  } else {
-    stopTickerRotation();
   }
   audio.nav();
   if (tab !== "game") {
@@ -1326,10 +1287,10 @@ async function startGame(): Promise<void> {
   lastFloorBand = "default";
   qaCoffeePickups = 0;
   activeDailyModifier = engine.getDailyModifier();
-  if (!activeTickerHeadline) {
+  if (tickerHeadlineSet.length === 0) {
     ensureTickerHeadlines();
   }
-  engine.setActiveTicker(activeTickerHeadline);
+  engine.setActiveTickerSet(tickerHeadlineSet);
   disableVerticalSwipe();
   audio.prepareBgmForRun();
   engine.start();

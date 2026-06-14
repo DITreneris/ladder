@@ -699,4 +699,22 @@ describe("GameEngine", () => {
     engine.restoreFromRevive(snapshot!);
     expect(engine.getTimeLeft()).toBe(energyAfterFirst);
   });
+
+  it("vindicated flavor can use any headline from active ticker set", () => {
+    const onGameOver = vi.fn();
+    const { engine } = createEngine({ onGameOver });
+    engine.setActiveTickerSet([
+      { text: "Calendar owns you", deathType: "meeting" },
+      { text: "Coffee doubles", deathType: "energy" },
+    ]);
+    vi.spyOn(Math, "random").mockReturnValue(0.1);
+
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "right");
+
+    expect(onGameOver).toHaveBeenCalledTimes(1);
+    expect(onGameOver.mock.calls[0]![0].terminationFlavor).toContain("Headline vindicated:");
+    expect(onGameOver.mock.calls[0]![0].terminationFlavor).toContain("Calendar owns you");
+  });
 });

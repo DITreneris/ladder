@@ -17,7 +17,10 @@ import {
   milestoneLabel,
   obstacleBadgeDisplay,
   pickObstacleType,
+  formatTickerMarqueeText,
   pickTickerHeadlineSet,
+  TICKER_MARQUEE_SEPARATOR,
+  tickerMarqueeDurationSec,
   rankEmoji,
   rankFromYears,
   reorgIntervalForRank,
@@ -257,6 +260,30 @@ describe("pickTickerHeadlineSet", () => {
       utcDate: new Date("2026-06-13T12:00:00Z"),
     });
     expect(set[0]?.deathType).toBe("sprint");
+  });
+});
+
+describe("formatTickerMarqueeText", () => {
+  it("joins headlines with marquee separator", () => {
+    const text = formatTickerMarqueeText([
+      { text: "Alpha", deathType: "meeting" },
+      { text: "Beta", deathType: "energy" },
+    ]);
+    expect(text).toBe(`* Alpha *${TICKER_MARQUEE_SEPARATOR}* Beta *`);
+  });
+});
+
+describe("tickerMarqueeDurationSec", () => {
+  it("clamps short strips to 30s minimum", () => {
+    expect(tickerMarqueeDurationSec("short")).toBe(30);
+  });
+
+  it("clamps very long strips to 60s maximum", () => {
+    expect(tickerMarqueeDurationSec("x".repeat(1000))).toBe(60);
+  });
+
+  it("scales mid-length strips between clamps", () => {
+    expect(tickerMarqueeDurationSec("x".repeat(400))).toBe(48);
   });
 });
 
