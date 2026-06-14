@@ -48,12 +48,24 @@ PRESETS: dict[str, ShiftPreset] = {
     },
 }
 
+# Monday=0 … Sunday=6 (datetime.weekday)
+WEEKDAY_PRESET: tuple[str, ...] = (
+    "meeting_monday",
+    "standard",
+    "coffee_break",
+    "reorg_week",
+    "synergy_sprint",
+    "coffee_break",
+    "standard",
+)
+
 
 def utc_date_key(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%d")
 
 
 def hash_date_key(key: str) -> int:
+    """Legacy hash — dev/tests only; production preset uses WEEKDAY_PRESET."""
     h = 0
     for char in key:
         h = (31 * h + ord(char)) & 0xFFFFFFFF
@@ -61,9 +73,12 @@ def hash_date_key(key: str) -> int:
 
 
 def preset_for_date(dt: datetime) -> ShiftPreset:
-    """Match mini-app presetIdForDate (UTC day hash)."""
-    idx = hash_date_key(utc_date_key(dt)) % len(PRESET_ORDER)
-    preset_id = PRESET_ORDER[idx]
+    """Match mini-app presetIdForDate (UTC weekday map)."""
+    weekday = dt.weekday()
+    if weekday < 0 or weekday > 6:
+        preset_id = "standard"
+    else:
+        preset_id = WEEKDAY_PRESET[weekday]
     return PRESETS[preset_id]
 
 

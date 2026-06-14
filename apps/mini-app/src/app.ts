@@ -1,4 +1,8 @@
 import {
+  ANGEL_TRAP_ANNOUNCEMENT,
+  ANGEL_YEARS,
+  BOARD_TRAP_ANNOUNCEMENT,
+  BOARD_YEARS,
   CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
@@ -7,13 +11,15 @@ import {
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
   RETRY_TIPS,
+  RETRY_TIPS_BY_RANK,
   TUTORIAL_DONE_STORAGE_KEY,
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
   floorLabel,
   formatTickerText,
-  isExecutiveRank,
+  MEETING_MONDAY_OPENING_MEMO,
   milestoneLabel,
+  obstacleBadgeDisplay,
   pickTickerHeadline,
   rankEmoji,
   rankFromYears,
@@ -44,6 +50,7 @@ import {
   triggerDeathEmoji,
   triggerDeathFlash,
   triggerDeathCauseHold,
+  triggerFloorBandFlash,
   triggerMeterFlash,
   triggerNearMissWince,
   triggerRankPop,
@@ -96,9 +103,12 @@ let earlyTapsRemaining = 0;
 let playerEmojiFlashTimer: ReturnType<typeof setTimeout> | null = null;
 let activeDailyModifier: DailyModifier = resolveDailyModifier();
 let shiftToastShown = false;
+let meetingMondayMemoShown = false;
 let activeTickerHeadline: TickerHeadline = pickTickerHeadline();
 let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
+let boardTrapShown = false;
+let angelTrapShown = false;
 let emojiFlashLock = false;
 let playerAtCorridor = true;
 let qaCoffeePickups = 0;
@@ -109,6 +119,10 @@ let homePreviewExpanded = false;
 type PlayerLayout = PlayerSide | "center";
 
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
+const FLOOR_BAND_CLASSES = ["office-grid-boardroom", "office-grid-investor-lounge"] as const;
+
+type FloorBand = "default" | "board" | "angel";
+let lastFloorBand: FloorBand = "default";
 
 let marketingGameCapture = false;
 let pendingSubmitDeferred = false;
@@ -146,6 +160,34 @@ function updateRankProp(rank: Rank): void {
 
 function updateFloorLabel(years: number): void {
   $("floorLabel").textContent = floorLabel(years);
+  updateFloorBandGrid(years);
+}
+
+function floorBandForYears(years: number): FloorBand {
+  if (years >= ANGEL_YEARS) return "angel";
+  if (years >= BOARD_YEARS) return "board";
+  return "default";
+}
+
+function updateFloorBandGrid(years: number): void {
+  const viewport = document.querySelector(".cl-viewport");
+  if (!viewport) return;
+  for (const cls of FLOOR_BAND_CLASSES) {
+    viewport.classList.remove(cls);
+  }
+  if (years >= ANGEL_YEARS) {
+    viewport.classList.add("office-grid-investor-lounge");
+  } else if (years >= BOARD_YEARS) {
+    viewport.classList.add("office-grid-boardroom");
+  }
+}
+
+function maybeFlashFloorBandTransition(years: number): void {
+  const band = floorBandForYears(years);
+  if (band !== lastFloorBand && (band === "board" || band === "angel")) {
+    triggerFloorBandFlash($("gamePlayArea"));
+  }
+  lastFloorBand = band;
 }
 
 function updateReorgHudStrip(rank: Rank, rungScore?: number): void {
@@ -607,35 +649,27 @@ function refreshDailyShiftUI(): void {
 }
 
 function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = false): HTMLElement {
+  const rank = engine?.getCurrentRank() ?? "Intern";
+  const display = obstacleBadgeDisplay(type, rank, {
+    isImminent,
+    dailyModifierId: activeDailyModifier.id,
+    rungId,
+  });
   const badge = document.createElement("div");
   badge.className =
     "obstacle-badge w-12 h-10 rounded-lg flex flex-col items-center justify-center border shadow-md text-center select-none obstacle-pulse";
   if (type === "meeting") {
     badge.className += " bg-red-100 border-red-400 text-red-900";
-    if (activeDailyModifier.id === "meeting_monday" && rungId % 2 === 0) {
-      badge.innerHTML = `<span class="text-lg leading-none">📧</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reply-All</span>`;
-    } else if (activeDailyModifier.id === "meeting_monday") {
-      badge.innerHTML = `<span class="text-lg leading-none">🧍</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Standup</span>`;
-    } else {
-      badge.innerHTML = `<span class="text-lg leading-none">📅</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Meeting</span>`;
-    }
   } else if (type === "reorg") {
     badge.className += " bg-amber-100 border-amber-500 text-amber-900";
-    if (isImminent) {
-      badge.innerHTML = `<span class="text-lg leading-none">🧊</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Frozen</span>`;
-    } else {
-      badge.innerHTML = `<span class="text-lg leading-none">🔄</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Reorg</span>`;
-    }
   } else if (type === "badge_gate") {
     badge.className += " bg-slate-100 border-slate-400 text-slate-800";
-    badge.innerHTML = `<span class="text-lg leading-none">🪪</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Gate</span>`;
   } else if (type === "foliage") {
     badge.className += " bg-emerald-100 border-emerald-500 text-emerald-900";
-    badge.innerHTML = `<span class="text-lg leading-none">🪴</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Plant</span>`;
   } else {
     badge.className += " bg-red-100 border-red-400 text-red-900";
-    badge.innerHTML = `<span class="text-lg leading-none">⏰</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">Deadline</span>`;
   }
+  badge.innerHTML = `<span class="text-lg leading-none">${display.emoji}</span><span class="text-nano uppercase font-black tracking-tight leading-none mt-0.5">${display.label}</span>`;
   return badge;
 }
 
@@ -851,15 +885,34 @@ function renderRungsInner(): void {
     layoutPlayerPosition(playerAtCorridor ? "center" : engine.getPlayerSide());
   }
   updateImminentRungHint();
-  maybeShowCeoTrapMemo();
+  maybeShowExecutiveTrapMemo();
 }
 
-function maybeShowCeoTrapMemo(): void {
-  if (ceoTrapShown || !engine || !isExecutiveRank(engine.getCurrentRank())) return;
+function maybeShowExecutiveTrapMemo(): void {
+  if (!engine) return;
+  const rank = engine.getCurrentRank();
   const next = engine.getRungs()[1];
-  if (next?.type === "burnout") {
+  if (!next?.type) return;
+
+  if (rank === "CEO" && next.type === "burnout" && !ceoTrapShown) {
     ceoTrapShown = true;
     showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+    return;
+  }
+
+  if (rank === "Board Member" && next.type === "meeting" && !boardTrapShown) {
+    boardTrapShown = true;
+    showHrMemo(BOARD_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+    return;
+  }
+
+  if (
+    rank === "Angel Investor" &&
+    (next.type === "burnout" || next.type === "foliage") &&
+    !angelTrapShown
+  ) {
+    angelTrapShown = true;
+    showHrMemo(ANGEL_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
   }
 }
 
@@ -909,7 +962,7 @@ async function renderLeaderboard(): Promise<void> {
   gapHint.textContent = "";
 
   const token = getSessionToken();
-  const boardLabel = leaderboardPeriod === "weekly" ? "the weekly board" : "today's board";
+  const boardLabel = leaderboardPeriod === "weekly" ? "the last 7 days board" : "today's board";
   const mePromise = token ? fetchLeaderboardMe(leaderboardPeriod, token) : Promise.resolve(null);
 
   const result = await fetchLeaderboard(leaderboardPeriod, token);
@@ -1206,7 +1259,11 @@ async function startGame(): Promise<void> {
   lastPointerTapAt = 0;
   earlyTapsRemaining = 5;
   shiftToastShown = false;
+  meetingMondayMemoShown = false;
   ceoTrapShown = false;
+  boardTrapShown = false;
+  angelTrapShown = false;
+  lastFloorBand = "default";
   qaCoffeePickups = 0;
   activeDailyModifier = engine.getDailyModifier();
   engine.setActiveTicker(activeTickerHeadline);
@@ -1259,7 +1316,7 @@ async function goHome(): Promise<void> {
 
 function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult): void {
   const gapEl = $("leaderboardGapLine");
-  const boardLabel = leaderboardPeriod === "weekly" ? "the weekly board" : "today's board";
+  const boardLabel = leaderboardPeriod === "weekly" ? "the last 7 days board" : "today's board";
   if (!lbResult.ok) {
     gapEl.textContent = "";
     gapEl.classList.add("hidden");
@@ -1358,7 +1415,8 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
   $("terminationReason").textContent = result.terminationDetail;
-  $("retryTip").textContent = RETRY_TIPS[result.deathType];
+$("retryTip").textContent =
+    RETRY_TIPS_BY_RANK[result.finalRank]?.[result.deathType] ?? RETRY_TIPS[result.deathType];
   $("terminationFlavor").textContent = result.terminationFlavor;
   $("reviewId").textContent = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
 
@@ -1739,7 +1797,8 @@ function applyMarketingGameOverUi(result: GameOverResult): void {
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
   $("terminationReason").textContent = result.terminationDetail;
-  $("retryTip").textContent = RETRY_TIPS[result.deathType];
+$("retryTip").textContent =
+    RETRY_TIPS_BY_RANK[result.finalRank]?.[result.deathType] ?? RETRY_TIPS[result.deathType];
   $("terminationFlavor").textContent = result.terminationFlavor;
   $("reviewId").textContent = "REF-89412";
   $("statBestDelta").textContent = "";
@@ -1841,6 +1900,7 @@ export function mountApp(): void {
         }
         updateMilestoneChip(years);
         updateFloorLabel(years);
+        maybeFlashFloorBandTransition(years);
         updateReorgHudStrip(engine.getCurrentRank(), engine.getRungsClimbed());
         $("burnoutMeter").style.width = `${energy}%`;
         $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;
@@ -1950,6 +2010,13 @@ export function mountApp(): void {
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
         shiftToastShown = true;
         showHrMemo("Shift rules active", { variant: "alert" });
+      }
+      if (
+        !meetingMondayMemoShown &&
+        activeDailyModifier.id === "meeting_monday"
+      ) {
+        meetingMondayMemoShown = true;
+        showHrMemo(MEETING_MONDAY_OPENING_MEMO, { variant: "promo", durationMs: 2500 });
       }
     },
     getCaptureFlags().og ? getDailyModifierById("reorg_week") : undefined

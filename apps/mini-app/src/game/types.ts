@@ -39,7 +39,7 @@ export interface ReviveSnapshot {
   triageBiasSide: PlayerSide | null;
   triageBiasRemaining: number;
   lastTriageAtScore: number;
-  internFakePromoShown: number[];
+  rankBandPromoShown: number[];
 }
 
 export interface GameCallbacks {

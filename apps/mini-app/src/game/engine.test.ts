@@ -5,6 +5,7 @@ vi.mock("./audio", () => ({
     init: vi.fn(),
     prepareBgmForRun: vi.fn(),
     startManagerBgmRamp: vi.fn(),
+    intensifyExecutiveBgm: vi.fn(),
     stopBgm: vi.fn(),
     tap: vi.fn(),
     coffee: vi.fn(),
@@ -564,6 +565,7 @@ describe("GameEngine", () => {
 
     expect(engine.getCurrentRank()).toBe("Board Member");
     expect(onRankChange).toHaveBeenCalledWith("Board Member", expect.stringContaining("Board"));
+    expect(audio.intensifyExecutiveBgm).toHaveBeenCalledWith("board");
   });
 
   it("promotes to Angel Investor at 75.0 years (300 rungs)", () => {
@@ -581,6 +583,41 @@ describe("GameEngine", () => {
 
     expect(engine.getCurrentRank()).toBe("Angel Investor");
     expect(onRankChange).toHaveBeenCalledWith("Angel Investor", expect.stringContaining("Angel"));
+    expect(audio.intensifyExecutiveBgm).toHaveBeenCalledWith("angel");
+  });
+
+  it("fires board fake promo toast at 52 years", () => {
+    const onToast = vi.fn();
+    const { engine } = createEngine({ onToast });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number; currentRank: string };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 207;
+    internal.currentRank = "Board Member";
+    tapWithCooldown(engine, "left");
+
+    expect(onToast).toHaveBeenCalledWith(expect.stringContaining("Spousal disclosure"));
+  });
+
+  it("fires angel fake promo toast at 78 years", () => {
+    const onToast = vi.fn();
+    const { engine } = createEngine({ onToast });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number; currentRank: string };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 311;
+    internal.currentRank = "Angel Investor";
+    tapWithCooldown(engine, "left");
+
+    expect(onToast).toHaveBeenCalledWith(expect.stringContaining("longevity screening"));
   });
 
   it("captures revive snapshot on collision death", () => {

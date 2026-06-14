@@ -1,29 +1,28 @@
 from datetime import datetime, timezone
 
 from main import build_help_text, build_welcome_text
-from shifts import PRESET_ORDER, PRESETS, hash_date_key, preset_for_date, utc_date_key
+from shifts import PRESETS, WEEKDAY_PRESET, preset_for_date
 
 
-def test_preset_order_matches_mini_app():
-    assert PRESET_ORDER == (
-        "standard",
-        "meeting_monday",
-        "coffee_break",
-        "reorg_week",
-        "synergy_sprint",
-    )
-    assert set(PRESETS.keys()) == set(PRESET_ORDER)
+def test_weekday_preset_table_length():
+    assert len(WEEKDAY_PRESET) == 7
 
 
-def test_preset_for_date_uses_utc_hash():
-    dt = datetime(2026, 6, 1, 15, 30, tzinfo=timezone.utc)
-    key = utc_date_key(dt)
-    idx = hash_date_key(key) % len(PRESET_ORDER)
-    expected_id = PRESET_ORDER[idx]
-    preset = preset_for_date(dt)
-    assert preset["id"] == expected_id
-    assert preset["label"] == PRESETS[expected_id]["label"]
-    assert preset["description"] == PRESETS[expected_id]["description"]
+def test_preset_for_date_weekday_map():
+    cases = [
+        (datetime(2026, 6, 15, 12, 0, tzinfo=timezone.utc), "meeting_monday"),
+        (datetime(2026, 6, 16, 12, 0, tzinfo=timezone.utc), "standard"),
+        (datetime(2026, 6, 17, 12, 0, tzinfo=timezone.utc), "coffee_break"),
+        (datetime(2026, 6, 18, 12, 0, tzinfo=timezone.utc), "reorg_week"),
+        (datetime(2026, 6, 19, 12, 0, tzinfo=timezone.utc), "synergy_sprint"),
+        (datetime(2026, 6, 20, 12, 0, tzinfo=timezone.utc), "coffee_break"),
+        (datetime(2026, 6, 21, 12, 0, tzinfo=timezone.utc), "standard"),
+    ]
+    for dt, expected_id in cases:
+        preset = preset_for_date(dt)
+        assert preset["id"] == expected_id
+        assert preset["label"] == PRESETS[expected_id]["label"]
+        assert preset["description"] == PRESETS[expected_id]["description"]
 
 
 def test_build_welcome_text_includes_controls_and_shift():

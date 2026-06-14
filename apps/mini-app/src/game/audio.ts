@@ -11,10 +11,19 @@ let rampDurationMs = 0;
 let rampFromVol = 0;
 let rampToVol = 0;
 
+let humOsc: OscillatorNode | null = null;
+let humGain: GainNode | null = null;
+
 const BGM_URL = "/audio/bgm-streso-chorus.mp3";
 const BGM_VOLUME_RUN_QUIET = 0.04;
 const BGM_VOLUME_RUN_FULL = 0.14;
+const BGM_VOLUME_EXEC_BOARD = 0.17;
+const BGM_VOLUME_EXEC_ANGEL = 0.20;
 const BGM_RAMP_MS = 12_000;
+const BGM_EXEC_RAMP_MS = 8_000;
+const HUM_FREQ_HZ = 55;
+const HUM_GAIN_BOARD = 0.015;
+const HUM_GAIN_ANGEL = 0.022;
 
 function initAudio(): void {
   if (!audioCtx) {
@@ -37,6 +46,44 @@ function cancelBgmAnim(): void {
     cancelAnimationFrame(animFrameId);
     animFrameId = null;
   }
+}
+
+function stopExecutiveHum(): void {
+  if (humOsc) {
+    try {
+      humOsc.stop();
+    } catch {
+      /* already stopped */
+    }
+    humOsc.disconnect();
+    humOsc = null;
+  }
+  if (humGain) {
+    humGain.disconnect();
+    humGain = null;
+  }
+}
+
+function startExecutiveHum(gainLevel: number): void {
+  if (isMuted || !audioCtx) return;
+  stopExecutiveHum();
+  try {
+    humOsc = audioCtx.createOscillator();
+    humGain = audioCtx.createGain();
+    humOsc.type = "sine";
+    humOsc.frequency.setValueAtTime(HUM_FREQ_HZ, audioCtx.currentTime);
+    humGain.gain.setValueAtTime(gainLevel, audioCtx.currentTime);
+    humOsc.connect(humGain);
+    humGain.connect(audioCtx.destination);
+    humOsc.start();
+  } catch {
+    stopExecutiveHum();
+  }
+}
+
+function setExecutiveHumGain(gainLevel: number): void {
+  if (!humGain || !audioCtx || isMuted) return;
+  humGain.gain.setValueAtTime(gainLevel, audioCtx.currentTime);
 }
 
 function startRamp(from: number, to: number, durationMs: number): void {
@@ -97,6 +144,7 @@ export const audio = {
     isMuted = muted;
     if (muted) {
       cancelBgmAnim();
+      stopExecutiveHum();
       bgm?.pause();
       return;
     }
@@ -106,6 +154,10 @@ export const audio = {
         /* iOS/Telegram gesture policy */
       });
       resumeRampIfNeeded();
+      if (humOsc && humGain) {
+        const level = humGain.gain.value;
+        setExecutiveHumGain(level);
+      }
     }
   },
   isMuted(): boolean {
@@ -118,6 +170,7 @@ export const audio = {
   },
   startManagerBgmRamp(): void {
     cancelBgmAnim();
+    stopExecutiveHum();
     bgmMode = "run";
     const el = initBgm();
     el.currentTime = 0;
@@ -134,8 +187,31 @@ export const audio = {
     });
     startRamp(BGM_VOLUME_RUN_QUIET, BGM_VOLUME_RUN_FULL, BGM_RAMP_MS);
   },
+  intensifyExecutiveBgm(tier: "board" | "angel"): void {
+    if (bgmMode !== "run") return;
+    const targetVol = tier === "board" ? BGM_VOLUME_EXEC_BOARD : BGM_VOLUME_EXEC_ANGEL;
+    const humLevel = tier === "board" ? HUM_GAIN_BOARD : HUM_GAIN_ANGEL;
+    const el = initBgm();
+    const fromVol = el.volume;
+    if (isMuted) {
+      rampStartedAt = performance.now();
+      rampDurationMs = BGM_EXEC_RAMP_MS;
+      rampFromVol = fromVol;
+      rampToVol = targetVol;
+      return;
+    }
+    startRamp(fromVol, targetVol, BGM_EXEC_RAMP_MS);
+    if (tier === "board") {
+      startExecutiveHum(humLevel);
+    } else if (humOsc) {
+      setExecutiveHumGain(humLevel);
+    } else {
+      startExecutiveHum(humLevel);
+    }
+  },
   stopBgm(): void {
     cancelBgmAnim();
+    stopExecutiveHum();
     bgmMode = "off";
     rampDurationMs = 0;
     if (!bgm) return;
@@ -185,6 +261,22 @@ export function __getBgmElementForTest(): HTMLAudioElement | null {
 
 /** @internal test hook */
 export function __resetBgmForTest(): void {
+  stopExecutiveHum();
   bgm = null;
   bgmMode = "off";
+}
+
+/** @internal test hook */
+export function __getBgmModeForTest(): BgmMode {
+  return bgmMode;
+}
+
+/** @internal test hook */
+export function __setBgmModeForTest(mode: BgmMode): void {
+  bgmMode = mode;
+}
+
+/** @internal test hook */
+export function __getRampTargetForTest(): number {
+  return rampToVol;
 }

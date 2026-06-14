@@ -70,6 +70,14 @@ export const NEWS_TICKER_HEADLINES: TickerHeadline[] = [
   { text: "Standup about standups yields no standing decisions", deathType: "meeting" },
   { text: "Matrix management trial enters year seven of phase one", deathType: "reorg" },
   { text: "Board approves unlimited PTO that nobody can take", deathType: "energy" },
+  { text: "Spousal disclosure committee schedules emergency quorum on your weekend", deathType: "meeting" },
+  { text: "Marital divestiture memo routed through Legal before breakfast", deathType: "reorg" },
+  { text: "Governance calendar now reports directly to your marriage", deathType: "meeting" },
+  { text: "Whistleblower forwarded your personal calendar to the board packet", deathType: "meeting" },
+  { text: "Executive longevity screening flagged pre-existing ambition", deathType: "burnout" },
+  { text: "Cardiologist opened a ticket in the same sprint as your term sheet", deathType: "burnout" },
+  { text: "Portfolio review now includes joints and quarterly KPIs", deathType: "foliage" },
+  { text: "IV drip lounge replaces coffee; hydration is due diligence", deathType: "energy" },
 ];
 
 export const REAPPLY_FLAVOR: { minRuns: number; line: string }[] = [
@@ -90,13 +98,52 @@ export const REAPPLY_FLAVOR: { minRuns: number; line: string }[] = [
 export const MANAGER_NEMESIS_LINE =
   "VP of People Ops: Congratulations. Your 1:1s are now everyone else's calendar problem.";
 
+export const MEETING_MONDAY_OPENING_MEMO =
+  "Meeting Monday — your calendar owns you now. Blockers are decorative.";
+
 export const CEO_TRAP_ANNOUNCEMENT =
   "Corner office secured. Quarterly deadlines now report directly to you.";
+
+export const BOARD_TRAP_ANNOUNCEMENT =
+  "Board seat secured. Governance quorum now blocks both lanes of your personal life.";
+
+export const ANGEL_TRAP_ANNOUNCEMENT =
+  "Term sheet signed. Runway deadlines and wellness kiosks now audit your biology.";
 
 export const INTERN_FAKE_PROMO: { years: number; message: string }[] = [
   { years: 2, message: "Performance note filed: almost ready for real promotion. Almost." },
   { years: 5, message: "VP pinged about your trajectory. The ping was CC'd to nobody." },
   { years: 9.9, message: "Manager paperwork submitted. Printer jammed. Classic." },
+];
+
+export const BOARD_FAKE_PROMO: { years: number; message: string }[] = [
+  {
+    years: 52,
+    message: "Spousal disclosure form filed under strategic partnership. Partnership under review.",
+  },
+  {
+    years: 58,
+    message: "Marital divestiture committee scheduled. Assets reorged before lunch.",
+  },
+  {
+    years: 65,
+    message: "Conflict-of-interest flagged with your weekend. HR cited fiduciary romance.",
+  },
+];
+
+export const ANGEL_FAKE_PROMO: { years: number; message: string }[] = [
+  {
+    years: 78,
+    message: "Executive longevity screening complete. Biology declined to comment.",
+  },
+  {
+    years: 85,
+    message: "Cardiologist ticket merged with your portfolio review. Same sprint.",
+  },
+  {
+    years: 92,
+    message: "IV drip lounge grand opening. Coffee is now a legacy integration.",
+  },
 ];
 
 export const DEATH_EMOJI: Record<DeathType, string> = {
@@ -127,6 +174,25 @@ export const RETRY_TIPS: Record<DeathType, string> = {
   foliage: "Mandatory desk plant owns that lane. Step to the open side.",
   energy: "Grab coffee when you can. Decaf is not a strategy.",
   sprint: "The buzzer doesn't care about your pipeline. Climb faster next standup.",
+};
+
+export const RETRY_TIPS_BY_RANK: Partial<
+  Record<Rank, Partial<Record<DeathType, string>>>
+> = {
+  "Board Member": {
+    meeting: "Quorum owns that lane. Dodge governance, not product.",
+    reorg: "Restructures shuffle fiduciary drama. Next rung stays frozen.",
+    burnout: "Filing deadlines outrank your calendar. Side-step the paperwork.",
+    foliage: "ESG mandate planted there. Biophilic compliance is not optional.",
+    energy: "Even the board runs dry. Coffee before the disclosure committee.",
+  },
+  "Angel Investor": {
+    meeting: "Pitch deck collision. Investors love slides in your lane.",
+    reorg: "Pivot shuffled the runway. Frozen rung still holds.",
+    burnout: "Runway clock owns that side. Due diligence is vibes-based.",
+    foliage: "Wellness kiosk deployed. IV drip is not a dodge strategy.",
+    energy: "Portfolio review drained you. Hydration is a KPI now.",
+  },
 };
 
 export const SPRINT_GAME_OVER = {
@@ -206,6 +272,18 @@ export const FAILURE_BY_RANK: Partial<Record<Rank, string[]>> = {
     "Strategic pivot into a pivot. You were the pivot.",
     "All-hands applauded your memo. Nobody read past the subject line.",
     "Corner office view excellent. Runway visibility zero.",
+  ],
+  "Board Member": [
+    "Spousal disclosure committee voted you out of your own marriage.",
+    "Whistleblower forwarded your calendar to Legal. Quorum optional.",
+    "Marital divestiture memo filed under strategic partnership. Partnership dissolved.",
+    "Governance meeting about your marriage yielded no standing decisions.",
+  ],
+  "Angel Investor": [
+    "Executive longevity screening flagged pre-existing ambition. Cardiology concurred.",
+    "Term sheet signed. Biology opened a follow-up ticket in the same sprint.",
+    "Portfolio review included your joints. Due diligence was vibes-based.",
+    "IV drip lounge replaced coffee. Hydration KPI met. Energy bar did not.",
   ],
 };
 
@@ -335,9 +413,63 @@ const OBSTACLE_WEIGHTS: Partial<Record<Rank, Partial<Record<ObstacleType, number
   Manager: { meeting: 0.55, reorg: 0.3, badge_gate: 0.15 },
   Director: { meeting: 0.45, reorg: 0.28, badge_gate: 0.12, burnout: 0.15 },
   CEO: { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
-  "Board Member": { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
-  "Angel Investor": { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
+  "Board Member": { meeting: 0.48, reorg: 0.27, burnout: 0.12, foliage: 0.13 },
+  "Angel Investor": { meeting: 0.35, reorg: 0.22, burnout: 0.28, foliage: 0.25 },
 };
+
+export type ObstacleBadgeDisplay = { emoji: string; label: string };
+
+const DEFAULT_BADGE_DISPLAY: Record<ObstacleType, ObstacleBadgeDisplay> = {
+  meeting: { emoji: "📅", label: "Meeting" },
+  reorg: { emoji: "🔄", label: "Reorg" },
+  burnout: { emoji: "⏰", label: "Deadline" },
+  badge_gate: { emoji: "🪪", label: "Gate" },
+  foliage: { emoji: "🪴", label: "Plant" },
+};
+
+const BOARD_BADGE_DISPLAY: Partial<Record<ObstacleType, ObstacleBadgeDisplay>> = {
+  meeting: { emoji: "🏛️", label: "Quorum" },
+  reorg: { emoji: "📋", label: "Restructure" },
+  burnout: { emoji: "📑", label: "Filing" },
+  foliage: { emoji: "🌿", label: "ESG" },
+};
+
+const ANGEL_BADGE_DISPLAY: Partial<Record<ObstacleType, ObstacleBadgeDisplay>> = {
+  meeting: { emoji: "📊", label: "Pitch" },
+  reorg: { emoji: "🔀", label: "Pivot" },
+  burnout: { emoji: "🛫", label: "Runway" },
+  foliage: { emoji: "💉", label: "Wellness" },
+};
+
+export function obstacleBadgeDisplay(
+  type: ObstacleType,
+  rank: Rank,
+  opts?: { isImminent?: boolean; dailyModifierId?: string; rungId?: number }
+): ObstacleBadgeDisplay {
+  const isImminent = opts?.isImminent ?? false;
+  const dailyModifierId = opts?.dailyModifierId ?? "standard";
+  const rungId = opts?.rungId ?? 0;
+
+  if (type === "meeting" && dailyModifierId === "meeting_monday") {
+    if (rungId % 2 === 0) {
+      return { emoji: "📧", label: "Reply-All" };
+    }
+    return { emoji: "🧍", label: "Standup" };
+  }
+
+  if (type === "reorg" && isImminent) {
+    return { emoji: "🧊", label: "Frozen" };
+  }
+
+  if (rank === "Board Member" && BOARD_BADGE_DISPLAY[type]) {
+    return BOARD_BADGE_DISPLAY[type]!;
+  }
+  if (rank === "Angel Investor" && ANGEL_BADGE_DISPLAY[type]) {
+    return ANGEL_BADGE_DISPLAY[type]!;
+  }
+
+  return DEFAULT_BADGE_DISPLAY[type];
+}
 
 export function pickObstacleType(
   rank: Rank,

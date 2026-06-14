@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  ANGEL_FAKE_PROMO,
   ANGEL_YEARS,
   BASE_DRAIN_RATE,
+  BOARD_FAKE_PROMO,
   BOARD_YEARS,
   CEO_YEARS,
   DIRECTOR_YEARS,
@@ -13,6 +15,7 @@ import {
   allowedObstacleTypes,
   isExecutiveRank,
   milestoneLabel,
+  obstacleBadgeDisplay,
   pickObstacleType,
   rankEmoji,
   rankFromYears,
@@ -113,6 +116,23 @@ describe("obstacle gating", () => {
     spy.mockRestore();
   });
 
+  it("pickObstacleType weights favor meetings for Board Member at low roll", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.1);
+    expect(pickObstacleType("Board Member")).toBe("meeting");
+    spy.mockRestore();
+  });
+
+  it("pickObstacleType weights favor foliage for Angel Investor at high roll", () => {
+    const spy = vi.spyOn(Math, "random").mockReturnValue(0.96);
+    expect(pickObstacleType("Angel Investor")).toBe("foliage");
+    spy.mockRestore();
+  });
+
+  it("board and angel fake promo arrays are populated", () => {
+    expect(BOARD_FAKE_PROMO.length).toBeGreaterThan(0);
+    expect(ANGEL_FAKE_PROMO.length).toBeGreaterThan(0);
+  });
+
   it("pickObstacleType can return burnout for Director", () => {
     const spy = vi.spyOn(Math, "random").mockReturnValue(0.95);
     expect(pickObstacleType("Director")).toBe("burnout");
@@ -176,5 +196,27 @@ describe("milestoneLabel", () => {
 describe("rankEmoji", () => {
   it("uses neutral manager emoji", () => {
     expect(rankEmoji("Manager")).toBe("🧑‍💼");
+  });
+});
+
+describe("obstacleBadgeDisplay", () => {
+  it("returns board governance labels", () => {
+    expect(obstacleBadgeDisplay("meeting", "Board Member").label).toBe("Quorum");
+    expect(obstacleBadgeDisplay("burnout", "Board Member").label).toBe("Filing");
+  });
+
+  it("returns angel investor labels", () => {
+    expect(obstacleBadgeDisplay("meeting", "Angel Investor").label).toBe("Pitch");
+    expect(obstacleBadgeDisplay("foliage", "Angel Investor").label).toBe("Wellness");
+  });
+
+  it("keeps meeting monday reskin ahead of rank labels", () => {
+    expect(
+      obstacleBadgeDisplay("meeting", "Board Member", { dailyModifierId: "meeting_monday", rungId: 0 }).label
+    ).toBe("Reply-All");
+  });
+
+  it("shows frozen label for imminent reorg", () => {
+    expect(obstacleBadgeDisplay("reorg", "CEO", { isImminent: true }).label).toBe("Frozen");
   });
 });

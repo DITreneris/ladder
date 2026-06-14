@@ -7,11 +7,28 @@ import {
   resolveDailyModifier,
 } from "./daily-modifier";
 
+const WEEK_PARITY_CASES: { iso: string; preset: string }[] = [
+  { iso: "2026-06-15T12:00:00Z", preset: "meeting_monday" },
+  { iso: "2026-06-16T12:00:00Z", preset: "standard" },
+  { iso: "2026-06-17T12:00:00Z", preset: "coffee_break" },
+  { iso: "2026-06-18T12:00:00Z", preset: "reorg_week" },
+  { iso: "2026-06-19T12:00:00Z", preset: "synergy_sprint" },
+  { iso: "2026-06-20T12:00:00Z", preset: "coffee_break" },
+  { iso: "2026-06-21T12:00:00Z", preset: "standard" },
+];
+
 describe("daily-modifier", () => {
+  it("maps UTC weekdays to work-week presets", () => {
+    for (const { iso, preset } of WEEK_PARITY_CASES) {
+      expect(presetIdForDate(new Date(iso))).toBe(preset);
+    }
+  });
+
   it("maps the same UTC date to the same preset", () => {
-    const a = presetIdForDate(new Date("2026-06-01T12:00:00Z"));
-    const b = presetIdForDate(new Date("2026-06-01T23:59:00Z"));
+    const a = presetIdForDate(new Date("2026-06-15T00:00:00Z"));
+    const b = presetIdForDate(new Date("2026-06-15T23:59:00Z"));
     expect(a).toBe(b);
+    expect(a).toBe("meeting_monday");
   });
 
   it("returns stable hash for a date key", () => {
@@ -44,15 +61,15 @@ describe("daily-modifier", () => {
   });
 
   it("getDailyModifier returns a copy of preset data", () => {
-    const mod = getDailyModifier(new Date("2026-01-15T00:00:00Z"));
-    expect(mod.id).toBe(presetIdForDate(new Date("2026-01-15T00:00:00Z")));
+    const mod = getDailyModifier(new Date("2026-06-18T00:00:00Z"));
+    expect(mod.id).toBe("reorg_week");
     expect(mod.description.length).toBeGreaterThan(0);
   });
 });
 
 describe("resolveDailyModifier", () => {
   it("falls back to UTC day preset in test env", () => {
-    const mod = resolveDailyModifier(new Date("2026-03-10T00:00:00Z"));
-    expect(mod.id).toBe(presetIdForDate(new Date("2026-03-10T00:00:00Z")));
+    const mod = resolveDailyModifier(new Date("2026-06-16T00:00:00Z"));
+    expect(mod.id).toBe("standard");
   });
 });

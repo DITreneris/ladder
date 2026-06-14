@@ -9,6 +9,8 @@ import {
   FAILURE_BY_RANK,
   FAILURE_BY_SHIFT,
   FAILURE_REASONS,
+  ANGEL_FAKE_PROMO,
+  BOARD_FAKE_PROMO,
   INTERN_FAKE_PROMO,
   INTERN_TUTORIAL_RUNGS,
   MANAGER_YEARS,
@@ -72,7 +74,7 @@ export class GameEngine {
   private dailyModifier: DailyModifier;
   private readonly fixedDailyModifier?: DailyModifier;
   private activeTicker: TickerHeadline | null = null;
-  private internFakePromoShown = new Set<number>();
+  private rankBandPromoShown = new Set<number>();
   private lastTapAt = 0;
   private runStartedAt = 0;
   private documentHidden = false;
@@ -286,7 +288,7 @@ export class GameEngine {
     this.firstTapDone = false;
     this.coffeeCollected = false;
     this.drainPausedUntil = 0;
-    this.internFakePromoShown.clear();
+    this.rankBandPromoShown.clear();
     this.lastTapAt = 0;
     this.runStartedAt = Date.now();
     this.documentHidden = typeof document !== "undefined" ? document.hidden : false;
@@ -384,7 +386,7 @@ export class GameEngine {
       triageBiasSide: this.triageBiasSide,
       triageBiasRemaining: this.triageBiasRemaining,
       lastTriageAtScore: this.lastTriageAtScore,
-      internFakePromoShown: [...this.internFakePromoShown],
+      rankBandPromoShown: [...this.rankBandPromoShown],
     };
   }
 
@@ -408,7 +410,11 @@ export class GameEngine {
     this.triageBiasSide = snapshot.triageBiasSide;
     this.triageBiasRemaining = snapshot.triageBiasRemaining;
     this.lastTriageAtScore = snapshot.lastTriageAtScore;
-    this.internFakePromoShown = new Set(snapshot.internFakePromoShown);
+    const promoShown =
+      snapshot.rankBandPromoShown ??
+      (snapshot as { internFakePromoShown?: number[] }).internFakePromoShown ??
+      [];
+    this.rankBandPromoShown = new Set(promoShown);
     this.rungs = snapshot.rungs.map((r) => ({ ...r }));
     this.dailyModifier =
       this.fixedDailyModifier ?? getDailyModifierById(snapshot.dailyModifierId as DailyModifier["id"]);
@@ -452,7 +458,7 @@ export class GameEngine {
     this.nextRungId = rungs.length;
     this.coffeeCollected = true;
     this.drainPausedUntil = 0;
-    this.internFakePromoShown.clear();
+    this.rankBandPromoShown.clear();
     this.dailyModifier = this.fixedDailyModifier ?? resolveDailyModifier();
     this.rungs = rungs.map((r) => ({ ...r }));
 
@@ -471,12 +477,17 @@ export class GameEngine {
     this.reorgInterval = null;
   }
 
-  private checkInternFakePromos(years: number): void {
-    if (this.currentRank !== "Intern") return;
+  private checkRankBandPromos(years: number): void {
+    let promos: { years: number; message: string }[] = [];
+    if (this.currentRank === "Intern") promos = INTERN_FAKE_PROMO;
+    else if (this.currentRank === "Board Member") promos = BOARD_FAKE_PROMO;
+    else if (this.currentRank === "Angel Investor") promos = ANGEL_FAKE_PROMO;
+    else return;
+
     const yearsTenths = Math.floor(years * 10) / 10;
-    for (const promo of INTERN_FAKE_PROMO) {
-      if (yearsTenths >= promo.years && !this.internFakePromoShown.has(promo.years)) {
-        this.internFakePromoShown.add(promo.years);
+    for (const promo of promos) {
+      if (yearsTenths >= promo.years && !this.rankBandPromoShown.has(promo.years)) {
+        this.rankBandPromoShown.add(promo.years);
         this.callbacks.onToast(promo.message);
       }
     }
@@ -550,7 +561,7 @@ export class GameEngine {
 
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
-    this.checkInternFakePromos(years);
+    this.checkRankBandPromos(years);
     if (coffeePickup) {
       this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
       debugTapResult(side, nextRung, "coffee");
@@ -572,6 +583,12 @@ export class GameEngine {
       this.callbacks.onRankChange(this.currentRank, msg);
       if (prevRank === "Intern" && this.currentRank === "Manager") {
         audio.startManagerBgmRamp();
+      }
+      if (this.currentRank === "Board Member" && prevRank !== "Board Member") {
+        audio.intensifyExecutiveBgm("board");
+      }
+      if (this.currentRank === "Angel Investor" && prevRank !== "Angel Investor") {
+        audio.intensifyExecutiveBgm("angel");
       }
       this.startReorgLoop();
     }

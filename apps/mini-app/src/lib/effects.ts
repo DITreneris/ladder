@@ -262,3 +262,15 @@ export function triggerDeathCauseHold(el: HTMLElement): void {
     { once: true }
   );
 }
+
+export function triggerFloorBandFlash(el: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  el.classList.remove("floor-band-flash");
+  void el.offsetWidth;
+  el.classList.add("floor-band-flash");
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove("floor-band-flash"),
+    { once: true }
+  );
+}

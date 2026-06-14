@@ -35,6 +35,17 @@ const PRESET_ORDER: DailyPresetId[] = [
   "synergy_sprint",
 ];
 
+/** Monday=1 … Sunday=0 (Date.getUTCDay) → preset id */
+const UTC_DAY_PRESET: DailyPresetId[] = [
+  "standard", // Sun
+  "meeting_monday", // Mon
+  "standard", // Tue
+  "coffee_break", // Wed
+  "reorg_week", // Thu
+  "synergy_sprint", // Fri
+  "coffee_break", // Sat
+];
+
 const PRESETS: Record<DailyPresetId, DailyModifier> = {
   standard: {
     id: "standard",
@@ -91,14 +102,7 @@ const PRESETS: Record<DailyPresetId, DailyModifier> = {
   },
 };
 
-function utcDateKey(date: Date): string {
-  const y = date.getUTCFullYear();
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(date.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-/** Deterministic hash for UTC date string → preset index */
+/** Legacy hash — dev/tests only; production preset uses UTC_DAY_PRESET. */
 export function hashDateKey(key: string): number {
   let h = 0;
   for (let i = 0; i < key.length; i++) {
@@ -108,8 +112,8 @@ export function hashDateKey(key: string): number {
 }
 
 export function presetIdForDate(utcDate: Date): DailyPresetId {
-  const idx = hashDateKey(utcDateKey(utcDate)) % PRESET_ORDER.length;
-  return PRESET_ORDER[idx]!;
+  const day = utcDate.getUTCDay();
+  return UTC_DAY_PRESET[day] ?? "standard";
 }
 
 export function getDailyModifier(utcDate: Date = new Date()): DailyModifier {

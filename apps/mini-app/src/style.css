@@ -1206,6 +1206,31 @@ html.cl-in-telegram .cl-telegram-cta-hint {
   background-color: color-mix(in srgb, var(--color-cl-promo-bg) 12%, transparent);
 }
 
+/* Floor bands at Board (50y) / Angel (75y) — skipped when Reorg Week tint is active */
+.office-grid-boardroom:not(.office-grid-reorg-week) {
+  background-color: color-mix(in srgb, var(--color-cl-rank-board-bg) 18%, transparent);
+}
+
+.office-grid-investor-lounge:not(.office-grid-reorg-week) {
+  background-color: color-mix(in srgb, var(--color-cl-rank-angel-bg) 18%, transparent);
+}
+
+@keyframes floor-band-flash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.88;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.floor-band-flash {
+  animation: floor-band-flash 0.15s ease-out;
+}
+
 @keyframes shift-badge-enter {
   from {
     opacity: 0;
