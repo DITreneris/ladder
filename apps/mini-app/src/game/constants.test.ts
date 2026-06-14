@@ -17,10 +17,11 @@ import {
   milestoneLabel,
   obstacleBadgeDisplay,
   pickObstacleType,
+  formatTickerMarqueeLoopText,
   formatTickerMarqueeText,
   pickTickerHeadlineSet,
   TICKER_MARQUEE_SEPARATOR,
-  tickerMarqueeDurationSec,
+  tickerMarqueeDurationFromCopyWidth,
   rankEmoji,
   rankFromYears,
   reorgIntervalForRank,
@@ -273,17 +274,26 @@ describe("formatTickerMarqueeText", () => {
   });
 });
 
-describe("tickerMarqueeDurationSec", () => {
-  it("clamps short strips to 30s minimum", () => {
-    expect(tickerMarqueeDurationSec("short")).toBe(30);
+describe("formatTickerMarqueeLoopText", () => {
+  it("duplicates marquee content with separator between copies", () => {
+    const once = formatTickerMarqueeText([{ text: "Alpha", deathType: "meeting" }]);
+    expect(formatTickerMarqueeLoopText([{ text: "Alpha", deathType: "meeting" }])).toBe(
+      `${once}${TICKER_MARQUEE_SEPARATOR}${once}`
+    );
+  });
+});
+
+describe("tickerMarqueeDurationFromCopyWidth", () => {
+  it("clamps short copy width to 18s minimum", () => {
+    expect(tickerMarqueeDurationFromCopyWidth(550)).toBe(18);
   });
 
-  it("clamps very long strips to 60s maximum", () => {
-    expect(tickerMarqueeDurationSec("x".repeat(1000))).toBe(60);
+  it("scales mid-width copy at 55 px/s", () => {
+    expect(tickerMarqueeDurationFromCopyWidth(1100)).toBe(20);
   });
 
-  it("scales mid-length strips between clamps", () => {
-    expect(tickerMarqueeDurationSec("x".repeat(400))).toBe(48);
+  it("clamps very wide copy to 90s maximum", () => {
+    expect(tickerMarqueeDurationFromCopyWidth(6000)).toBe(90);
   });
 });
 

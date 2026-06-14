@@ -438,9 +438,17 @@ export function formatTickerMarqueeText(headlines: TickerHeadline[]): string {
   return headlines.map(formatTickerText).join(TICKER_MARQUEE_SEPARATOR);
 }
 
-/** Seconds for one full marquee pass; ~0.12s per char, clamped for readability. */
-export function tickerMarqueeDurationSec(text: string): number {
-  return Math.min(60, Math.max(30, Math.round(text.length * 0.12)));
+export const TICKER_MARQUEE_PX_PER_SEC = 55;
+
+export function formatTickerMarqueeLoopText(headlines: TickerHeadline[]): string {
+  const once = formatTickerMarqueeText(headlines);
+  return `${once}${TICKER_MARQUEE_SEPARATOR}${once}`;
+}
+
+/** Duration for one seamless copy pass at constant scroll speed. */
+export function tickerMarqueeDurationFromCopyWidth(copyWidthPx: number): number {
+  const sec = copyWidthPx / TICKER_MARQUEE_PX_PER_SEC;
+  return Math.min(90, Math.max(18, Math.round(sec * 10) / 10));
 }
 
 export function reappliesFlavor(runCount: number): string {

@@ -14,13 +14,14 @@ import {
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
   floorLabel,
+  formatTickerMarqueeLoopText,
   formatTickerMarqueeText,
   MEETING_MONDAY_OPENING_MEMO,
   milestoneLabel,
   obstacleBadgeDisplay,
   pickTickerHeadlineSet,
   rankEmoji,
-  tickerMarqueeDurationSec,
+  tickerMarqueeDurationFromCopyWidth,
   rankFromYears,
   rankPropEmoji,
   type TickerHeadline,
@@ -226,16 +227,38 @@ function tickerCacheKeyFor(utcDate: Date, presetId: DailyModifier["id"], careerB
 
 function mountTickerMarqueeDOM(): void {
   if (tickerHeadlineSet.length === 0) return;
-  const text = formatTickerMarqueeText(tickerHeadlineSet);
   const tickerEl = $("newsTickerText");
-  tickerEl.classList.remove("news-ticker-text--static");
-  tickerEl.textContent = text;
-  tickerEl.style.setProperty("--ticker-duration", `${tickerMarqueeDurationSec(text)}s`);
-  if (shouldTickerScroll()) {
-    void tickerEl.offsetWidth;
-  } else {
+  const trackEl = tickerEl.parentElement;
+
+  tickerEl.style.removeProperty("--ticker-start");
+  tickerEl.style.removeProperty("--ticker-end");
+  tickerEl.style.removeProperty("--ticker-duration");
+
+  if (!shouldTickerScroll() || !trackEl) {
+    tickerEl.textContent = formatTickerMarqueeText(tickerHeadlineSet);
     tickerEl.classList.add("news-ticker-text--static");
+    return;
   }
+
+  tickerEl.classList.remove("news-ticker-text--static");
+  tickerEl.textContent = formatTickerMarqueeLoopText(tickerHeadlineSet);
+  void tickerEl.offsetWidth;
+
+  const trackW = trackEl.clientWidth;
+  const loopW = tickerEl.scrollWidth;
+  const copyW = loopW / 2;
+
+  if (copyW <= trackW) {
+    tickerEl.textContent = formatTickerMarqueeText(tickerHeadlineSet);
+    tickerEl.classList.add("news-ticker-text--static");
+    return;
+  }
+
+  const durationSec = tickerMarqueeDurationFromCopyWidth(copyW);
+  tickerEl.style.setProperty("--ticker-start", `${trackW}px`);
+  tickerEl.style.setProperty("--ticker-end", `${trackW - copyW}px`);
+  tickerEl.style.setProperty("--ticker-duration", `${durationSec}s`);
+  void tickerEl.offsetWidth;
 }
 
 function ensureTickerHeadlines(): void {
