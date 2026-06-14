@@ -10,8 +10,6 @@ import {
   MAX_VISIBLE_RUNGS,
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
-  RETRY_TIPS,
-  RETRY_TIPS_BY_RANK,
   TUTORIAL_DONE_STORAGE_KEY,
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
@@ -24,7 +22,6 @@ import {
   rankEmoji,
   rankFromYears,
   rankPropEmoji,
-  reappliesFlavor,
   type TickerHeadline,
 } from "./game/constants";
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
@@ -38,6 +35,16 @@ import { trackEvent } from "./lib/analytics";
 import { debugLog, describeNextRung, getSafeTapSide, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
 import { openPromptAnatomy } from "./lib/branding";
 import { buildShareMessageText } from "./lib/share-copy";
+import {
+  formatStatBestDelta,
+  formatTerminationDisplayDetail,
+  loadRankHintsSeen,
+  markRankHintSeen,
+  pickGameOverPunchline,
+  pickLeaderboardGapContextLine,
+  pickSyncGameOverContextLine,
+  type GameOverContextLine,
+} from "./lib/game-over-copy";
 import { icon } from "./lib/icons";
 import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
 import {
@@ -1359,32 +1366,48 @@ async function goHome(): Promise<void> {
   switchTab("home");
 }
 
-function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult): void {
-  const gapEl = $("leaderboardGapLine");
-  const boardLabel = leaderboardPeriod === "weekly" ? "the last 7 days board" : "today's board";
-  if (!lbResult.ok) {
-    gapEl.textContent = "";
-    gapEl.classList.add("hidden");
+function setGameOverContextLine(line: GameOverContextLine | null): void {
+  const el = $("gameOverContextLine");
+  if (!line) {
+    el.textContent = "";
+    el.classList.add("hidden");
+    el.classList.remove("text-indigo-700", "font-bold", "text-slate-500", "font-semibold");
     return;
   }
-  const top = lbResult.entries[0];
-  if (top && top.years_survived > result.yearsSurvived) {
-    const gap = top.years_survived - result.yearsSurvived;
-    gapEl.textContent = `#1 on ${boardLabel} is ${gap.toFixed(1)}y ahead`;
-    gapEl.classList.remove("hidden");
-  } else if (top?.is_current_user) {
-    gapEl.textContent = `You're #1 on ${boardLabel}.`;
-    gapEl.classList.remove("hidden");
-  } else {
-    gapEl.textContent = "";
-    gapEl.classList.add("hidden");
-  }
+  el.textContent = line.text;
+  el.classList.remove("hidden");
+  const isLeaderboard = line.variant === "leaderboard";
+  el.classList.toggle("text-indigo-700", isLeaderboard);
+  el.classList.toggle("font-bold", isLeaderboard);
+  el.classList.toggle("text-slate-500", !isLeaderboard);
+  el.classList.toggle("font-semibold", !isLeaderboard);
 }
 
-function refreshCareerHighOnGameOver(): void {
-  if (highScore > 0 && bestRank) {
-    $("careerHighLine").textContent = `Career high: ${bestRank} (${highScore.toFixed(1)}y)`;
-  }
+function applyStatBestDelta(
+  yearsSurvived: number,
+  previousBest: number,
+  previousBestRank: Rank | null,
+  pendingStamp: boolean
+): void {
+  const delta = formatStatBestDelta(yearsSurvived, previousBest, previousBestRank, pendingStamp);
+  $("statBestDelta").textContent = delta.text;
+  $("statBestDelta").className = delta.className;
+}
+
+function applyLeaderboardGap(result: GameOverResult, lbResult: LeaderboardResult): void {
+  if (challengeTargetYears !== null) return;
+
+  const boardLabel = leaderboardPeriod === "weekly" ? "the last 7 days board" : "today's board";
+  if (!lbResult.ok) return;
+
+  const top = lbResult.entries[0];
+  const line = pickLeaderboardGapContextLine({
+    yearsSurvived: result.yearsSurvived,
+    topYears: top?.years_survived ?? null,
+    isCurrentUserTop: Boolean(top?.is_current_user),
+    boardLabel,
+  });
+  setGameOverContextLine(line);
 }
 
 function showSubmitResultToast(submitResult: SubmitRunResult | null): void {
@@ -1432,8 +1455,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
     engine?.setCareerBestYears(highScore);
     $("highScoreBadge").textContent = highScore.toFixed(1);
     refreshHomeBadgeUI();
-    refreshCareerHighOnGameOver();
-    refreshOptimisticBestDelta(result, previousBest, false);
+    applyStatBestDelta(result.yearsSurvived, previousBest, bestRank, false);
     setSyncStatus("ok");
   } else {
     setSyncStatus("failed");
@@ -1465,23 +1487,6 @@ function enrichGameOverAsync(result: GameOverResult, submitResult: SubmitRunResu
       }
     }
   });
-}
-
-function refreshOptimisticBestDelta(
-  result: GameOverResult,
-  previousBest: number,
-  pendingStamp: boolean
-): void {
-  const deltaEl = $("statBestDelta");
-  if (result.yearsSurvived > previousBest) {
-    const delta = previousBest > 0 ? result.yearsSurvived - previousBest : result.yearsSurvived;
-    const suffix = pendingStamp ? " (pending HR stamp)" : "";
-    deltaEl.textContent =
-      previousBest > 0
-        ? `+${delta.toFixed(1)} Years (new record!)${suffix}`
-        : `New personal best!${suffix}`;
-    deltaEl.className = "text-nano font-bold text-emerald-600 mt-0.5";
-  }
 }
 
 function retryLastSubmit(): void {
@@ -1526,60 +1531,35 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
-  $("terminationReason").textContent = result.terminationDetail;
-$("retryTip").textContent =
-    RETRY_TIPS_BY_RANK[result.finalRank]?.[result.deathType] ?? RETRY_TIPS[result.deathType];
-  $("terminationFlavor").textContent = result.terminationFlavor;
+  $("terminationReason").textContent = formatTerminationDisplayDetail(
+    result.deathType,
+    result.terminationDetail
+  );
   $("reviewId").textContent = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
 
   const reapplyCount = incrementReapplyCount();
-  $("reapplyFlavorLine").textContent = reappliesFlavor(reapplyCount);
+  $("gameOverPunchline").textContent = pickGameOverPunchline({
+    reapplyCount,
+    finalRank: result.finalRank,
+    deathType: result.deathType,
+    terminationFlavor: result.terminationFlavor,
+  });
 
-  const progressionHint = $("progressionHintLine");
-  if (challengeTargetYears !== null) {
-    progressionHint.textContent =
-      result.yearsSurvived > challengeTargetYears
-        ? `Challenge cleared: you outlasted your colleague's ${challengeTargetYears.toFixed(1)}y. HR is re-checking the math.`
-        : `Challenge open: ${(challengeTargetYears - result.yearsSurvived).toFixed(1)}y short of your colleague's ${challengeTargetYears.toFixed(1)}y. The org chart remembers.`;
-    progressionHint.classList.remove("hidden");
-  } else if (result.finalRank !== "Angel Investor") {
-    const hintByRank: Partial<Record<Rank, string>> = {
-      Intern:
-        "Most employees peak at Manager. Director at 20y is the real ceiling; CEO at 35y is the boardroom myth HR keeps on the org chart.",
-      Manager:
-        "Director at 20y is where the ladder gets honest. CEO at 35y is still mostly folklore — until it isn't.",
-      Director: "CEO at 35y is the boardroom myth. Board Member at 50y is where governance replaces climbing.",
-      CEO: "Board Member at 50y is the next filing tier. Angel Investor at 75y is the exit fantasy.",
-      "Board Member": "Angel Investor at 75y is the capstone rank. HR still audits every year above 50.",
-    };
-    progressionHint.textContent =
-      hintByRank[result.finalRank] ??
-      "Most employees peak at Manager. Director at 20y is the real ceiling; CEO at 35y is the boardroom myth HR keeps on the org chart.";
-    progressionHint.classList.remove("hidden");
-  } else {
-    progressionHint.textContent = "";
-    progressionHint.classList.add("hidden");
-  }
-
-  if (previousBest > 0 && previousBestRank) {
-    $("careerHighLine").textContent = `Career high: ${previousBestRank} (${previousBest.toFixed(1)}y)`;
-  } else {
-    $("careerHighLine").textContent = "";
+  const syncContext = pickSyncGameOverContextLine({
+    yearsSurvived: result.yearsSurvived,
+    finalRank: result.finalRank,
+    challengeTargetYears,
+    rankHintsSeen: loadRankHintsSeen(),
+  });
+  setGameOverContextLine(syncContext);
+  if (syncContext?.markRankHint) {
+    markRankHintSeen(syncContext.markRankHint);
   }
 
   const initData = getInitData();
+  const pendingStamp = Boolean(initData) && result.yearsSurvived > previousBest;
+  applyStatBestDelta(result.yearsSurvived, previousBest, previousBestRank, pendingStamp);
 
-  if (result.yearsSurvived > previousBest) {
-    refreshOptimisticBestDelta(result, previousBest, Boolean(initData));
-  } else if (previousBest > 0) {
-    $("statBestDelta").textContent = `${(previousBest - result.yearsSurvived).toFixed(1)} short of your best`;
-    $("statBestDelta").className = "text-nano font-bold text-slate-500 mt-0.5";
-  } else {
-    $("statBestDelta").textContent = "";
-  }
-
-  $("leaderboardGapLine").textContent = "";
-  $("leaderboardGapLine").classList.add("hidden");
   resetSyncStatus();
   resetHrStamp();
 
@@ -1910,16 +1890,19 @@ function applyMarketingGameOverUi(result: GameOverResult): void {
   $("statRank").innerHTML = `<span>${rankEmoji(result.finalRank)}</span> ${result.finalRank}`;
   $("terminationCauseIcon").textContent = DEATH_EMOJI[result.deathType];
   $("terminationCauseLabel").textContent = DEATH_LABELS[result.deathType];
-  $("terminationReason").textContent = result.terminationDetail;
-$("retryTip").textContent =
-    RETRY_TIPS_BY_RANK[result.finalRank]?.[result.deathType] ?? RETRY_TIPS[result.deathType];
-  $("terminationFlavor").textContent = result.terminationFlavor;
+  $("terminationReason").textContent = formatTerminationDisplayDetail(
+    result.deathType,
+    result.terminationDetail
+  );
   $("reviewId").textContent = "REF-89412";
-  $("statBestDelta").textContent = "";
-  $("careerHighLine").textContent = "Career high: Intern (3.5y)";
-  $("leaderboardGapLine").textContent = "";
-  $("leaderboardGapLine").classList.add("hidden");
-  $("reapplyFlavorLine").textContent = reappliesFlavor(1);
+  applyStatBestDelta(result.yearsSurvived, 92.3, "Angel Investor", false);
+  setGameOverContextLine(null);
+  $("gameOverPunchline").textContent = pickGameOverPunchline({
+    reapplyCount: 1,
+    finalRank: result.finalRank,
+    deathType: result.deathType,
+    terminationFlavor: result.terminationFlavor,
+  });
 }
 
 function mountMarketingGameOverCapture(): void {

@@ -146,7 +146,7 @@
 }
 
 @utility card-performance {
-  @apply relative my-4 w-full min-w-0 space-y-3 overflow-visible rounded-xl border-2 border-slate-300 bg-white p-4 pb-8 pr-8 shadow-md;
+  @apply relative my-2 w-full min-w-0 space-y-2 overflow-visible rounded-xl border-2 border-slate-300 bg-white p-3 pb-8 pr-8 shadow-md;
 }
 
 .game-over-actions {

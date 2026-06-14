@@ -91,9 +91,9 @@ try {
     document.getElementById("terminationCauseIcon").textContent = "🛫";
     document.getElementById("terminationCauseLabel").textContent = "Runway";
     document.getElementById("terminationReason").textContent = "Runway expired before the pivot landed.";
-    document.getElementById("terminationFlavor").textContent =
+    document.getElementById("gameOverPunchline").textContent =
       "HR notes your term sheet was still in legal review.";
-    document.getElementById("careerHighLine").textContent = "Career high: Angel Investor (92.3y)";
+    document.getElementById("statBestDelta").textContent = "New personal best!";
   });
   await goPage.waitForTimeout(300);
   const goFile = "03-angel-gameover-92y.png";

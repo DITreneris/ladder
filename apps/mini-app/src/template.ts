@@ -213,11 +213,8 @@ export const APP_SHELL = `
           <div><p class="text-slate-400 text-label-upper">Years Survived</p><p class="font-extrabold text-slate-900 text-lg" id="statYears">0.0</p><p id="statBestDelta" class="text-nano font-bold text-slate-500 mt-0.5"></p></div>
           <div><p class="text-slate-400 text-label-upper">Highest Level</p><p class="font-extrabold text-cl-primary text-lg flex items-center gap-1" id="statRank"><span>🧑‍💻</span> Intern</p></div>
         </div>
-        <p id="careerHighLine" class="text-nano font-bold text-slate-500 -mt-1 mb-1"></p>
-        <p id="progressionHintLine" class="text-nano font-semibold text-slate-500 text-center px-2 mb-1 hidden"></p>
-        <p id="leaderboardGapLine" class="text-nano font-bold text-indigo-700 text-center hidden"></p>
-        <p id="reapplyFlavorLine" class="text-caption text-slate-600 italic text-center px-2"></p>
-        <div class="bg-red-50/50 border border-red-100 p-3 rounded-lg text-xs">
+        <p id="gameOverContextLine" class="text-nano font-semibold text-slate-500 text-center hidden"></p>
+        <div class="bg-red-50/50 border border-red-100 p-2.5 rounded-lg text-xs">
           <p class="text-nano uppercase font-bold text-red-700 tracking-wider">Termination Cause</p>
           <div id="terminationCauseRow" class="flex items-center gap-2 mt-1 mb-1">
             <span id="terminationCauseIcon" class="text-lg leading-none">📅</span>
@@ -225,8 +222,7 @@ export const APP_SHELL = `
           </div>
           <p class="font-bold text-red-950 italic" id="terminationReason">Attended 214 meetings.</p>
         </div>
-        <p class="text-caption text-slate-600 font-semibold text-center px-2 mt-2" id="retryTip"></p>
-        <p class="text-caption text-slate-500 italic text-center px-2 mt-1" id="terminationFlavor">Your synergy did not scale optimally with our paradigms.</p>
+        <p class="text-caption text-slate-600 italic text-center px-2" id="gameOverPunchline"></p>
         <div id="hrStampPad" class="hr-stamp-pad hidden mt-3">
           <button type="button" id="hrStampBtn" class="hr-stamp-btn focus-ring" aria-label="Vent to HR — stamp paperwork">
             <span class="hr-stamp-btn-label">Vent to HR</span>
