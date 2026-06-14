@@ -27,6 +27,11 @@ function apiPreconnectPlugin(): Plugin {
 export default defineConfig({
   envDir: repoRoot,
   plugins: [tailwindcss(), apiPreconnectPlugin()],
+  esbuild: {
+    supported: {
+      destructuring: true,
+    },
+  },
   build: {
     rollupOptions: {
       input: {
