@@ -18,7 +18,7 @@ import {
   MEETING_MONDAY_OPENING_MEMO,
   milestoneLabel,
   obstacleBadgeDisplay,
-  pickTickerHeadline,
+  pickTickerHeadlineSet,
   rankEmoji,
   rankFromYears,
   rankPropEmoji,
@@ -114,7 +114,12 @@ let playerEmojiFlashTimer: ReturnType<typeof setTimeout> | null = null;
 let activeDailyModifier: DailyModifier = resolveDailyModifier();
 let shiftToastShown = false;
 let meetingMondayMemoShown = false;
-let activeTickerHeadline: TickerHeadline = pickTickerHeadline();
+let activeTickerHeadline: TickerHeadline | null = null;
+let tickerHeadlineSet: TickerHeadline[] = [];
+let tickerRotateIndex = 0;
+let tickerRotateTimer: ReturnType<typeof setInterval> | null = null;
+let tickerCacheKey: string | null = null;
+const TICKER_ROTATE_MS = 9000;
 let lastHeartbeatAt = 0;
 let ceoTrapShown = false;
 let boardTrapShown = false;
@@ -218,8 +223,12 @@ function shouldTickerScroll(): boolean {
   return true;
 }
 
-function mountTickerHeadline(): void {
-  activeTickerHeadline = pickTickerHeadline();
+function tickerCacheKeyFor(utcDate: Date, presetId: DailyModifier["id"], careerBest: number): string {
+  return `${utcDate.toISOString().slice(0, 10)}|${presetId}|${rankFromYears(careerBest)}`;
+}
+
+function mountTickerHeadlineDOM(): void {
+  if (!activeTickerHeadline) return;
   const formatted = formatTickerText(activeTickerHeadline);
   const tickerEl = $("newsTickerText");
   tickerEl.classList.remove("news-ticker-text--static");
@@ -229,7 +238,55 @@ function mountTickerHeadline(): void {
   } else {
     tickerEl.classList.add("news-ticker-text--static");
   }
-  engine?.setActiveTicker(activeTickerHeadline);
+}
+
+function showTickerHeadlineAt(index: number): void {
+  if (tickerHeadlineSet.length === 0) return;
+  tickerRotateIndex = ((index % tickerHeadlineSet.length) + tickerHeadlineSet.length) % tickerHeadlineSet.length;
+  activeTickerHeadline = tickerHeadlineSet[tickerRotateIndex]!;
+  mountTickerHeadlineDOM();
+}
+
+function stopTickerRotation(): void {
+  if (tickerRotateTimer !== null) {
+    clearInterval(tickerRotateTimer);
+    tickerRotateTimer = null;
+  }
+}
+
+function shouldRotateTickerHeadlines(): boolean {
+  if (tickerHeadlineSet.length <= 1) return false;
+  if (respectsReducedMotion()) return false;
+  if (document.documentElement.dataset.ogCapture === "1") return false;
+  if (getCaptureFlags().capture !== null) return false;
+  return true;
+}
+
+function startTickerRotation(): void {
+  stopTickerRotation();
+  if (!shouldRotateTickerHeadlines()) return;
+  tickerRotateTimer = setInterval(() => {
+    if (document.hidden) return;
+    if ($("startScreen").classList.contains("hidden")) return;
+    showTickerHeadlineAt(tickerRotateIndex + 1);
+  }, TICKER_ROTATE_MS);
+}
+
+function ensureTickerHeadlines(): void {
+  const key = tickerCacheKeyFor(new Date(), activeDailyModifier.id, highScore);
+  if (key === tickerCacheKey && tickerHeadlineSet.length > 0) {
+    showTickerHeadlineAt(tickerRotateIndex);
+    startTickerRotation();
+    return;
+  }
+  tickerCacheKey = key;
+  tickerHeadlineSet = pickTickerHeadlineSet({
+    presetId: activeDailyModifier.id,
+    careerBestYears: highScore,
+  });
+  tickerRotateIndex = 0;
+  showTickerHeadlineAt(0);
+  startTickerRotation();
 }
 
 function getReapplyCount(): number {
@@ -339,56 +396,10 @@ function dismissChallengeBanner(): void {
   refreshHomeContextSlot();
 }
 
-type HomeContextItemId = "homeNewsTicker" | "dailyShiftBlock" | "challengeBanner";
-const HOME_CONTEXT_ITEMS: HomeContextItemId[] = ["homeNewsTicker", "dailyShiftBlock", "challengeBanner"];
-const HOME_CONTEXT_ROTATION: HomeContextItemId[] = ["dailyShiftBlock", "homeNewsTicker"];
-const HOME_CONTEXT_ROTATE_MS = 6000;
-let homeContextTimer: ReturnType<typeof setInterval> | null = null;
-let homeContextIndex = 0;
-let homeContextActiveId: HomeContextItemId | null = null;
-
-function setHomeContextActive(activeId: HomeContextItemId): void {
-  if (homeContextActiveId === activeId) return;
-  homeContextActiveId = activeId;
-  for (const id of HOME_CONTEXT_ITEMS) {
-    const el = $(id);
-    el.classList.toggle("invisible", id !== activeId);
-    el.classList.remove("home-context-item--enter");
-  }
-  if (!respectsReducedMotion()) {
-    const activeEl = $(activeId);
-    void activeEl.offsetWidth;
-    activeEl.classList.add("home-context-item--enter");
-  }
-}
-
-function stopHomeContextRotation(): void {
-  if (homeContextTimer !== null) {
-    clearInterval(homeContextTimer);
-    homeContextTimer = null;
-  }
-}
-
 function refreshHomeContextSlot(): void {
-  stopHomeContextRotation();
-  if (challengeTargetYears !== null && !challengeBannerDismissed) {
-    setHomeContextActive("challengeBanner");
-    return;
-  }
-  const staticMode =
-    respectsReducedMotion() ||
-    document.documentElement.dataset.ogCapture === "1" ||
-    getCaptureFlags().capture !== null;
-  if (staticMode) {
-    setHomeContextActive("dailyShiftBlock");
-    return;
-  }
-  setHomeContextActive(HOME_CONTEXT_ROTATION[homeContextIndex]);
-  homeContextTimer = setInterval(() => {
-    if (document.hidden) return;
-    homeContextIndex = (homeContextIndex + 1) % HOME_CONTEXT_ROTATION.length;
-    setHomeContextActive(HOME_CONTEXT_ROTATION[homeContextIndex]);
-  }, HOME_CONTEXT_ROTATE_MS);
+  const showChallenge = challengeTargetYears !== null && !challengeBannerDismissed;
+  $("dailyShiftBlock").classList.toggle("hidden", showChallenge);
+  $("challengeBanner").classList.toggle("hidden", !showChallenge);
 }
 
 function updateImminentRungHint(): void {
@@ -525,8 +536,9 @@ function switchTab(tab: Screen): void {
   syncTelegramMainButton(tab);
   if (tab === "home") {
     refreshHomeContextSlot();
+    ensureTickerHeadlines();
   } else {
-    stopHomeContextRotation();
+    stopTickerRotation();
   }
   audio.nav();
   if (tab !== "game") {
@@ -612,7 +624,6 @@ function setPlayerPanic(on: boolean): void {
 function refreshDailyShiftUI(): void {
   activeDailyModifier = resolveDailyModifier();
   $("dailyShiftLabel").textContent = activeDailyModifier.label;
-  $("dailyShiftDescription").textContent = activeDailyModifier.description;
   const pill = $("dailyShiftPill");
   if (pill) {
     pill.title = activeDailyModifier.description;
@@ -633,7 +644,6 @@ function refreshDailyShiftUI(): void {
   block.classList.remove("shift-badge-enter");
   void block.offsetWidth;
   block.classList.add("shift-badge-enter");
-  mountTickerHeadline();
 }
 
 function createObstacleBadge(type: ObstacleType, rungId: number, isImminent = false): HTMLElement {
@@ -1316,6 +1326,9 @@ async function startGame(): Promise<void> {
   lastFloorBand = "default";
   qaCoffeePickups = 0;
   activeDailyModifier = engine.getDailyModifier();
+  if (!activeTickerHeadline) {
+    ensureTickerHeadlines();
+  }
   engine.setActiveTicker(activeTickerHeadline);
   disableVerticalSwipe();
   audio.prepareBgmForRun();
@@ -1806,7 +1819,6 @@ function signalCaptureReady(delayMs = 0): void {
 function applyDailyModifierUi(modifier: DailyModifier): void {
   activeDailyModifier = modifier;
   $("dailyShiftLabel").textContent = modifier.label;
-  $("dailyShiftDescription").textContent = modifier.description;
   const pill = $("dailyShiftPill");
   if (pill) {
     pill.title = modifier.description;
@@ -1832,7 +1844,7 @@ function mountMarketingHomeCapture(): void {
     highScore = m.MARKETING_HOME_HIGH_SCORE;
     bestRank = rankFromYears(Math.floor(highScore));
     applyDailyModifierUi(m.MARKETING_HOME_MODIFIER);
-    mountTickerHeadline();
+    ensureTickerHeadlines();
     refreshHomeBadgeUI();
     switchTab("home");
     $("startScreen").scrollTop = 0;
@@ -2239,6 +2251,8 @@ export function mountApp(): void {
     refreshHomeContextSlot();
   }
 
+  ensureTickerHeadlines();
+
   const initData = getInitData();
   if (initData && isTelegram()) {
     setHomeBadgeSkeleton(true);
@@ -2251,6 +2265,7 @@ export function mountApp(): void {
           bestRank = rankFromCareerHigh(highScore);
           engine?.setCareerBestYears(highScore);
           refreshHomeBadgeUI();
+          ensureTickerHeadlines();
           if (profile.first_name || profile.username) {
             username = profile.username ?? profile.first_name ?? username;
             ($("usernameInput") as HTMLInputElement).value = username;

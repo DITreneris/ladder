@@ -1,3 +1,4 @@
+import type { DailyPresetId } from "./daily-modifier";
 import type { DeathType, ObstacleType, Rank, Rung } from "./types";
 
 export const MAX_VISIBLE_RUNGS = 7;
@@ -78,7 +79,114 @@ export const NEWS_TICKER_HEADLINES: TickerHeadline[] = [
   { text: "Cardiologist opened a ticket in the same sprint as your term sheet", deathType: "burnout" },
   { text: "Portfolio review now includes joints and quarterly KPIs", deathType: "foliage" },
   { text: "IV drip lounge replaces coffee; hydration is due diligence", deathType: "energy" },
+  { text: "Facilities audit: badge readers now reject the lane you're standing in", deathType: "badge_gate" },
+  { text: "Turnstile firmware update — wrong aisle is a feature, not a bug", deathType: "badge_gate" },
+  { text: "Mandatory biophilic desk plant program blocks both exits; wellness unchanged", deathType: "foliage" },
+  { text: "Friday focus sprint: years survived archived when the timer wins", deathType: "sprint" },
 ];
+
+/** Shift-pinned lead headline on non-standard UTC preset days (parity with daily-modifier map). */
+export const SHIFT_TICKER_HEADLINES: Record<Exclude<DailyPresetId, "standard">, TickerHeadline> = {
+  meeting_monday: {
+    text: "Meeting Monday declared — your calendar filed a restraining order on free time",
+    deathType: "meeting",
+  },
+  coffee_break: {
+    text: "Coffee Break sanctioned — decaf still counts as a personality defect",
+    deathType: "energy",
+  },
+  reorg_week: {
+    text: "Reorg Week: reporting lines updated; your desk reports to itself",
+    deathType: "reorg",
+  },
+  synergy_sprint: {
+    text: "Synergy Sprint live — HR will grade your climb at the buzzer",
+    deathType: "sprint",
+  },
+};
+
+/** Headlines shown per UTC day in the home ticker rotation (3–5). */
+export const TICKER_DAILY_COUNT = 4;
+
+export interface PickTickerOptions {
+  utcDate?: Date;
+  presetId: DailyPresetId;
+  careerBestYears: number;
+}
+
+/** Mirrors daily-modifier hashDateKey — kept here to avoid circular imports. */
+function tickerHashDateKey(key: string): number {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) {
+    h = (Math.imul(31, h) + key.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+function filterTickerPool(opts: PickTickerOptions): TickerHeadline[] {
+  const rank = rankFromYears(opts.careerBestYears);
+  const allowedDeaths = new Set<DeathType>([
+    ...allowedObstacleTypes(rank, opts.presetId === "reorg_week"),
+    "energy",
+  ]);
+  if (opts.presetId === "synergy_sprint") {
+    allowedDeaths.add("sprint");
+  }
+  return NEWS_TICKER_HEADLINES.filter((h) => !h.deathType || allowedDeaths.has(h.deathType));
+}
+
+function pickDeterministicSubset(
+  pool: TickerHeadline[],
+  seed: string,
+  count: number,
+  excludeText?: string
+): TickerHeadline[] {
+  const candidates = excludeText ? pool.filter((h) => h.text !== excludeText) : [...pool];
+  const source = candidates.length > 0 ? candidates : [...pool];
+  const scored = source.map((h, i) => ({
+    h,
+    score: tickerHashDateKey(`${seed}|${i}|${h.text}`),
+  }));
+  scored.sort((a, b) => a.score - b.score);
+
+  const result: TickerHeadline[] = [];
+  const seen = new Set<string>();
+  for (const { h } of scored) {
+    if (result.length >= count) break;
+    if (seen.has(h.text)) continue;
+    seen.add(h.text);
+    result.push(h);
+  }
+  return result;
+}
+
+/** Deterministic daily set for home ticker rotation — game-attached by shift, rank, and death type. */
+export function pickTickerHeadlineSet(opts: PickTickerOptions): TickerHeadline[] {
+  const utcDate = opts.utcDate ?? new Date();
+  const dateKey = utcDate.toISOString().slice(0, 10);
+  const pool = filterTickerPool(opts);
+
+  if (opts.presetId !== "standard") {
+    const pinned = SHIFT_TICKER_HEADLINES[opts.presetId];
+    const extras = pickDeterministicSubset(
+      pool,
+      `${dateKey}|${opts.presetId}|${rankFromYears(opts.careerBestYears)}`,
+      Math.max(1, TICKER_DAILY_COUNT - 1),
+      pinned.text
+    );
+    return [pinned, ...extras].slice(0, TICKER_DAILY_COUNT);
+  }
+
+  return pickDeterministicSubset(
+    pool,
+    `${dateKey}|standard|${rankFromYears(opts.careerBestYears)}`,
+    TICKER_DAILY_COUNT
+  );
+}
+
+export function pickTickerHeadline(opts: PickTickerOptions): TickerHeadline {
+  return pickTickerHeadlineSet(opts)[0]!;
+}
 
 export const REAPPLY_FLAVOR: { minRuns: number; line: string }[] = [
   {
@@ -319,10 +427,6 @@ export const PROMOTION_DIALOGUES: Partial<Record<Rank, string>> = {
   "Angel Investor":
     "Angel Investor unlocked. You write checks for pivots you would've killed as CEO.",
 };
-
-export function pickTickerHeadline(): TickerHeadline {
-  return NEWS_TICKER_HEADLINES[Math.floor(Math.random() * NEWS_TICKER_HEADLINES.length)]!;
-}
 
 export function formatTickerText(headline: TickerHeadline): string {
   return `* ${headline.text} *`;

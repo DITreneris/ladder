@@ -86,22 +86,23 @@ export const APP_SHELL = `
           </button>
         </div>
         <div id="homeContextSlot" class="home-context-slot shrink-0">
-          <div id="homeNewsTicker" class="home-context-item invisible ticker-bar">
+          <div id="homeNewsTicker" class="ticker-bar">
             <span class="text-nano font-bold uppercase shrink-0 border-r border-amber-500/30 pr-2 mr-2">News</span>
             <div class="news-ticker-track min-w-0 flex-1">
               <span id="newsTickerText" class="news-ticker-text text-caption font-mono"></span>
             </div>
           </div>
-          <div id="dailyShiftBlock" class="home-context-item shift-badge-enter">
-            <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
-              <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
-              <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+          <div id="homeContextSecondary" class="home-context-secondary">
+            <div id="dailyShiftBlock" class="home-context-secondary-item shift-badge-enter">
+              <div class="flex items-center justify-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5" id="dailyShiftPill" title="">
+                <span class="text-nano font-bold uppercase tracking-wider text-indigo-400">Today&apos;s shift</span>
+                <span id="dailyShiftLabel" class="text-caption font-extrabold text-indigo-900">Open Floor Plan</span>
+              </div>
             </div>
-            <p id="dailyShiftDescription" class="text-caption text-slate-500 text-center mt-1 px-1 line-clamp-2"></p>
-          </div>
-          <div id="challengeBanner" class="home-context-item invisible rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
-            <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
-            <button type="button" id="challengeBannerDismiss" data-action="dismiss-challenge" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+            <div id="challengeBanner" class="home-context-secondary-item hidden rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 flex items-start gap-2">
+              <p id="challengeBannerText" class="text-caption font-bold text-indigo-900 flex-1 min-w-0"></p>
+              <button type="button" id="challengeBannerDismiss" data-action="dismiss-challenge" class="text-indigo-700 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss challenge">&times;</button>
+            </div>
           </div>
         </div>
         <div id="homeBrandFooter" class="home-brand-footer shrink-0">

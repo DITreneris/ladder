@@ -17,6 +17,7 @@ import {
   milestoneLabel,
   obstacleBadgeDisplay,
   pickObstacleType,
+  pickTickerHeadlineSet,
   rankEmoji,
   rankFromYears,
   reorgIntervalForRank,
@@ -196,6 +197,66 @@ describe("milestoneLabel", () => {
 describe("rankEmoji", () => {
   it("uses neutral manager emoji", () => {
     expect(rankEmoji("Manager")).toBe("🧑‍💼");
+  });
+});
+
+describe("pickTickerHeadlineSet", () => {
+  const internOpts = { presetId: "standard" as const, careerBestYears: 0, utcDate: new Date("2026-06-14T12:00:00Z") };
+  const directorOpts = { presetId: "standard" as const, careerBestYears: 25, utcDate: new Date("2026-06-14T12:00:00Z") };
+
+  it("returns a deterministic set for the same UTC day and career band", () => {
+    const a = pickTickerHeadlineSet(internOpts);
+    const b = pickTickerHeadlineSet(internOpts);
+    expect(a.map((h) => h.text)).toEqual(b.map((h) => h.text));
+  });
+
+  it("returns up to TICKER_DAILY_COUNT unique headlines", () => {
+    const set = pickTickerHeadlineSet(internOpts);
+    expect(set.length).toBeGreaterThan(0);
+    expect(set.length).toBeLessThanOrEqual(4);
+    expect(new Set(set.map((h) => h.text)).size).toBe(set.length);
+  });
+
+  it("may differ across UTC dates", () => {
+    const a = pickTickerHeadlineSet(internOpts);
+    const b = pickTickerHeadlineSet({
+      ...internOpts,
+      utcDate: new Date("2026-06-15T12:00:00Z"),
+    });
+    expect(a.map((h) => h.text).join("|")).not.toBe(b.map((h) => h.text).join("|"));
+  });
+
+  it("pins meeting_monday shift lead on Meeting Monday preset", () => {
+    const set = pickTickerHeadlineSet({
+      presetId: "meeting_monday",
+      careerBestYears: 0,
+      utcDate: new Date("2026-06-09T12:00:00Z"),
+    });
+    expect(set[0]?.text).toContain("Meeting Monday");
+    expect(set[0]?.deathType).toBe("meeting");
+  });
+
+  it("excludes director-only deaths for intern career best", () => {
+    const set = pickTickerHeadlineSet(internOpts);
+    for (const headline of set) {
+      expect(headline.deathType).not.toBe("burnout");
+      expect(headline.deathType).not.toBe("foliage");
+      expect(headline.deathType).not.toBe("badge_gate");
+    }
+  });
+
+  it("allows burnout headlines for director career best", () => {
+    const set = pickTickerHeadlineSet(directorOpts);
+    expect(set.some((h) => h.deathType === "burnout")).toBe(true);
+  });
+
+  it("pins synergy sprint lead on sprint preset", () => {
+    const set = pickTickerHeadlineSet({
+      presetId: "synergy_sprint",
+      careerBestYears: 12,
+      utcDate: new Date("2026-06-13T12:00:00Z"),
+    });
+    expect(set[0]?.deathType).toBe("sprint");
   });
 });
 
