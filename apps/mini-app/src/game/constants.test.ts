@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  ANGEL_YEARS,
   BASE_DRAIN_RATE,
+  BOARD_YEARS,
   CEO_YEARS,
   DIRECTOR_YEARS,
   MANAGER_YEARS,
@@ -9,6 +11,7 @@ import {
   REORG_INTERVAL_MS,
   TUTORIAL_RUNG_SPECS,
   allowedObstacleTypes,
+  isExecutiveRank,
   milestoneLabel,
   pickObstacleType,
   rankEmoji,
@@ -34,9 +37,19 @@ describe("rankFromYears", () => {
     expect(rankFromYears(CEO_YEARS - 1)).toBe("Director");
   });
 
-  it("returns CEO at 35 years", () => {
+  it("returns CEO at 35 years up to board threshold", () => {
     expect(rankFromYears(CEO_YEARS)).toBe("CEO");
-    expect(rankFromYears(100)).toBe("CEO");
+    expect(rankFromYears(BOARD_YEARS - 1)).toBe("CEO");
+  });
+
+  it("returns Board Member at 50 years up to angel threshold", () => {
+    expect(rankFromYears(BOARD_YEARS)).toBe("Board Member");
+    expect(rankFromYears(ANGEL_YEARS - 1)).toBe("Board Member");
+  });
+
+  it("returns Angel Investor at 75 years", () => {
+    expect(rankFromYears(ANGEL_YEARS)).toBe("Angel Investor");
+    expect(rankFromYears(100)).toBe("Angel Investor");
   });
 });
 
@@ -69,6 +82,11 @@ describe("obstacle gating", () => {
 
   it("CEO allows meetings, reorgs, deadlines, and foliage", () => {
     expect(allowedObstacleTypes("CEO")).toEqual(["meeting", "reorg", "burnout", "foliage"]);
+  });
+
+  it("board and angel inherit executive obstacle pool", () => {
+    expect(allowedObstacleTypes("Board Member")).toEqual(["meeting", "reorg", "burnout", "foliage"]);
+    expect(allowedObstacleTypes("Angel Investor")).toEqual(["meeting", "reorg", "burnout", "foliage"]);
   });
 
   it("pickObstacleType returns only meeting for intern", () => {
@@ -112,10 +130,19 @@ describe("obstacle gating", () => {
     }
   });
 
-  it("reorgIntervalForRank returns CEO interval for CEO", () => {
+  it("reorgIntervalForRank returns CEO interval for executive ranks", () => {
     expect(reorgIntervalForRank("CEO")).toBe(REORG_INTERVAL_CEO_MS);
+    expect(reorgIntervalForRank("Board Member")).toBe(REORG_INTERVAL_CEO_MS);
+    expect(reorgIntervalForRank("Angel Investor")).toBe(REORG_INTERVAL_CEO_MS);
     expect(reorgIntervalForRank("Director")).toBe(REORG_INTERVAL_MS);
     expect(reorgIntervalForRank("Intern")).toBe(REORG_INTERVAL_MS);
+  });
+
+  it("isExecutiveRank covers CEO and post-CEO ranks", () => {
+    expect(isExecutiveRank("CEO")).toBe(true);
+    expect(isExecutiveRank("Board Member")).toBe(true);
+    expect(isExecutiveRank("Angel Investor")).toBe(true);
+    expect(isExecutiveRank("Director")).toBe(false);
   });
 });
 
@@ -133,8 +160,16 @@ describe("milestoneLabel", () => {
     expect(milestoneLabel(DIRECTOR_YEARS)).toBe("CEO myth in 15.0y");
   });
 
-  it("shows corner office for CEO", () => {
-    expect(milestoneLabel(CEO_YEARS)).toBe("Corner office secured");
+  it("shows board seat countdown for CEO band", () => {
+    expect(milestoneLabel(CEO_YEARS)).toBe("Board seat in 15.0y");
+  });
+
+  it("shows angel countdown for board band", () => {
+    expect(milestoneLabel(BOARD_YEARS)).toBe("Angel round in 25.0y");
+  });
+
+  it("shows capstone for angel investor", () => {
+    expect(milestoneLabel(ANGEL_YEARS)).toBe("Term sheet signed");
   });
 });
 

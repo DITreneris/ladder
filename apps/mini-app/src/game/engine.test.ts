@@ -531,6 +531,57 @@ describe("GameEngine", () => {
     expect(onRankChange).toHaveBeenCalledWith("Director", expect.stringContaining("Director"));
   });
 
+  it("promotes to CEO at 35.0 years (140 rungs)", () => {
+    const onRankChange = vi.fn();
+    const { engine } = createEngine({ onRankChange });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 139;
+    tapWithCooldown(engine, "left");
+
+    expect(engine.getCurrentRank()).toBe("CEO");
+    expect(onRankChange).toHaveBeenCalledWith("CEO", expect.stringContaining("CEO"));
+  });
+
+  it("promotes to Board Member at 50.0 years (200 rungs)", () => {
+    const onRankChange = vi.fn();
+    const { engine } = createEngine({ onRankChange });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 199;
+    tapWithCooldown(engine, "left");
+
+    expect(engine.getCurrentRank()).toBe("Board Member");
+    expect(onRankChange).toHaveBeenCalledWith("Board Member", expect.stringContaining("Board"));
+  });
+
+  it("promotes to Angel Investor at 75.0 years (300 rungs)", () => {
+    const onRankChange = vi.fn();
+    const { engine } = createEngine({ onRankChange });
+    engine.start();
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+    tapWithCooldown(engine, "left");
+
+    type EngineInternals = { score: number };
+    const internal = engine as unknown as EngineInternals;
+    internal.score = 299;
+    tapWithCooldown(engine, "left");
+
+    expect(engine.getCurrentRank()).toBe("Angel Investor");
+    expect(onRankChange).toHaveBeenCalledWith("Angel Investor", expect.stringContaining("Angel"));
+  });
+
   it("captures revive snapshot on collision death", () => {
     const onGameOver = vi.fn();
     const { engine } = createEngine({ onGameOver });

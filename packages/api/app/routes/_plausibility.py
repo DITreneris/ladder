@@ -6,8 +6,7 @@ from fastapi import HTTPException
 
 from app.daily_preset import today_preset_id
 from app.models import RunSubmitRequest
-
-MAX_YEARS_NORMAL = 50.0
+from app.ranks import MAX_YEARS_NORMAL
 MAX_YEARS_SPRINT = 25.0
 MAX_RUNGS_PER_SECOND = 2.5
 SPRINT_SESSION_CAP_SECONDS = 90

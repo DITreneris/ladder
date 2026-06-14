@@ -21,7 +21,7 @@ A fast-paced Telegram Mini App — climb the corporate ladder while avoiding mee
 3. Grab **coffee** (+25% energy) when you can.
 4. Survive as many **Career Years** as possible.
 
-Ranks: Intern → Manager (10y) → Director (20y) → CEO (35y). Daily and Weekly leaderboards.
+Ranks: Intern → Manager (10y) → Director (20y) → CEO (35y) → Board Member (50y) → Angel Investor (75y). Scores file up to 100y. Daily and Weekly leaderboards.
 
 ## Stack
 

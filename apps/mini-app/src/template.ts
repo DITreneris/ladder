@@ -103,7 +103,7 @@ export const APP_SHELL = `
             <p class="text-caption font-extrabold text-slate-800">Avoid</p>
             <p class="text-caption text-slate-600">Meetings · Reorgs · Deadlines</p>
             <p class="text-caption font-extrabold text-slate-800 mt-1">Climb</p>
-            <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y). CEO (35y) is the boardroom myth.</p>
+            <p class="text-caption text-slate-600">Intern → Manager (10y) → Director (20y) → CEO (35y) → Board (50y) → Angel (75y).</p>
           </div>
         </div>
         <button type="button" id="homePreviewToggle" onclick="toggleHomeGameplayPreview()" class="hidden text-micro font-bold text-cl-primary focus-ring rounded px-1 min-h-[44px]">
@@ -331,14 +331,18 @@ export const APP_SHELL = `
                 <li><strong>Open Office (5–&lt;10y):</strong> Hot desks. Still Intern rank — meetings only.</li>
                 <li><strong>Middle Management (10–&lt;20y):</strong> Manager rank — reorgs and badge gates.</li>
                 <li><strong>Director Wing (20–&lt;35y):</strong> Director rank — quarterly deadlines join the stack.</li>
-                <li><strong>Executive Suite (35y+):</strong> CEO rank — desk plants complete the gauntlet.</li>
+                <li><strong>Executive Suite (35–&lt;50y):</strong> CEO rank — desk plants complete the gauntlet.</li>
+                <li><strong>Boardroom (50–&lt;75y):</strong> Board Member — governance replaces climbing.</li>
+                <li><strong>Investor Lounge (75y+):</strong> Angel Investor — the capstone rank.</li>
               </ul>
               <ul class="mt-2 text-caption space-y-0.5 list-disc list-inside">
                 <li><strong>Intern:</strong> Meetings only — safe-side tapping.</li>
                 <li><strong>Manager @ 10y:</strong> Reorgs swap sides; badge gates appear.</li>
                 <li><strong>Director @ 20y:</strong> Deadlines arrive — coffee is strategic.</li>
                 <li><strong>CEO @ 35y:</strong> Rare desk plants on top. The boardroom myth HR keeps on the org chart.</li>
-                <li><strong>Unlock by rank:</strong> Reorg + gates @ Manager; Deadline @ Director; desk plants @ CEO.</li>
+                <li><strong>Board Member @ 50y:</strong> Same executive hazards — promoted off the ladder into governance.</li>
+                <li><strong>Angel Investor @ 75y:</strong> Endgame rank. HR still audits scores up to 100y.</li>
+                <li><strong>Unlock by rank:</strong> Reorg + gates @ Manager; Deadline @ Director; desk plants @ CEO+.</li>
               </ul>
               <p class="mt-2 text-caption"><strong>First climb:</strong> Scripted first 3 rungs, gentler hazard rate through ~3–5y (longer until your first Manager run), hints through 10y. <strong>Reorg Week</strong> shift may add reorgs after ~3y — not on rung one.</p>
             </div>

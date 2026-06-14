@@ -1,6 +1,6 @@
 # Corporate Ladder
 
-> Corporate Ladder is a satirical one-thumb Telegram Mini App game by Prompt Anatomy. Dodge meetings, grab coffee, survive reorgs, and climb from Intern toward CEO. Live since 2026-06-15 via @CorporateLadder_bot; listed on tApps Center.
+> Corporate Ladder is a satirical one-thumb Telegram Mini App game by Prompt Anatomy. Dodge meetings, grab coffee, survive reorgs, and climb from Intern toward Angel Investor. Live since 2026-06-15 via @CorporateLadder_bot; listed on tApps Center.
 
 Last updated: 2026-06-13
 
@@ -25,6 +25,10 @@ Optional brand play from Prompt Anatomy; not AI training or governance software.
 | Manager | 10y |
 | Director | 20y |
 | CEO | 35y |
+| Board Member | 50y |
+| Angel Investor | 75y |
+
+Scores file with HR up to **100y** on normal shifts (25y cap on Synergy Sprint days).
 
 ## Stack (six layers)
 

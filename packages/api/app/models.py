@@ -2,9 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.ranks import rank_from_years
-
-FinalRank = Literal["Intern", "Manager", "Director", "CEO"]
+from app.ranks import FinalRank, rank_from_years
 
 
 class InitDataRequest(BaseModel):

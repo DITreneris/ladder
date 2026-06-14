@@ -33,6 +33,12 @@ def configure_test_settings(monkeypatch):
     monkeypatch.setattr(settings, "supabase_service_role_key", "test-service-key")
 
 
+@pytest.fixture(autouse=True)
+def standard_daily_preset(monkeypatch):
+    """Most run submits assume a non-sprint shift unless a test overrides the preset."""
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "standard")
+
+
 @pytest.fixture
 def valid_init_data() -> str:
     return build_init_data(TEST_USER, auth_date=int(time.time()) - 120)

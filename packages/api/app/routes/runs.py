@@ -12,6 +12,7 @@ from app.db.supabase import get_supabase
 from app.models import RunSubmitRequest
 from app.routes._cooldowns import check_submit_cooldown, record_submit_cooldown
 from app.routes._plausibility import validate_score_plausibility
+from app.ranks import validate_rank_years
 from app.routes._users import upsert_user
 
 router = APIRouter()
@@ -20,26 +21,6 @@ router = APIRouter()
 _submit_timestamps: dict[int, float] = defaultdict(float)
 _submit_last_years: dict[int, float] = defaultdict(float)
 SUBMIT_COOLDOWN_SECONDS = 10
-MANAGER_YEARS = 10
-DIRECTOR_YEARS = 20
-CEO_YEARS = 35
-
-# Contiguous rank bands: Intern [0,10) / Manager [10,20) / Director [20,35) / CEO [35,...)
-_RANK_BANDS: dict[str, tuple[float, float]] = {
-    "Intern": (0, MANAGER_YEARS),
-    "Manager": (MANAGER_YEARS, DIRECTOR_YEARS),
-    "Director": (DIRECTOR_YEARS, CEO_YEARS),
-    "CEO": (CEO_YEARS, float("inf")),
-}
-
-
-def _validate_rank_years(final_rank: str, years_survived: float) -> None:
-    band = _RANK_BANDS.get(final_rank)
-    if band is None:
-        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
-    low, high = band
-    if years_survived < low or years_survived >= high:
-        raise HTTPException(status_code=400, detail="Rank inconsistent with years survived")
 
 
 def _get_user_from_init(init_data: str) -> dict:
@@ -94,7 +75,7 @@ def submit_run(body: RunSubmitRequest):
         if abs(body.rungs_climbed - expected_rungs) > 1:
             raise HTTPException(status_code=400, detail="Score inconsistent with rungs climbed")
 
-        _validate_rank_years(body.final_rank, body.years_survived)
+        validate_rank_years(body.final_rank, body.years_survived)
         validate_score_plausibility(body, auth_date)
 
         user = upsert_user(tg_user)

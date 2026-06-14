@@ -168,19 +168,95 @@ def test_runs_validation_error_does_not_rate_limit(mock_supabase, valid_init_dat
     assert good.status_code == 200
 
 
-def test_runs_rejects_implausible_score(mock_supabase, valid_init_data):
+def test_runs_rejects_implausible_score(mock_supabase, valid_init_data, monkeypatch):
     runs_module._submit_timestamps.clear()
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 120)
     response = client.post(
         "/runs",
         json={
-            "initData": valid_init_data,
-            "years_survived": 99.9,
-            "final_rank": "CEO",
-            "rungs_climbed": 400,
+            "initData": init_data,
+            "years_survived": 26,
+            "final_rank": "Manager",
+            "rungs_climbed": 104,
+            "sprint_mode": True,
         },
     )
     assert response.status_code == 400
     assert "plausible" in response.json()["detail"].lower()
+
+
+def test_runs_accepts_board_member_run(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 58.5,
+            "final_rank": "Board Member",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 234,
+        },
+    )
+    assert response.status_code == 200
+
+
+def test_runs_accepts_angel_investor_run(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 99.9,
+            "final_rank": "Angel Investor",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 400,
+        },
+    )
+    assert response.status_code == 200
+
+
+def test_rank_band_boundaries(mock_supabase, valid_init_data):
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    cases = [
+        (49.9, "CEO", 200),
+        (50.0, "Board Member", 200),
+        (74.9, "Board Member", 300),
+        (75.0, "Angel Investor", 300),
+    ]
+    for years, rank, rungs in cases:
+        runs_module._submit_timestamps.clear()
+        response = client.post(
+            "/runs",
+            json={
+                "initData": init_data,
+                "years_survived": years,
+                "final_rank": rank,
+                "termination_cause": "Reorganization",
+                "rungs_climbed": rungs,
+            },
+        )
+        assert response.status_code == 200, (years, rank, response.json())
+
+
+def test_runs_normalizes_board_member_from_years(mock_supabase, valid_init_data):
+    """50y+ runs normalize to Board Member even when client sends CEO."""
+    runs_module._submit_timestamps.clear()
+    init_data = build_init_data(TEST_USER, auth_date=int(__import__("time").time()) - 3600)
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 58.5,
+            "final_rank": "CEO",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 234,
+        },
+    )
+    assert response.status_code == 200
 
 
 def test_runs_accepts_legitimate_manager_run(mock_supabase, valid_init_data):

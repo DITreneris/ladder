@@ -49,7 +49,7 @@ def build_help_text() -> str:
         "• TAP LEFT or RIGHT for the next rung's safe side.\n"
         "• Meetings, reorgs, and deadlines block one side.\n"
         "• Coffee restores +25% Energy when you pick it up.\n"
-        "• Climb Intern → Manager (10y) → Director (20y). CEO (35y) is the boardroom myth.\n"
+        "• Climb Intern → Manager (10y) → Director (20y) → CEO (35y) → Board Member (50y) → Angel Investor (75y).\n"
         "• Scores land on Daily and Weekly leaderboards.\n\n"
         "Tap Punch In & Climb to open the app.\n\n"
         "In a group with other bots, use /go (or /go@this_bot) instead of /start.\n"

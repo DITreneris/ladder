@@ -12,6 +12,7 @@ import {
   TRIAGE_PROMPT,
   floorLabel,
   formatTickerText,
+  isExecutiveRank,
   milestoneLabel,
   pickTickerHeadline,
   rankEmoji,
@@ -510,6 +511,8 @@ const RANK_BADGE: Record<Rank, string> = {
   Manager: "badge-rank-manager mt-0.5",
   Director: "badge-rank-director mt-0.5",
   CEO: "badge-rank-ceo mt-0.5",
+  "Board Member": "badge-rank-board mt-0.5",
+  "Angel Investor": "badge-rank-angel mt-0.5",
 };
 
 function playerDisplayEmoji(rank: Rank): string {
@@ -852,7 +855,7 @@ function renderRungsInner(): void {
 }
 
 function maybeShowCeoTrapMemo(): void {
-  if (ceoTrapShown || engine.getCurrentRank() !== "CEO") return;
+  if (ceoTrapShown || !engine || !isExecutiveRank(engine.getCurrentRank())) return;
   const next = engine.getRungs()[1];
   if (next?.type === "burnout") {
     ceoTrapShown = true;
@@ -1368,8 +1371,18 @@ async function onGameOver(result: GameOverResult): Promise<void> {
         ? `Challenge cleared: you outlasted your colleague's ${challengeTargetYears.toFixed(1)}y. HR is re-checking the math.`
         : `Challenge open: ${(challengeTargetYears - result.yearsSurvived).toFixed(1)}y short of your colleague's ${challengeTargetYears.toFixed(1)}y. The org chart remembers.`;
     progressionHint.classList.remove("hidden");
-  } else if (result.finalRank !== "CEO") {
+  } else if (result.finalRank !== "Angel Investor") {
+    const hintByRank: Partial<Record<Rank, string>> = {
+      Intern:
+        "Most employees peak at Manager. Director at 20y is the real ceiling; CEO at 35y is the boardroom myth HR keeps on the org chart.",
+      Manager:
+        "Director at 20y is where the ladder gets honest. CEO at 35y is still mostly folklore — until it isn't.",
+      Director: "CEO at 35y is the boardroom myth. Board Member at 50y is where governance replaces climbing.",
+      CEO: "Board Member at 50y is the next filing tier. Angel Investor at 75y is the exit fantasy.",
+      "Board Member": "Angel Investor at 75y is the capstone rank. HR still audits every year above 50.",
+    };
     progressionHint.textContent =
+      hintByRank[result.finalRank] ??
       "Most employees peak at Manager. Director at 20y is the real ceiling; CEO at 35y is the boardroom myth HR keeps on the org chart.";
     progressionHint.classList.remove("hidden");
   } else {
@@ -1866,12 +1879,34 @@ export function mountApp(): void {
             variant: "alert",
             durationMs: 2500,
           });
+        } else if (rank === "Board Member") {
+          showHrMemo(message, { variant: "promo", durationMs: 2500 });
+          showHrMemo("Governance meetings now outrank product deadlines. Quorum optional.", {
+            variant: "alert",
+            durationMs: 2500,
+          });
+        } else if (rank === "Angel Investor") {
+          showHrMemo(message, { variant: "promo", durationMs: 2500 });
+          showHrMemo("Portfolio reviews replace performance reviews. Due diligence is vibes-based.", {
+            variant: "alert",
+            durationMs: 2500,
+          });
         } else {
           showHrMemo(message, { variant: "promo", durationMs: 2000 });
         }
         hapticNotification("success");
         const promoEmoji =
-          rank === "Manager" ? "📋" : rank === "Director" ? "💼" : rank === "CEO" ? "👑" : "🎉";
+          rank === "Manager"
+            ? "📋"
+            : rank === "Director"
+              ? "💼"
+              : rank === "CEO"
+                ? "👑"
+                : rank === "Board Member"
+                  ? "🏛️"
+                  : rank === "Angel Investor"
+                    ? "👼"
+                    : "🎉";
         spawnFloatingParticles($("playerClimber"), promoEmoji, 4);
       },
       onGameOver,

@@ -32,6 +32,12 @@
   --color-cl-rank-ceo-bg: #ecfdf5;
   --color-cl-rank-ceo-text: #047857;
   --color-cl-rank-ceo-border: #a7f3d0;
+  --color-cl-rank-board-bg: #eff6ff;
+  --color-cl-rank-board-text: #1e3a8a;
+  --color-cl-rank-board-border: #93c5fd;
+  --color-cl-rank-angel-bg: #faf5ff;
+  --color-cl-rank-angel-text: #7e22ce;
+  --color-cl-rank-angel-border: #d8b4fe;
   --color-cl-share: #059669;
   --color-cl-share-dark: #047857;
 
@@ -166,6 +172,14 @@
 
 @utility badge-rank-ceo {
   @apply inline-flex items-center gap-1.5 rounded-full border border-cl-rank-ceo-border bg-cl-rank-ceo-bg px-3 py-1 text-xs font-extrabold text-cl-rank-ceo-text;
+}
+
+@utility badge-rank-board {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-cl-rank-board-border bg-cl-rank-board-bg px-3 py-1 text-xs font-extrabold text-cl-rank-board-text;
+}
+
+@utility badge-rank-angel {
+  @apply inline-flex items-center gap-1.5 rounded-full border border-cl-rank-angel-border bg-cl-rank-angel-bg px-3 py-1 text-xs font-extrabold text-cl-rank-angel-text;
 }
 
 @utility lb-tab-active {
@@ -433,7 +447,9 @@ html.cl-in-telegram .cl-telegram-cta-hint {
 .game-hud-rank-stack .badge-rank-intern,
 .game-hud-rank-stack .badge-rank-manager,
 .game-hud-rank-stack .badge-rank-director,
-.game-hud-rank-stack .badge-rank-ceo {
+.game-hud-rank-stack .badge-rank-ceo,
+.game-hud-rank-stack .badge-rank-board,
+.game-hud-rank-stack .badge-rank-angel {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

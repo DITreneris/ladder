@@ -5,6 +5,8 @@ export const MAX_VISIBLE_RUNGS = 7;
 export const MANAGER_YEARS = 10;
 export const DIRECTOR_YEARS = 20;
 export const CEO_YEARS = 35;
+export const BOARD_YEARS = 50;
+export const ANGEL_YEARS = 75;
 
 export const TICK_MS = 100;
 export const BASE_DRAIN_RATE = 0.85;
@@ -234,6 +236,10 @@ export const PROMOTION_DIALOGUES: Partial<Record<Rank, string>> = {
   Director:
     "Promoted to Director. You now own a strategy deck and the deadlines that come with it.",
   CEO: "Reached CEO. Strategic budget requests denied. Monocle unlocked. The board is watching.",
+  "Board Member":
+    "Promoted to the Board. Your calendar is now other people's emergencies.",
+  "Angel Investor":
+    "Angel Investor unlocked. You write checks for pivots you would've killed as CEO.",
 };
 
 export function pickTickerHeadline(): TickerHeadline {
@@ -257,10 +263,18 @@ export function floorLabel(years: number): string {
   if (years < MANAGER_YEARS) return `Floor ${floor} — Open Office`;
   if (years < DIRECTOR_YEARS) return `Floor ${floor} — Middle Management`;
   if (years < CEO_YEARS) return `Floor ${floor} — Director Wing`;
-  return `Floor ${floor} — Executive Suite`;
+  if (years < BOARD_YEARS) return `Floor ${floor} — Executive Suite`;
+  if (years < ANGEL_YEARS) return `Floor ${floor} — Boardroom`;
+  return `Floor ${floor} — Investor Lounge`;
+}
+
+export function isExecutiveRank(rank: Rank): boolean {
+  return rank === "CEO" || rank === "Board Member" || rank === "Angel Investor";
 }
 
 export function rankPropEmoji(rank: Rank): string {
+  if (rank === "Angel Investor") return "💸";
+  if (rank === "Board Member") return "🪑";
   if (rank === "CEO") return "🧐";
   if (rank === "Director") return "💼";
   if (rank === "Manager") return "📋";
@@ -268,6 +282,8 @@ export function rankPropEmoji(rank: Rank): string {
 }
 
 export function rankFromYears(years: number): Rank {
+  if (years >= ANGEL_YEARS) return "Angel Investor";
+  if (years >= BOARD_YEARS) return "Board Member";
   if (years >= CEO_YEARS) return "CEO";
   if (years >= DIRECTOR_YEARS) return "Director";
   if (years >= MANAGER_YEARS) return "Manager";
@@ -275,6 +291,8 @@ export function rankFromYears(years: number): Rank {
 }
 
 export function rankEmoji(rank: Rank): string {
+  if (rank === "Angel Investor") return "👼";
+  if (rank === "Board Member") return "🏛️";
   if (rank === "CEO") return "👑";
   if (rank === "Director") return "🕴️";
   if (rank === "Manager") return "🧑‍💼";
@@ -282,7 +300,15 @@ export function rankEmoji(rank: Rank): string {
 }
 
 export function milestoneLabel(years: number): string {
-  if (years >= CEO_YEARS) return "Corner office secured";
+  if (years >= ANGEL_YEARS) return "Term sheet signed";
+  if (years >= BOARD_YEARS) {
+    const remaining = Math.max(0, ANGEL_YEARS - years);
+    return `Angel round in ${remaining.toFixed(1)}y`;
+  }
+  if (years >= CEO_YEARS) {
+    const remaining = Math.max(0, BOARD_YEARS - years);
+    return `Board seat in ${remaining.toFixed(1)}y`;
+  }
   if (years >= DIRECTOR_YEARS) {
     const remaining = Math.max(0, CEO_YEARS - years);
     return `CEO myth in ${remaining.toFixed(1)}y`;
@@ -296,7 +322,7 @@ export function milestoneLabel(years: number): string {
 }
 
 export function allowedObstacleTypes(rank: Rank, allowEarlyReorg = false): ObstacleType[] {
-  if (rank === "CEO") return ["meeting", "reorg", "burnout", "foliage"];
+  if (isExecutiveRank(rank)) return ["meeting", "reorg", "burnout", "foliage"];
   if (rank === "Director") return ["meeting", "reorg", "badge_gate", "burnout"];
   if (rank === "Manager") return ["meeting", "reorg", "badge_gate"];
   if (allowEarlyReorg) return ["meeting", "reorg"];
@@ -309,6 +335,8 @@ const OBSTACLE_WEIGHTS: Partial<Record<Rank, Partial<Record<ObstacleType, number
   Manager: { meeting: 0.55, reorg: 0.3, badge_gate: 0.15 },
   Director: { meeting: 0.45, reorg: 0.28, badge_gate: 0.12, burnout: 0.15 },
   CEO: { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
+  "Board Member": { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
+  "Angel Investor": { meeting: 0.4, reorg: 0.25, burnout: 0.2, foliage: 0.15 },
 };
 
 export function pickObstacleType(
@@ -348,5 +376,5 @@ export function pickObstacleType(
 }
 
 export function reorgIntervalForRank(rank: Rank): number {
-  return rank === "CEO" ? REORG_INTERVAL_CEO_MS : REORG_INTERVAL_MS;
+  return isExecutiveRank(rank) ? REORG_INTERVAL_CEO_MS : REORG_INTERVAL_MS;
 }
