@@ -174,7 +174,9 @@ export async function submitRun(
     | null = null;
 
   for (let attempt = 1; attempt <= SUBMIT_MAX_ATTEMPTS; attempt++) {
-    const runEndedAt = payload.runEndedAt ?? Date.now();
+    const runEndedAtMs = Math.max(payload.runEndedAt ?? 0, Date.now());
+    const runStartedAtMs = payload.runStartedAt;
+    const runDurationMs = Math.max(1, Math.round(runEndedAtMs - runStartedAtMs));
     const body = {
       initData,
       years_survived: yearsSurvived,
@@ -182,8 +184,9 @@ export async function submitRun(
       termination_cause: payload.terminationCause ?? "",
       rungs_climbed: rungsClimbed,
       sprint_mode: Boolean(payload.sprintMode),
-      run_started_at: Math.floor(payload.runStartedAt / 1000),
-      run_ended_at: Math.ceil(runEndedAt / 1000),
+      run_started_at: Math.floor(runStartedAtMs / 1000),
+      run_ended_at: Math.ceil(runEndedAtMs / 1000),
+      run_duration_ms: runDurationMs,
     };
     lastResult = await apiPost<{ ok: boolean; best_score: number; best_rank: string }>("/runs", body);
     if (lastResult.ok) {

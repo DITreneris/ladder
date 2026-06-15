@@ -10,12 +10,16 @@ from app.ranks import MAX_YEARS_NORMAL
 
 MAX_YEARS_SPRINT = 25.0
 MIN_TAP_INTERVAL_S = 0.12
-# Match mini-app MIN_TAP_INTERVAL_MS (120) — one climb per tap, ~8.33 rungs/s max.
-MAX_RUNGS_PER_SECOND = 1.0 / MIN_TAP_INTERVAL_S
+# Anti-cheat cap at 2× the client tap throttle (120ms → 8.33 rungs/s) so fast legal
+# play has honest headroom; blatant speed hacks still fail the min-duration floor.
+GAME_MAX_RUNGS_PER_SECOND = 2.0 / MIN_TAP_INTERVAL_S
 SPRINT_SESSION_CAP_SECONDS = 60
 MAX_RUN_DURATION_SECONDS = 600
 MIN_TAP_TOLERANCE = 0.85
 CLOCK_SKEW_TOLERANCE_S = 30
+# Client sends true ms duration plus floor/ceil unix-second timestamps; allow the
+# quantization gap between them before rejecting a duration/timestamp mismatch.
+DURATION_SEC_SLACK_MS = 2000
 
 
 def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
@@ -37,15 +41,20 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
     now = int(time.time())
     _validate_run_timestamps(body, auth_date, now)
 
-    run_elapsed = body.run_ended_at - body.run_started_at
-    if body.sprint_mode:
-        run_elapsed = min(run_elapsed, SPRINT_SESSION_CAP_SECONDS)
-    else:
-        run_elapsed = min(run_elapsed, MAX_RUN_DURATION_SECONDS)
+    # True play time comes from run_duration_ms; unix-second timestamps only gate the
+    # session window and clock skew. Guard against duration that overruns its window.
+    sec_window_ms = (body.run_ended_at - body.run_started_at) * 1000
+    if body.run_duration_ms > sec_window_ms + DURATION_SEC_SLACK_MS:
+        raise HTTPException(
+            status_code=400,
+            detail="Run duration inconsistent with timestamps",
+        )
 
-    # +2s bucket: client sends unix seconds (floor start, ceil end); up to ~2s of
-    # real play can collapse into one integer second boundary at fast tap rates.
-    max_rungs = int((run_elapsed + 2) * MAX_RUNGS_PER_SECOND) + 2
+    elapsed_s = body.run_duration_ms / 1000.0
+    cap_s = SPRINT_SESSION_CAP_SECONDS if body.sprint_mode else MAX_RUN_DURATION_SECONDS
+    elapsed_s = min(elapsed_s, cap_s)
+
+    max_rungs = int(elapsed_s * GAME_MAX_RUNGS_PER_SECOND) + 1
     if body.rungs_climbed > max_rungs:
         raise HTTPException(
             status_code=400,
@@ -53,7 +62,7 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
         )
 
     min_elapsed = body.rungs_climbed * MIN_TAP_INTERVAL_S * MIN_TAP_TOLERANCE
-    if run_elapsed < min_elapsed:
+    if elapsed_s < min_elapsed:
         raise HTTPException(
             status_code=400,
             detail="Score exceeds minimum run duration",

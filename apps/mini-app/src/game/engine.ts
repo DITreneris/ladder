@@ -643,6 +643,7 @@ export class GameEngine {
       terminationFlavor: funnyQuote,
       deathType,
       runStartedAt: this.runStartedAt,
+      runEndedAt: Date.now(),
     };
     this.callbacks.onGameOver(result);
   }

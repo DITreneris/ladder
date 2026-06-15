@@ -1,0 +1,23 @@
+name: Prod smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prod-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: API health
+        run: |
+          BODY=$(curl -sf https://ladder-production-642d.up.railway.app/health)
+          echo "$BODY"
+          echo "$BODY" | grep -q '"status":"ok"'
+          echo "$BODY" | grep -q '"db":"ok"'
+
+      - name: Mini-app bundle
+        run: |
+          HTML=$(curl -sf https://www.promptanatomy.lol)
+          echo "$HTML" | grep -qE 'main-[A-Za-z0-9_-]+\.js'
+
+      - name: OG asset
+        run: curl -sf -o /dev/null -w "%{http_code}" https://www.promptanatomy.lol/og.png | grep -q 200

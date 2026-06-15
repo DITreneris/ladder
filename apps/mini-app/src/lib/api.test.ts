@@ -68,6 +68,46 @@ describe("submitRun", () => {
     expect(firstBody.years_survived).toBe(30);
     expect(firstBody.run_started_at).toBeTypeOf("number");
     expect(firstBody.run_ended_at).toBeTypeOf("number");
+    expect(firstBody.run_duration_ms).toBeTypeOf("number");
+    expect(firstBody.run_duration_ms).toBeGreaterThan(0);
+  });
+
+  it("sends honest ms duration that does not shrink across retries", async () => {
+    let runsCalls = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: RequestInfo | URL) => {
+        if (!String(url).includes("/runs")) {
+          return new Response(null, { status: 204 });
+        }
+        runsCalls += 1;
+        if (runsCalls === 1) {
+          return new Response(JSON.stringify({ detail: "Too many submissions" }), { status: 429 });
+        }
+        return new Response(JSON.stringify({ ok: true, best_score: 18, best_rank: "Manager" }), { status: 200 });
+      })
+    );
+
+    const startedAt = Date.now() - 8_640;
+    const promise = submitRun("init-data-test", {
+      yearsSurvived: 18,
+      finalRank: "Manager",
+      terminationCause: "test",
+      rungsClimbed: 72,
+      runStartedAt: startedAt,
+      runEndedAt: Date.now(),
+    });
+
+    await vi.advanceTimersByTimeAsync(SUBMIT_COOLDOWN_RETRY_MS);
+    await promise;
+
+    const fetchMock = vi.mocked(fetch);
+    const runsBodies = fetchMock.mock.calls
+      .filter((c) => String(c[0]).includes("/runs"))
+      .map((c) => JSON.parse(String(c[1]?.body)) as { run_duration_ms: number });
+    expect(runsBodies).toHaveLength(2);
+    expect(runsBodies[0]!.run_duration_ms).toBeGreaterThanOrEqual(8_640);
+    expect(runsBodies[1]!.run_duration_ms).toBeGreaterThanOrEqual(runsBodies[0]!.run_duration_ms);
   });
 
   it("retries after 503 then succeeds", async () => {

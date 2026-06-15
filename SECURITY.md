@@ -30,7 +30,7 @@ Remove overrides when `npm audit --audit-level=high` passes without them.
 
 ## Score integrity
 
-`POST /runs` requires `run_started_at` and `run_ended_at` (unix seconds). Plausibility checks use run duration and minimum tap-interval floor — not Telegram session idle time alone.
+`POST /runs` requires `run_started_at` / `run_ended_at` (unix seconds) and `run_duration_ms` (true elapsed play time in milliseconds). The unix-second timestamps gate the session window (`run_started_at >= auth_date`) and clock skew only. Tap-rate plausibility uses `run_duration_ms` against a cap of 2× the client tap throttle (120ms → max ~16.7 rungs/s), plus a minimum-duration floor (`rungs × 120ms × 0.85`) that blocks impossible tap density. A consistency check rejects an ms duration that overruns its second window by more than 2s, so a forged long duration inside a short session is caught.
 
 ## Production config
 

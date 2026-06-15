@@ -1432,6 +1432,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
       rungsClimbed: result.rungsClimbed,
       sprintMode: Boolean(activeDailyModifier.sprintDurationMs),
       runStartedAt: result.runStartedAt,
+      runEndedAt: result.runEndedAt,
     },
     {
       previousBestScore: previousBest,

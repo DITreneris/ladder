@@ -1,13 +1,13 @@
 # Deploy checklist (GitHub-tracked lean runbook)
 
-Full cold-deploy steps live in local `DEPLOY.md` when available. This file covers the minimum production gate.
+Env vars, migration order, and service deploy sequence. **Gate index:** [SHIP_GATES.md](SHIP_GATES.md) Tier B/C.
 
 ## Prerequisites
 
 1. Supabase project with migrations applied in order:
    - `supabase/migrations/001_initial_schema.sql`
    - `supabase/migrations/002_v2_hardening.sql` (required — `submit_cooldowns`, `api_sessions`)
-   - `supabase/migrations/003_leaderboard_rpc.sql` (recommended — leaderboard RPC)
+   - `supabase/migrations/003_leaderboard_rpc.sql` (required — leaderboard RPC)
    - `supabase/migrations/004_leaderboard_public_view.sql` (optional)
 2. Verify `migration_002_ok: true` via local `python scripts/ff-metrics.py` (script is local-only).
 
@@ -28,22 +28,19 @@ See [.env.example](.env.example) for the full list.
 3. Deploy **mini-app** (`apps/mini-app`) in the same window as API when score validation changes ship.
 4. Deploy **bot** (`apps/bot`) — `GET /health` on bot service port.
 
-## Smoke (CI parity)
-
-From repo root:
+## Pre-deploy smoke (Tier B)
 
 ```bash
 bash scripts/smoke-ci.sh
 ```
 
-Or run the same commands as [.github/workflows/ci.yml](.github/workflows/ci.yml).
+Full Playwright parity: `bash scripts/smoke-ci.sh --full` or wait for CI on the PR ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Post-deploy
 
-- Open Mini App from `@CorporateLadder_bot`
-- Play one run; confirm score on Daily leaderboard
-- Test native share in a group chat
-- On Synergy Sprint days, submit requires `sprint_mode: true`
+See [SHIP_GATES.md](SHIP_GATES.md) Tier C (health, ff-metrics, bundle hash, Telegram spot check) and Tier D (device QA before launch).
+
+Optional: run [`.github/workflows/prod-smoke.yml`](.github/workflows/prod-smoke.yml) manually after deploy.
 
 ## Security
 

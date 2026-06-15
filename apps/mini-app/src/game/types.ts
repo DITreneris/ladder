@@ -18,8 +18,10 @@ export interface GameOverResult {
   terminationDetail: string;
   terminationFlavor: string;
   deathType: DeathType;
-  /** Unix ms when the player tapped to start the run (first tap). */
+  /** Unix ms when the run clock started (engine.start). */
   runStartedAt: number;
+  /** Unix ms when the run ended (game over). */
+  runEndedAt: number;
 }
 
 export interface ReviveSnapshot {

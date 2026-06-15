@@ -54,7 +54,7 @@ cd packages/api && pytest
 cd apps/mini-app && npm run lint && npm test && npm run build
 ```
 
-CI runs the same on push to `main` (`.github/workflows/ci.yml`). See [DEPLOY.md](DEPLOY.md) for production checklist and [SECURITY.md](SECURITY.md) for scanning policy.
+CI runs the same on push to `main` (`.github/workflows/ci.yml`). See [SHIP_GATES.md](SHIP_GATES.md) for deploy gates, [DEPLOY.md](DEPLOY.md) for env/deploy order, and [SECURITY.md](SECURITY.md) for scanning policy.
 
 ## License
 

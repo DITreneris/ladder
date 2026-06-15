@@ -117,6 +117,7 @@ def test_runs_invalid_init_data():
             "rungs_climbed": 4,
             "run_started_at": started,
             "run_ended_at": ended,
+            "run_duration_ms": (ended - started) * 1000,
         },
     )
     assert response.status_code == 401
@@ -242,6 +243,7 @@ def test_runs_rejects_idle_auth_date_forge(mock_supabase, valid_init_data):
             "rungs_climbed": 400,
             "run_started_at": now - 10,
             "run_ended_at": now,
+            "run_duration_ms": 10_000,
         },
     )
     assert response.status_code == 400
@@ -262,6 +264,7 @@ def test_runs_rejects_run_started_before_auth_date(mock_supabase, valid_init_dat
             "rungs_climbed": 20,
             "run_started_at": auth_date - 120,
             "run_ended_at": int(time.time()),
+            "run_duration_ms": 60_000,
         },
     )
     assert response.status_code == 400
@@ -282,11 +285,54 @@ def test_runs_rejects_impossible_tap_rate(mock_supabase, valid_init_data):
             "rungs_climbed": 200,
             "run_started_at": now - 5,
             "run_ended_at": now,
+            "run_duration_ms": 5_000,
         },
     )
     assert response.status_code == 400
     detail = response.json()["detail"].lower()
     assert "minimum run duration" in detail or "run duration plausibility" in detail
+
+
+def test_runs_rejects_duration_inconsistent_with_timestamps(mock_supabase, valid_init_data):
+    """Forged long ms duration inside a short unix-second window must be rejected."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 12.0,
+            "final_rank": "Manager",
+            "rungs_climbed": 48,
+            "run_started_at": now - 5,
+            "run_ended_at": now,
+            "run_duration_ms": 60_000,
+        },
+    )
+    assert response.status_code == 400
+    assert "inconsistent" in response.json()["detail"].lower()
+
+
+def test_runs_requires_run_duration_ms(mock_supabase, valid_init_data):
+    """run_duration_ms is required — missing field is a 422 schema error."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 18.0,
+            "final_rank": "Manager",
+            "rungs_climbed": 72,
+            "run_started_at": now - 9,
+            "run_ended_at": now,
+        },
+    )
+    assert response.status_code == 422
 
 
 def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
@@ -295,7 +341,6 @@ def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
     auth_date = int(time.time()) - 120
     init_data = build_init_data(TEST_USER, auth_date=auth_date)
     rungs = 72  # 18.0y Manager
-    elapsed = max(1, int(rungs * 0.12))
     now = int(time.time())
     response = client.post(
         "/runs",
@@ -305,15 +350,20 @@ def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
             "final_rank": "Manager",
             "termination_cause": "Reorganization",
             "rungs_climbed": rungs,
-            "run_started_at": now - elapsed,
+            "run_started_at": now - 9,
             "run_ended_at": now,
+            "run_duration_ms": rungs * 120,  # honest ~8.6s play time
         },
     )
     assert response.status_code == 200
 
 
-def test_runs_accepts_rungs_at_tight_second_boundary(mock_supabase, valid_init_data):
-    """72 rungs in an 8s unix-second window must pass (worst-case second quantization)."""
+def test_runs_accepts_fast_run_with_tight_second_window(mock_supabase, valid_init_data):
+    """True ms duration (8.6s) passes even when the unix-second window quantizes to 7s.
+
+    Reproduces the production false-reject: 72 rungs whose floor/ceil second window
+    understates real play time; the ms-based check must accept it.
+    """
     mock_supabase.cooldowns_store.clear()
     auth_date = int(time.time()) - 120
     init_data = build_init_data(TEST_USER, auth_date=auth_date)
@@ -327,8 +377,32 @@ def test_runs_accepts_rungs_at_tight_second_boundary(mock_supabase, valid_init_d
             "final_rank": "Manager",
             "termination_cause": "Reorganization",
             "rungs_climbed": rungs,
-            "run_started_at": now - 8,
+            "run_started_at": now - 7,
             "run_ended_at": now,
+            "run_duration_ms": rungs * 120,  # 8640ms real time inside a 7s window
+        },
+    )
+    assert response.status_code == 200
+
+
+def test_runs_accepts_fast_director_run(mock_supabase, valid_init_data):
+    """103 rungs / 25.8y Director run with honest ms duration must pass (prod 25.8y case)."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    rungs = 103
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 25.8,
+            "final_rank": "Director",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": rungs,
+            "run_started_at": now - 12,
+            "run_ended_at": now,
+            "run_duration_ms": rungs * 120,  # ~12.4s
         },
     )
     assert response.status_code == 200

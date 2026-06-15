@@ -37,4 +37,5 @@ export const MARKETING_GAMEOVER = {
   terminationFlavor: FAILURE_REASONS[0] ?? "Your synergy did not scale optimally with our paradigms.",
   rungsClimbed: 25,
   runStartedAt: Date.now() - 60_000,
+  runEndedAt: Date.now(),
 };

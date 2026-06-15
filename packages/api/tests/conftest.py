@@ -52,15 +52,17 @@ def runs_payload(
     if auth_date is None:
         auth_date = int(time.time()) - 120
     started, ended = run_timestamps_for_rungs(rungs_climbed, auth_date=auth_date)
-    return {
+    payload = {
         "initData": init_data,
         "years_survived": years_survived,
         "final_rank": final_rank,
         "rungs_climbed": rungs_climbed,
         "run_started_at": started,
         "run_ended_at": ended,
+        "run_duration_ms": (ended - started) * 1000,
         **extra,
     }
+    return payload
 
 
 from app.main import app
