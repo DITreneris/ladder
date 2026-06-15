@@ -413,9 +413,10 @@ html.cl-in-telegram .text-micro {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--cl-border) 40%, var(--cl-text));
+  /* FAB bg is always light (--cl-secondary-bg); never inherit TG dark text_color */
+  border: 1px solid #cbd5e1;
   background-color: var(--cl-secondary-bg);
-  color: var(--cl-text);
+  color: #0f172a;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   transition: opacity 150ms;
 }
