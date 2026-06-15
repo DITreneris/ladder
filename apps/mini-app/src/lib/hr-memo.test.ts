@@ -31,7 +31,7 @@ describe("hr-memo", () => {
     expect(scheduler.isShowing()).toBe(true);
     expect(scheduler.getQueueLength()).toBe(1);
 
-    vi.advanceTimersByTime(1800);
+    vi.advanceTimersByTime(1200);
     expect(shown).toEqual(["First", "Second"]);
 
     vi.advanceTimersByTime(1000);

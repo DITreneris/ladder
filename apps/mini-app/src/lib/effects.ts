@@ -140,6 +140,18 @@ export function triggerRankPop(el: HTMLElement): void {
   );
 }
 
+export function triggerRankBadgePulse(el: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  el.classList.remove("rank-badge-pulse");
+  void el.offsetWidth;
+  el.classList.add("rank-badge-pulse");
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove("rank-badge-pulse"),
+    { once: true }
+  );
+}
+
 export function triggerPromoConfetti(el: HTMLElement): void {
   if (respectsReducedMotion()) return;
   el.classList.remove("promo-confetti");

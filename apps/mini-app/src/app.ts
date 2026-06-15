@@ -1,11 +1,14 @@
 import {
+  ANGEL_FAKE_PROMO,
   ANGEL_TRAP_ANNOUNCEMENT,
   ANGEL_YEARS,
+  BOARD_FAKE_PROMO,
   BOARD_TRAP_ANNOUNCEMENT,
   BOARD_YEARS,
   CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
+  INTERN_FAKE_PROMO,
   LAST_RUN_STORAGE_KEY,
   MAX_VISIBLE_RUNGS,
   MIN_TAP_INTERVAL_MS,
@@ -58,7 +61,7 @@ import {
   type GameOverContextLine,
 } from "./lib/game-over-copy";
 import { icon } from "./lib/icons";
-import { hideHrMemo, showHrMemo, showHrMemoCombined } from "./lib/hr-memo";
+import { hideHrMemo, showHrMemo } from "./lib/hr-memo";
 import {
   applyReorgSlide,
   flashBurnoutStress,
@@ -72,6 +75,7 @@ import {
   triggerFloorBandFlash,
   triggerMeterFlash,
   triggerNearMissWince,
+  triggerRankBadgePulse,
   triggerRankPop,
   triggerReorgTelegraph,
   triggerRungAdvance,
@@ -111,6 +115,10 @@ import { shouldClearPendingOnRevive } from "./lib/submit-orchestrator";
 
 type Screen = "home" | "game" | "gameover" | "leaderboard" | "howtoplay";
 type LeaderboardPeriod = "daily" | "weekly";
+
+const FAKE_PROMO_MESSAGES = new Set(
+  [...INTERN_FAKE_PROMO, ...BOARD_FAKE_PROMO, ...ANGEL_FAKE_PROMO].map((p) => p.message)
+);
 
 let username = "CorporateSlave";
 let highScore = 0;
@@ -190,11 +198,16 @@ function updateFloorLabel(years: number): void {
 }
 
 function updateCorpGhostBg(years: number): void {
-  const ghost = document.getElementById("corpGhostBg");
-  if (!ghost) return;
   const next = CORP_ENV_BAND_CLASSES[corpEnvBandForYears(years)];
-  for (const cls of Object.values(CORP_ENV_BAND_CLASSES)) {
-    ghost.classList.toggle(cls, cls === next);
+  const targets = [
+    document.getElementById("corpGhostBg"),
+    document.getElementById("gamePlayArea"),
+  ];
+  for (const el of targets) {
+    if (!el) continue;
+    for (const cls of Object.values(CORP_ENV_BAND_CLASSES)) {
+      el.classList.toggle(cls, cls === next);
+    }
   }
 }
 
@@ -891,13 +904,13 @@ function maybeShowExecutiveTrapMemo(): void {
 
   if (rank === "CEO" && next.type === "burnout" && !ceoTrapShown) {
     ceoTrapShown = true;
-    showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+    showHrMemo(CEO_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 1600 });
     return;
   }
 
   if (rank === "Board Member" && next.type === "meeting" && !boardTrapShown) {
     boardTrapShown = true;
-    showHrMemo(BOARD_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+    showHrMemo(BOARD_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 1600 });
     return;
   }
 
@@ -907,7 +920,7 @@ function maybeShowExecutiveTrapMemo(): void {
     !angelTrapShown
   ) {
     angelTrapShown = true;
-    showHrMemo(ANGEL_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 2500 });
+    showHrMemo(ANGEL_TRAP_ANNOUNCEMENT, { variant: "promo", durationMs: 1600 });
   }
 }
 
@@ -1712,14 +1725,14 @@ function toggleMute(): void {
   if (audio.isMuted()) {
     soundIcon.innerHTML = icon("volume-xmark", "text-red-400");
     if (inGame) {
-      showHrMemo("Synthesizer muted.", { variant: "info", durationMs: 1500 });
+      showHrMemo("Synthesizer muted.", { variant: "info", durationMs: 1000 });
     } else {
       showToast("Synthesizer Muted");
     }
   } else {
     soundIcon.innerHTML = icon("volume-high", "text-sm");
     if (inGame) {
-      showHrMemo("Synthesizer live.", { variant: "info", durationMs: 1500 });
+      showHrMemo("Synthesizer live.", { variant: "info", durationMs: 1000 });
     } else {
       showToast("Synthesizer Unmuted");
     }
@@ -1780,7 +1793,7 @@ function attemptGameTap(side: PlayerSide, source: "pointer" | "keyboard", button
   if (isTutorialOverlayActive()) {
     const required = getSafeTapSide(engine.getRungs()[1]);
     if (required !== null && side !== required) {
-      showHrMemo(getTutorialWrongTapMessage(side), { variant: "info", durationMs: 2200 });
+      showHrMemo(getTutorialWrongTapMessage(side), { variant: "info", durationMs: 1200 });
       hapticImpact("rigid");
       if (source === "pointer" && buttonEl) triggerClimbPop(buttonEl);
       return;
@@ -2040,34 +2053,8 @@ export function mountApp(): void {
         updateRankUI(rank, false);
         flashPlayerEmoji("😎", 400);
         triggerRankPop($("playerActionEmoji"));
-        if (rank === "Manager") {
-          showHrMemoCombined([message, "Reorgs now swap sides. Time your climbs."], {
-            variant: "promo",
-            durationMs: 2000,
-          });
-        } else if (rank === "Director") {
-          showHrMemoCombined(
-            [message, "Deadlines joined the org chart. Good luck."],
-            { variant: "promo", durationMs: 2000 }
-          );
-        } else if (rank === "CEO") {
-          showHrMemoCombined(
-            [message, "Mandatory desk plants now block corridors. Wellness is not optional."],
-            { variant: "promo", durationMs: 2000 }
-          );
-        } else if (rank === "Board Member") {
-          showHrMemoCombined(
-            [message, "Governance meetings now outrank product deadlines. Quorum optional."],
-            { variant: "promo", durationMs: 2000 }
-          );
-        } else if (rank === "Angel Investor") {
-          showHrMemoCombined(
-            [message, "Portfolio reviews replace performance reviews. Due diligence is vibes-based."],
-            { variant: "promo", durationMs: 2000 }
-          );
-        } else {
-          showHrMemo(message, { variant: "promo", durationMs: 1800 });
-        }
+        triggerRankBadgePulse($("gameRankBadge"));
+        showHrMemo(message, { variant: "promo", durationMs: 1400 });
         hapticNotification("success");
         const promoEmoji =
           rank === "Manager"
@@ -2097,16 +2084,19 @@ export function mountApp(): void {
         spawnFloatingParticles($("playerClimber"), "☕", 5);
         hapticImpact("medium");
       },
-      onToast: (msg) => showHrMemo(msg, { variant: "info" }),
+      onToast: (msg) => {
+        const isFakePromo = FAKE_PROMO_MESSAGES.has(msg);
+        showHrMemo(msg, {
+          variant: isFakePromo ? "promo" : "info",
+          durationMs: isFakePromo ? 1400 : undefined,
+        });
+      },
       onNearMiss: () => {
         triggerNearMissWince($("playerClimber"));
         hapticImpact("light");
       },
       onTriagePrompt: () => {
-        showHrMemoCombined([TRIAGE_PROMPT, "Your next tap assigns backlog — not a climb."], {
-          variant: "alert",
-          durationMs: 2500,
-        });
+        showHrMemo(TRIAGE_PROMPT, { variant: "alert", durationMs: 1800 });
         hapticImpact("medium");
       },
     },
@@ -2116,8 +2106,8 @@ export function mountApp(): void {
       hideHudTapHint();
       if (isTutorialDone() && getReapplyCount() <= 1) {
         showHrMemo(
-          "TAP LEFT or RIGHT — avoid the occupied side.",
-          { variant: "info", durationMs: 2500 }
+          "TAP LEFT or RIGHT — dodge the occupied side.",
+          { variant: "info", durationMs: 1400 }
         );
       }
       if (!shiftToastShown && activeDailyModifier.id !== "standard") {
@@ -2129,7 +2119,7 @@ export function mountApp(): void {
         activeDailyModifier.id === "meeting_monday"
       ) {
         meetingMondayMemoShown = true;
-        showHrMemo(MEETING_MONDAY_OPENING_MEMO, { variant: "promo", durationMs: 2500 });
+        showHrMemo(MEETING_MONDAY_OPENING_MEMO, { variant: "promo", durationMs: 1400 });
       }
     },
     getCaptureFlags().og ? getDailyModifierById("reorg_week") : undefined

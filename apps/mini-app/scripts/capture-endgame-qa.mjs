@@ -14,6 +14,34 @@ const previewUrl = process.env.PREVIEW_URL ?? "http://127.0.0.1:4173";
 
 const SCENARIOS = [
   {
+    file: "03-intern-pit-2y.png",
+    label: "Intern Pit @ 2y — early-band ghost + play-area wash",
+    years: 2,
+    rank: "Intern",
+    rankEmoji: "🎓",
+    propEmoji: "📎",
+    badgeClass: "badge-rank-intern mt-0.5",
+    milestone: "Manager in 8.0y",
+    floor: "Floor 3 — Intern Pit",
+    floorBand: "default",
+    corpEnvClass: "corp-env-intern-pit",
+    obstacle: { emoji: "📅", label: "Meeting" },
+  },
+  {
+    file: "06-open-office-7y.png",
+    label: "Open Office @ 7y — neutral band wash",
+    years: 7,
+    rank: "Intern",
+    rankEmoji: "🎓",
+    propEmoji: "📎",
+    badgeClass: "badge-rank-intern mt-0.5",
+    milestone: "Manager in 3.0y",
+    floor: "Floor 8 — Open Office",
+    floorBand: "default",
+    corpEnvClass: "corp-env-open-office",
+    obstacle: { emoji: "🔄", label: "Reorg" },
+  },
+  {
     file: "01-board-member-55y.png",
     label: "Board Member @ 55y — HUD + Quorum obstacle",
     years: 55,
@@ -92,6 +120,11 @@ async function applyGameplayScenario(page, scenario) {
     const ghost = document.getElementById("corpGhostBg");
     if (ghost && s.corpEnvClass) {
       ghost.className = `corp-ghost-bg ${s.corpEnvClass}`;
+    }
+
+    const playArea = document.getElementById("gamePlayArea");
+    if (playArea && s.corpEnvClass) {
+      playArea.className = `game-play-area ${s.corpEnvClass}`;
     }
 
     const imminent = document.querySelector(".rung-row.imminent .obstacle-badge, .rung-row:first-of-type .obstacle-badge");

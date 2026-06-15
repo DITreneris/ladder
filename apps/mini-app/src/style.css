@@ -38,6 +38,23 @@
   --color-cl-rank-angel-bg: #faf5ff;
   --color-cl-rank-angel-text: #7e22ce;
   --color-cl-rank-angel-border: #d8b4fe;
+  /* Corp-env wash aliases (v2.4.1 preset B) — play-area + ghost overlays */
+  --color-cl-corp-open-wash: #e2e8f0;
+  --cl-corp-wash-mix-intern: 16%;
+  --cl-corp-wash-mix-open: 15%;
+  --cl-corp-wash-mix-rank: 18%;
+  --cl-corp-wash-mix-rank-high: 19%;
+  --cl-corp-ghost-opacity: 0.17;
+  --cl-corp-ghost-blur: 6px;
+  --cl-corp-ghost-wash-mix-early: 8%;
+  --cl-corp-ghost-wash-mix-rank: 10%;
+  --cl-corp-ghost-wash-mix-rank-high: 12%;
+  --cl-corp-flash-brightness: 1.05;
+  --cl-corp-flash-duration: 0.2s;
+  --cl-corp-wash-transition-duration: 0.45s;
+  --cl-rank-badge-pulse-scale: 1.04;
+  --cl-rank-badge-pulse-shadow-mix: 30%;
+  --cl-rank-pop-scale: 1.2;
   --color-cl-share: #059669;
   --color-cl-share-dark: #047857;
 
@@ -453,7 +470,6 @@ html.cl-in-telegram .text-micro {
 
 .game-hud,
 .hr-memo-rail,
-.game-play-area,
 .tap-controls-bar {
   background: #fff;
 }
@@ -470,6 +486,37 @@ html.cl-in-telegram .text-micro {
   padding-right: 4px;
   border-top: 1px solid #e2e8f0;
   border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+  transition: background-color var(--cl-corp-wash-transition-duration) ease-in-out;
+}
+
+/* Progressive corp env — play-area band wash (mirrors #corpGhostBg class on #gamePlayArea). */
+.game-play-area.corp-env-intern-pit {
+  background-color: color-mix(in srgb, var(--color-cl-rank-intern-bg) var(--cl-corp-wash-mix-intern), #fff);
+}
+
+.game-play-area.corp-env-open-office {
+  background-color: color-mix(in srgb, var(--color-cl-corp-open-wash) var(--cl-corp-wash-mix-open), #fff);
+}
+
+.game-play-area.corp-env-middle-management {
+  background-color: color-mix(in srgb, var(--color-cl-rank-manager-bg) var(--cl-corp-wash-mix-rank), #fff);
+}
+
+.game-play-area.corp-env-director-wing {
+  background-color: color-mix(in srgb, var(--color-cl-rank-director-bg) var(--cl-corp-wash-mix-rank), #fff);
+}
+
+.game-play-area.corp-env-executive-suite {
+  background-color: color-mix(in srgb, var(--color-cl-rank-ceo-bg) var(--cl-corp-wash-mix-rank-high), #fff);
+}
+
+.game-play-area.corp-env-boardroom {
+  background-color: color-mix(in srgb, var(--color-cl-rank-board-bg) var(--cl-corp-wash-mix-rank-high), #fff);
+}
+
+.game-play-area.corp-env-investor-lounge {
+  background-color: color-mix(in srgb, var(--color-cl-rank-angel-bg) var(--cl-corp-wash-mix-rank-high), #fff);
 }
 
 .ladder-track {
@@ -711,6 +758,7 @@ html.cl-in-telegram .text-micro {
 
 .hr-memo-rail--promo .hr-memo-text {
   color: #78350f;
+  -webkit-line-clamp: 1;
 }
 
 .hr-memo-rail--alert {
@@ -934,7 +982,7 @@ html.cl-in-telegram .text-micro {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.35);
+    transform: scale(var(--cl-rank-pop-scale));
   }
   100% {
     transform: scale(1);
@@ -943,6 +991,23 @@ html.cl-in-telegram .text-micro {
 .rank-pop {
   animation: rank-pop 0.5s ease-out;
   display: inline-block;
+}
+
+@keyframes rank-badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+  50% {
+    transform: scale(var(--cl-rank-badge-pulse-scale));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-cl-promo) var(--cl-rank-badge-pulse-shadow-mix), transparent);
+  }
+}
+
+.rank-badge-pulse {
+  animation: rank-badge-pulse 0.35s ease-out;
+  display: inline-flex;
 }
 
 @keyframes promo-confetti {
@@ -1194,21 +1259,24 @@ html.cl-in-telegram .text-micro {
 @keyframes floor-band-flash {
   0% {
     opacity: 1;
+    filter: brightness(1);
   }
-  50% {
-    opacity: 0.88;
+  40% {
+    opacity: 1;
+    filter: brightness(var(--cl-corp-flash-brightness));
   }
   100% {
     opacity: 1;
+    filter: brightness(1);
   }
 }
 
 .floor-band-flash {
-  animation: floor-band-flash 0.15s ease-out;
+  animation: floor-band-flash var(--cl-corp-flash-duration) ease-out;
 }
 
-/* Progressive corporate environment ghost backdrop — subconscious office cue per floor band.
-   Blurred monochrome silhouettes; never competes with obstacle badges (z-index 0, opacity <= 0.08). */
+/* Progressive corporate environment ghost backdrop — readable office cue per floor band.
+   Blurred silhouettes behind ladder (z-index 0, --cl-corp-ghost-opacity); play-area wash on #gamePlayArea. */
 .corp-ghost-bg {
   position: absolute;
   inset: 0;
@@ -1221,52 +1289,63 @@ html.cl-in-telegram .text-micro {
   content: "";
   position: absolute;
   inset: -8%;
-  opacity: 0.07;
-  filter: blur(12px);
+  opacity: var(--cl-corp-ghost-opacity);
+  filter: blur(var(--cl-corp-ghost-blur));
   background-repeat: no-repeat;
   background-position: center bottom;
-  background-size: 110% auto;
+  background-size: 120% auto;
   transition: opacity 0.4s ease, background-image 0.4s ease;
 }
 
-/* Subtle rank wash from Manager onward — reinforces promotion without obscuring play. */
+.corp-ghost-bg.corp-env-intern-pit::before {
+  background-size: 130% auto;
+}
+
+/* Rank wash on ghost layer — all bands get a light overlay. */
 .corp-ghost-bg::after {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  opacity: 1;
+  transition: background-color 0.3s ease;
 }
 
-.corp-env-middle-management::after,
+.corp-env-intern-pit::after {
+  background-color: color-mix(in srgb, var(--color-cl-rank-intern-bg) var(--cl-corp-ghost-wash-mix-early), transparent);
+}
+
+.corp-env-open-office::after {
+  background-color: color-mix(in srgb, var(--color-cl-corp-open-wash) var(--cl-corp-ghost-wash-mix-early), transparent);
+}
+
+.corp-env-middle-management::after {
+  background-color: color-mix(in srgb, var(--color-cl-rank-manager-bg) var(--cl-corp-ghost-wash-mix-rank), transparent);
+}
+
 .corp-env-director-wing::after {
-  opacity: 1;
-  background-color: color-mix(in srgb, var(--color-cl-rank-manager-bg) 10%, transparent);
+  background-color: color-mix(in srgb, var(--color-cl-rank-director-bg) var(--cl-corp-ghost-wash-mix-rank), transparent);
 }
 
 .corp-env-executive-suite::after {
-  opacity: 1;
-  background-color: color-mix(in srgb, var(--color-cl-rank-director-bg) 10%, transparent);
+  background-color: color-mix(in srgb, var(--color-cl-rank-ceo-bg) var(--cl-corp-ghost-wash-mix-rank-high), transparent);
 }
 
 .corp-env-boardroom::after {
-  opacity: 1;
-  background-color: color-mix(in srgb, var(--color-cl-rank-board-bg) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-cl-rank-board-bg) var(--cl-corp-ghost-wash-mix-rank-high), transparent);
 }
 
 .corp-env-investor-lounge::after {
-  opacity: 1;
-  background-color: color-mix(in srgb, var(--color-cl-rank-angel-bg) 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-cl-rank-angel-bg) var(--cl-corp-ghost-wash-mix-rank-high), transparent);
 }
 
-/* Intern Pit — sparse hot desks. */
+/* Intern Pit — dense hot-desk row (readable at 3y). */
 .corp-env-intern-pit::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3Cg fill='%2364748b'%3E%3Crect x='18' y='140' width='62' height='30' rx='2'/%3E%3Crect x='40' y='126' width='28' height='14' rx='1'/%3E%3Crect x='128' y='148' width='62' height='24' rx='2'/%3E%3Crect x='150' y='136' width='26' height='12' rx='1'/%3E%3Crect x='240' y='138' width='62' height='32' rx='2'/%3E%3Crect x='262' y='124' width='28' height='14' rx='1'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3Crect x='0' y='158' width='320' height='4' fill='%2394a3b8'/%3E%3Cg fill='%2364748b'%3E%3Crect x='8' y='128' width='56' height='28' rx='2'/%3E%3Crect x='24' y='114' width='24' height='14' rx='1'/%3E%3Crect x='72' y='132' width='56' height='24' rx='2'/%3E%3Crect x='88' y='118' width='24' height='14' rx='1'/%3E%3Crect x='136' y='124' width='56' height='32' rx='2'/%3E%3Crect x='152' y='110' width='28' height='14' rx='1'/%3E%3Crect x='200' y='130' width='56' height='26' rx='2'/%3E%3Crect x='216' y='116' width='24' height='14' rx='1'/%3E%3Crect x='264' y='126' width='48' height='30' rx='2'/%3E%3Crect x='280' y='112' width='22' height='14' rx='1'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Open Office — cubicle partition grid. */
+/* Open Office — cubicle grid with partition dividers. */
 .corp-env-open-office::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3Cg fill='%2364748b'%3E%3Crect x='14' y='118' width='52' height='56' rx='2'/%3E%3Crect x='74' y='118' width='52' height='56' rx='2'/%3E%3Crect x='134' y='118' width='52' height='56' rx='2'/%3E%3Crect x='194' y='118' width='52' height='56' rx='2'/%3E%3Crect x='254' y='118' width='52' height='56' rx='2'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'%3E%3Cg fill='%2364748b'%3E%3Crect x='10' y='108' width='54' height='62' rx='2'/%3E%3Crect x='70' y='108' width='54' height='62' rx='2'/%3E%3Crect x='130' y='108' width='54' height='62' rx='2'/%3E%3Crect x='190' y='108' width='54' height='62' rx='2'/%3E%3Crect x='250' y='108' width='54' height='62' rx='2'/%3E%3C/g%3E%3Cg stroke='%2394a3b8' stroke-width='2'%3E%3Cline x1='37' y1='108' x2='37' y2='170'/%3E%3Cline x1='97' y1='108' x2='97' y2='170'/%3E%3Cline x1='157' y1='108' x2='157' y2='170'/%3E%3Cline x1='217' y1='108' x2='217' y2='170'/%3E%3Cline x1='277' y1='108' x2='277' y2='170'/%3E%3Cline x1='10' y1='140' x2='304' y2='140'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* Middle Management — glass-walled offices with mullions. */
@@ -1498,6 +1577,7 @@ html.cl-in-telegram .text-micro {
   .reorg-slide-right,
   .float-particle,
   .rank-pop,
+  .rank-badge-pulse,
   .promo-confetti,
   .death-flash,
   .meter-flash,
@@ -1524,6 +1604,9 @@ html.cl-in-telegram .text-micro {
   .floor-band-flash,
   .tap-deck-hint .btn-tap-zone {
     animation: none !important;
+  }
+  .game-play-area {
+    transition: none !important;
   }
   .shake-element {
     transform: none;

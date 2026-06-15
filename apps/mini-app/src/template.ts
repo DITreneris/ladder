@@ -156,7 +156,7 @@ export const APP_SHELL = `
           <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
         </div>
       </div>
-        <div id="gamePlayArea" class="game-play-area">
+        <div id="gamePlayArea" class="game-play-area corp-env-intern-pit">
           <div id="reorgHudStrip" class="reorg-hud-strip reorg-hud-overlay hidden">
             <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
           </div>

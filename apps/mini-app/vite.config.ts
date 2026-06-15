@@ -32,6 +32,11 @@ export default defineConfig({
       destructuring: true,
     },
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: "esnext",
+    },
+  },
   build: {
     rollupOptions: {
       input: {

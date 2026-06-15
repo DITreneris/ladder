@@ -53,15 +53,27 @@ async function main() {
   check("P1-10 mechanics preview removed", previewGone === 0);
   check("P1-10 secondary nav below badge", secondaryNav);
 
-  // P1-11: progressive ghost backdrop
-  const ghost = await page.evaluate(() => {
-    const el = document.getElementById("corpGhostBg");
-    return el ? { id: el.id, classes: el.className } : null;
+  // P1-11: progressive ghost backdrop + play-area band mirror
+  const corpEnv = await page.evaluate(() => {
+    const ghost = document.getElementById("corpGhostBg");
+    const play = document.getElementById("gamePlayArea");
+    const band = "corp-env-intern-pit";
+    return {
+      ghost: ghost?.className ?? "",
+      play: play?.className ?? "",
+      ghostOk: ghost?.classList.contains("corp-ghost-bg") && ghost?.classList.contains(band),
+      playOk: play?.classList.contains("game-play-area") && play?.classList.contains(band),
+    };
   });
   check(
     "P1-11 corp ghost backdrop",
-    ghost?.classes.includes("corp-ghost-bg") && ghost?.classes.includes("corp-env-intern-pit"),
-    ghost ? ghost.classes : "missing"
+    corpEnv.ghostOk,
+    corpEnv.ghost
+  );
+  check(
+    "P1-11 play-area band class mirror",
+    corpEnv.playOk,
+    corpEnv.play
   );
 
   // P1-17: HR stamp pad markup

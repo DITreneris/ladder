@@ -65,7 +65,7 @@ export function createHrMemoScheduler(
         text,
         variant,
         from: opts?.from ?? DEFAULT_FROM[variant],
-        durationMs: opts?.durationMs ?? 1800,
+        durationMs: opts?.durationMs ?? 1200,
       });
       while (queue.length > 1) {
         const dropIdx = queue.findIndex((e) => e.variant !== "promo");

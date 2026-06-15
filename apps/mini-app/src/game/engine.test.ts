@@ -634,7 +634,7 @@ describe("GameEngine", () => {
     internal.currentRank = "Angel Investor";
     tapWithCooldown(engine, "left");
 
-    expect(onToast).toHaveBeenCalledWith(expect.stringContaining("longevity screening"));
+    expect(onToast).toHaveBeenCalledWith(expect.stringContaining("Longevity screening"));
   });
 
   it("captures revive snapshot on collision death", () => {

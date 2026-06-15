@@ -32,10 +32,10 @@ export const TRIAGE_RUNG_INTERVAL = 16;
 export const TRIAGE_BIAS_RUNGS = 3;
 export const TRIAGE_SPAWN_BIAS = 0.75;
 export const TRIAGE_PROMPT =
-  "HR triage: tap LEFT or RIGHT to overload that lane with P1 backlog.";
+  "HR triage: next tap overloads a lane — not a climb.";
 export function triageConfirmCopy(side: "left" | "right"): string {
   const lane = side === "left" ? "LEFT" : "RIGHT";
-  return `P1 backlog routed to the ${lane} lane for the next few rungs.`;
+  return `${lane} lane overloaded — ${TRIAGE_BIAS_RUNGS} rungs.`;
 }
 
 /** Scripted imminent rungs after foot (rungs[1..3]) — L/R spawn only. */
@@ -204,53 +204,53 @@ export const REAPPLY_FLAVOR: { minRuns: number; line: string }[] = [
 ];
 
 export const MANAGER_NEMESIS_LINE =
-  "VP of People Ops: Congratulations. Your 1:1s are now everyone else's calendar problem.";
+  "VP of People Ops: your 1:1s are now everyone else's calendar problem.";
 
 export const MEETING_MONDAY_OPENING_MEMO =
-  "Meeting Monday — your calendar owns you now. Blockers are decorative.";
+  "Meeting Monday: your calendar owns you. Blockers are decorative.";
 
 export const CEO_TRAP_ANNOUNCEMENT =
-  "Corner office secured. Quarterly deadlines now report directly to you.";
+  "CEO: quarterly deadlines now report directly to you.";
 
 export const BOARD_TRAP_ANNOUNCEMENT =
-  "Board seat secured. Governance quorum now blocks both lanes of your personal life.";
+  "Board seat: governance quorum now blocks both lanes of life.";
 
 export const ANGEL_TRAP_ANNOUNCEMENT =
-  "Term sheet signed. Runway deadlines and wellness kiosks now audit your biology.";
+  "Angel round: runway deadlines audit your biology now.";
 
 export const INTERN_FAKE_PROMO: { years: number; message: string }[] = [
-  { years: 2, message: "Performance note filed: almost ready for real promotion. Almost." },
-  { years: 5, message: "VP pinged about your trajectory. The ping was CC'd to nobody." },
-  { years: 9.9, message: "Manager paperwork submitted. Printer jammed. Classic." },
+  { years: 2, message: "Performance note: almost ready for promotion. Almost." },
+  { years: 5, message: "VP pinged your trajectory. The ping was CC'd to nobody." },
+  { years: 9.9, message: "Manager paperwork filed. Printer jammed. Classic." },
 ];
 
 export const BOARD_FAKE_PROMO: { years: number; message: string }[] = [
   {
     years: 52,
-    message: "Spousal disclosure form filed under strategic partnership. Partnership under review.",
+    message: "Spousal disclosure filed under strategic partnership. Under review.",
   },
   {
     years: 58,
-    message: "Marital divestiture committee scheduled. Assets reorged before lunch.",
+    message: "Marital divestiture committee meets before lunch. Assets reorged.",
   },
   {
     years: 65,
-    message: "Conflict-of-interest flagged with your weekend. HR cited fiduciary romance.",
+    message: "Conflict-of-interest flagged with your weekend. Fiduciary romance.",
   },
 ];
 
 export const ANGEL_FAKE_PROMO: { years: number; message: string }[] = [
   {
     years: 78,
-    message: "Executive longevity screening complete. Biology declined to comment.",
+    message: "Longevity screening complete. Biology declined to comment.",
   },
   {
     years: 85,
-    message: "Cardiologist ticket merged with your portfolio review. Same sprint.",
+    message: "Cardiologist ticket merged with portfolio review. Same sprint.",
   },
   {
     years: 92,
-    message: "IV drip lounge grand opening. Coffee is now a legacy integration.",
+    message: "IV drip lounge opens. Coffee is now a legacy integration.",
   },
 ];
 
@@ -416,16 +416,12 @@ export const FAILURE_BY_SHIFT: Record<string, string[]> = {
 };
 
 export const PROMOTION_DIALOGUES: Partial<Record<Rank, string>> = {
-  Intern: "Still an Intern. HR says your badge printer is 'in the queue.'",
-  Manager:
-    "Promoted to Manager. Your calendar now belongs to everyone else. Stress increased.",
-  Director:
-    "Promoted to Director. You now own a strategy deck and the deadlines that come with it.",
-  CEO: "Reached CEO. Strategic budget requests denied. Monocle unlocked. The board is watching.",
-  "Board Member":
-    "Promoted to the Board. Your calendar is now other people's emergencies.",
-  "Angel Investor":
-    "Angel Investor unlocked. You write checks for pivots you would've killed as CEO.",
+  Intern: "Still an Intern. HR says your badge printer is in the queue.",
+  Manager: "Manager: your calendar is everyone else's. Reorgs shuffle lanes now.",
+  Director: "Director: you own the deck. Deadlines report to you now.",
+  CEO: "CEO: monocle unlocked. Mandatory desk plants block corridors.",
+  "Board Member": "Board seat: quorum owns meetings. Your calendar is an emergency.",
+  "Angel Investor": "Angel round: you fund pivots you would've killed as CEO.",
 };
 
 export function formatTickerText(headline: TickerHeadline): string {
@@ -481,7 +477,7 @@ const CORP_ENV_BAND_LABELS: Record<CorpEnvBand, string> = {
   "investor-lounge": "Investor Lounge",
 };
 
-/** CSS class on `#corpGhostBg` for each band (see `.corp-env-*` in style.css). */
+/** CSS class on `#corpGhostBg` and `#gamePlayArea` for each band (see `.corp-env-*` in style.css). */
 export const CORP_ENV_BAND_CLASSES: Record<CorpEnvBand, string> = {
   "intern-pit": "corp-env-intern-pit",
   "open-office": "corp-env-open-office",

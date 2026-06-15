@@ -17,6 +17,7 @@
     "capture:marketing": "node scripts/capture-marketing.mjs",
     "adopt:og": "node scripts/adopt-og.mjs",
     "capture:og": "node scripts/capture-og.mjs",
+    "capture:progression-ab": "node scripts/capture-progression-ab.mjs",
     "verify:og": "node scripts/verify-og.mjs",
     "verify:seo": "node scripts/verify-seo.mjs",
     "verify:seo:live": "node scripts/verify-seo-live.mjs"
