@@ -12,7 +12,7 @@ client = TestClient(app)
 def test_health(mock_supabase):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "db": "ok"}
+    assert response.json() == {"status": "ok", "db": "ok", "score_schema": "run_duration_ms_v1"}
 
 
 def test_health_db_unavailable_returns_503(monkeypatch):

@@ -92,4 +92,4 @@ def health():
             status_code=503,
             content={"status": "degraded", "db": "unavailable"},
         )
-    return {"status": "ok", "db": "ok"}
+    return {"status": "ok", "db": "ok", "score_schema": "run_duration_ms_v1"}
