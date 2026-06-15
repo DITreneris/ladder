@@ -1859,6 +1859,56 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
   gap: 0.5rem;
 }
 
+.hr-stamp-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgb(100 116 139);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.hr-stamp-pad--slow .hr-stamp-btn {
+  border-color: rgb(203 213 225);
+  background: rgb(248 250 252);
+}
+
+.hr-stamp-pad--retry .hr-stamp-btn {
+  border-color: rgb(253 230 138);
+  background: rgb(255 251 235);
+}
+
+.hr-stamp-pad--enter {
+  animation: hr-stamp-pad-in 0.18s ease-out forwards;
+}
+
+.hr-stamp-pad--exit {
+  animation: hr-stamp-pad-out 0.28s ease-in forwards;
+}
+
+@keyframes hr-stamp-pad-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hr-stamp-pad-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
 .hr-stamp-btn {
   width: 100%;
   padding: 0.65rem 1rem;
@@ -1925,6 +1975,11 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hr-stamp-pad--enter,
+  .hr-stamp-pad--exit {
+    animation: none;
+  }
+
   .hr-stamp-pop--animate {
     animation: none;
     opacity: 1;

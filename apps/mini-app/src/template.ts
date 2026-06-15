@@ -223,6 +223,7 @@ export const APP_SHELL = `
         </div>
         <p class="text-caption text-slate-600 italic text-center px-2" id="gameOverPunchline"></p>
         <div id="hrStampPad" class="hr-stamp-pad hidden mt-3">
+          <p id="hrStampHint" class="hr-stamp-hint hidden" aria-live="polite"></p>
           <button type="button" id="hrStampBtn" class="hr-stamp-btn focus-ring" aria-label="Vent to HR — stamp paperwork">
             <span class="hr-stamp-btn-label">Vent to HR</span>
             <span class="hr-stamp-btn-sub">Stamps: <span id="hrStampCount">0</span></span>

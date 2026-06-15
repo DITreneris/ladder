@@ -154,7 +154,7 @@ export function formatStatBestDelta(
   const baseClass = "text-nano font-bold mt-0.5";
   if (yearsSurvived > previousBest) {
     const delta = previousBest > 0 ? yearsSurvived - previousBest : yearsSurvived;
-    const suffix = pendingStamp ? " (pending HR stamp)" : "";
+    const suffix = pendingStamp ? " (filing with HR…)" : "";
     return {
       text:
         previousBest > 0

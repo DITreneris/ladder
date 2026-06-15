@@ -100,6 +100,7 @@ describe("game-over-copy", () => {
 
   it("formatStatBestDelta covers PB, short-of-best, and empty", () => {
     expect(formatStatBestDelta(5, 3, "Intern", false).text).toContain("new record");
+    expect(formatStatBestDelta(5, 3, "Intern", true).text).toContain("(filing with HR…)");
     expect(formatStatBestDelta(2, 5, "Manager", false).text).toBe(
       "3.0y short of best (Manager @ 5.0y)"
     );

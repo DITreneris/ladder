@@ -5,7 +5,8 @@ export type FunnelEventName =
   | "share_tap"
   | "share_success"
   | "revive_offer"
-  | "revive_complete";
+  | "revive_complete"
+  | "hr_stamp_vent";
 
 type AnalyticsClient = {
   event?: (name: string, payload?: Record<string, unknown>) => void;
