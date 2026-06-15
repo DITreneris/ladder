@@ -12,6 +12,7 @@
     "qa:viewport": "node scripts/viewport-qa.mjs",
     "qa:layout": "node scripts/layout-audit.mjs",
     "qa:coffee": "node scripts/coffee-pickup-qa.mjs",
+    "qa:prelaunch": "node scripts/local-prelaunch-qa.mjs",
     "capture:hero": "node scripts/capture-hero.mjs",
     "capture:marketing": "node scripts/capture-marketing.mjs",
     "adopt:og": "node scripts/adopt-og.mjs",
