@@ -528,6 +528,12 @@ function syncTelegramMainButton(tab: Screen): void {
   hideHomeMainButton();
 }
 
+function syncSoundFabPlacement(tab: Screen): void {
+  const btn = $("soundToggleBtn");
+  const onHome = tab === "home" && isTelegram();
+  btn.classList.toggle("sound-fab--home", onHome);
+}
+
 function switchTab(tab: Screen): void {
   ["startScreen", "gameScreen", "gameOverScreen", "leaderboardScreen", "howToPlayScreen"].forEach((id) => {
     $(id).classList.add("hidden");
@@ -546,6 +552,7 @@ function switchTab(tab: Screen): void {
   el.classList.add("flex");
   syncTelegramBackButton(tab);
   syncTelegramMainButton(tab);
+  syncSoundFabPlacement(tab);
   if (tab === "home") {
     refreshHomeContextSlot();
     ensureTickerHeadlines();
@@ -2233,6 +2240,7 @@ export function mountApp(): void {
   refreshDailyShiftUI();
   syncTelegramBackButton("home");
   syncTelegramMainButton("home");
+  syncSoundFabPlacement("home");
 
   const challengeYears = parseChallengeParam(getStartParam());
   if (challengeYears !== null && challengeYears > 0) {

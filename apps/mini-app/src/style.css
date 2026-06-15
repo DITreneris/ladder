@@ -365,7 +365,9 @@ html.cl-in-telegram #app {
 }
 
 html.cl-in-telegram #startScreen {
-  padding: 0;
+  padding-top: 2rem;
+  padding-right: 0;
+  padding-left: 0;
   padding-bottom: calc(3.25rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -429,6 +431,10 @@ html.cl-in-telegram .text-micro {
 .cl-in-telegram .sound-fab {
   top: calc(0.5rem + var(--tg-content-safe-area-inset-top, env(safe-area-inset-top, 0px)));
   right: calc(0.5rem + var(--tg-content-safe-area-inset-right, env(safe-area-inset-right, 0px)));
+}
+
+.cl-in-telegram .sound-fab.sound-fab--home {
+  top: calc(5.5rem + var(--tg-content-safe-area-inset-top, env(safe-area-inset-top, 0px)));
 }
 
 .cl-in-telegram #startScreen .cl-primary-btn {
@@ -1201,6 +1207,10 @@ html.cl-in-telegram .text-micro {
 }
 
 /* Home context slot — ticker always row 1; shift or challenge row 2 */
+html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
+  margin-top: 0.75rem;
+}
+
 .home-context-slot {
   display: flex;
   flex-direction: column;

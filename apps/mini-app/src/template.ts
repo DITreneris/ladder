@@ -47,7 +47,7 @@ export const APP_SHELL = `
         </p>
         <button type="button" data-action="dismiss-auth-banner" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
-        <div class="text-center">
+        <div class="home-hero text-center shrink-0">
           <div class="home-hero-enter home-hero-enter-icon home-hero-idle inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
             ${icon("briefcase", "text-xl")}
           </div>
