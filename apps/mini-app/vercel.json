@@ -7,7 +7,7 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://telegram.org https://sad.adsgram.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.up.railway.app https://*.vercel-insights.com https://tganalytics.xyz; img-src 'self' data: https:;"
+          "value": "default-src 'self'; script-src 'self' https://telegram.org https://sad.adsgram.ai; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.up.railway.app https://*.vercel-insights.com https://tganalytics.xyz https://sad.adsgram.ai https://api.adsgram.ai; frame-src 'self' https://sad.adsgram.ai; img-src 'self' data: https:;"
         }
       ]
     },

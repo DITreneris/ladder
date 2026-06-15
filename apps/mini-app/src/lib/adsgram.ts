@@ -66,6 +66,11 @@ function getController(): Promise<AdsgramController> {
   });
 }
 
+function adsgramShowError(result: AdsgramShowResult): Error {
+  const detail = result.description || "AdsGram rewarded ad did not complete";
+  return new Error(`${detail} [state=${result.state}, error=${result.error}, done=${result.done}]`);
+}
+
 /**
  * Shows a rewarded ad when Block ID is configured.
  * Resolves immediately when revive is enabled for testing without a Block ID.
@@ -77,6 +82,6 @@ export async function showRewardedAd(): Promise<void> {
   const ad = await getController();
   const result = await ad.show();
   if (result.error || !result.done) {
-    throw new Error(result.description || "AdsGram rewarded ad did not complete");
+    throw adsgramShowError(result);
   }
 }

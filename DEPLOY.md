@@ -19,6 +19,8 @@ Env vars, migration order, and service deploy sequence. **Gate index:** [SHIP_GA
 | **Bot (Railway)** | `TELEGRAM_BOT_TOKEN`, `MINI_APP_URL`, `PORT` (health probe) |
 | **Mini App (Vercel)** | `VITE_API_URL`, `VITE_BOT_USERNAME` |
 
+Optional mini-app: `VITE_ADSGRAM_REVIVE_ENABLED`, `VITE_ADSGRAM_BLOCK_ID` (rewarded revive). When Block ID is set, [`apps/mini-app/vercel.json`](apps/mini-app/vercel.json) CSP must allow `https://sad.adsgram.ai` and `https://api.adsgram.ai` (`connect-src` + `frame-src`).
+
 See [.env.example](.env.example) for the full list.
 
 ## Deploy order

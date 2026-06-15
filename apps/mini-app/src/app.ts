@@ -34,7 +34,14 @@ import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
 import { getCaptureFlags } from "./lib/capture-mode";
 import { trackEvent } from "./lib/analytics";
-import { debugLog, describeNextRung, getSafeTapSide, mountDebugStrip, shouldShowImminentHint } from "./lib/debug";
+import {
+  debugLog,
+  describeNextRung,
+  getSafeTapSide,
+  isDebugMode,
+  mountDebugStrip,
+  shouldShowImminentHint,
+} from "./lib/debug";
 import { openPromptAnatomy } from "./lib/branding";
 import { buildShareMessageText } from "./lib/share-copy";
 import {
@@ -1263,8 +1270,12 @@ async function onReviveAdClick(): Promise<void> {
       layoutPlayerPosition(engine.getPlayerSide());
     });
     hapticImpact("medium");
-  } catch {
-    debugLog("revive", "revive_ad_failed", {});
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    debugLog("revive", "revive_ad_failed", { message });
+    if (isDebugMode()) {
+      console.warn("[revive] revive_ad_failed:", message);
+    }
     showToast("HR Training unavailable — re-apply when ads load.", { surface: "shell" });
   } finally {
     btn.disabled = false;
