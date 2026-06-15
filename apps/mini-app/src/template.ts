@@ -291,19 +291,19 @@ export const APP_SHELL = `
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🔄</span>
-            <div><h4 class="font-extrabold text-slate-800">Reorganizations</h4><p class="mt-0.5 text-caption">Sides swap. Time your climbs. Manager rank.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Reorganizations</h4><p class="mt-0.5 text-caption">Sides swap. Time your climbs.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">⏰</span>
-            <div><h4 class="font-extrabold text-slate-800">Deadlines</h4><p class="mt-0.5 text-caption">Quarter-end blocks. Touch = termination. Director rank and up.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Deadlines</h4><p class="mt-0.5 text-caption">Quarter-end blocks. Touch = termination.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🪪</span>
-            <div><h4 class="font-extrabold text-slate-800">Badge Gates</h4><p class="mt-0.5 text-caption">Turnstile jams on one side. Dodge like a meeting — Manager rank and up.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Badge Gates</h4><p class="mt-0.5 text-caption">Turnstile jams on one side. Dodge like a meeting.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">🪴</span>
-            <div><h4 class="font-extrabold text-slate-800">Desk Plants</h4><p class="mt-0.5 text-caption">Wellness obstruction on one aisle. Side-step — rare at CEO level.</p></div>
+            <div><h4 class="font-extrabold text-slate-800">Desk Plants</h4><p class="mt-0.5 text-caption">Wellness obstruction on one aisle. Side-step when it appears.</p></div>
           </div>
           <div class="card-light-sm">
             <span class="text-xl shrink-0">☕</span>
@@ -313,24 +313,7 @@ export const APP_SHELL = `
             <span class="text-xl shrink-0">📈</span>
             <div>
               <h4 class="font-extrabold text-slate-800">Career ladder</h4>
-              <ul class="mt-1 text-caption space-y-0.5 list-disc list-inside">
-                <li><strong>Intern Pit (0–&lt;5y):</strong> Onboarding theater. Meetings only.</li>
-                <li><strong>Open Office (5–&lt;10y):</strong> Hot desks. Still Intern rank — meetings only.</li>
-                <li><strong>Middle Management (10–&lt;20y):</strong> Manager rank — reorgs and badge gates.</li>
-                <li><strong>Director Wing (20–&lt;35y):</strong> Director rank — quarterly deadlines join the stack.</li>
-                <li><strong>Executive Suite (35–&lt;50y):</strong> CEO rank — desk plants complete the gauntlet.</li>
-                <li><strong>Boardroom (50–&lt;75y):</strong> Board Member — governance replaces climbing.</li>
-                <li><strong>Investor Lounge (75y+):</strong> Angel Investor — the capstone rank.</li>
-              </ul>
-              <ul class="mt-2 text-caption space-y-0.5 list-disc list-inside">
-                <li><strong>Intern:</strong> Meetings only — safe-side tapping.</li>
-                <li><strong>Manager @ 10y:</strong> Reorgs swap sides; badge gates appear.</li>
-                <li><strong>Director @ 20y:</strong> Deadlines arrive — coffee is strategic.</li>
-                <li><strong>CEO @ 35y:</strong> Rare desk plants on top. The boardroom myth HR keeps on the org chart.</li>
-                <li><strong>Board Member @ 50y:</strong> Same executive hazards — promoted off the ladder into governance.</li>
-                <li><strong>Angel Investor @ 75y:</strong> Endgame rank. HR still audits scores up to 100y.</li>
-                <li><strong>Unlock by rank:</strong> Reorg + gates @ Manager; Deadline @ Director; desk plants @ CEO+.</li>
-              </ul>
+              <ul id="playbookLadderList" class="mt-1 text-caption space-y-0.5 list-disc list-inside"></ul>
               <p class="mt-2 text-caption"><strong>First climb:</strong> Scripted first 3 rungs, gentler hazard rate through ~3–5y (longer until your first Manager run), hints through 10y. <strong>Reorg Week</strong> shift may add reorgs after ~3y — not on rung one.</p>
             </div>
           </div>

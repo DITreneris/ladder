@@ -467,7 +467,7 @@ export type CorpEnvBand =
   | "boardroom"
   | "investor-lounge";
 
-const CORP_ENV_BAND_LABELS: Record<CorpEnvBand, string> = {
+export const CORP_ENV_BAND_LABELS: Record<CorpEnvBand, string> = {
   "intern-pit": "Intern Pit",
   "open-office": "Open Office",
   "middle-management": "Middle Management",

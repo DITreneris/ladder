@@ -49,6 +49,7 @@ import {
   shouldShowImminentHint,
 } from "./lib/debug";
 import { openPromptAnatomy } from "./lib/branding";
+import { renderPlaybookLadderHtml } from "./lib/how-to-play";
 import { buildShareMessageText } from "./lib/share-copy";
 import {
   formatStatBestDelta,
@@ -2005,6 +2006,8 @@ function mountOgCaptureMode(): void {
 
 export function mountApp(): void {
   initTelegram();
+  const playbookLadder = $("playbookLadderList");
+  if (playbookLadder) playbookLadder.innerHTML = renderPlaybookLadderHtml();
   installPendingSubmitLifecycleGuards();
   bindSyncStatusRetry();
   setSyncRetryHandler(retryLastSubmit);
