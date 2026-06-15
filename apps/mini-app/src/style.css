@@ -1182,6 +1182,19 @@ html.cl-in-telegram .text-micro {
 .home-hero-enter-tagline {
   animation-delay: 160ms;
 }
+.home-hero-enter-mechanic {
+  animation-delay: 200ms;
+}
+.home-hero-enter-hook {
+  animation-delay: 280ms;
+}
+
+.home-hero {
+  overflow: visible;
+}
+.home-hero-icon-wrap {
+  overflow: visible;
+}
 
 /* Hero idle sway — long rest, brief tilt around base -6deg (v2.2 home polish) */
 @keyframes hero-idle-sway {

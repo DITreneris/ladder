@@ -38,8 +38,8 @@ export const APP_SHELL = `
     </div>
   </div>
   <div class="cl-viewport relative flex-grow rounded-b-2xl flex flex-col overflow-hidden office-grid min-h-0">
-    <div id="startScreen" class="flex flex-col flex-grow min-h-0 min-w-0 select-none z-10 pt-4 pb-2 overflow-x-hidden">
-      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-x-hidden space-y-2.5">
+    <div id="startScreen" class="flex flex-col flex-grow min-h-0 min-w-0 select-none z-10 pt-4 pb-2 overflow-x-clip">
+      <div class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 overflow-x-clip space-y-2.5">
       <div id="authDegradedBanner" class="hidden shrink-0 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
         <p id="authDegradedText" class="text-caption font-extrabold text-amber-900 flex-1 min-w-0">
           <span id="authDegradedLead"></span>
@@ -48,12 +48,15 @@ export const APP_SHELL = `
         <button type="button" data-action="dismiss-auth-banner" class="text-amber-800 min-h-[44px] min-w-[44px] flex items-center justify-center focus-ring rounded-lg shrink-0 text-lg leading-none" aria-label="Dismiss session notice">&times;</button>
       </div>
         <div class="home-hero text-center shrink-0">
-          <div class="home-hero-enter home-hero-enter-icon home-hero-idle inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg mb-2 transform -rotate-6">
-            ${icon("briefcase", "text-xl")}
+          <div class="home-hero-icon-wrap inline-block p-1 mb-1">
+            <div class="home-hero-enter home-hero-enter-icon home-hero-idle inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-cl-primary to-cl-accent-indigo text-white rounded-xl shadow-lg transform -rotate-6">
+              ${icon("briefcase", "text-xl")}
+            </div>
           </div>
           <h2 class="home-hero-enter home-hero-enter-title text-2xl font-extrabold text-slate-900 tracking-tight leading-none">CORPORATE<br><span class="text-cl-primary">LADDER</span></h2>
           <p class="home-hero-enter home-hero-enter-tagline text-xs text-slate-500 font-semibold uppercase tracking-wider mt-1">Modern work chaos</p>
-          <p class="home-hero-enter text-caption font-semibold text-slate-600 text-center px-2 mt-2">Dodge meetings. Survive the org chart.</p>
+          <p class="home-hero-enter home-hero-enter-mechanic text-caption font-semibold text-cl-primary text-center px-2 mt-2">Tap left or right.</p>
+          <p class="home-hero-enter home-hero-enter-hook text-caption font-semibold text-slate-600 text-center px-2 mt-1">Dodge meetings. Survive the org chart.</p>
         </div>
         <div class="card-light space-y-2 py-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
