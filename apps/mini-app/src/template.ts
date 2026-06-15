@@ -160,12 +160,7 @@ export const APP_SHELL = `
           <div id="reorgHudStrip" class="reorg-hud-strip reorg-hud-overlay hidden">
             <span class="reorg-hud-strip-label">ORG CHART UNSTABLE</span>
           </div>
-          <div class="absolute bottom-8 left-0 right-0 opacity-5 flex justify-between items-end pointer-events-none select-none">
-            <div class="w-12 h-36 bg-slate-900 rounded-t"></div>
-            <div class="w-16 h-48 bg-slate-900 rounded-t"></div>
-            <div class="w-8 h-24 bg-slate-900 rounded-t"></div>
-            <div class="w-14 h-40 bg-slate-900 rounded-t"></div>
-          </div>
+          <div id="corpGhostBg" class="corp-ghost-bg corp-env-intern-pit" aria-hidden="true"></div>
           <div id="ladderTrack" class="ladder-track select-none pointer-events-none">
             <div class="ladder-rail ladder-rail--left" aria-hidden="true"></div>
             <div class="ladder-rail ladder-rail--right" aria-hidden="true"></div>

@@ -13,6 +13,9 @@ import {
   TUTORIAL_DONE_STORAGE_KEY,
   INTERN_TUTORIAL_RUNGS,
   TRIAGE_PROMPT,
+  CORP_ENV_BAND_CLASSES,
+  corpEnvBandForYears,
+  type CorpEnvBand,
   floorLabel,
   formatTickerMarqueeLoopText,
   formatTickerMarqueeText,
@@ -140,8 +143,7 @@ type PlayerLayout = PlayerSide | "center";
 const GRID_TINT_CLASSES = ["office-grid-reorg-week"] as const;
 const FLOOR_BAND_CLASSES = ["office-grid-boardroom", "office-grid-investor-lounge"] as const;
 
-type FloorBand = "default" | "board" | "angel";
-let lastFloorBand: FloorBand = "default";
+let lastCorpEnvBand: CorpEnvBand | null = null;
 
 let marketingGameCapture = false;
 let pendingSubmitDeferred = false;
@@ -183,13 +185,17 @@ function updateRankProp(rank: Rank): void {
 
 function updateFloorLabel(years: number): void {
   $("floorLabel").textContent = floorLabel(years);
+  updateCorpGhostBg(years);
   updateFloorBandGrid(years);
 }
 
-function floorBandForYears(years: number): FloorBand {
-  if (years >= ANGEL_YEARS) return "angel";
-  if (years >= BOARD_YEARS) return "board";
-  return "default";
+function updateCorpGhostBg(years: number): void {
+  const ghost = document.getElementById("corpGhostBg");
+  if (!ghost) return;
+  const next = CORP_ENV_BAND_CLASSES[corpEnvBandForYears(years)];
+  for (const cls of Object.values(CORP_ENV_BAND_CLASSES)) {
+    ghost.classList.toggle(cls, cls === next);
+  }
 }
 
 function updateFloorBandGrid(years: number): void {
@@ -206,11 +212,11 @@ function updateFloorBandGrid(years: number): void {
 }
 
 function maybeFlashFloorBandTransition(years: number): void {
-  const band = floorBandForYears(years);
-  if (band !== lastFloorBand && (band === "board" || band === "angel")) {
+  const band = corpEnvBandForYears(years);
+  if (lastCorpEnvBand !== null && band !== lastCorpEnvBand) {
     triggerFloorBandFlash($("gamePlayArea"));
   }
-  lastFloorBand = band;
+  lastCorpEnvBand = band;
 }
 
 function updateReorgHudStrip(rank: Rank, rungScore?: number): void {
@@ -1318,7 +1324,7 @@ async function startGame(): Promise<void> {
   ceoTrapShown = false;
   boardTrapShown = false;
   angelTrapShown = false;
-  lastFloorBand = "default";
+  lastCorpEnvBand = corpEnvBandForYears(0);
   qaCoffeePickups = 0;
   activeDailyModifier = engine.getDailyModifier();
   if (tickerHeadlineSet.length === 0) {

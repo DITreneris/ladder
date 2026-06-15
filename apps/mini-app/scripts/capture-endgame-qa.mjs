@@ -24,6 +24,7 @@ const SCENARIOS = [
     milestone: "Angel round in 20.0y",
     floor: "Floor 14 — Boardroom",
     floorBand: "board",
+    corpEnvClass: "corp-env-boardroom",
     obstacle: { emoji: "🏛️", label: "Quorum" },
   },
   {
@@ -37,7 +38,36 @@ const SCENARIOS = [
     milestone: "Term sheet signed",
     floor: "Floor 23 — Investor Lounge",
     floorBand: "angel",
+    corpEnvClass: "corp-env-investor-lounge",
     obstacle: { emoji: "🛫", label: "Runway" },
+  },
+  {
+    file: "04-manager-12y.png",
+    label: "Manager @ 12y — Middle Management ghost backdrop",
+    years: 12,
+    rank: "Manager",
+    rankEmoji: "🧑‍💼",
+    propEmoji: "📋",
+    badgeClass: "badge-rank-manager mt-0.5",
+    milestone: "Director in 8.0y",
+    floor: "Floor 13 — Middle Management",
+    floorBand: "default",
+    corpEnvClass: "corp-env-middle-management",
+    obstacle: { emoji: "📅", label: "Meeting" },
+  },
+  {
+    file: "05-director-25y.png",
+    label: "Director @ 25y — Director Wing ghost backdrop",
+    years: 25,
+    rank: "Director",
+    rankEmoji: "🕴️",
+    propEmoji: "💼",
+    badgeClass: "badge-rank-director mt-0.5",
+    milestone: "CEO myth in 10.0y",
+    floor: "Floor 26 — Director Wing",
+    floorBand: "default",
+    corpEnvClass: "corp-env-director-wing",
+    obstacle: { emoji: "🔄", label: "Reorg" },
   },
 ];
 
@@ -57,6 +87,11 @@ async function applyGameplayScenario(page, scenario) {
       viewport.classList.remove("office-grid-boardroom", "office-grid-investor-lounge");
       if (s.floorBand === "angel") viewport.classList.add("office-grid-investor-lounge");
       else if (s.floorBand === "board") viewport.classList.add("office-grid-boardroom");
+    }
+
+    const ghost = document.getElementById("corpGhostBg");
+    if (ghost && s.corpEnvClass) {
+      ghost.className = `corp-ghost-bg ${s.corpEnvClass}`;
     }
 
     const imminent = document.querySelector(".rung-row.imminent .obstacle-badge, .rung-row:first-of-type .obstacle-badge");

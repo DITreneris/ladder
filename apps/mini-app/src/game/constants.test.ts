@@ -13,6 +13,8 @@ import {
   REORG_INTERVAL_MS,
   TUTORIAL_RUNG_SPECS,
   allowedObstacleTypes,
+  corpEnvBandForYears,
+  floorLabel,
   isExecutiveRank,
   milestoneLabel,
   obstacleBadgeDisplay,
@@ -58,6 +60,37 @@ describe("rankFromYears", () => {
   it("returns Angel Investor at 75 years", () => {
     expect(rankFromYears(ANGEL_YEARS)).toBe("Angel Investor");
     expect(rankFromYears(100)).toBe("Angel Investor");
+  });
+});
+
+describe("corpEnvBandForYears", () => {
+  it("maps each year range to its progressive corporate band", () => {
+    expect(corpEnvBandForYears(0)).toBe("intern-pit");
+    expect(corpEnvBandForYears(4.9)).toBe("intern-pit");
+    expect(corpEnvBandForYears(5)).toBe("open-office");
+    expect(corpEnvBandForYears(9.99)).toBe("open-office");
+    expect(corpEnvBandForYears(MANAGER_YEARS)).toBe("middle-management");
+    expect(corpEnvBandForYears(DIRECTOR_YEARS - 0.1)).toBe("middle-management");
+    expect(corpEnvBandForYears(DIRECTOR_YEARS)).toBe("director-wing");
+    expect(corpEnvBandForYears(CEO_YEARS - 0.1)).toBe("director-wing");
+    expect(corpEnvBandForYears(CEO_YEARS)).toBe("executive-suite");
+    expect(corpEnvBandForYears(BOARD_YEARS - 0.1)).toBe("executive-suite");
+    expect(corpEnvBandForYears(BOARD_YEARS)).toBe("boardroom");
+    expect(corpEnvBandForYears(ANGEL_YEARS - 0.1)).toBe("boardroom");
+    expect(corpEnvBandForYears(ANGEL_YEARS)).toBe("investor-lounge");
+    expect(corpEnvBandForYears(100)).toBe("investor-lounge");
+  });
+});
+
+describe("floorLabel", () => {
+  it("shares band thresholds with corpEnvBandForYears", () => {
+    expect(floorLabel(0)).toContain("Intern Pit");
+    expect(floorLabel(5)).toContain("Open Office");
+    expect(floorLabel(MANAGER_YEARS)).toContain("Middle Management");
+    expect(floorLabel(DIRECTOR_YEARS)).toContain("Director Wing");
+    expect(floorLabel(CEO_YEARS)).toContain("Executive Suite");
+    expect(floorLabel(BOARD_YEARS)).toContain("Boardroom");
+    expect(floorLabel(ANGEL_YEARS)).toContain("Investor Lounge");
   });
 });
 

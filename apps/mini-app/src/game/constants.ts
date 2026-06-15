@@ -458,15 +458,53 @@ export function reappliesFlavor(runCount: number): string {
   return REAPPLY_FLAVOR[REAPPLY_FLAVOR.length - 1]!.line;
 }
 
+/** Years at which the playfield switches from Intern Pit to Open Office. */
+export const OPEN_OFFICE_YEARS = 5;
+
+/** Progressive corporate environment band — drives both floor label and ghost backdrop. */
+export type CorpEnvBand =
+  | "intern-pit"
+  | "open-office"
+  | "middle-management"
+  | "director-wing"
+  | "executive-suite"
+  | "boardroom"
+  | "investor-lounge";
+
+const CORP_ENV_BAND_LABELS: Record<CorpEnvBand, string> = {
+  "intern-pit": "Intern Pit",
+  "open-office": "Open Office",
+  "middle-management": "Middle Management",
+  "director-wing": "Director Wing",
+  "executive-suite": "Executive Suite",
+  boardroom: "Boardroom",
+  "investor-lounge": "Investor Lounge",
+};
+
+/** CSS class on `#corpGhostBg` for each band (see `.corp-env-*` in style.css). */
+export const CORP_ENV_BAND_CLASSES: Record<CorpEnvBand, string> = {
+  "intern-pit": "corp-env-intern-pit",
+  "open-office": "corp-env-open-office",
+  "middle-management": "corp-env-middle-management",
+  "director-wing": "corp-env-director-wing",
+  "executive-suite": "corp-env-executive-suite",
+  boardroom: "corp-env-boardroom",
+  "investor-lounge": "corp-env-investor-lounge",
+};
+
+export function corpEnvBandForYears(years: number): CorpEnvBand {
+  if (years < OPEN_OFFICE_YEARS) return "intern-pit";
+  if (years < MANAGER_YEARS) return "open-office";
+  if (years < DIRECTOR_YEARS) return "middle-management";
+  if (years < CEO_YEARS) return "director-wing";
+  if (years < BOARD_YEARS) return "executive-suite";
+  if (years < ANGEL_YEARS) return "boardroom";
+  return "investor-lounge";
+}
+
 export function floorLabel(years: number): string {
   const floor = Math.max(1, Math.floor(years) + 1);
-  if (years < 5) return `Floor ${floor} — Intern Pit`;
-  if (years < MANAGER_YEARS) return `Floor ${floor} — Open Office`;
-  if (years < DIRECTOR_YEARS) return `Floor ${floor} — Middle Management`;
-  if (years < CEO_YEARS) return `Floor ${floor} — Director Wing`;
-  if (years < BOARD_YEARS) return `Floor ${floor} — Executive Suite`;
-  if (years < ANGEL_YEARS) return `Floor ${floor} — Boardroom`;
-  return `Floor ${floor} — Investor Lounge`;
+  return `Floor ${floor} — ${CORP_ENV_BAND_LABELS[corpEnvBandForYears(years)]}`;
 }
 
 export function isExecutiveRank(rank: Rank): boolean {
