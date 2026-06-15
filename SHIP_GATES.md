@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Tag** | `v2.3.0` @ `d78fb8b` (2026-06-14) |
-| **Prod bundle** | `main-kwgdbRPx.js` (2026-06-15; `[Unreleased]` hotfix not yet deployed) |
+| **Prod bundle** | `main--mYf7zTM.js` (2026-06-15; run_duration_ms hotfix @ `4abbe6c`) |
 | **Surfaces** | Mini App https://www.promptanatomy.lol · API https://ladder-production-642d.up.railway.app · Bot `@CorporateLadder_bot` |
 | **Open gates** | D1–D2 device QA + share 11–12 (see Tier D) · T+7 metrics ~Jun 18 |
 
