@@ -26,7 +26,7 @@ Remove overrides when `npm audit --audit-level=high` passes without them.
 
 ### pip-audit (API)
 
-`fastapi==0.115.6` pins `starlette<0.47.0`, which has open advisories fixed only in `starlette>=0.47.2`. CI ignores those IDs until a post-launch FastAPI bump (see dependabot ignore rules). `python-dotenv` is pinned at `1.2.2`.
+`fastapi==0.135.4` with explicit `starlette>=1.3.1` (Starlette 1.x line) clears 2025–2026 advisories including GHSA-wqp7-x3pw-xc5r, GHSA-x746-7m8f-x49c, GHSA-82w8-qh3p-5jfq, and GHSA-jp82-jpqv-5vv3. `python-dotenv` is pinned at `1.2.2`.
 
 ## Score integrity
 
