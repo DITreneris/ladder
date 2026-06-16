@@ -21,7 +21,17 @@ interface TelegramBackButton {
   offClick: (callback: () => void) => void;
 }
 
-interface TelegramMainButton {
+interface TelegramBottomButtonParams {
+  text?: string;
+  color?: string;
+  text_color?: string;
+  is_visible?: boolean;
+  is_active?: boolean;
+  is_progress_visible?: boolean;
+  position?: "left" | "right" | "top" | "bottom";
+}
+
+interface TelegramBottomButton {
   show: () => void;
   hide: () => void;
   enable: () => void;
@@ -29,6 +39,9 @@ interface TelegramMainButton {
   setText: (text: string) => void;
   onClick: (callback: () => void) => void;
   offClick: (callback: () => void) => void;
+  showProgress?: (leaveActive?: boolean) => void;
+  hideProgress?: () => void;
+  setParams?: (params: TelegramBottomButtonParams) => void;
 }
 
 declare global {
@@ -43,7 +56,8 @@ declare global {
         shareMessage?: (msgId: string, callback?: (sent: boolean) => void) => void;
         openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
         openTelegramLink?: (url: string) => void;
-        MainButton: TelegramMainButton;
+        MainButton: TelegramBottomButton;
+        SecondaryButton?: TelegramBottomButton;
         BackButton?: TelegramBackButton;
         themeParams: Record<string, string>;
         colorScheme?: "light" | "dark";
@@ -64,8 +78,15 @@ declare global {
   }
 }
 
+export type BottomBarConfig =
+  | { mode: "hidden" }
+  | { mode: "home"; onPlay: () => void }
+  | { mode: "gameover"; onReapply: () => void; onShare?: () => void };
+
 let backButtonHandler: (() => void) | null = null;
 let mainButtonHandler: (() => void) | null = null;
+let secondaryButtonHandler: (() => void) | null = null;
+let bottomBarProgressOnSecondary = false;
 
 function setThemeVar(root: HTMLElement, cssVar: string, value: string | undefined, fallback: string): void {
   root.style.setProperty(cssVar, value && value.length > 0 ? value : fallback);
@@ -74,6 +95,41 @@ function setThemeVar(root: HTMLElement, cssVar: string, value: string | undefine
 function insetPx(value: number | undefined): string {
   if (value === undefined || Number.isNaN(value)) return "0px";
   return `${Math.max(0, value)}px`;
+}
+
+function getMainButton(): TelegramBottomButton | undefined {
+  return window.Telegram?.WebApp?.MainButton;
+}
+
+function getSecondaryButton(): TelegramBottomButton | undefined {
+  return window.Telegram?.WebApp?.SecondaryButton;
+}
+
+function clearMainButtonHandler(): void {
+  const mb = getMainButton();
+  if (mb && mainButtonHandler) {
+    mb.offClick(mainButtonHandler);
+    mainButtonHandler = null;
+  }
+}
+
+function clearSecondaryButtonHandler(): void {
+  const sb = getSecondaryButton();
+  if (sb && secondaryButtonHandler) {
+    sb.offClick(secondaryButtonHandler);
+    secondaryButtonHandler = null;
+  }
+}
+
+function hideAllBottomButtons(): void {
+  clearMainButtonHandler();
+  clearSecondaryButtonHandler();
+  getMainButton()?.hideProgress?.();
+  getSecondaryButton()?.hideProgress?.();
+  getMainButton()?.hide();
+  getSecondaryButton()?.hide();
+  document.documentElement.classList.remove("cl-tg-secondary-share", "cl-tg-bottom-bar-visible");
+  bottomBarProgressOnSecondary = false;
 }
 
 export function applySafeAreaInsets(): void {
@@ -180,27 +236,109 @@ export function hideTelegramBack(): void {
   bb.hide();
 }
 
-export function showHomeMainButton(onPlay: () => void): void {
-  const mb = window.Telegram?.WebApp?.MainButton;
-  if (!mb || !isTelegram()) return;
-  if (mainButtonHandler) {
-    mb.offClick(mainButtonHandler);
+export function isSecondaryButtonSupported(): boolean {
+  if (!isTelegram()) return false;
+  const tg = window.Telegram?.WebApp;
+  if (!tg?.SecondaryButton) return false;
+  if (typeof tg.isVersionAtLeast === "function") {
+    return tg.isVersionAtLeast("7.10");
   }
-  mainButtonHandler = onPlay;
-  mb.setText("PUNCH IN & CLIMB");
-  mb.enable();
-  mb.onClick(onPlay);
-  mb.show();
+  return true;
 }
 
-export function hideHomeMainButton(): void {
-  const mb = window.Telegram?.WebApp?.MainButton;
-  if (!mb) return;
-  if (mainButtonHandler) {
-    mb.offClick(mainButtonHandler);
-    mainButtonHandler = null;
+export function isTelegramBottomBarActive(): boolean {
+  return document.documentElement.classList.contains("cl-tg-bottom-bar-visible");
+}
+
+export function syncTelegramBottomBar(config: BottomBarConfig): void {
+  if (!isTelegram()) {
+    hideAllBottomButtons();
+    return;
   }
-  mb.hide();
+
+  hideAllBottomButtons();
+
+  if (config.mode === "hidden") return;
+
+  const mb = getMainButton();
+  if (!mb) return;
+
+  document.documentElement.classList.add("cl-tg-bottom-bar-visible");
+
+  if (config.mode === "home") {
+    mainButtonHandler = config.onPlay;
+    mb.setText("PUNCH IN & CLIMB");
+    mb.enable();
+    mb.onClick(config.onPlay);
+    mb.show();
+    return;
+  }
+
+  mainButtonHandler = config.onReapply;
+  mb.setText("RE-APPLY FOR ROLE");
+  mb.enable();
+  mb.onClick(config.onReapply);
+  mb.show();
+
+  if (config.onShare && isSecondaryButtonSupported()) {
+    const sb = getSecondaryButton();
+    if (sb) {
+      secondaryButtonHandler = config.onShare;
+      if (sb.setParams) {
+        sb.setParams({
+          text: "Share",
+          position: "left",
+          is_visible: true,
+          is_active: true,
+          is_progress_visible: false,
+        });
+      } else {
+        sb.setText("Share");
+      }
+      sb.enable();
+      sb.onClick(config.onShare);
+      sb.show();
+      document.documentElement.classList.add("cl-tg-secondary-share");
+      bottomBarProgressOnSecondary = true;
+    }
+  }
+}
+
+export function setBottomBarProgress(visible: boolean): void {
+  if (!isTelegram()) return;
+
+  if (bottomBarProgressOnSecondary) {
+    const sb = getSecondaryButton();
+    if (!sb) return;
+    if (visible) {
+      sb.showProgress?.();
+      sb.disable();
+    } else {
+      sb.hideProgress?.();
+      sb.enable();
+    }
+    return;
+  }
+
+  const mb = getMainButton();
+  if (!mb) return;
+  if (visible) {
+    mb.showProgress?.();
+    mb.disable();
+  } else {
+    mb.hideProgress?.();
+    mb.enable();
+  }
+}
+
+/** @deprecated Use syncTelegramBottomBar({ mode: "home", onPlay }) */
+export function showHomeMainButton(onPlay: () => void): void {
+  syncTelegramBottomBar({ mode: "home", onPlay });
+}
+
+/** @deprecated Use syncTelegramBottomBar({ mode: "hidden" }) */
+export function hideHomeMainButton(): void {
+  syncTelegramBottomBar({ mode: "hidden" });
 }
 
 export function hapticImpact(style: HapticImpact): void {
@@ -241,7 +379,7 @@ export function initTelegram(): void {
   if (tg) {
     tg.ready();
     tg.expand();
-    hideHomeMainButton();
+    syncTelegramBottomBar({ mode: "hidden" });
     applyTelegramTheme();
     onThemeChanged(applyTelegramTheme);
     onSafeAreaChanged(applySafeAreaInsets);

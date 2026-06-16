@@ -1,5 +1,6 @@
 /**
  * Viewport QA — checks horizontal overflow, play-area budget, and rung fit on Corporate Ladder screens.
+ * Layout contract: docs/MINI_APP_GOLDEN_STANDARD.md (repo root docs/)
  * Run: npm run preview (in apps/mini-app) then npm run qa:viewport
  */
 import { chromium } from "playwright";
@@ -16,7 +17,6 @@ const VIEWPORTS = [
 
 // Bottom tap deck sits outside #gamePlayArea; rung-fit is the primary ladder guardrail.
 const MIN_PLAY_AREA_RATIO = 0.5;
-const MIN_MEMO_PLAY_AREA_RATIO = 0.45;
 const MIN_TAP_BUTTON_HEIGHT = 112;
 
 const SCREENS = [
@@ -197,17 +197,45 @@ async function hudTapHintReferencesDeck(page) {
   });
 }
 
-async function memoVisiblePlayAreaRatio(page) {
+async function memoPlayAreaStability(page) {
   return page.evaluate(() => {
     const rail = document.getElementById("hrMemoRail");
+    const strip = document.getElementById("hrMemoStrip");
     const textEl = document.getElementById("hrMemoText");
-    if (!rail || !textEl) return 0;
-    rail.classList.remove("hidden");
-    textEl.textContent = "Viewport QA memo — play area budget check.";
-    const gameScreen = document.getElementById("gameScreen");
     const playArea = document.getElementById("gamePlayArea");
-    if (!gameScreen || !playArea) return 0;
-    return playArea.clientHeight / gameScreen.clientHeight;
+    const meter = document.getElementById("burnoutMeter");
+    if (!rail || !strip || !textEl || !playArea || !meter) {
+      return { ok: false, reason: "missing-elements" };
+    }
+
+    const heightBefore = playArea.clientHeight;
+    const stripRect = strip.getBoundingClientRect();
+
+    rail.classList.remove("hidden");
+    strip.classList.add("hr-memo-strip--active");
+    textEl.textContent = "Viewport QA memo — play area stability check.";
+
+    const heightAfter = playArea.clientHeight;
+    const heightDelta = Math.abs(heightAfter - heightBefore);
+    const railRect = rail.getBoundingClientRect();
+    const memoInsideStrip =
+      railRect.top >= stripRect.top - 1 &&
+      railRect.bottom <= stripRect.bottom + 1 &&
+      railRect.left >= stripRect.left - 1 &&
+      railRect.right <= stripRect.right + 1;
+
+    const meterRect = meter.getBoundingClientRect();
+    const energyVisibleDuringMemo =
+      meterRect.bottom <= railRect.top + 1 || meterRect.top >= railRect.bottom - 1;
+
+    return {
+      ok: heightDelta <= 1 && memoInsideStrip && energyVisibleDuringMemo,
+      heightBefore,
+      heightAfter,
+      heightDelta,
+      memoInsideStrip,
+      energyVisibleDuringMemo,
+    };
   });
 }
 
@@ -282,11 +310,21 @@ async function gameStackColumnAlignment(page) {
 async function gameOverColumnAlignment(page) {
   return page.evaluate(() => {
     const card = document.querySelector("#gameOverScreen .card-performance");
-    const btn = document.querySelector("#gameOverScreen .btn-cl-primary");
-    if (!card || !btn) return { ok: false, reason: "missing-game-over" };
+    if (!card) return { ok: false, reason: "missing-game-over" };
+
+    const primaryBtn = document.querySelector(
+      "#gameOverScreen .game-over-actions .btn-cl-primary[data-action='start-game']"
+    );
+    const primaryVisible =
+      primaryBtn && window.getComputedStyle(primaryBtn).display !== "none";
+    const alignTarget =
+      primaryVisible && primaryBtn
+        ? primaryBtn
+        : document.querySelector("#gameOverScreen .game-over-actions");
+    if (!alignTarget) return { ok: false, reason: "missing-game-over-actions" };
 
     const cr = card.getBoundingClientRect();
-    const br = btn.getBoundingClientRect();
+    const br = alignTarget.getBoundingClientRect();
     const widthDelta = Math.abs(cr.width - br.width);
     const leftDelta = Math.abs(cr.left - br.left);
 
@@ -296,6 +334,7 @@ async function gameOverColumnAlignment(page) {
       btnWidth: br.width,
       widthDelta,
       leftDelta,
+      usedActionsContainer: !primaryVisible,
     };
   });
 }
@@ -471,14 +510,13 @@ async function main() {
         }
 
         if (vp.width === 320 && vp.height === 800) {
-          const memoRatio = await memoVisiblePlayAreaRatio(page);
-          if (memoRatio < MIN_MEMO_PLAY_AREA_RATIO) {
+          const memoStable = await memoPlayAreaStability(page);
+          if (!memoStable.ok) {
             failures.push({
               viewport: vp.label,
               screen: screen.label,
-              type: "memo-play-area-ratio",
-              ratio: memoRatio,
-              min: MIN_MEMO_PLAY_AREA_RATIO,
+              type: "memo-play-area-stability",
+              ...memoStable,
             });
           }
         }
@@ -569,7 +607,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; home Prompt Anatomy brand visible without scroll at 320x568; game play area >= 50%; memo-visible play area >= 45% at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; home Prompt Anatomy brand visible without scroll at 320x568; game play area >= 50%; memo visible does not reflow play area at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
   );
 }
 

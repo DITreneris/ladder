@@ -34,7 +34,7 @@ import {
 } from "./game/constants";
 import { type DailyModifier, getDailyModifierById, resolveDailyModifier } from "./game/daily-modifier";
 import { GameEngine } from "./game/engine";
-import type { GameOverResult, ObstacleType, PlayerSide, Rank, Rung } from "./game/types";
+import type { GameOverResult, ObstacleType, PlayerSide, PlayerTapAnim, Rank, Rung } from "./game/types";
 import { fetchLeaderboard, fetchLeaderboardWithMeHighlight, fetchLeaderboardMe, fetchProfile, getSessionToken, prepareShare, submitRun, type ApiFailureReason, type LeaderboardEntry, type LeaderboardMeResponse, type LeaderboardResult, type SubmitRunResult } from "./lib/api";
 import { cycleAvatarEmoji, getStoredAvatarEmoji, type AvatarEmoji } from "./lib/avatar";
 import { nextHighScoreAfterSubmit } from "./lib/score-trust";
@@ -69,18 +69,21 @@ import {
   respectsReducedMotion,
   spawnFloatingParticles,
   triggerClimbPop,
-  triggerCoffeePickup,
+  triggerCoffeePickupFromPlayer,
   triggerDeathEmoji,
   triggerDeathFlash,
   triggerDeathCauseHold,
+  triggerDeathImpact,
   triggerFloorBandFlash,
   triggerMeterFlash,
   triggerNearMissWince,
+  triggerObstacleDeathFade,
   triggerRankBadgePulse,
   triggerRankPop,
   triggerReorgTelegraph,
   triggerRungAdvance,
   triggerShake,
+  waitForRungAdvance,
 } from "./lib/effects";
 import {
   disableVerticalSwipe,
@@ -93,12 +96,13 @@ import {
   hapticImpact,
   hapticNotification,
   hideTelegramBack,
-  hideHomeMainButton,
   initTelegram,
   isTelegram,
+  isTelegramBottomBarActive,
   sharePreparedMessage,
-  showHomeMainButton,
+  setBottomBarProgress,
   showTelegramBack,
+  syncTelegramBottomBar,
 } from "./lib/telegram";
 import { audio } from "./game/audio";
 import { isReviveFeatureEnabled, showRewardedAd } from "./lib/adsgram";
@@ -179,13 +183,6 @@ function flashPlayerEmoji(emoji: string, ms: number): void {
       $("playerActionEmoji").textContent = rankEmoji(engine.getCurrentRank());
     }
   }, ms);
-}
-
-function findImminentCoffeeBadge(side: PlayerSide): HTMLElement | null {
-  const imminent = $("rungsContainer").querySelector(".next-rung");
-  if (!imminent) return null;
-  const slot = imminent.querySelector(side === "left" ? ".left-slot" : ".right-slot");
-  return slot?.querySelector(".coffee-badge") as HTMLElement | null;
 }
 
 function updateRankProp(rank: Rank): void {
@@ -450,8 +447,10 @@ function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   const onGameOver = !$("gameOverScreen").classList.contains("hidden");
   const aboveTapDeck = onGame && opts?.surface !== "shell";
   const aboveGameOverActions = onGameOver && !onGame;
+  const aboveTgBottomBar = aboveGameOverActions && isTelegramBottomBarActive();
   toast.classList.toggle("toast-above-tap-deck", aboveTapDeck);
-  toast.classList.toggle("toast-above-game-over-actions", aboveGameOverActions);
+  toast.classList.toggle("toast-above-game-over-actions", aboveGameOverActions && !aboveTgBottomBar);
+  toast.classList.toggle("toast-above-tg-bottom-bar", aboveTgBottomBar);
   $("toastText").textContent = msg;
   toast.style.opacity = "1";
   if (toastHideTimer) clearTimeout(toastHideTimer);
@@ -518,15 +517,35 @@ function syncTelegramBackButton(tab: Screen): void {
   });
 }
 
-function syncTelegramMainButton(tab: Screen): void {
+function syncTelegramBottomBarForTab(tab: Screen): void {
   if (tab === "home") {
-    showHomeMainButton(() => {
-      hapticImpact("medium");
-      startGame();
+    syncTelegramBottomBar({
+      mode: "home",
+      onPlay: () => {
+        hapticImpact("medium");
+        void startGame();
+      },
     });
     return;
   }
-  hideHomeMainButton();
+  if (tab === "gameover") {
+    const shareAvailable = canNativeShare() && lastGameResult !== null && Boolean(getInitData());
+    syncTelegramBottomBar({
+      mode: "gameover",
+      onReapply: () => {
+        hapticImpact("light");
+        void startGame();
+      },
+      onShare: shareAvailable
+        ? () => {
+            hapticImpact("medium");
+            void copyShareText();
+          }
+        : undefined,
+    });
+    return;
+  }
+  syncTelegramBottomBar({ mode: "hidden" });
 }
 
 function syncSoundFabPlacement(tab: Screen): void {
@@ -552,7 +571,7 @@ function switchTab(tab: Screen): void {
   el.classList.remove("hidden");
   el.classList.add("flex");
   syncTelegramBackButton(tab);
-  syncTelegramMainButton(tab);
+  syncTelegramBottomBarForTab(tab);
   syncSoundFabPlacement(tab);
   if (tab === "home") {
     refreshHomeContextSlot();
@@ -723,8 +742,9 @@ function fillSlot(slotEl: HTMLElement, rung: Rung, side: "left" | "right", isImm
   }
 }
 
-const RUNG_HEIGHT_MAX = 52;
 const RUNG_HEIGHT_MIN = 32;
+/** Space reserved at top of ladder track for #floorLabel (px). */
+const FLOOR_LABEL_RESERVE_PX = 20;
 
 function layoutTrackMetrics(): void {
   const playArea = $("gamePlayArea");
@@ -773,10 +793,13 @@ function layoutPlayerPosition(side: PlayerLayout): void {
 
 function layoutRungs(): void {
   const playArea = $("gamePlayArea");
-  const h = playArea.clientHeight;
-  if (h <= 0) return;
-  const perRung = Math.floor(h / MAX_VISIBLE_RUNGS);
-  const rungHeight = Math.min(RUNG_HEIGHT_MAX, Math.max(RUNG_HEIGHT_MIN, perRung));
+  const track = playArea.querySelector(".ladder-track") as HTMLElement | null;
+  const trackH = track?.clientHeight ?? playArea.clientHeight;
+  if (trackH <= 0) return;
+  playArea.style.setProperty("--floor-label-reserve", `${FLOOR_LABEL_RESERVE_PX}px`);
+  const ladderH = Math.max(RUNG_HEIGHT_MIN * MAX_VISIBLE_RUNGS, trackH - FLOOR_LABEL_RESERVE_PX);
+  const perRung = Math.floor(ladderH / MAX_VISIBLE_RUNGS);
+  const rungHeight = Math.max(RUNG_HEIGHT_MIN, perRung);
   playArea.querySelectorAll("[data-rung-slot]").forEach((el) => {
     (el as HTMLElement).style.height = `${rungHeight}px`;
   });
@@ -941,12 +964,16 @@ function renderRungsWithReorgFeedback(): void {
   }
 }
 
-function updatePlayerPosition(side: PlayerSide): void {
+function updatePlayerPosition(side: PlayerSide, anim: PlayerTapAnim = "climb"): void {
   playerAtCorridor = false;
   $("playerClimber").classList.remove("player-at-corridor");
   layoutPlayerPosition(side);
-  triggerClimbPop($("playerClimber"));
-  hapticImpact("light");
+  if (anim === "climb") {
+    triggerClimbPop($("playerClimber"));
+    hapticImpact("light");
+  } else {
+    triggerDeathImpact($("playerClimber"));
+  }
 }
 
 function renderLeaderboardSkeleton(list: HTMLElement): void {
@@ -1115,12 +1142,29 @@ function bindShellActions(): void {
     "copy-share": copyShareText,
   };
 
+  const hapticMedium = new Set(["copy-share", "revive-ad"]);
+  const hapticLight = new Set([
+    "go-home",
+    "start-game",
+    "open-leaderboard",
+    "open-howtoplay",
+    "open-prompt-anatomy",
+    "toggle-mute",
+    "dismiss-auth-banner",
+    "cycle-avatar",
+    "dismiss-challenge",
+  ]);
+
   document.querySelectorAll<HTMLElement>("[data-action]").forEach((el) => {
     const action = el.dataset.action;
     const handler = action ? handlers[action] : undefined;
     if (!handler) return;
     el.addEventListener("click", (e) => {
       e.preventDefault();
+      if (isTelegram() && action) {
+        if (hapticMedium.has(action)) hapticImpact("medium");
+        else if (hapticLight.has(action)) hapticImpact("light");
+      }
       handler();
     });
   });
@@ -1130,6 +1174,16 @@ let tapHintTimer: ReturnType<typeof setTimeout> | null = null;
 let tapDeckHintTimer: ReturnType<typeof setTimeout> | null = null;
 
 function showTapDeckHint(): void {
+  if (isTutorialOverlayActive()) {
+    updateSafeSideTapPulse();
+    if (tapDeckHintTimer) clearTimeout(tapDeckHintTimer);
+    tapDeckHintTimer = setTimeout(() => {
+      $("btnTapLeft").classList.remove("safe-side-hint");
+      $("btnTapRight").classList.remove("safe-side-hint");
+      tapDeckHintTimer = null;
+    }, 3000);
+    return;
+  }
   $("tapControlsBar").classList.add("tap-deck-hint");
   if (tapDeckHintTimer) clearTimeout(tapDeckHintTimer);
   tapDeckHintTimer = setTimeout(() => hideTapDeckHint(), 3000);
@@ -1545,6 +1599,16 @@ function seedGameOverForQa(): void {
 async function onGameOver(result: GameOverResult): Promise<void> {
   debugLog("gameover", "collision/death", { deathType: result.deathType });
 
+  if (
+    result.deathType === "meeting" ||
+    result.deathType === "reorg" ||
+    result.deathType === "burnout" ||
+    result.deathType === "badge_gate" ||
+    result.deathType === "foliage"
+  ) {
+    triggerObstacleDeathFade($("gamePlayArea"));
+  }
+
   if (reviveContinuedAt !== null) {
     debugLog("revive", "revive_run_continued_seconds", {
       seconds: Math.round((Date.now() - reviveContinuedAt) / 1000),
@@ -1691,6 +1755,7 @@ async function copyShareText(): Promise<void> {
   shareInProgress = true;
   const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
   if (shareBtn) shareBtn.disabled = true;
+  setBottomBarProgress(true);
 
   try {
     const text = buildShareText();
@@ -1723,6 +1788,7 @@ async function copyShareText(): Promise<void> {
   } finally {
     shareInProgress = false;
     if (shareBtn) shareBtn.disabled = false;
+    setBottomBarProgress(false);
   }
 }
 
@@ -2084,15 +2150,14 @@ export function mountApp(): void {
       onCoffee: (side, rungId) => {
         qaCoffeePickups++;
         debugLog("coffee", "callback", { side, rungId });
-        const badge = findImminentCoffeeBadge(side);
-        if (badge) {
-          triggerCoffeePickup(badge, $("gamePlayArea"));
-        }
-        flashPlayerEmoji("🤤", 550);
-        showHrMemo("+25% Energy Recovery! ☕", { variant: "info" });
-        triggerMeterFlash($("burnoutMeter"));
-        spawnFloatingParticles($("playerClimber"), "☕", 5);
-        hapticImpact("medium");
+        const container = $("rungsContainer");
+        waitForRungAdvance(container, () => {
+          triggerCoffeePickupFromPlayer($("playerClimber"), $("gamePlayArea"));
+          flashPlayerEmoji("🤤", 550);
+          triggerMeterFlash($("burnoutMeter"));
+          spawnFloatingParticles($("playerClimber"), "☕", 5);
+          hapticImpact("medium");
+        });
       },
       onToast: (msg) => {
         const isFakePromo = FAKE_PROMO_MESSAGES.has(msg);
@@ -2242,7 +2307,7 @@ export function mountApp(): void {
 
   refreshDailyShiftUI();
   syncTelegramBackButton("home");
-  syncTelegramMainButton("home");
+  syncTelegramBottomBarForTab("home");
   syncSoundFabPlacement("home");
 
   const challengeYears = parseChallengeParam(getStartParam());

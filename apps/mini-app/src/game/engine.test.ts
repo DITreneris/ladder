@@ -97,7 +97,7 @@ describe("GameEngine", () => {
     expect(onCoffee).toHaveBeenCalledWith("left", expect.any(Number));
   });
 
-  it("invokes onCoffee before renderRungs on coffee pickup", () => {
+  it("invokes onCoffee after renderRungs on coffee pickup", () => {
     const callOrder: string[] = [];
     const renderRungs = vi.fn(() => callOrder.push("renderRungs"));
     const onCoffee = vi.fn(() => callOrder.push("onCoffee"));
@@ -116,7 +116,7 @@ describe("GameEngine", () => {
     tapWithCooldown(engine, "left");
 
     expect(onCoffee).toHaveBeenCalledTimes(1);
-    expect(callOrder).toEqual(["onCoffee", "renderRungs"]);
+    expect(callOrder).toEqual(["renderRungs", "onCoffee"]);
   });
 
   it("adds COFFEE_RECOVERY to timeLeft on tutorial coffee tap", () => {

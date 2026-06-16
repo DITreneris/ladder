@@ -1,4 +1,5 @@
 export type PlayerSide = "left" | "right";
+export type PlayerTapAnim = "climb" | "death";
 export type ObstacleType = "meeting" | "reorg" | "burnout" | "badge_gate" | "foliage";
 export type Rank = "Intern" | "Manager" | "Director" | "CEO" | "Board Member" | "Angel Investor";
 export type DeathType = ObstacleType | "energy" | "sprint";

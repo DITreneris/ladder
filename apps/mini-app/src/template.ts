@@ -122,7 +122,7 @@ export const APP_SHELL = `
       <div id="deathFlash" class="pointer-events-none absolute inset-0 bg-red-500/20 opacity-0 z-40"></div>
       <div id="gameContentColumn" class="cl-shell-gutter flex flex-col flex-grow min-h-0 min-w-0 w-full">
       <div id="ogCaptureFrame" class="og-capture-frame min-h-0 flex-1 flex flex-col min-w-0 w-full">
-      <div id="gameHud" class="game-hud z-10 flex flex-col gap-1.5">
+      <div id="gameHud" class="game-hud relative z-10 flex flex-col gap-1.5">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-baseline gap-1 text-slate-900">
             <span class="text-2xl font-black leading-none" id="gameYearsLabel">0.0</span>
@@ -147,16 +147,18 @@ export const APP_SHELL = `
         <p id="hudTapHint" class="hud-tap-hint hidden">TAP LEFT or RIGHT for the next rung's safe side.</p>
         <p id="imminentHint" class="imminent-hint hidden" aria-live="polite"></p>
       </div>
-      <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden" aria-live="polite">
-        <div class="hr-memo-rail-body">
-          <span id="hrMemoFrom" class="hr-memo-from">People Ops</span>
-          <p id="hrMemoText" class="hr-memo-text">…</p>
-        </div>
-        <div class="hr-memo-rail-meta">
-          <span class="hr-memo-stamp-wrap hidden">
-            <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-0.5 rounded rotate-12 shrink-0">PROMOTED</span>
-          </span>
-          <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
+      <div id="hrMemoStrip" class="hr-memo-strip" aria-live="polite">
+        <div id="hrMemoRail" class="hr-memo-rail hr-memo-rail--info hidden">
+          <div class="hr-memo-rail-body">
+            <span id="hrMemoFrom" class="hr-memo-from">People Ops</span>
+            <p id="hrMemoText" class="hr-memo-text">…</p>
+          </div>
+          <div class="hr-memo-rail-meta">
+            <span class="hr-memo-stamp-wrap hidden">
+              <span class="promo-stamp text-nano font-black uppercase text-emerald-700 border-2 border-emerald-600 px-2 py-0.5 rounded rotate-12 shrink-0">PROMOTED</span>
+            </span>
+            <span id="hrMemoRef" class="hr-memo-ref">REF-00000</span>
+          </div>
         </div>
       </div>
         <div id="gamePlayArea" class="game-play-area corp-env-intern-pit">
@@ -179,14 +181,12 @@ export const APP_SHELL = `
       </div>
       <div id="tapControlsBar" class="tap-controls-bar select-none">
         <button id="btnTapLeft" type="button" aria-label="Climb left" class="btn-tap-zone btn-tap-zone-left touch-none focus-ring">
-          ${icon("arrow-left", "icon-md text-slate-700")}
-          <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP LEFT</span>
-          <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: ←</span>
+          ${icon("arrow-left", "btn-tap-icon text-slate-700")}
+          <span class="btn-tap-label">TAP LEFT</span>
         </button>
         <button id="btnTapRight" type="button" aria-label="Climb right" class="btn-tap-zone btn-tap-zone-right touch-none focus-ring">
-          ${icon("arrow-right", "icon-md text-slate-700")}
-          <span class="text-caption font-extrabold text-slate-800 tracking-wide">TAP RIGHT</span>
-          <span class="keyboard-hint text-nano text-slate-400 font-mono">Keyboard: →</span>
+          ${icon("arrow-right", "btn-tap-icon text-slate-700")}
+          <span class="btn-tap-label">TAP RIGHT</span>
         </button>
       </div>
       </div>

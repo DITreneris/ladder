@@ -97,6 +97,7 @@ function applyVariant(rail: HTMLElement, variant: HrMemoVariant): void {
 
 function renderMemo(entry: HrMemoEntry): void {
   const rail = document.getElementById("hrMemoRail");
+  const strip = document.getElementById("hrMemoStrip");
   const fromEl = document.getElementById("hrMemoFrom");
   const textEl = document.getElementById("hrMemoText");
   const refEl = document.getElementById("hrMemoRef");
@@ -107,6 +108,7 @@ function renderMemo(entry: HrMemoEntry): void {
   textEl.textContent = entry.text;
   refEl.textContent = randomRef();
   rail.classList.remove("hidden", "hr-memo-enter");
+  strip?.classList.add("hr-memo-strip--active");
   void rail.offsetWidth;
   rail.classList.add("hr-memo-enter");
 
@@ -118,6 +120,7 @@ function renderMemo(entry: HrMemoEntry): void {
 
 function hideRail(): void {
   document.getElementById("hrMemoRail")?.classList.add("hidden");
+  document.getElementById("hrMemoStrip")?.classList.remove("hr-memo-strip--active");
 }
 
 const hrMemo = createHrMemoScheduler(renderMemo, hideRail);

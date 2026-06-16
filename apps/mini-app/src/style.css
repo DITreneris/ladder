@@ -55,6 +55,7 @@
   --cl-rank-badge-pulse-scale: 1.04;
   --cl-rank-badge-pulse-shadow-mix: 30%;
   --cl-rank-pop-scale: 1.2;
+  --cl-hr-memo-slot: 2.75rem;
   --color-cl-share: #059669;
   --color-cl-share-dark: #047857;
 
@@ -124,6 +125,13 @@
   @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl font-extrabold text-white shadow-lg transition hover:opacity-90 focus-ring;
   background: linear-gradient(to right, var(--cl-button), color-mix(in srgb, var(--cl-button) 85%, var(--color-cl-accent-indigo)));
   color: var(--cl-button-text);
+  transition-property: opacity, transform;
+}
+
+.btn-cl-primary:active,
+.cl-primary-btn:active,
+.btn-cl-share:active {
+  transform: scale(0.98);
 }
 
 @utility btn-cl-primary-sm {
@@ -235,9 +243,8 @@
   flex-shrink: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
-  border-top: 1px solid #e2e8f0;
   background: #fff;
-  padding-top: 1rem;
+  padding-top: 0.625rem;
   padding-bottom: calc(1rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   /* Horizontal inset from parent .cl-shell-gutter game column */
 }
@@ -249,13 +256,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.375rem;
   border-radius: 1rem;
   border: 2px solid #cbd5e1;
   background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
   transition: transform 100ms ease, background 100ms ease, border-color 100ms ease;
 }
+
+.btn-tap-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+  font-size: 1.625rem;
+}
+
+.btn-tap-label {
+  font-size: 14px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1e293b;
+}
+
+.btn-tap-zone-left {
+  border-color: color-mix(in srgb, var(--color-cl-primary) 35%, #cbd5e1);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-cl-primary) 8%, #f1f5f9),
+    color-mix(in srgb, var(--color-cl-primary) 12%, #e2e8f0)
+  );
+}
+
+.btn-tap-zone-right {
+  border-color: color-mix(in srgb, var(--color-cl-accent-indigo) 35%, #cbd5e1);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-cl-accent-indigo) 8%, #f1f5f9),
+    color-mix(in srgb, var(--color-cl-accent-indigo) 12%, #e2e8f0)
+  );
+}
+
 .cl-phone-shell {
   background-color: var(--cl-bg);
   border-color: var(--cl-border);
@@ -398,10 +439,6 @@ html.cl-in-telegram .text-micro {
   line-height: 1.25;
 }
 
-.cl-in-telegram .keyboard-hint {
-  display: none;
-}
-
 .sound-fab {
   position: absolute;
   top: 0.75rem;
@@ -442,6 +479,14 @@ html.cl-in-telegram .text-micro {
   display: none;
 }
 
+html.cl-in-telegram #gameOverScreen .game-over-actions .btn-cl-primary[data-action="start-game"] {
+  display: none;
+}
+
+html.cl-in-telegram.cl-tg-secondary-share #gameOverScreen .game-over-actions #shareBtn {
+  display: none;
+}
+
 .game-hud {
   flex-shrink: 0;
   border-bottom: 1px solid #e2e8f0;
@@ -476,9 +521,23 @@ html.cl-in-telegram .text-micro {
 }
 
 .game-hud,
+.hr-memo-strip,
 .hr-memo-rail,
 .tap-controls-bar {
   background: #fff;
+}
+
+.hr-memo-strip {
+  position: relative;
+  flex-shrink: 0;
+  min-height: var(--cl-hr-memo-slot);
+  overflow: hidden;
+  border-bottom: 1px solid #e2e8f0;
+  background: transparent;
+}
+
+.hr-memo-strip--active {
+  background: rgb(255 255 255 / 0.88);
 }
 
 .game-play-area {
@@ -529,11 +588,22 @@ html.cl-in-telegram .text-micro {
 .ladder-track {
   position: absolute;
   inset: 0;
-  bottom: 3rem;
+  bottom: 1.5rem;
   display: flex;
   flex-direction: column-reverse;
   align-items: stretch;
   justify-content: flex-start;
+}
+
+#rungsContainer {
+  box-sizing: border-box;
+  padding-top: var(--floor-label-reserve, 1.25rem);
+}
+
+#floorLabel {
+  top: 0.125rem;
+  height: var(--floor-label-reserve, 1.25rem);
+  line-height: var(--floor-label-reserve, 1.25rem);
 }
 
 .ladder-rail {
@@ -599,6 +669,10 @@ html.cl-in-telegram .text-micro {
   bottom: calc(12rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
 }
 
+#toastNotification.toast-above-tg-bottom-bar {
+  bottom: calc(4.5rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
 .username-readonly {
   border-bottom-style: solid;
   border-bottom-color: #e2e8f0;
@@ -652,12 +726,26 @@ html.cl-in-telegram .text-micro {
     gap: 0.5rem;
   }
 
+  html.cl-in-telegram .btn-tap-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1.5rem;
+  }
+
+  html.cl-in-telegram .btn-tap-label {
+    font-size: 13px;
+  }
+
   html.cl-in-telegram #toastNotification.toast-above-game-over-actions {
     bottom: calc(10.5rem + var(--tg-content-safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
   }
 
   html.cl-in-telegram .hr-memo-rail {
     padding: 0.25rem 0;
+  }
+
+  html.cl-in-telegram .hr-memo-strip {
+    min-height: 2.25rem;
   }
 
   html.cl-in-telegram .hr-memo-text {
@@ -695,13 +783,12 @@ html.cl-in-telegram .text-micro {
 }
 
 .hr-memo-rail {
+  position: absolute;
+  inset: 0;
   display: flex;
-  flex-shrink: 0;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #fff;
   padding: 0.375rem 0;
   pointer-events: none;
 }
@@ -917,6 +1004,22 @@ html.cl-in-telegram .text-micro {
 }
 .climb-pop {
   animation: climb-pop 0.14s ease-out;
+  transform-origin: bottom center;
+}
+
+@keyframes death-impact {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  45% {
+    transform: translateY(4px) scale(0.88, 0.92);
+  }
+  100% {
+    transform: translateY(2px) scale(0.94, 0.96);
+  }
+}
+.death-impact {
+  animation: death-impact 0.12s ease-in forwards;
   transform-origin: bottom center;
 }
 
@@ -1451,7 +1554,7 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
 }
 
 #playerClimber {
-  z-index: 6;
+  z-index: 11;
 }
 
 .rung-center {
@@ -1499,6 +1602,41 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
 }
 .coffee-pickup {
   animation: coffee-pickup 0.28s ease-out forwards;
+}
+
+@keyframes coffee-consume {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.85;
+  }
+  40% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8) translateY(-8px);
+    opacity: 0;
+  }
+}
+.coffee-consume-badge {
+  font-size: 1.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+.coffee-consume {
+  animation: coffee-consume 0.28s ease-out forwards;
+}
+
+@keyframes obstacle-death-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+.obstacle-death-fade {
+  animation: obstacle-death-fade 0.15s ease-out forwards;
 }
 
 @keyframes safe-side-hint {
@@ -1596,6 +1734,7 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
 @media (prefers-reduced-motion: reduce) {
   .shake-element,
   .climb-pop,
+  .death-impact,
   .near-miss-wince #playerActionEmoji,
   .reorg-slide-left,
   .reorg-slide-right,
@@ -1615,6 +1754,8 @@ html.cl-in-telegram .cl-shell-gutter > .home-hero + .card-light {
   .next-coffee-hint,
   .coffee-bounce,
   .coffee-pickup,
+  .coffee-consume,
+  .obstacle-death-fade,
   .news-ticker-text,
   .reorg-warning,
   #playerActionEmoji.idle-bob,

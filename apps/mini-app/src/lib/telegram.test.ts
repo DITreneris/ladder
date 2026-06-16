@@ -2,7 +2,14 @@
  * @vitest-environment jsdom
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { applyTelegramTheme, canNativeShare, sharePreparedMessage } from "./telegram";
+import {
+  applyTelegramTheme,
+  canNativeShare,
+  isSecondaryButtonSupported,
+  isTelegramBottomBarActive,
+  sharePreparedMessage,
+  syncTelegramBottomBar,
+} from "./telegram";
 
 function mockTelegramTheme(
   themeParams: Record<string, string>,
@@ -164,5 +171,120 @@ describe("sharePreparedMessage", () => {
     const promise = sharePreparedMessage("prepared-fail");
     handlers.shareMessageFailed?.();
     await expect(promise).resolves.toBe(false);
+  });
+});
+
+function mockTelegramWebApp(overrides: Record<string, unknown> = {}): void {
+  const mainButton = {
+    show: vi.fn(),
+    hide: vi.fn(),
+    enable: vi.fn(),
+    disable: vi.fn(),
+    setText: vi.fn(),
+    onClick: vi.fn(),
+    offClick: vi.fn(),
+    showProgress: vi.fn(),
+    hideProgress: vi.fn(),
+  };
+  const secondaryButton = {
+    show: vi.fn(),
+    hide: vi.fn(),
+    enable: vi.fn(),
+    disable: vi.fn(),
+    setText: vi.fn(),
+    onClick: vi.fn(),
+    offClick: vi.fn(),
+    showProgress: vi.fn(),
+    hideProgress: vi.fn(),
+    setParams: vi.fn(),
+  };
+
+  window.Telegram = {
+    WebApp: {
+      initData: "mock-init",
+      themeParams: {},
+      MainButton: mainButton,
+      SecondaryButton: secondaryButton,
+      isVersionAtLeast: (version: string) => version === "7.10" || version === "8.0",
+      ...overrides,
+    },
+  } as unknown as Window["Telegram"];
+}
+
+describe("syncTelegramBottomBar", () => {
+  afterEach(() => {
+    delete window.Telegram;
+    document.documentElement.classList.remove(
+      "cl-in-telegram",
+      "cl-tg-secondary-share",
+      "cl-tg-bottom-bar-visible"
+    );
+  });
+
+  it("shows home MainButton text and handler", () => {
+    mockTelegramWebApp();
+    document.documentElement.classList.add("cl-in-telegram");
+    const onPlay = vi.fn();
+
+    syncTelegramBottomBar({ mode: "home", onPlay });
+
+    const mb = window.Telegram!.WebApp.MainButton;
+    expect(mb.setText).toHaveBeenCalledWith("PUNCH IN & CLIMB");
+    expect(mb.show).toHaveBeenCalled();
+    expect(mb.onClick).toHaveBeenCalledWith(onPlay);
+    expect(isTelegramBottomBarActive()).toBe(true);
+  });
+
+  it("shows game-over MainButton and SecondaryButton when share handler provided", () => {
+    mockTelegramWebApp();
+    document.documentElement.classList.add("cl-in-telegram");
+    const onReapply = vi.fn();
+    const onShare = vi.fn();
+
+    syncTelegramBottomBar({ mode: "gameover", onReapply, onShare });
+
+    const mb = window.Telegram!.WebApp.MainButton;
+    const sb = window.Telegram!.WebApp.SecondaryButton!;
+    expect(mb.setText).toHaveBeenCalledWith("RE-APPLY FOR ROLE");
+    expect(mb.show).toHaveBeenCalled();
+    expect(sb.setParams).toHaveBeenCalledWith(
+      expect.objectContaining({ text: "Share", position: "left", is_visible: true })
+    );
+    expect(sb.show).toHaveBeenCalled();
+    expect(document.documentElement.classList.contains("cl-tg-secondary-share")).toBe(true);
+  });
+
+  it("hides bottom bar and clears classes on hidden mode", () => {
+    mockTelegramWebApp();
+    document.documentElement.classList.add("cl-in-telegram");
+    syncTelegramBottomBar({ mode: "home", onPlay: vi.fn() });
+
+    syncTelegramBottomBar({ mode: "hidden" });
+
+    expect(window.Telegram!.WebApp.MainButton.hide).toHaveBeenCalled();
+    expect(isTelegramBottomBarActive()).toBe(false);
+    expect(document.documentElement.classList.contains("cl-tg-secondary-share")).toBe(false);
+  });
+});
+
+describe("isSecondaryButtonSupported", () => {
+  afterEach(() => {
+    delete window.Telegram;
+  });
+
+  it("returns false without Telegram initData", () => {
+    expect(isSecondaryButtonSupported()).toBe(false);
+  });
+
+  it("returns true when SecondaryButton exists and version is 7.10+", () => {
+    mockTelegramWebApp();
+    expect(isSecondaryButtonSupported()).toBe(true);
+  });
+
+  it("returns false when client is below 7.10", () => {
+    mockTelegramWebApp({
+      isVersionAtLeast: () => false,
+    });
+    expect(isSecondaryButtonSupported()).toBe(false);
   });
 });

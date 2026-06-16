@@ -31,6 +31,18 @@ export function triggerClimbPop(el: HTMLElement): void {
   );
 }
 
+export function triggerDeathImpact(el: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  el.classList.remove("death-impact");
+  void el.offsetWidth;
+  el.classList.add("death-impact");
+  el.addEventListener(
+    "animationend",
+    () => el.classList.remove("death-impact"),
+    { once: true }
+  );
+}
+
 export function triggerShake(el: HTMLElement, onComplete?: () => void): void {
   if (respectsReducedMotion()) {
     onComplete?.();
@@ -226,6 +238,54 @@ export function triggerRungAdvance(container: HTMLElement): void {
     () => container.classList.remove("rung-advance"),
     { once: true }
   );
+}
+
+/** Wait for ladder scroll animation after a successful climb (fallback 200ms). */
+export function waitForRungAdvance(container: HTMLElement, onComplete: () => void): void {
+  if (respectsReducedMotion() || !container.classList.contains("rung-advance")) {
+    onComplete();
+    return;
+  }
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(fallback);
+    onComplete();
+  };
+  const fallback = setTimeout(finish, 200);
+  container.addEventListener("animationend", finish, { once: true });
+}
+
+export function triggerCoffeePickupFromPlayer(climber: HTMLElement, playArea: HTMLElement): void {
+  if (respectsReducedMotion()) return;
+  const climberRect = climber.getBoundingClientRect();
+  const playRect = playArea.getBoundingClientRect();
+  const particle = document.createElement("span");
+  particle.className = "coffee-consume-badge";
+  particle.textContent = "☕";
+  particle.style.position = "absolute";
+  particle.style.left = `${climberRect.left + climberRect.width / 2 - playRect.left - 12}px`;
+  particle.style.top = `${climberRect.top + climberRect.height / 2 - playRect.top - 12}px`;
+  particle.style.zIndex = "20";
+  particle.style.pointerEvents = "none";
+  playArea.appendChild(particle);
+  void particle.offsetWidth;
+  particle.classList.add("coffee-consume");
+  particle.addEventListener(
+    "animationend",
+    () => particle.remove(),
+    { once: true }
+  );
+}
+
+export function triggerObstacleDeathFade(playArea: HTMLElement): void {
+  const badge = playArea.querySelector(
+    ".next-rung .obstacle-badge:not(.coffee-badge)"
+  ) as HTMLElement | null;
+  if (!badge || respectsReducedMotion()) return;
+  badge.classList.remove("next-obstacle-warn");
+  badge.classList.add("obstacle-death-fade");
 }
 
 export function applyReorgSlide(badge: HTMLElement, toSide: "left" | "right"): void {

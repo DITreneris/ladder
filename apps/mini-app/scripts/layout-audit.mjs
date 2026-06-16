@@ -1,5 +1,6 @@
 /**
  * Layout audit — verifies game column width alignment at key viewports.
+ * Layout contract: docs/MINI_APP_GOLDEN_STANDARD.md (repo root docs/)
  * After first tap, play-area width must stay stable (C-01 regression guard).
  * Run: npm run preview then npm run qa:layout
  */

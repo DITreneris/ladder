@@ -44,6 +44,7 @@ import type {
   GameOverResult,
   ObstacleType,
   PlayerSide,
+  PlayerTapAnim,
   Rank,
   ReviveSnapshot,
   Rung,
@@ -66,7 +67,7 @@ export class GameEngine {
   private reorgInterval: ReturnType<typeof setInterval> | null = null;
   private callbacks: GameCallbacks;
   private renderRungs: () => void;
-  private updatePlayerPosition: (side: PlayerSide) => void;
+  private updatePlayerPosition: (side: PlayerSide, anim?: PlayerTapAnim) => void;
   private onFirstTap: () => void;
   private firstTapDone = false;
   private coffeeCollected = false;
@@ -92,7 +93,7 @@ export class GameEngine {
   constructor(
     callbacks: GameCallbacks,
     renderRungs: () => void,
-    updatePlayerPosition: (side: PlayerSide) => void,
+    updatePlayerPosition: (side: PlayerSide, anim?: PlayerTapAnim) => void,
     onFirstTap: () => void,
     dailyModifier?: DailyModifier,
     careerBestYears = 0
@@ -530,17 +531,18 @@ export class GameEngine {
     }
 
     this.playerSide = side;
-    this.updatePlayerPosition(side);
-
     const nextRung = this.rungs[1];
 
     if (nextRung?.obstacle === side) {
+      this.updatePlayerPosition(side, "death");
       const obstacleType = nextRung.type ?? "reorg";
       const copy = OBSTACLE_DEATH_COPY[obstacleType] ?? OBSTACLE_DEATH_COPY.reorg;
       this.triggerGameOver(copy.cause, copy.detail, copy.deathType);
       debugTapResult(side, nextRung, "death");
       return;
     }
+
+    this.updatePlayerPosition(side, "climb");
 
     if (nextRung?.obstacle && nextRung.obstacle !== side) {
       this.callbacks.onNearMiss?.();
@@ -571,13 +573,13 @@ export class GameEngine {
     const years = this.score / 4;
     this.callbacks.onScoreUpdate(years, this.timeLeft);
     this.checkRankBandPromos(years);
+    this.renderRungs();
     if (coffeePickup) {
       this.callbacks.onCoffee(coffeePickup.side, coffeePickup.rungId);
       debugTapResult(side, nextRung, "coffee");
     } else {
       debugTapResult(side, nextRung, "climb");
     }
-    this.renderRungs();
     debugTapContext(this.rungs[1]);
   }
 
