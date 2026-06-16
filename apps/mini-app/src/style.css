@@ -179,6 +179,21 @@
   min-width: 0;
 }
 
+.game-over-summary {
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.game-over-summary .card-performance {
+  margin-block: 0;
+}
+
+.game-over-tail {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
 @utility ticker-bar {
   @apply flex items-center overflow-hidden rounded-lg bg-cl-promo-bg px-3 py-1.5 text-xs text-cl-promo;
 }
@@ -485,6 +500,17 @@ html.cl-in-telegram #gameOverScreen .game-over-actions .btn-cl-primary[data-acti
 
 html.cl-in-telegram.cl-tg-secondary-share #gameOverScreen .game-over-actions #shareBtn {
   display: none;
+}
+
+html.cl-in-telegram.cl-tg-secondary-share #gameOverScreen .game-over-actions .grid.grid-cols-2 {
+  grid-template-columns: 1fr;
+}
+
+html.cl-in-telegram.cl-tg-secondary-share
+  #gameOverScreen
+  .game-over-actions
+  [data-action="open-leaderboard"] {
+  grid-column: 1 / -1;
 }
 
 .game-hud {

@@ -191,7 +191,8 @@ export const APP_SHELL = `
       </div>
       </div>
     </div>
-    <div id="gameOverScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-6 select-none overflow-y-auto min-w-0">
+    <div id="gameOverScreen" class="hidden flex-col flex-grow gap-0 cl-shell-gutter py-6 select-none overflow-y-auto min-w-0">
+      <div class="game-over-summary w-full min-w-0 shrink-0 space-y-2">
       <div class="text-center mt-2 w-full min-w-0">
         <span class="inline-flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full mb-2">
           ${icon("triangle-exclamation", "text-2xl")}
@@ -231,7 +232,8 @@ export const APP_SHELL = `
           <span id="hrStampPop" class="hr-stamp-pop hidden" aria-hidden="true"></span>
         </div>
       </div>
-      <div class="game-over-actions space-y-2 mt-auto w-full min-w-0">
+      </div>
+      <div class="game-over-actions space-y-2 shrink-0 w-full min-w-0 mt-3">
         <button type="button" data-action="start-game" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
           ${icon("rotate-right")}<span>RE-APPLY FOR ROLE</span>
         </button>
@@ -248,8 +250,8 @@ export const APP_SHELL = `
           </button>
         </div>
         <button type="button" data-action="go-home" class="btn-cl-muted text-xs">Back to Corporate Lounge</button>
-        ${BRAND_FOOTER}
       </div>
+      <div class="game-over-tail flex-1 min-h-0" aria-hidden="true"></div>
     </div>
     <div id="leaderboardScreen" class="hidden flex-col flex-grow justify-between cl-shell-gutter py-5 select-none overflow-y-auto min-w-0">
       <div>

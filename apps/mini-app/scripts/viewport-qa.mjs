@@ -307,6 +307,111 @@ async function gameStackColumnAlignment(page) {
   });
 }
 
+async function gameOverCardActionsGap(page, viewportWidth) {
+  return page.evaluate((vpWidth) => {
+    const MAX_CARD_ACTIONS_GAP = 24;
+
+    function measureGap() {
+      const screen = document.getElementById("gameOverScreen");
+      const card = document.querySelector("#gameOverScreen .card-performance");
+      const actions = document.querySelector("#gameOverScreen .game-over-actions");
+      if (!screen || !card || !actions) return null;
+
+      const cardRect = card.getBoundingClientRect();
+      const actionsRect = actions.getBoundingClientRect();
+      const screenRect = screen.getBoundingClientRect();
+      return {
+        cardActionsGap: actionsRect.top - cardRect.bottom,
+        actionsTailGap: screenRect.bottom - actionsRect.bottom,
+      };
+    }
+
+    const sparse = measureGap();
+    if (!sparse) return { ok: false, reason: "missing-game-over-elements" };
+
+    const revive = document.getElementById("reviveAdBtn");
+    const stamp = document.getElementById("hrStampPad");
+    const chip = document.getElementById("syncStatusChip");
+    const reviveWasHidden = revive?.classList.contains("hidden") ?? true;
+    const stampWasHidden = stamp?.classList.contains("hidden") ?? true;
+    const chipWasHidden = chip?.classList.contains("hidden") ?? true;
+
+    revive?.classList.remove("hidden");
+    stamp?.classList.remove("hidden");
+    if (chip) {
+      chip.classList.remove("hidden");
+      chip.classList.add("sync-status-chip--syncing");
+    }
+
+    const busy = measureGap();
+
+    if (reviveWasHidden) revive?.classList.add("hidden");
+    if (stampWasHidden) stamp?.classList.add("hidden");
+    if (chip) {
+      if (chipWasHidden) chip.classList.add("hidden");
+      chip.classList.remove("sync-status-chip--syncing");
+    }
+
+    const gapInRange = (gap) => gap <= MAX_CARD_ACTIONS_GAP && gap >= -1;
+    const sparseGapOk = gapInRange(sparse.cardActionsGap);
+    const busyGapOk = busy !== null && gapInRange(busy.cardActionsGap);
+    const TAIL_MIN = 32;
+    const tailOk =
+      vpWidth !== 390 ||
+      sparse.actionsTailGap < TAIL_MIN ||
+      sparse.actionsTailGap > sparse.cardActionsGap;
+
+    return {
+      ok: sparseGapOk && busyGapOk && tailOk,
+      sparseCardActionsGap: sparse.cardActionsGap,
+      sparseActionsTailGap: sparse.actionsTailGap,
+      busyCardActionsGap: busy?.cardActionsGap ?? null,
+      tailOk,
+    };
+  }, viewportWidth);
+}
+
+async function gameOverLeaderboardFullWidth(page) {
+  return page.evaluate(() => {
+    const root = document.documentElement;
+    const hadTelegram = root.classList.contains("cl-in-telegram");
+    const hadSecondaryShare = root.classList.contains("cl-tg-secondary-share");
+    root.classList.add("cl-in-telegram", "cl-tg-secondary-share");
+
+    const actions = document.querySelector("#gameOverScreen .game-over-actions");
+    const lbBtn = document.querySelector(
+      '#gameOverScreen .game-over-actions [data-action="open-leaderboard"]'
+    );
+    const shareBtn = document.getElementById("shareBtn");
+    if (!actions || !lbBtn) {
+      if (!hadTelegram) root.classList.remove("cl-in-telegram");
+      if (!hadSecondaryShare) root.classList.remove("cl-tg-secondary-share");
+      return { ok: false, reason: "missing-game-over-leaderboard" };
+    }
+
+    const shareHidden =
+      shareBtn && window.getComputedStyle(shareBtn).display === "none";
+    const ar = actions.getBoundingClientRect();
+    const lr = lbBtn.getBoundingClientRect();
+    const widthDelta = Math.abs(ar.width - lr.width);
+    const leftDelta = Math.abs(ar.left - lr.left);
+    const gridColumn = window.getComputedStyle(lbBtn).gridColumnStart;
+
+    if (!hadTelegram) root.classList.remove("cl-in-telegram");
+    if (!hadSecondaryShare) root.classList.remove("cl-tg-secondary-share");
+
+    return {
+      ok: shareHidden && widthDelta <= 2 && leftDelta <= 2,
+      shareHidden,
+      actionsWidth: ar.width,
+      leaderboardWidth: lr.width,
+      widthDelta,
+      leftDelta,
+      gridColumn,
+    };
+  });
+}
+
 async function gameOverColumnAlignment(page) {
   return page.evaluate(() => {
     const card = document.querySelector("#gameOverScreen .card-performance");
@@ -581,6 +686,26 @@ async function main() {
             screen: screen.label,
             type: "game-over-column-mismatch",
             ...goAlign,
+          });
+        }
+
+        const lbFullWidth = await gameOverLeaderboardFullWidth(page);
+        if (!lbFullWidth.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "game-over-leaderboard-not-full-width",
+            ...lbFullWidth,
+          });
+        }
+
+        const cardActionsGap = await gameOverCardActionsGap(page, vp.width);
+        if (!cardActionsGap.ok) {
+          failures.push({
+            viewport: vp.label,
+            screen: screen.label,
+            type: "game-over-card-actions-gap",
+            ...cardActionsGap,
           });
         }
 
