@@ -100,7 +100,6 @@ import {
   isTelegram,
   isTelegramBottomBarActive,
   sharePreparedMessage,
-  setBottomBarProgress,
   showTelegramBack,
   syncTelegramBottomBar,
 } from "./lib/telegram";
@@ -529,19 +528,12 @@ function syncTelegramBottomBarForTab(tab: Screen): void {
     return;
   }
   if (tab === "gameover") {
-    const shareAvailable = canNativeShare() && lastGameResult !== null && Boolean(getInitData());
     syncTelegramBottomBar({
       mode: "gameover",
       onReapply: () => {
         hapticImpact("light");
         void startGame();
       },
-      onShare: shareAvailable
-        ? () => {
-            hapticImpact("medium");
-            void copyShareText();
-          }
-        : undefined,
     });
     return;
   }
@@ -1755,7 +1747,6 @@ async function copyShareText(): Promise<void> {
   shareInProgress = true;
   const shareBtn = document.getElementById("shareBtn") as HTMLButtonElement | null;
   if (shareBtn) shareBtn.disabled = true;
-  setBottomBarProgress(true);
 
   try {
     const text = buildShareText();
@@ -1788,7 +1779,6 @@ async function copyShareText(): Promise<void> {
   } finally {
     shareInProgress = false;
     if (shareBtn) shareBtn.disabled = false;
-    setBottomBarProgress(false);
   }
 }
 

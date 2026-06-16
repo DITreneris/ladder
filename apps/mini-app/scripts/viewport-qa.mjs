@@ -371,43 +371,42 @@ async function gameOverCardActionsGap(page, viewportWidth) {
   }, viewportWidth);
 }
 
-async function gameOverLeaderboardFullWidth(page) {
+async function gameOverShareVisibleInTelegram(page) {
   return page.evaluate(() => {
     const root = document.documentElement;
     const hadTelegram = root.classList.contains("cl-in-telegram");
-    const hadSecondaryShare = root.classList.contains("cl-tg-secondary-share");
-    root.classList.add("cl-in-telegram", "cl-tg-secondary-share");
+    root.classList.add("cl-in-telegram");
 
-    const actions = document.querySelector("#gameOverScreen .game-over-actions");
+    const social = document.querySelector("#gameOverScreen .game-over-social");
+    const shareBtn = document.getElementById("shareBtn");
     const lbBtn = document.querySelector(
       '#gameOverScreen .game-over-actions [data-action="open-leaderboard"]'
     );
-    const shareBtn = document.getElementById("shareBtn");
-    if (!actions || !lbBtn) {
+    if (!social || !shareBtn || !lbBtn) {
       if (!hadTelegram) root.classList.remove("cl-in-telegram");
-      if (!hadSecondaryShare) root.classList.remove("cl-tg-secondary-share");
-      return { ok: false, reason: "missing-game-over-leaderboard" };
+      return { ok: false, reason: "missing-game-over-social" };
     }
 
-    const shareHidden =
-      shareBtn && window.getComputedStyle(shareBtn).display === "none";
-    const ar = actions.getBoundingClientRect();
-    const lr = lbBtn.getBoundingClientRect();
-    const widthDelta = Math.abs(ar.width - lr.width);
-    const leftDelta = Math.abs(ar.left - lr.left);
-    const gridColumn = window.getComputedStyle(lbBtn).gridColumnStart;
+    const shareVisible = window.getComputedStyle(shareBtn).display !== "none";
+    const socialGrid = window.getComputedStyle(social).gridTemplateColumns;
+    const socialRect = social.getBoundingClientRect();
+    const shareRect = shareBtn.getBoundingClientRect();
+    const lbRect = lbBtn.getBoundingClientRect();
+    const shareWidthRatio = socialRect.width > 0 ? shareRect.width / socialRect.width : 0;
+    const lbWidthRatio = socialRect.width > 0 ? lbRect.width / socialRect.width : 0;
+    const twoCol =
+      socialGrid.split(" ").filter((c) => c && c !== "0px").length >= 2 ||
+      (shareWidthRatio >= 0.35 && shareWidthRatio <= 0.65 && lbWidthRatio >= 0.35 && lbWidthRatio <= 0.65);
 
     if (!hadTelegram) root.classList.remove("cl-in-telegram");
-    if (!hadSecondaryShare) root.classList.remove("cl-tg-secondary-share");
 
     return {
-      ok: shareHidden && widthDelta <= 2 && leftDelta <= 2,
-      shareHidden,
-      actionsWidth: ar.width,
-      leaderboardWidth: lr.width,
-      widthDelta,
-      leftDelta,
-      gridColumn,
+      ok: shareVisible && twoCol,
+      shareVisible,
+      socialGrid,
+      shareWidthRatio,
+      lbWidthRatio,
+      twoCol,
     };
   });
 }
@@ -689,13 +688,13 @@ async function main() {
           });
         }
 
-        const lbFullWidth = await gameOverLeaderboardFullWidth(page);
-        if (!lbFullWidth.ok) {
+        const shareInTelegram = await gameOverShareVisibleInTelegram(page);
+        if (!shareInTelegram.ok) {
           failures.push({
             viewport: vp.label,
             screen: screen.label,
-            type: "game-over-leaderboard-not-full-width",
-            ...lbFullWidth,
+            type: "game-over-share-hidden-in-telegram",
+            ...shareInTelegram,
           });
         }
 
@@ -732,7 +731,7 @@ async function main() {
   }
 
   console.log(
-    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; home Prompt Anatomy brand visible without scroll at 320x568; game play area >= 50%; memo visible does not reflow play area at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; REJECTED stamp, HUD text, and player sprite not clipped."
+    "VIEWPORT QA PASSED: no horizontal overflow at 320–768px; home CTA reachable at 320x568; home Prompt Anatomy brand visible without scroll at 320x568; game play area >= 50%; memo visible does not reflow play area at 320x800; HUD hint references tap deck; tap deck visible (h-28); 7 rungs fit (Telegram mode); game HUD, play area, and tap deck share one content column at 320px and 390px; game-over card matches CTA width; game-over Share visible in Telegram social row; REJECTED stamp, HUD text, and player sprite not clipped."
   );
 }
 

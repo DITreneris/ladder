@@ -541,21 +541,6 @@ html.cl-in-telegram #gameOverScreen .game-over-actions .btn-cl-primary[data-acti
   display: none;
 }
 
-html.cl-in-telegram.cl-tg-secondary-share #gameOverScreen .game-over-actions #shareBtn {
-  display: none;
-}
-
-html.cl-in-telegram.cl-tg-secondary-share #gameOverScreen .game-over-actions .game-over-social {
-  grid-template-columns: 1fr;
-}
-
-html.cl-in-telegram.cl-tg-secondary-share
-  #gameOverScreen
-  .game-over-actions
-  [data-action="open-leaderboard"] {
-  grid-column: 1 / -1;
-}
-
 .game-hud {
   flex-shrink: 0;
   border-bottom: 1px solid #e2e8f0;

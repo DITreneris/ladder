@@ -81,12 +81,11 @@ declare global {
 export type BottomBarConfig =
   | { mode: "hidden" }
   | { mode: "home"; onPlay: () => void }
-  | { mode: "gameover"; onReapply: () => void; onShare?: () => void };
+  | { mode: "gameover"; onReapply: () => void };
 
 let backButtonHandler: (() => void) | null = null;
 let mainButtonHandler: (() => void) | null = null;
 let secondaryButtonHandler: (() => void) | null = null;
-let bottomBarProgressOnSecondary = false;
 
 function setThemeVar(root: HTMLElement, cssVar: string, value: string | undefined, fallback: string): void {
   root.style.setProperty(cssVar, value && value.length > 0 ? value : fallback);
@@ -129,7 +128,6 @@ function hideAllBottomButtons(): void {
   getMainButton()?.hide();
   getSecondaryButton()?.hide();
   document.documentElement.classList.remove("cl-tg-secondary-share", "cl-tg-bottom-bar-visible");
-  bottomBarProgressOnSecondary = false;
 }
 
 export function applySafeAreaInsets(): void {
@@ -279,46 +277,10 @@ export function syncTelegramBottomBar(config: BottomBarConfig): void {
   mb.enable();
   mb.onClick(config.onReapply);
   mb.show();
-
-  if (config.onShare && isSecondaryButtonSupported()) {
-    const sb = getSecondaryButton();
-    if (sb) {
-      secondaryButtonHandler = config.onShare;
-      if (sb.setParams) {
-        sb.setParams({
-          text: "Share",
-          position: "left",
-          is_visible: true,
-          is_active: true,
-          is_progress_visible: false,
-        });
-      } else {
-        sb.setText("Share");
-      }
-      sb.enable();
-      sb.onClick(config.onShare);
-      sb.show();
-      document.documentElement.classList.add("cl-tg-secondary-share");
-      bottomBarProgressOnSecondary = true;
-    }
-  }
 }
 
 export function setBottomBarProgress(visible: boolean): void {
   if (!isTelegram()) return;
-
-  if (bottomBarProgressOnSecondary) {
-    const sb = getSecondaryButton();
-    if (!sb) return;
-    if (visible) {
-      sb.showProgress?.();
-      sb.disable();
-    } else {
-      sb.hideProgress?.();
-      sb.enable();
-    }
-    return;
-  }
 
   const mb = getMainButton();
   if (!mb) return;

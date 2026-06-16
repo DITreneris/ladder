@@ -235,23 +235,19 @@ describe("syncTelegramBottomBar", () => {
     expect(isTelegramBottomBarActive()).toBe(true);
   });
 
-  it("shows game-over MainButton and SecondaryButton when share handler provided", () => {
+  it("shows game-over MainButton only (Share stays in-page)", () => {
     mockTelegramWebApp();
     document.documentElement.classList.add("cl-in-telegram");
     const onReapply = vi.fn();
-    const onShare = vi.fn();
 
-    syncTelegramBottomBar({ mode: "gameover", onReapply, onShare });
+    syncTelegramBottomBar({ mode: "gameover", onReapply });
 
     const mb = window.Telegram!.WebApp.MainButton;
     const sb = window.Telegram!.WebApp.SecondaryButton!;
     expect(mb.setText).toHaveBeenCalledWith("RE-APPLY FOR ROLE");
     expect(mb.show).toHaveBeenCalled();
-    expect(sb.setParams).toHaveBeenCalledWith(
-      expect.objectContaining({ text: "Share", position: "left", is_visible: true })
-    );
-    expect(sb.show).toHaveBeenCalled();
-    expect(document.documentElement.classList.contains("cl-tg-secondary-share")).toBe(true);
+    expect(sb.show).not.toHaveBeenCalled();
+    expect(document.documentElement.classList.contains("cl-tg-secondary-share")).toBe(false);
   });
 
   it("hides bottom bar and clears classes on hidden mode", () => {
