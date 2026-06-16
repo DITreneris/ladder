@@ -237,19 +237,19 @@ export const APP_SHELL = `
         <button type="button" data-action="start-game" class="btn-cl-primary w-full py-3.5 px-6 shadow-md min-h-[44px] focus-ring">
           ${icon("rotate-right")}<span>RE-APPLY FOR ROLE</span>
         </button>
-        <button id="reviveAdBtn" type="button" data-action="revive-ad" class="hidden btn-cl-secondary w-full py-3 px-6 min-h-[44px] focus-ring flex flex-col items-center gap-0.5">
+        <button id="reviveAdBtn" type="button" data-action="revive-ad" class="hidden btn-cl-revive w-full py-3 px-6 min-h-[44px] focus-ring">
           <span id="reviveAdTitle" class="text-sm font-extrabold">Mandatory HR Training</span>
-          <span id="reviveAdSubline" class="text-nano font-semibold text-slate-500">One executive exception this shift</span>
+          <span id="reviveAdSubline" class="revive-ad-subline text-nano font-semibold">One executive exception this shift</span>
         </button>
-        <div class="grid grid-cols-2 gap-2">
-          <button id="shareBtn" type="button" data-action="copy-share" class="btn-cl-share py-2.5 px-3 text-xs">
+        <div class="game-over-social grid grid-cols-2 gap-2 border-t border-slate-200 pt-2">
+          <button id="shareBtn" type="button" data-action="copy-share" class="btn-cl-share py-3 px-3 text-sm">
             ${icon("share")} Share
           </button>
-          <button type="button" data-action="open-leaderboard" class="btn-cl-secondary py-2.5 px-3 text-xs">
+          <button type="button" data-action="open-leaderboard" class="btn-cl-leaderboard py-3 px-3 text-sm">
             ${icon("trophy", "text-amber-500")} Leaderboard
           </button>
         </div>
-        <button type="button" data-action="go-home" class="btn-cl-muted text-xs">Back to Corporate Lounge</button>
+        <button type="button" data-action="go-home" class="btn-cl-exit-link">Back to Corporate Lounge</button>
       </div>
       <div class="game-over-tail flex-1 min-h-0" aria-hidden="true"></div>
     </div>
