@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import time
+import uuid
 from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
@@ -46,6 +47,7 @@ def runs_payload(
     final_rank: str,
     rungs_climbed: int,
     auth_date: int | None = None,
+    client_run_id: str | None = None,
     **extra,
 ) -> dict:
     """Standard /runs JSON body with plausible run timestamps."""
@@ -60,6 +62,7 @@ def runs_payload(
         "run_started_at": started,
         "run_ended_at": ended,
         "run_duration_ms": (ended - started) * 1000,
+        "client_run_id": client_run_id or str(uuid.uuid4()),
         **extra,
     }
     return payload
@@ -519,6 +522,86 @@ def mock_supabase(monkeypatch):
     db.users_store = users_store
     db.rpc_calls: list[str] = []
 
+    def _mock_submit_run_atomic(params: dict) -> dict:
+        telegram_id = params["p_telegram_id"]
+        client_run_id = params.get("p_client_run_id")
+        years = float(params["p_years_survived"])
+        final_rank = params["p_final_rank"]
+        termination_cause = params.get("p_termination_cause")
+        rungs_climbed = params["p_rungs_climbed"]
+        username = params.get("p_username")
+        first_name = params.get("p_first_name")
+
+        user = users_store.get(telegram_id)
+        if user is None:
+            user = {
+                "id": f"user-{telegram_id}",
+                "telegram_id": telegram_id,
+                "username": username,
+                "first_name": first_name,
+                "best_score": 0,
+                "best_rank": "Intern",
+            }
+            users_store[telegram_id] = user
+        else:
+            user["username"] = username
+            user["first_name"] = first_name
+
+        user_id = user["id"]
+        for existing in runs_store:
+            if existing.get("user_id") == user_id and existing.get("client_run_id") == client_run_id:
+                return {
+                    "ok": True,
+                    "years_survived": years,
+                    "best_score": float(user.get("best_score", 0)),
+                    "best_rank": user.get("best_rank", "Intern"),
+                    "run_id": existing["id"],
+                    "idempotent": True,
+                }
+
+        last_submit = cooldowns.get(telegram_id)
+        if last_submit:
+            last_ts = datetime.fromisoformat(last_submit.replace("Z", "+00:00")).timestamp()
+            if time.time() - last_ts < 10:
+                recent_years = None
+                for existing in reversed(runs_store):
+                    if existing.get("user_id") == user_id:
+                        recent_years = float(existing["years_survived"])
+                        break
+                if recent_years is None or years <= recent_years:
+                    return {"ok": False, "error": "cooldown"}
+
+        run_id = f"run-{len(runs_store)}"
+        runs_store.append(
+            {
+                "id": run_id,
+                "user_id": user_id,
+                "years_survived": years,
+                "final_rank": final_rank,
+                "termination_cause": termination_cause,
+                "rungs_climbed": rungs_climbed,
+                "client_run_id": client_run_id,
+            }
+        )
+
+        best_score = float(user.get("best_score", 0))
+        best_rank = str(user.get("best_rank", "Intern"))
+        if years > best_score:
+            user["best_score"] = years
+            user["best_rank"] = final_rank
+            best_score = years
+            best_rank = final_rank
+
+        cooldowns[telegram_id] = datetime.now(timezone.utc).isoformat()
+        return {
+            "ok": True,
+            "years_survived": years,
+            "best_score": best_score,
+            "best_rank": best_rank,
+            "run_id": run_id,
+            "idempotent": False,
+        }
+
     def rpc(name: str, params: dict | None = None):
         db.rpc_calls.append(name)
         rpc_chain = MagicMock()
@@ -547,6 +630,8 @@ def mock_supabase(monkeypatch):
                         }
                 rows = list(by_user.values())
                 return MagicMock(data=rows)
+            if name == "submit_run_atomic":
+                return MagicMock(data=_mock_submit_run_atomic(params or {}))
             return MagicMock(data=[])
 
         rpc_chain.execute = execute
@@ -559,6 +644,7 @@ def mock_supabase(monkeypatch):
 
     monkeypatch.setattr("app.routes._users.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes.runs.get_supabase", get_supabase)
+    monkeypatch.setattr("app.routes._submit_atomic.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes.leaderboard.get_supabase", get_supabase)
     monkeypatch.setattr("app.auth.session.get_supabase", get_supabase)
     monkeypatch.setattr("app.routes._cooldowns.get_supabase", get_supabase)

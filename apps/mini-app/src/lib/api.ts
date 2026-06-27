@@ -52,6 +52,8 @@ export type LeaderboardResult =
   | { ok: false; reason: ApiFailureReason };
 
 export interface SubmitRunCallbacks {
+  /** Stable id for this game-over submit; reused across 429/503 retries. */
+  clientRunId: string;
   onRetry?: (attempt: number, waitMs: number, secondsRemaining: number) => void;
   /** Local career high before this run — enables immediate 429 retry when beating PB. */
   previousBestScore?: number;
@@ -158,14 +160,15 @@ export async function submitRun(
     runStartedAt: number;
     runEndedAt?: number;
   },
-  callbacks?: SubmitRunCallbacks
+  callbacks: SubmitRunCallbacks
 ): Promise<SubmitRunResult> {
   if (!initData) return { ok: false, reason: "auth" };
+  if (!callbacks.clientRunId) return { ok: false, reason: "validation" };
   const rungsClimbed = Math.max(0, Math.round(payload.rungsClimbed));
   const yearsSurvived = Number(payload.yearsSurvived);
   if (!Number.isFinite(yearsSurvived)) return { ok: false, reason: "validation" };
   const finalRank = rankFromYears(yearsSurvived);
-  const previousBest = callbacks?.previousBestScore ?? 0;
+  const previousBest = callbacks.previousBestScore ?? 0;
   let immediateRetryUsed = false;
 
   let lastResult:
@@ -187,6 +190,7 @@ export async function submitRun(
       run_started_at: Math.floor(runStartedAtMs / 1000),
       run_ended_at: Math.ceil(runEndedAtMs / 1000),
       run_duration_ms: runDurationMs,
+      client_run_id: callbacks.clientRunId,
     };
     lastResult = await apiPost<{ ok: boolean; best_score: number; best_rank: string }>("/runs", body);
     if (lastResult.ok) {

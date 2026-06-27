@@ -1,7 +1,19 @@
 import json
 import logging
+import re
 import sys
 from datetime import datetime, timezone
+
+_SENSITIVE_URL = re.compile(r"token=eq\.[^&\s\"']+", re.IGNORECASE)
+
+
+class RedactSensitiveLogFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        if _SENSITIVE_URL.search(message):
+            record.msg = _SENSITIVE_URL.sub("token=eq.[REDACTED]", message)
+            record.args = ()
+        return True
 
 
 class JsonLogFormatter(logging.Formatter):
@@ -23,7 +35,9 @@ class JsonLogFormatter(logging.Formatter):
 def configure_logging() -> None:
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JsonLogFormatter())
+    handler.addFilter(RedactSensitiveLogFilter())
     root = logging.getLogger()
     root.handlers.clear()
     root.addHandler(handler)
     root.setLevel(logging.INFO)
+    logging.getLogger("httpx").setLevel(logging.WARNING)

@@ -1,4 +1,5 @@
 import time
+import uuid
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -75,6 +76,25 @@ def test_runs_valid(mock_supabase, valid_init_data):
     assert data["years_survived"] == 5
     assert data["best_score"] == 5
     assert data["best_rank"] == "Intern"
+    assert "submit_run_atomic" in mock_supabase.rpc_calls
+
+
+def test_runs_idempotent_client_run_id(mock_supabase, valid_init_data):
+    mock_supabase.cooldowns_store.clear()
+    run_id = "22222222-2222-4222-8222-222222222222"
+    payload = runs_payload(
+        valid_init_data,
+        years_survived=4,
+        final_rank="Intern",
+        rungs_climbed=16,
+        client_run_id=run_id,
+    )
+    first = client.post("/runs", json=payload)
+    second = client.post("/runs", json=payload)
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert len(mock_supabase.runs_store) == 1
+    assert first.json()["best_score"] == second.json()["best_score"]
 
 
 def test_runs_rung_mismatch(mock_supabase, valid_init_data):
@@ -94,15 +114,26 @@ def test_runs_rung_mismatch(mock_supabase, valid_init_data):
 
 def test_runs_rate_limit(mock_supabase, valid_init_data):
     mock_supabase.cooldowns_store.clear()
-    payload = runs_payload(
-        valid_init_data,
-        years_survived=3,
-        final_rank="Intern",
-        rungs_climbed=12,
+    first = client.post(
+        "/runs",
+        json=runs_payload(
+            valid_init_data,
+            years_survived=3,
+            final_rank="Intern",
+            rungs_climbed=12,
+        ),
     )
-    first = client.post("/runs", json=payload)
     assert first.status_code == 200
-    second = client.post("/runs", json=payload)
+    second = client.post(
+        "/runs",
+        json=runs_payload(
+            valid_init_data,
+            years_survived=3,
+            final_rank="Intern",
+            rungs_climbed=12,
+            client_run_id=str(uuid.uuid4()),
+        ),
+    )
     assert second.status_code == 429
 
 
@@ -118,6 +149,7 @@ def test_runs_invalid_init_data():
             "run_started_at": started,
             "run_ended_at": ended,
             "run_duration_ms": (ended - started) * 1000,
+            "client_run_id": str(uuid.uuid4()),
         },
     )
     assert response.status_code == 401
@@ -191,23 +223,54 @@ def test_runs_validation_error_does_not_rate_limit(mock_supabase, valid_init_dat
 
 
 def test_runs_rejects_implausible_score(mock_supabase, valid_init_data, monkeypatch):
+    """A sprint run with too many rungs for its duration must still be rejected (anti-cheat)."""
     mock_supabase.cooldowns_store.clear()
     monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
     auth_date = int(time.time()) - 120
     init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
     response = client.post(
         "/runs",
         json=runs_payload(
             init_data,
-            years_survived=26,
-            final_rank="Manager",
-            rungs_climbed=104,
+            years_survived=50,
+            final_rank="Board Member",
+            rungs_climbed=200,
             auth_date=auth_date,
+            run_started_at=now - 3,
+            run_ended_at=now,
+            run_duration_ms=3_000,
             sprint_mode=True,
         ),
     )
     assert response.status_code == 400
-    assert "plausible" in response.json()["detail"].lower()
+    detail = response.json()["detail"].lower()
+    assert "minimum run duration" in detail or "run duration plausibility" in detail
+
+
+def test_runs_accepts_high_sprint_score(mock_supabase, valid_init_data, monkeypatch):
+    """Kristupas's 61.8y Board Member sprint run must now be accepted (no 25y cap)."""
+    mock_supabase.cooldowns_store.clear()
+    monkeypatch.setattr("app.routes._plausibility.today_preset_id", lambda: "synergy_sprint")
+    auth_date = int(time.time()) - 120
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    now = int(time.time())
+    response = client.post(
+        "/runs",
+        json=runs_payload(
+            init_data,
+            years_survived=61.8,
+            final_rank="Board Member",
+            rungs_climbed=247,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+            run_started_at=now - 52,
+            run_ended_at=now,
+            run_duration_ms=50_000,
+            sprint_mode=True,
+        ),
+    )
+    assert response.status_code == 200
 
 
 def test_runs_accepts_board_member_run(mock_supabase, valid_init_data):
@@ -235,16 +298,17 @@ def test_runs_rejects_idle_auth_date_forge(mock_supabase, valid_init_data):
     now = int(time.time())
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 99.9,
-            "final_rank": "Angel Investor",
-            "termination_cause": "Reorganization",
-            "rungs_climbed": 400,
-            "run_started_at": now - 10,
-            "run_ended_at": now,
-            "run_duration_ms": 10_000,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=99.9,
+            final_rank="Angel Investor",
+            rungs_climbed=400,
+            auth_date=auth_date,
+            termination_cause="Reorganization",
+            run_started_at=now - 10,
+            run_ended_at=now,
+            run_duration_ms=10_000,
+        ),
     )
     assert response.status_code == 400
     detail = response.json()["detail"].lower()
@@ -257,15 +321,16 @@ def test_runs_rejects_run_started_before_auth_date(mock_supabase, valid_init_dat
     init_data = build_init_data(TEST_USER, auth_date=auth_date)
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 5,
-            "final_rank": "Intern",
-            "rungs_climbed": 20,
-            "run_started_at": auth_date - 120,
-            "run_ended_at": int(time.time()),
-            "run_duration_ms": 60_000,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=5,
+            final_rank="Intern",
+            rungs_climbed=20,
+            auth_date=auth_date,
+            run_started_at=auth_date - 120,
+            run_ended_at=int(time.time()),
+            run_duration_ms=60_000,
+        ),
     )
     assert response.status_code == 400
     assert "session open" in response.json()["detail"].lower()
@@ -278,15 +343,16 @@ def test_runs_rejects_impossible_tap_rate(mock_supabase, valid_init_data):
     now = int(time.time())
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 50,
-            "final_rank": "Board Member",
-            "rungs_climbed": 200,
-            "run_started_at": now - 5,
-            "run_ended_at": now,
-            "run_duration_ms": 5_000,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=50,
+            final_rank="Board Member",
+            rungs_climbed=200,
+            auth_date=auth_date,
+            run_started_at=now - 5,
+            run_ended_at=now,
+            run_duration_ms=5_000,
+        ),
     )
     assert response.status_code == 400
     detail = response.json()["detail"].lower()
@@ -301,15 +367,16 @@ def test_runs_rejects_duration_inconsistent_with_timestamps(mock_supabase, valid
     now = int(time.time())
     response = client.post(
         "/runs",
-        json={
-            "initData": init_data,
-            "years_survived": 12.0,
-            "final_rank": "Manager",
-            "rungs_climbed": 48,
-            "run_started_at": now - 5,
-            "run_ended_at": now,
-            "run_duration_ms": 60_000,
-        },
+        json=runs_payload(
+            init_data,
+            years_survived=12.0,
+            final_rank="Manager",
+            rungs_climbed=48,
+            auth_date=auth_date,
+            run_started_at=now - 5,
+            run_ended_at=now,
+            run_duration_ms=60_000,
+        ),
     )
     assert response.status_code == 400
     assert "inconsistent" in response.json()["detail"].lower()
@@ -330,6 +397,7 @@ def test_runs_requires_run_duration_ms(mock_supabase, valid_init_data):
             "rungs_climbed": 72,
             "run_started_at": now - 9,
             "run_ended_at": now,
+            "client_run_id": str(uuid.uuid4()),
         },
     )
     assert response.status_code == 422
@@ -353,6 +421,7 @@ def test_runs_accepts_fast_legal_manager_run(mock_supabase, valid_init_data):
             "run_started_at": now - 9,
             "run_ended_at": now,
             "run_duration_ms": rungs * 120,  # honest ~8.6s play time
+            "client_run_id": str(uuid.uuid4()),
         },
     )
     assert response.status_code == 200
@@ -380,6 +449,7 @@ def test_runs_accepts_fast_run_with_tight_second_window(mock_supabase, valid_ini
             "run_started_at": now - 7,
             "run_ended_at": now,
             "run_duration_ms": rungs * 120,  # 8640ms real time inside a 7s window
+            "client_run_id": str(uuid.uuid4()),
         },
     )
     assert response.status_code == 200
@@ -403,6 +473,7 @@ def test_runs_accepts_fast_director_run(mock_supabase, valid_init_data):
             "run_started_at": now - 12,
             "run_ended_at": now,
             "run_duration_ms": rungs * 120,  # ~12.4s
+            "client_run_id": str(uuid.uuid4()),
         },
     )
     assert response.status_code == 200
@@ -648,7 +719,12 @@ def test_runs_accepts_sprint_mode_on_sprint_day(mock_supabase, valid_init_data, 
 
 def test_runs_cooldown_db_unavailable_returns_503(mock_supabase, valid_init_data):
     mock_supabase.cooldowns_store.clear()
-    with patch("app.routes.runs.check_submit_cooldown", side_effect=RuntimeError("db down")):
+    from fastapi import HTTPException
+
+    with patch(
+        "app.routes.runs.atomic_submit_run",
+        side_effect=HTTPException(status_code=503, detail="Submit temporarily unavailable"),
+    ):
         response = client.post(
             "/runs",
             json=runs_payload(
@@ -703,11 +779,14 @@ def test_runs_cooldown_persist_failure_returns_503(mock_supabase, valid_init_dat
         rungs_climbed=12,
     )
 
+    from app.routes._submit_atomic import RpcUnavailableError
+
     def fail_record(_telegram_id: int) -> None:
         raise RuntimeError("cooldown write failed")
 
-    monkeypatch.setattr("app.routes.runs.record_submit_cooldown", fail_record)
-    response = client.post("/runs", json=payload)
+    with patch("app.routes.runs.atomic_submit_run", side_effect=RpcUnavailableError()):
+        monkeypatch.setattr("app.routes._cooldowns.record_submit_cooldown", fail_record)
+        response = client.post("/runs", json=payload)
     assert response.status_code == 503
     assert len(mock_supabase.runs_store) == 0
 

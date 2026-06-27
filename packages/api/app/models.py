@@ -1,4 +1,5 @@
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -37,6 +38,7 @@ class RunSubmitRequest(BaseModel):
     run_started_at: int = Field(..., alias="runStartedAt", gt=0)
     run_ended_at: int = Field(..., alias="runEndedAt", gt=0)
     run_duration_ms: int = Field(..., alias="runDurationMs", gt=0, le=600_000)
+    client_run_id: UUID = Field(..., alias="clientRunId")
 
     model_config = {"populate_by_name": True}
 

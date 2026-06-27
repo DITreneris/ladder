@@ -459,7 +459,7 @@ function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   }, 2500);
 }
 
-function submitFailureMessage(reason: ApiFailureReason, detail?: string): string {
+function submitFailureMessage(reason: ApiFailureReason, _detail?: string): string {
   const bot = getBotUsername();
   if (reason === "auth") {
     return `HR couldn't verify your badge. Reopen from @${bot}.`;
@@ -468,9 +468,6 @@ function submitFailureMessage(reason: ApiFailureReason, detail?: string): string
     return "Score filing cooldown — HR is retrying automatically.";
   }
   if (reason === "validation") {
-    if (detail?.includes("25 years")) {
-      return "Synergy Sprint caps at 25y on the leaderboard — HR rejected the over-velocity filing.";
-    }
     return "HR rejected the filing — score didn't pass audit. Local run counts.";
   }
   return "Score not filed with HR. Check connection.";
@@ -1507,6 +1504,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
   notifySyncStarted();
 
   const previousBest = highScore;
+  const clientRunId = crypto.randomUUID();
   const submitResult = await submitRun(
     initData,
     {
@@ -1519,6 +1517,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
       runEndedAt: result.runEndedAt,
     },
     {
+      clientRunId,
       previousBestScore: previousBest,
       onRetry: (_attempt, _waitMs, secondsRemaining) => {
         setSyncStatus("retrying", secondsRemaining);

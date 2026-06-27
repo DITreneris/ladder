@@ -53,7 +53,7 @@ Human checklist before Vercel/Railway auto-deploy from `main`.
 
 | ID | Gate | Pass |
 |----|------|------|
-| B1 | Supabase migrations | `002_v2_hardening.sql` + `003_leaderboard_rpc.sql` applied |
+| B1 | Supabase migrations | `002_v2_hardening.sql` + `003_leaderboard_rpc.sql` + `006_submit_run_atomic.sql` applied |
 | B2 | Local smoke | `bash scripts/smoke-ci.sh` exits 0 |
 | B3 | Deploy order | API → mini-app → bot ([DEPLOY.md](DEPLOY.md)) |
 | B4 | User-visible changes | `[Unreleased]` entry in CHANGELOG (local) |

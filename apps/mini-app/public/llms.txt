@@ -28,7 +28,7 @@ Optional brand play from Prompt Anatomy; not AI training or governance software.
 | Board Member | 50y |
 | Angel Investor | 75y |
 
-Scores file with HR up to **100y** on normal shifts (25y cap on Synergy Sprint days).
+Scores file with HR up to **100y** on all shifts.
 
 ## Stack (six layers)
 

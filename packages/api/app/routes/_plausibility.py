@@ -8,7 +8,6 @@ from app.daily_preset import today_preset_id
 from app.models import RunSubmitRequest
 from app.ranks import MAX_YEARS_NORMAL
 
-MAX_YEARS_SPRINT = 25.0
 MIN_TAP_INTERVAL_S = 0.12
 # Anti-cheat cap at 2× the client tap throttle (120ms → 8.33 rungs/s) so fast legal
 # play has honest headroom; blatant speed hacks still fail the min-duration floor.
@@ -31,7 +30,7 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
     if is_sprint_day and not body.sprint_mode:
         raise HTTPException(status_code=400, detail="sprint_mode required for Synergy Sprint shift")
 
-    max_years = MAX_YEARS_SPRINT if body.sprint_mode else MAX_YEARS_NORMAL
+    max_years = MAX_YEARS_NORMAL
     if body.years_survived > max_years:
         raise HTTPException(
             status_code=400,

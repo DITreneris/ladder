@@ -144,7 +144,8 @@ def get_leaderboard(
 
 
 @router.post("/me", response_model=LeaderboardMeResponse)
-def get_leaderboard_me(body: LeaderboardMeRequest):
+@limiter.limit("30/minute")
+def get_leaderboard_me(request: Request, body: LeaderboardMeRequest):
     since = _period_start(body.period)
     telegram_id = resolve_session_token(body.session_token)
 
