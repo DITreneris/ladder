@@ -4,8 +4,8 @@
 
 | | |
 |---|---|
-| **Tag** | `v2.4.0` @ `758cb90` (2026-06-15) |
-| **Prod bundle** | `main-CSbx4fxL.js` (2026-06-15; v2.4.0 train — hero clip/pitch `758cb90` → `main-DLf4VdzW.js` rolling out) |
+| **Tag** | `v2.4.1` @ `3cb5b97` (2026-06-27) |
+| **Prod bundle** | `main-DwH-T8bE.js` (2026-06-27; v2.4.1 — atomic submit, migrations 006/007, game-over/button UX) |
 | **Surfaces** | Mini App https://www.promptanatomy.lol · API https://ladder-production-642d.up.railway.app · Bot `@CorporateLadder_bot` |
 | **Open gates** | D1–D2 device QA + share 11–12 (see Tier D) · T+7 metrics ~Jun 18 |
 
