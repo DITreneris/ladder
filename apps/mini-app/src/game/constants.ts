@@ -309,8 +309,6 @@ export const SPRINT_GAME_OVER = {
   deathType: "sprint" as const,
 };
 
-export const SPRINT_SHARE_LINE = "Sprint archived at the buzzer — velocity noted, outcomes pending.";
-
 export interface ObstacleDeathCopy {
   cause: string;
   detail: string;

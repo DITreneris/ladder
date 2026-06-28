@@ -6,6 +6,7 @@ import {
   markRankHintSeen,
   pickChallengeContextLine,
   pickGameOverPunchline,
+  pickGhostContextLine,
   pickLeaderboardGapContextLine,
   pickRankProgressionContextLine,
   pickSyncGameOverContextLine,
@@ -26,14 +27,48 @@ describe("game-over-copy", () => {
     };
   };
 
-  it("pickSyncGameOverContextLine prefers challenge over rank hint", () => {
+  it("pickSyncGameOverContextLine prefers challenge over ghost and rank hint", () => {
     const line = pickSyncGameOverContextLine({
       yearsSurvived: 2,
       finalRank: "Intern",
       challengeTargetYears: 5,
+      lastRunYears: 4,
       rankHintsSeen: new Set(),
     });
     expect(line?.text).toContain("Challenge open");
+  });
+
+  it("pickSyncGameOverContextLine prefers ghost over rank hint", () => {
+    const line = pickSyncGameOverContextLine({
+      yearsSurvived: 3,
+      finalRank: "Intern",
+      challengeTargetYears: null,
+      lastRunYears: 5,
+      rankHintsSeen: new Set(),
+    });
+    expect(line?.text).toContain("short of your last run");
+  });
+
+  it("pickSyncGameOverContextLine falls back to rank hint without ghost target", () => {
+    const line = pickSyncGameOverContextLine({
+      yearsSurvived: 3,
+      finalRank: "Intern",
+      challengeTargetYears: null,
+      lastRunYears: null,
+      rankHintsSeen: new Set(),
+    });
+    expect(line?.text).toContain("Director @ 20y");
+  });
+
+  it("pickGhostContextLine covers short, beat, and below-min cases", () => {
+    expect(pickGhostContextLine(3, 5)?.text).toBe(
+      "2.0y short of your last run (5.0y). One more?"
+    );
+    expect(pickGhostContextLine(7.5, 5)?.text).toBe(
+      "+2.5y past your last run (5.0y). Keep it going."
+    );
+    expect(pickGhostContextLine(3, null)).toBeNull();
+    expect(pickGhostContextLine(3, 1.5)).toBeNull();
   });
 
   it("pickRankProgressionContextLine shows once per rank", () => {

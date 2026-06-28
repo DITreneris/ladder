@@ -82,6 +82,29 @@ export function pickChallengeContextLine(
   return { text, variant: "default" };
 }
 
+/** Minimum prior run to use as a personal "ghost" target (avoids trivial early runs). */
+export const GHOST_MIN_YEARS = 2;
+
+export function pickGhostContextLine(
+  yearsSurvived: number,
+  lastRunYears: number | null
+): GameOverContextLine | null {
+  if (lastRunYears === null || lastRunYears < GHOST_MIN_YEARS) return null;
+  const last = lastRunYears.toFixed(1);
+  if (yearsSurvived >= lastRunYears) {
+    const delta = (yearsSurvived - lastRunYears).toFixed(1);
+    return {
+      text: `+${delta}y past your last run (${last}y). Keep it going.`,
+      variant: "default",
+    };
+  }
+  const gap = (lastRunYears - yearsSurvived).toFixed(1);
+  return {
+    text: `${gap}y short of your last run (${last}y). One more?`,
+    variant: "default",
+  };
+}
+
 export function pickRankProgressionContextLine(
   finalRank: Rank,
   rankHintsSeen: ReadonlySet<Rank>
@@ -97,11 +120,14 @@ export function pickSyncGameOverContextLine(input: {
   yearsSurvived: number;
   finalRank: Rank;
   challengeTargetYears: number | null;
+  lastRunYears: number | null;
   rankHintsSeen: ReadonlySet<Rank>;
 }): GameOverContextLine | null {
   if (input.challengeTargetYears !== null) {
     return pickChallengeContextLine(input.challengeTargetYears, input.yearsSurvived);
   }
+  const ghost = pickGhostContextLine(input.yearsSurvived, input.lastRunYears);
+  if (ghost) return ghost;
   return pickRankProgressionContextLine(input.finalRank, input.rankHintsSeen);
 }
 

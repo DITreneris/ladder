@@ -54,6 +54,7 @@ import { buildShareMessageText } from "./lib/share-copy";
 import {
   formatStatBestDelta,
   formatTerminationDisplayDetail,
+  GHOST_MIN_YEARS,
   loadRankHintsSeen,
   markRankHintSeen,
   pickGameOverPunchline,
@@ -149,6 +150,8 @@ let playerAtCorridor = true;
 let qaCoffeePickups = 0;
 let challengeTargetYears: number | null = null;
 let challengeBannerDismissed = false;
+let ghostTargetYears: number | null = null;
+let ghostPassedThisRun = false;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -440,6 +443,16 @@ function updateMilestoneChip(years: number): void {
   chip.title = milestoneLabel(years);
 }
 
+/** One-time juice when the player passes their previous run — the "beat your last run" hook. */
+function maybeFireGhostCrossing(years: number): void {
+  if (ghostPassedThisRun || ghostTargetYears === null) return;
+  if (ghostTargetYears < GHOST_MIN_YEARS || years < ghostTargetYears) return;
+  if (!isTutorialDone()) return;
+  ghostPassedThisRun = true;
+  showHrMemo(`Past your last run (${ghostTargetYears.toFixed(1)}y) — keep climbing.`);
+  hapticNotification("success");
+}
+
 function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
   const toast = $("toastNotification");
   const onGame = !$("gameScreen").classList.contains("hidden");
@@ -621,7 +634,7 @@ function refreshBeatGapLine(): void {
     return;
   }
   const gap = (highScore - lastRun).toFixed(1);
-  line.textContent = `Last shift: ${lastRun.toFixed(1)}y — ${gap}y below your record. HR noticed.`;
+  line.textContent = `Last run: ${lastRun.toFixed(1)}y — ${gap}y under your record. Beat it.`;
   line.classList.remove("hidden");
 }
 
@@ -1383,6 +1396,8 @@ async function startGame(): Promise<void> {
   prevRungsSnapshot = [];
   lastPointerTapAt = 0;
   earlyTapsRemaining = 5;
+  ghostTargetYears = getLastRunYears();
+  ghostPassedThisRun = false;
   shiftToastShown = false;
   meetingMondayMemoShown = false;
   ceoTrapShown = false;
@@ -1612,6 +1627,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
   hideHudTapHint();
   hideImminentHint();
   lastGameResult = result;
+  const ghostPrevYears = getLastRunYears();
   saveLastRunYears(result.yearsSurvived);
   $("playerActionEmoji").classList.remove("idle-bob");
 
@@ -1640,6 +1656,7 @@ async function onGameOver(result: GameOverResult): Promise<void> {
     yearsSurvived: result.yearsSurvived,
     finalRank: result.finalRank,
     challengeTargetYears,
+    lastRunYears: ghostPrevYears,
     rankHintsSeen: loadRankHintsSeen(),
   });
   setGameOverContextLine(syncContext);
@@ -2093,6 +2110,7 @@ export function mountApp(): void {
         updateMilestoneChip(years);
         updateFloorLabel(years);
         maybeFlashFloorBandTransition(years);
+        maybeFireGhostCrossing(years);
         updateReorgHudStrip(engine.getCurrentRank(), engine.getRungsClimbed());
         $("burnoutMeter").style.width = `${energy}%`;
         $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;

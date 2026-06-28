@@ -3,7 +3,7 @@ import {
   buildChallengeLink,
   buildShareCardDescription,
   buildShareMessageText,
-  pickDeathLine,
+  shortDeathTag,
 } from "./share-copy";
 
 describe("share-copy", () => {
@@ -15,24 +15,20 @@ describe("share-copy", () => {
     deathType: "meeting",
   };
 
-  it("buildShareMessageText uses 3-line Variant A hook", () => {
+  it("buildShareMessageText uses status-first 3-line hook", () => {
     const text = buildShareMessageText(base);
     const lines = text.split("\n");
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe("Manager · 12.5y — Your synergy did not scale optimally with our paradigms.");
-    expect(lines[1]).toBe("Think you can outlast me?");
+    expect(lines[0]).toBe("I survived 12.5y as Manager before a meeting ran long.");
+    expect(lines[1]).toBe("Think you can climb higher? 👇");
     expect(lines[2]).toContain("startapp=c_125");
     expect(text).not.toContain("Employee:");
     expect(text).not.toContain("Prompt Anatomy");
   });
 
-  it("pickDeathLine prefers short flavor", () => {
-    expect(pickDeathLine("long detail sentence.", "Short flavor.")).toBe("Short flavor");
-  });
-
-  it("pickDeathLine falls back to first sentence of detail", () => {
-    const longFlavor = "x".repeat(100);
-    expect(pickDeathLine("First sentence. Second sentence.", longFlavor)).toBe("First sentence");
+  it("shortDeathTag maps death types and falls back", () => {
+    expect(shortDeathTag("reorg")).toBe("before a reorg erased me");
+    expect(shortDeathTag("unknown")).toBe("before HR caught up");
   });
 
   it("buildChallengeLink encodes years", () => {
@@ -48,8 +44,8 @@ describe("share-copy", () => {
     expect(desc).not.toContain("https://");
   });
 
-  it("sprint death uses sprint line in body", () => {
+  it("sprint death uses sprint tag in body", () => {
     const text = buildShareMessageText({ ...base, deathType: "sprint" });
-    expect(text).toContain("Sprint archived at the buzzer");
+    expect(text).toContain("before the sprint buzzer");
   });
 });

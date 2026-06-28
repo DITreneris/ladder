@@ -1,12 +1,22 @@
 /**
- * Share message body — must match packages/api/app/share_copy.py (Variant A hook).
+ * Share message body — must match packages/api/app/share_copy.py (status-first hook).
  */
 
-import { SPRINT_SHARE_LINE } from "../game/constants";
 import { getBotUsername } from "./telegram";
 
-const MAX_DEATH_LINE = 90;
 const PA_CARD_SUFFIX = " Built with Prompt Anatomy";
+
+/** Short satirical death tag for the status-first share hook — must match share_copy.py. */
+export const SHORT_DEATH_TAG: Record<string, string> = {
+  meeting: "before a meeting ran long",
+  reorg: "before a reorg erased me",
+  burnout: "before a deadline buried me",
+  badge_gate: "before the turnstile won",
+  foliage: "before a desk plant won",
+  energy: "before burnout finished me",
+  sprint: "before the sprint buzzer",
+};
+const SHORT_DEATH_TAG_FALLBACK = "before HR caught up";
 
 export type ShareCopyInput = {
   yearsSurvived: number;
@@ -29,24 +39,8 @@ export function buildChallengeLink(yearsSurvived: number, botUsername?: string):
   return `https://t.me/${bot}?startapp=c_${compact}`;
 }
 
-export function pickDeathLine(detail: string, flavor: string): string {
-  const flavorClean = flavor.trim().replace(/^"|"$/g, "");
-  if (flavorClean && flavorClean.length <= MAX_DEATH_LINE) {
-    return flavorClean.replace(/\.$/, "");
-  }
-
-  const detailTrim = detail.trim();
-  if (detailTrim) {
-    const periodIdx = detailTrim.indexOf(".");
-    const first = periodIdx >= 0 ? detailTrim.slice(0, periodIdx + 1) : detailTrim;
-    return truncate(first.trim().replace(/\.$/, ""), MAX_DEATH_LINE);
-  }
-
-  if (flavorClean) {
-    return truncate(flavorClean.replace(/\.$/, ""), MAX_DEATH_LINE);
-  }
-
-  return "HR filed the paperwork";
+export function shortDeathTag(deathType: string): string {
+  return SHORT_DEATH_TAG[deathType] ?? SHORT_DEATH_TAG_FALLBACK;
 }
 
 /** Card description preview — PA co-brand on card only, not in message body. */
@@ -56,15 +50,12 @@ export function buildShareCardDescription(detail: string, flavor: string): strin
   return truncate(base, maxBase) + PA_CARD_SUFFIX;
 }
 
-/** 3-line share hook for native share body and clipboard fallback. */
+/** Status-first 3-line share hook for native share body and clipboard fallback. */
 export function buildShareMessageText(input: ShareCopyInput): string {
   const years = input.yearsSurvived.toFixed(1);
   const rank = input.finalRank;
-  const shortDeath =
-    input.deathType === "sprint"
-      ? SPRINT_SHARE_LINE.replace(/\.$/, "")
-      : pickDeathLine(input.terminationDetail, input.terminationFlavor);
+  const tag = shortDeathTag(input.deathType);
 
   const challengeUrl = buildChallengeLink(input.yearsSurvived);
-  return `${rank} · ${years}y — ${shortDeath}.\nThink you can outlast me?\n${challengeUrl}`;
+  return `I survived ${years}y as ${rank} ${tag}.\nThink you can climb higher? 👇\n${challengeUrl}`;
 }

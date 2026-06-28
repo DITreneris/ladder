@@ -9,12 +9,23 @@ from typing import Any
 from app.config import settings
 from app.models import SharePrepareRequest
 
-SPRINT_SHARE_LINE = "Sprint archived at the buzzer — velocity noted, outcomes pending."
 PA_CARD_SUFFIX = " Built with Prompt Anatomy"
 MAX_MESSAGE_TEXT = 4096
 MAX_TITLE = 64
 MAX_DESCRIPTION = 256
-MAX_DEATH_LINE = 90
+
+# Short satirical death tag for the status-first share hook — must match
+# apps/mini-app/src/lib/share-copy.ts SHORT_DEATH_TAG.
+SHORT_DEATH_TAG: dict[str, str] = {
+    "meeting": "before a meeting ran long",
+    "reorg": "before a reorg erased me",
+    "burnout": "before a deadline buried me",
+    "badge_gate": "before the turnstile won",
+    "foliage": "before a desk plant won",
+    "energy": "before burnout finished me",
+    "sprint": "before the sprint buzzer",
+}
+SHORT_DEATH_TAG_FALLBACK = "before HR caught up"
 
 
 def _truncate(text: str, max_len: int) -> str:
@@ -31,22 +42,8 @@ def build_challenge_link(years_survived: float) -> str:
     return f"https://t.me/{bot}?startapp=c_{compact}"
 
 
-def _pick_death_line(detail: str, flavor: str) -> str:
-    """One punchline for share body — flavor if short, else first sentence of detail."""
-    flavor_clean = flavor.strip().strip('"')
-    if flavor_clean and len(flavor_clean) <= MAX_DEATH_LINE:
-        return flavor_clean.rstrip(".")
-
-    detail = detail.strip()
-    if detail:
-        period_idx = detail.find(".")
-        first = detail[: period_idx + 1] if period_idx >= 0 else detail
-        return _truncate(first.strip().rstrip("."), MAX_DEATH_LINE)
-
-    if flavor_clean:
-        return _truncate(flavor_clean.rstrip("."), MAX_DEATH_LINE)
-
-    return "HR filed the paperwork"
+def _short_death_tag(death_type: str) -> str:
+    return SHORT_DEATH_TAG.get(death_type, SHORT_DEATH_TAG_FALLBACK)
 
 
 def _card_description(detail: str, flavor: str) -> str:
@@ -56,18 +53,15 @@ def _card_description(detail: str, flavor: str) -> str:
 
 
 def build_share_text(_tg_user: dict, body: SharePrepareRequest) -> str:
-    """3-line viral hook — must match apps/mini-app/src/lib/share-copy.ts."""
+    """Status-first 3-line viral hook — must match apps/mini-app/src/lib/share-copy.ts."""
     years = f"{body.years_survived:.1f}"
     rank = body.final_rank
-    if body.death_type == "sprint":
-        short_death = SPRINT_SHARE_LINE.rstrip(".")
-    else:
-        short_death = _pick_death_line(body.termination_detail, body.termination_flavor)
+    tag = _short_death_tag(body.death_type)
 
     challenge_url = build_challenge_link(body.years_survived)
     text = (
-        f"{rank} · {years}y — {short_death}.\n"
-        "Think you can outlast me?\n"
+        f"I survived {years}y as {rank} {tag}.\n"
+        "Think you can climb higher? 👇\n"
         f"{challenge_url}"
     )
     return _truncate(text, MAX_MESSAGE_TEXT)
