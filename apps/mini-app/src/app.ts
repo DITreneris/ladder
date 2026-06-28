@@ -8,8 +8,11 @@ import {
   CEO_TRAP_ANNOUNCEMENT,
   DEATH_EMOJI,
   DEATH_LABELS,
+  FIRST_WIN_MEMO,
+  FIRST_WIN_YEARS,
   INTERN_FAKE_PROMO,
   LAST_RUN_STORAGE_KEY,
+  MANAGER_YEARS,
   MAX_VISIBLE_RUNGS,
   MIN_TAP_INTERVAL_MS,
   REAPPLY_STORAGE_KEY,
@@ -152,6 +155,7 @@ let challengeTargetYears: number | null = null;
 let challengeBannerDismissed = false;
 let ghostTargetYears: number | null = null;
 let ghostPassedThisRun = false;
+let firstWinFiredThisRun = false;
 
 type PlayerLayout = PlayerSide | "center";
 
@@ -451,6 +455,19 @@ function maybeFireGhostCrossing(years: number): void {
   ghostPassedThisRun = true;
   showHrMemo(`Past your last run (${ghostTargetYears.toFixed(1)}y) — keep climbing.`);
   hapticNotification("success");
+}
+
+/**
+ * Genuine early "first win" — one reward beat for rookies before the first real
+ * promotion (Manager @ 10y), so the median external run tastes a win before quitting.
+ */
+function maybeFireFirstWin(years: number): void {
+  if (firstWinFiredThisRun || years < FIRST_WIN_YEARS) return;
+  if (highScore >= MANAGER_YEARS || !isTutorialDone()) return;
+  firstWinFiredThisRun = true;
+  showHrMemo(FIRST_WIN_MEMO, { variant: "promo", durationMs: 1400 });
+  hapticNotification("success");
+  spawnFloatingParticles($("playerClimber"), "🎉", 4);
 }
 
 function showToast(msg: string, opts?: { surface?: "shell" | "game" }): void {
@@ -1398,6 +1415,7 @@ async function startGame(): Promise<void> {
   earlyTapsRemaining = 5;
   ghostTargetYears = getLastRunYears();
   ghostPassedThisRun = false;
+  firstWinFiredThisRun = false;
   shiftToastShown = false;
   meetingMondayMemoShown = false;
   ceoTrapShown = false;
@@ -2111,6 +2129,7 @@ export function mountApp(): void {
         updateFloorLabel(years);
         maybeFlashFloorBandTransition(years);
         maybeFireGhostCrossing(years);
+        maybeFireFirstWin(years);
         updateReorgHudStrip(engine.getCurrentRank(), engine.getRungsClimbed());
         $("burnoutMeter").style.width = `${energy}%`;
         $("burnoutPercentLabel").textContent = `${Math.round(energy)}%`;

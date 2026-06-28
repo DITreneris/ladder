@@ -22,6 +22,12 @@ export const INTERN_TUTORIAL_RUNGS = 12;
 /** Adaptive rookie ramp (v2.1): players with career best < Manager get a longer gentle ramp. */
 export const ROOKIE_TUTORIAL_RUNGS = 20;
 export const ROOKIE_INTERN_SPAWN_RATE_CAP = 0.3;
+/**
+ * Early "first win" beat — a genuine reward fired once per run before the median
+ * external player dies (~4.3y), well below the first real promotion (Manager @ 10y).
+ * Sits between the deflating INTERN_FAKE_PROMO beats (2y / 5y) so they do not collide.
+ */
+export const FIRST_WIN_YEARS = 3.5;
 export const TUTORIAL_COFFEE_MIN_RUNG = 8;
 export const COFFEE_SPAWN_THRESHOLD = 0.85;
 export const PROMO_DRAIN_PAUSE_MS = 800;
@@ -217,6 +223,9 @@ export const BOARD_TRAP_ANNOUNCEMENT =
 
 export const ANGEL_TRAP_ANNOUNCEMENT =
   "Angel round: runway deadlines audit your biology now.";
+
+/** Genuine early reward copy for the FIRST_WIN_YEARS beat — satirical, but a real win, no quotes. */
+export const FIRST_WIN_MEMO = "Probation cleared — you're officially expendable.";
 
 export const INTERN_FAKE_PROMO: { years: number; message: string }[] = [
   { years: 2, message: "Performance note: almost ready for promotion. Almost." },

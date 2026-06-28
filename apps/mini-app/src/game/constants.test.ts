@@ -8,6 +8,9 @@ import {
   BOARD_YEARS,
   CEO_YEARS,
   DIRECTOR_YEARS,
+  FIRST_WIN_MEMO,
+  FIRST_WIN_YEARS,
+  INTERN_FAKE_PROMO,
   MANAGER_YEARS,
   REORG_INTERVAL_CEO_MS,
   REORG_INTERVAL_MS,
@@ -169,6 +172,14 @@ describe("obstacle gating", () => {
   it("board and angel fake promo arrays are populated", () => {
     expect(BOARD_FAKE_PROMO.length).toBeGreaterThan(0);
     expect(ANGEL_FAKE_PROMO.length).toBeGreaterThan(0);
+  });
+
+  it("early first-win beat fires before Manager and does not collide with fake promos", () => {
+    expect(FIRST_WIN_YEARS).toBeLessThan(MANAGER_YEARS);
+    expect(FIRST_WIN_YEARS).toBeGreaterThan(0);
+    expect(INTERN_FAKE_PROMO.map((p) => p.years)).not.toContain(FIRST_WIN_YEARS);
+    expect(FIRST_WIN_MEMO.length).toBeGreaterThan(0);
+    expect(FIRST_WIN_MEMO).not.toMatch(/^["']|["']$/);
   });
 
   it("pickObstacleType can return burnout for Director", () => {
