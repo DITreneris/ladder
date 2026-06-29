@@ -6,7 +6,14 @@ export type FunnelEventName =
   | "share_success"
   | "revive_offer"
   | "revive_complete"
-  | "hr_stamp_vent";
+  | "hr_stamp_vent"
+  | "game_start"
+  | "game_finish"
+  | "score_submitted"
+  | "leaderboard_viewed"
+  | "return_session"
+  | "ad_shown"
+  | "ad_completed";
 
 type AnalyticsClient = {
   event?: (name: string, payload?: Record<string, unknown>) => void;

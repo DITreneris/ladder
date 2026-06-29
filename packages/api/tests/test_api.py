@@ -5,6 +5,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.routes._plausibility import DEFERRED_GRACE_SECONDS
 from tests.conftest import TEST_USER, build_init_data, run_timestamps_for_rungs, runs_payload
 
 client = TestClient(app)
@@ -327,13 +328,39 @@ def test_runs_rejects_run_started_before_auth_date(mock_supabase, valid_init_dat
             final_rank="Intern",
             rungs_climbed=20,
             auth_date=auth_date,
-            run_started_at=auth_date - 120,
+            run_started_at=auth_date - DEFERRED_GRACE_SECONDS - 120,
             run_ended_at=int(time.time()),
             run_duration_ms=60_000,
         ),
     )
     assert response.status_code == 400
     assert "session open" in response.json()["detail"].lower()
+
+
+def test_runs_accepts_deferred_resubmit_within_grace(mock_supabase, valid_init_data):
+    """A run from a prior session (app reopened -> new auth_date) is auto-resubmitted
+    after /auth/me; the deferred-submit grace window must accept it."""
+    mock_supabase.cooldowns_store.clear()
+    auth_date = int(time.time())  # fresh session after reopen
+    init_data = build_init_data(TEST_USER, auth_date=auth_date)
+    run_started_at = auth_date - 3600  # ran ~1h before reopening, within 26h grace
+    run_ended_at = run_started_at + 60
+    response = client.post(
+        "/runs",
+        json={
+            "initData": init_data,
+            "years_survived": 22.0,
+            "final_rank": "Director",
+            "termination_cause": "Reorganization",
+            "rungs_climbed": 88,
+            "run_started_at": run_started_at,
+            "run_ended_at": run_ended_at,
+            "run_duration_ms": 60_000,
+            "client_run_id": str(uuid.uuid4()),
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["years_survived"] == 22.0
 
 
 def test_runs_rejects_impossible_tap_rate(mock_supabase, valid_init_data):

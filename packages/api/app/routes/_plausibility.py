@@ -16,6 +16,12 @@ SPRINT_SESSION_CAP_SECONDS = 60
 MAX_RUN_DURATION_SECONDS = 600
 MIN_TAP_TOLERANCE = 0.85
 CLOCK_SKEW_TOLERANCE_S = 30
+# Deferred / auto-resubmit grace: a run filed after the Mini App was reopened (new
+# auth_date) legitimately started in the prior session. Allow run_started_at to
+# predate auth_date by up to this window so persisted runs can be recovered.
+# Kept aligned with the client PENDING_SUBMIT_TTL_MS (26h). Anti-cheat integrity
+# still comes from the run-duration, rungs, and min-tap floors below.
+DEFERRED_GRACE_SECONDS = 26 * 3600
 # Client sends true ms duration plus floor/ceil unix-second timestamps; allow the
 # quantization gap between them before rejecting a duration/timestamp mismatch.
 DURATION_SEC_SLACK_MS = 2000
@@ -71,7 +77,7 @@ def validate_score_plausibility(body: RunSubmitRequest, auth_date: int) -> None:
 def _validate_run_timestamps(body: RunSubmitRequest, auth_date: int, now: int) -> None:
     if body.run_started_at >= body.run_ended_at:
         raise HTTPException(status_code=400, detail="Invalid run timestamps")
-    if body.run_started_at < auth_date:
+    if body.run_started_at < auth_date - DEFERRED_GRACE_SECONDS:
         raise HTTPException(status_code=400, detail="Run started before session open")
     if body.run_ended_at > now + CLOCK_SKEW_TOLERANCE_S:
         raise HTTPException(status_code=400, detail="Invalid run end time")

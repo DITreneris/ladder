@@ -117,6 +117,7 @@ import {
   type ReviveContext,
 } from "./lib/revive";
 import { shouldFlushPendingSubmitOnLeave } from "./lib/pending-submit";
+import { addPending, loadPending, removePending, type PendingSubmit } from "./lib/pending-submit-store";
 import { bindSyncStatusRetry, resetSyncStatus, setSyncRetryHandler, setSyncStatus } from "./lib/sync-status";
 import { mountHrStamp, notifySyncEnded, notifySyncRetrying, notifySyncStarted, resetHrStamp } from "./lib/hr-stamp";
 import { shouldClearPendingOnRevive } from "./lib/submit-orchestrator";
@@ -1143,6 +1144,7 @@ function bindShellActions(): void {
     "open-leaderboard": () => {
       switchTab("leaderboard");
       renderLeaderboard();
+      trackEvent("leaderboard_viewed", { period: leaderboardPeriod });
     },
     "open-howtoplay": () => switchTab("howtoplay"),
     "open-prompt-anatomy": openPromptAnatomy,
@@ -1334,7 +1336,9 @@ async function onReviveAdClick(): Promise<void> {
   debugLog("revive", "revive_ad_started", {});
 
   try {
+    trackEvent("ad_shown", { years: lastGameResult.yearsSurvived });
     await showRewardedAd();
+    trackEvent("ad_completed", { years: lastGameResult.yearsSurvived });
 
     if (activeGameOverSubmit) {
       await activeGameOverSubmit;
@@ -1431,6 +1435,7 @@ async function startGame(): Promise<void> {
   disableVerticalSwipe();
   audio.prepareBgmForRun();
   engine.start();
+  trackEvent("game_start", { shift: activeDailyModifier.id, reapply: getReapplyCount() });
   attachPlayAreaObserver();
   if (challengeTargetYears !== null) {
     dismissChallengeBanner();
@@ -1538,6 +1543,26 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
 
   const previousBest = highScore;
   const clientRunId = crypto.randomUUID();
+  const sprintMode = Boolean(activeDailyModifier.sprintDurationMs);
+
+  // Persist significant runs before submitting so an auth/network failure can be
+  // auto-resubmitted after the next /auth/me (survives app reload). Removed on
+  // success or on terminal validation rejection below.
+  const durable = result.yearsSurvived > previousBest || isReviveEligibleBase(result);
+  if (durable) {
+    addPending({
+      clientRunId,
+      yearsSurvived: result.yearsSurvived,
+      finalRank: result.finalRank,
+      terminationCause: result.terminationCause,
+      rungsClimbed: result.rungsClimbed,
+      sprintMode,
+      runStartedAt: result.runStartedAt,
+      runEndedAt: result.runEndedAt,
+      createdAt: Date.now(),
+    });
+  }
+
   const submitResult = await submitRun(
     initData,
     {
@@ -1545,7 +1570,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
       finalRank: result.finalRank,
       terminationCause: result.terminationCause,
       rungsClimbed: result.rungsClimbed,
-      sprintMode: Boolean(activeDailyModifier.sprintDurationMs),
+      sprintMode,
       runStartedAt: result.runStartedAt,
       runEndedAt: result.runEndedAt,
     },
@@ -1562,6 +1587,7 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
   notifySyncEnded();
 
   if (submitResult.ok) {
+    if (durable) removePending(clientRunId);
     pendingSubmitDeferred = false;
     pendingSubmitResult = null;
     highScore = nextHighScoreAfterSubmit(highScore, result.yearsSurvived, true, submitResult.bestScore);
@@ -1571,7 +1597,13 @@ async function executeSubmitOnly(result: GameOverResult, initData: string): Prom
     refreshHomeBadgeUI();
     applyStatBestDelta(result.yearsSurvived, previousBest, bestRank, false);
     setSyncStatus("ok");
+    trackEvent("score_submitted", {
+      years: result.yearsSurvived,
+      is_best: result.yearsSurvived > previousBest,
+    });
   } else {
+    // Validation failures will never pass on retry — drop from the durable queue.
+    if (durable && submitResult.reason === "validation") removePending(clientRunId);
     setSyncStatus("failed");
     if (isReviveEligibleBase(result)) {
       pendingSubmitDeferred = true;
@@ -1587,6 +1619,60 @@ async function runSubmitOnly(result: GameOverResult, initData: string): Promise<
   const chained = submitQueue.then(() => executeSubmitOnly(result, initData));
   submitQueue = chained.catch(() => undefined);
   return chained;
+}
+
+function submitPersistedEntry(
+  entry: PendingSubmit,
+  initData: string,
+  previousBest: number
+): Promise<SubmitRunResult | null> {
+  const chained = submitQueue.then(() =>
+    submitRun(
+      initData,
+      {
+        yearsSurvived: entry.yearsSurvived,
+        finalRank: entry.finalRank,
+        terminationCause: entry.terminationCause,
+        rungsClimbed: entry.rungsClimbed,
+        sprintMode: entry.sprintMode,
+        runStartedAt: entry.runStartedAt,
+        runEndedAt: entry.runEndedAt,
+      },
+      { clientRunId: entry.clientRunId, previousBestScore: previousBest }
+    )
+  );
+  submitQueue = chained.catch(() => undefined);
+  return chained;
+}
+
+/**
+ * Auto-resubmit runs persisted from a previous session after a fresh /auth/me.
+ * Server idempotency (client_run_id) makes this safe if a run actually landed;
+ * the API deferred-submit grace window accepts runs from the prior session.
+ */
+async function flushPersistedSubmits(initData: string): Promise<void> {
+  if (!initData) return;
+  const pending = loadPending();
+  if (pending.length === 0) return;
+
+  for (const entry of pending) {
+    const previousBest = highScore;
+    const submitResult = await submitPersistedEntry(entry, initData, previousBest);
+    if (!submitResult) continue;
+
+    if (submitResult.ok) {
+      removePending(entry.clientRunId);
+      highScore = nextHighScoreAfterSubmit(highScore, entry.yearsSurvived, true, submitResult.bestScore);
+      bestRank = rankFromCareerHigh(highScore);
+      engine?.setCareerBestYears(highScore);
+      $("highScoreBadge").textContent = highScore.toFixed(1);
+      refreshHomeBadgeUI();
+    } else if (submitResult.reason === "validation") {
+      // Will never pass (e.g. expired beyond grace, sprint-mode mismatch) — drop it.
+      removePending(entry.clientRunId);
+    }
+    // auth/network/server: keep for the next bootstrap attempt.
+  }
 }
 
 function enrichGameOverAsync(result: GameOverResult, submitResult: SubmitRunResult | null): void {
@@ -1622,6 +1708,11 @@ function seedGameOverForQa(): void {
 
 async function onGameOver(result: GameOverResult): Promise<void> {
   debugLog("gameover", "collision/death", { deathType: result.deathType });
+  trackEvent("game_finish", {
+    years: result.yearsSurvived,
+    rank: result.finalRank,
+    death: result.deathType,
+  });
 
   if (
     result.deathType === "meeting" ||
@@ -2355,6 +2446,12 @@ export function mountApp(): void {
         if (result.ok) {
           hideAuthDegradedBanner();
           const profile = result.profile;
+          if (profile.best_score > 0 || getReapplyCount() > 0) {
+            trackEvent("return_session", {
+              best_score: profile.best_score,
+              reapply: getReapplyCount(),
+            });
+          }
           highScore = profile.best_score;
           bestRank = rankFromCareerHigh(highScore);
           engine?.setCareerBestYears(highScore);
@@ -2364,6 +2461,7 @@ export function mountApp(): void {
             username = profile.username ?? profile.first_name ?? username;
             ($("usernameInput") as HTMLInputElement).value = username;
           }
+          void flushPersistedSubmits(initData);
         } else {
           showAuthDegradedBanner(result.reason);
         }
