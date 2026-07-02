@@ -1,5 +1,6 @@
 import time
 import uuid
+import pytest
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -862,3 +863,67 @@ def test_leaderboard_uses_rpc_path(mock_supabase, valid_init_data):
 def test_runs_missing_fields_returns_422(mock_supabase):
     response = client.post("/runs", json={"initData": "not-valid"})
     assert response.status_code == 422
+
+def test_atomic_submit_run_missing_rpc_raises_rpc_unavailable(monkeypatch):
+    from uuid import uuid4
+
+    from app.routes import _submit_atomic
+    from app.routes._submit_atomic import RpcUnavailableError
+
+    class MissingRpc:
+        def execute(self):
+            raise RuntimeError("function submit_run_atomic not found")
+
+    class MissingDb:
+        def rpc(self, *_args, **_kwargs):
+            return MissingRpc()
+
+    monkeypatch.setattr(_submit_atomic, "get_supabase", lambda: MissingDb())
+
+    with pytest.raises(RpcUnavailableError):
+        _submit_atomic.atomic_submit_run(
+            telegram_id=123,
+            username="tester",
+            first_name="Test",
+            client_run_id=uuid4(),
+            years_survived=3.0,
+            final_rank="Intern",
+            termination_cause=None,
+            rungs_climbed=12,
+        )
+
+
+def test_atomic_submit_run_generic_rpc_failure_returns_503(monkeypatch):
+    from uuid import uuid4
+
+    from fastapi import HTTPException
+
+    from app.routes import _submit_atomic
+    from app.routes._submit_atomic import RpcUnavailableError
+
+    class FailingRpc:
+        def execute(self):
+            raise RuntimeError("connection timeout")
+
+    class FailingDb:
+        def rpc(self, *_args, **_kwargs):
+            return FailingRpc()
+
+    monkeypatch.setattr(_submit_atomic, "get_supabase", lambda: FailingDb())
+
+    with pytest.raises(HTTPException) as exc_info:
+        _submit_atomic.atomic_submit_run(
+            telegram_id=123,
+            username="tester",
+            first_name="Test",
+            client_run_id=uuid4(),
+            years_survived=3.0,
+            final_rank="Intern",
+            termination_cause=None,
+            rungs_climbed=12,
+        )
+
+    assert not isinstance(exc_info.value, RpcUnavailableError)
+    assert exc_info.value.status_code == 503
+    assert exc_info.value.detail == "Submit temporarily unavailable"
+
